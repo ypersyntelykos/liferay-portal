@@ -2,6 +2,7 @@ package ${packagePath}.service;
 
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
 import com.liferay.portal.kernel.bean.PortletBeanLocatorUtil;
+import com.liferay.portal.kernel.security.annotation.AccessControl;
 import com.liferay.portal.kernel.util.ReferenceRegistry;
 import com.liferay.portal.service.Invokable${sessionTypeName}Service;
 
@@ -34,6 +35,11 @@ import com.liferay.portal.service.Invokable${sessionTypeName}Service;
  * @generated
  */
 </#if>
+@AccessControl(service = true
+<#if pluginName != "">
+, servletContextName = ${pluginName}
+</#if>
+)
 public class ${entity.name}${sessionTypeName}ServiceUtil {
 
 	/*

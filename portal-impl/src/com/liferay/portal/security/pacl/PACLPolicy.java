@@ -45,6 +45,9 @@ public interface PACLPolicy {
 
 	public Set<String> getPropertySet(String key);
 
+	public Map<String, Set<String>> getServiceWhiteList(
+		String servletContextName);
+
 	public String getServletContextName();
 
 	public boolean hasJNDI(String name);

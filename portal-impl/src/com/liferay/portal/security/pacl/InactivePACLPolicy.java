@@ -46,6 +46,12 @@ public class InactivePACLPolicy extends BasePACLPolicy {
 		return Collections.emptyMap();
 	}
 
+	public Map<String, Set<String>> getServiceWhiteList(
+		String servletContextName) {
+
+		return Collections.emptyMap();
+	}
+
 	public boolean hasJNDI(String name) {
 		return true;
 	}

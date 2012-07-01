@@ -6,6 +6,7 @@ import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
 import com.liferay.portal.kernel.bean.PortletBeanLocatorUtil;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.security.annotation.AccessControl;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ReferenceRegistry;
 import com.liferay.portal.service.ServiceContext;
@@ -25,6 +26,11 @@ import java.util.List;
  * @see ${entity.name}PersistenceImpl
  * @generated
  */
+@AccessControl(persistence = true
+<#if pluginName != "">
+, servletContextName = ${pluginName}
+</#if>
+)
 public class ${entity.name}Util {
 
 	/*

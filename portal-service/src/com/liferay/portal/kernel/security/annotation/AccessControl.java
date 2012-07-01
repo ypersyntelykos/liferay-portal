@@ -32,4 +32,10 @@ public @interface AccessControl {
 
 	boolean checkSetter() default true;
 
+	boolean persistence() default false;
+
+	boolean service() default false;
+
+	String servletContextName() default "";
+
 }

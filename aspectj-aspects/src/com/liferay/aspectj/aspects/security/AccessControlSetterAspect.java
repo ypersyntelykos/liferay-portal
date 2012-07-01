@@ -36,7 +36,9 @@ public class AccessControlSetterAspect extends BaseAccessControlAspect {
 	public AcceptStatus acceptClass(
 		PACLPolicy paclPolicy, Class<?> clazz, AccessControl accessControl) {
 
-		if (!accessControl.checkGetter()) {
+		if (!accessControl.checkGetter() || accessControl.persistence() ||
+			accessControl.service()) {
+
 			return AcceptStatus.FULL_ACCESS;
 		}
 

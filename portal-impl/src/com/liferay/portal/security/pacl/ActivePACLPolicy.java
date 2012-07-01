@@ -18,6 +18,9 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.pacl.permission.PortalServicePermission;
 import com.liferay.portal.kernel.util.CharPool;
+import com.liferay.portal.kernel.util.SetUtil;
+import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.security.pacl.checker.Checker;
 import com.liferay.portal.security.pacl.checker.JNDIChecker;
 import com.liferay.portal.security.pacl.checker.PortalServiceChecker;
@@ -36,6 +39,7 @@ import java.util.Set;
 
 /**
  * @author Brian Wing Shun Chan
+ * @author Shuyang Zhou
  */
 public class ActivePACLPolicy extends BasePACLPolicy {
 
@@ -50,6 +54,7 @@ public class ActivePACLPolicy extends BasePACLPolicy {
 			initPortalBeanPropertyWhiteList();
 			initPortalServiceChecker();
 			initSQLChecker();
+			initServices();
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -68,6 +73,16 @@ public class ActivePACLPolicy extends BasePACLPolicy {
 
 	public Map<String, Set<String>> getPortalBeanPropertySetterWhiteList() {
 		return _portalBeanPropertySetterWhiteList;
+	}
+
+	public Map<String, Set<String>> getServiceWhiteList(
+		String servletContextName) {
+
+		if (Validator.isNull(servletContextName)) {
+			return _portalServiceWhiteList;
+		}
+
+		return _pluginServiceWhiteList.get(servletContextName);
 	}
 
 	public boolean hasJNDI(String name) {
@@ -98,13 +113,13 @@ public class ActivePACLPolicy extends BasePACLPolicy {
 		Set<String> beanPropertyGetterSet = getPropertySet(
 			"security-manager-get-bean-property");
 
-		_portalBeanPropertyGetterWhiteList = parsePortalBeanPropertyWhiteList(
+		_portalBeanPropertyGetterWhiteList = parsePropertyWhiteList(
 			beanPropertyGetterSet);
 
 		Set<String> beanPropertySetterSet = getPropertySet(
 			"security-manager-set-bean-property");
 
-		_portalBeanPropertySetterWhiteList = parsePortalBeanPropertyWhiteList(
+		_portalBeanPropertySetterWhiteList = parsePropertyWhiteList(
 			beanPropertySetterSet);
 	}
 
@@ -119,60 +134,100 @@ public class ActivePACLPolicy extends BasePACLPolicy {
 		}
 	}
 
+	protected void initServices() {
+		_pluginServiceWhiteList =
+			new HashMap<String, Map<String, Set<String>>>();
+
+		Properties properties = getProperties();
+
+		for (Map.Entry<Object, Object> entry : properties.entrySet()) {
+			String key = (String)entry.getKey();
+			String value = (String)entry.getValue();
+
+			if (!key.startsWith("security-manager-services[")) {
+				continue;
+			}
+
+			int x = key.indexOf("[");
+			int y = key.indexOf("]", x);
+
+			String servicesServletContextName = key.substring(x + 1, y);
+
+			Set<String> services = SetUtil.fromArray(StringUtil.split(value));
+
+			Map<String, Set<String>> serviceWhiteList = parsePropertyWhiteList(
+				services);
+
+			if (servicesServletContextName.equals(
+				_PORTAL_SERVLET_CONTEXT_NAME)) {
+
+				_portalServiceWhiteList = serviceWhiteList;
+			}
+			else {
+				_pluginServiceWhiteList.put(
+					servicesServletContextName, serviceWhiteList);
+			}
+		}
+
+		Set<String> portalServiceSet = getPropertySet(
+			"security-manager-services[portal]");
+
+	}
+
 	protected void initSQLChecker() {
 		_sqlChecker = new SQLChecker();
 
 		initChecker(_sqlChecker);
 	}
 
-	protected Map<String, Set<String>> parsePortalBeanPropertyWhiteList(
-		Set<String> beanPropertySet) {
+	protected Map<String, Set<String>> parsePropertyWhiteList(
+		Set<String> propertySet) {
 
-		Map<String, Set<String>> beanPropertyWhiteList =
-			new HashMap<String, Set<String>>();
+		Map<String, Set<String>> whiteList = new HashMap<String, Set<String>>();
 
-		for (String beanProperty : beanPropertySet) {
-			String className = beanProperty;
+		for (String property : propertySet) {
+			String className = property;
 
-			int index = beanProperty.indexOf(CharPool.POUND);
+			int index = property.indexOf(CharPool.POUND);
 
 			if (index == -1) {
-				Set<String> methodNameSet = beanPropertyWhiteList.get(
-					className);
+				Set<String> methodNameSet = whiteList.get(className);
 
 				if (methodNameSet == null) {
-					beanPropertyWhiteList.put(
-						className, Collections.<String>emptySet());
+					whiteList.put(className, Collections.<String>emptySet());
 				}
 			}
 			else {
 				String methodName = className.substring(index + 1);
 				className = className.substring(0, index);
 
-				Set<String> methodNameSet = beanPropertyWhiteList.get(
-					className);
+				Set<String> methodNameSet = whiteList.get(className);
 
 				if ((methodNameSet == null) ||
 					(methodNameSet == Collections.<String>emptySet())) {
 
 					methodNameSet = new HashSet<String>();
 
-					beanPropertyWhiteList.put(className, methodNameSet);
+					whiteList.put(className, methodNameSet);
 				}
 
 				methodNameSet.add(methodName);
 			}
 		}
 
-		return beanPropertyWhiteList;
+		return whiteList;
 	}
+
+	private static final String _PORTAL_SERVLET_CONTEXT_NAME = "portal";
 
 	private static Log _log = LogFactoryUtil.getLog(ActivePACLPolicy.class);
 
 	private JNDIChecker _jndiChecker;
+	private Map<String, Map<String, Set<String>>> _pluginServiceWhiteList;
 	private Map<String, Set<String>> _portalBeanPropertyGetterWhiteList;
 	private Map<String, Set<String>> _portalBeanPropertySetterWhiteList;
 	private PortalServiceChecker _portalServiceChecker;
+	private Map<String, Set<String>> _portalServiceWhiteList;
 	private SQLChecker _sqlChecker;
 
 }
