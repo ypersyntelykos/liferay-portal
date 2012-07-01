@@ -15,12 +15,21 @@
 package com.liferay.portal.security.pacl;
 
 import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
+import com.liferay.portal.kernel.util.WeakValueConcurrentHashMap;
 import com.liferay.portal.security.lang.PortalSecurityManagerThreadLocal;
+
+import java.util.Map;
 
 /**
  * @author Raymond Augé
  */
 public class PACLClassLoaderUtil {
+
+	public static void addClassLoaderMapping(
+		ClassLoader webappClassLoader, ClassLoader weavingClassLoader) {
+
+		_classLoaderMap.put(webappClassLoader, weavingClassLoader);
+	}
 
 	public static ClassLoader getClassLoader(Class<?> clazz) {
 		boolean checkGetClassLoader =
@@ -76,6 +85,12 @@ public class PACLClassLoaderUtil {
 		try {
 			PortalSecurityManagerThreadLocal.setCheckGetClassLoader(false);
 
+			ClassLoader mappedClassLoader = _classLoaderMap.get(classLoader);
+
+			if (mappedClassLoader != null) {
+				classLoader = mappedClassLoader;
+			}
+
 			Thread thread = Thread.currentThread();
 
 			thread.setContextClassLoader(classLoader);
@@ -85,5 +100,8 @@ public class PACLClassLoaderUtil {
 				checkGetClassLoader);
 		}
 	}
+
+	private static Map<ClassLoader, ClassLoader> _classLoaderMap =
+		new WeakValueConcurrentHashMap<ClassLoader, ClassLoader>();
 
 }

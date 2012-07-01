@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+
+<project name="aspectj-aspects" basedir="." default="compile">
+	<import file="../build-common-java.xml" />
+
+	<taskdef classpath="lib/aspectj-tools.jar"
+		resource="org/aspectj/tools/ant/taskdefs/aspectjTaskdefs.properties"/>
+
+	<property name="deploy.dir" value="${app.server.lib.portal.dir}" />
+	<property name="jar.file" value="${ant.project.name}" />
+	<property name="manifest.bundle.name" value="Liferay AspectJ Aspects" />
+	<property name="manifest.bundle.symbolic.name" value="com.liferay.aspectj.aspects;singleton:=true" />
+
+	<target name="compile">
+		<!--
+			Copy aspectj-rt.jar to local and rename it to aspectjrt.jar
+			iajc interally checks exact name "aspectjrt.jar" on classpath.
+		-->
+		<mkdir dir="templib" />
+
+		<copy file="../lib/portal/aspectj-rt.jar" tofile="templib/aspectjrt.jar" />
+
+		<path id="temp.classpath">
+			<pathelement path="templib/aspectjrt.jar" />
+			<pathelement path="lib/aspectj-tools.jar" />
+			<path refid="project.classpath" />
+		</path>
+
+		<iajc destdir="classes" source="1.5" classpathref="temp.classpath">
+			<sourceroots>
+				<pathelement location="src"/>
+			</sourceroots>
+		</iajc>
+
+		<delete dir="templib" />
+	</target>
+</project>

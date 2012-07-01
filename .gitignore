@@ -30,6 +30,9 @@ _sass_cache_*.css
 /test.*.properties
 /WEB-INF
 
+/aspectj-aspects/aspectj-aspects*.jar
+/aspectj-aspects/classes
+
 /benchmarks/*.csv
 /benchmarks/*.sql
 /benchmarks/lib

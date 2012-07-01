@@ -1,0 +1,5 @@
+aspectj-tools.jar contains an older OSGi code which conflicts
+with equinox.jar.
+
+aspectj-tools.jar can not appear in lib.classpath, otherwise
+will cause build failure.

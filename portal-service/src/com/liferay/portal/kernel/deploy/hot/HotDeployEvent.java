@@ -17,6 +17,7 @@ package com.liferay.portal.kernel.deploy.hot;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.plugin.PluginPackage;
+import com.liferay.portal.kernel.servlet.PluginContextListener;
 import com.liferay.portal.kernel.util.PropertiesUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 
@@ -35,18 +36,15 @@ import javax.servlet.ServletContext;
  */
 public class HotDeployEvent {
 
-	public HotDeployEvent(
-		ServletContext servletContext, ClassLoader contextClassLoader) {
+	public HotDeployEvent(ServletContext servletContext) {
 
-		this(servletContext, contextClassLoader, true);
+		this(servletContext, true);
 	}
 
 	public HotDeployEvent(
-		ServletContext servletContext, ClassLoader contextClassLoader,
-		boolean dependencyManagementEnabled) {
+		ServletContext servletContext, boolean dependencyManagementEnabled) {
 
 		_servletContext = servletContext;
-		_contextClassLoader = contextClassLoader;
 		_dependencyManagementEnabled = dependencyManagementEnabled;
 
 		try {
@@ -58,7 +56,8 @@ public class HotDeployEvent {
 	}
 
 	public ClassLoader getContextClassLoader() {
-		return _contextClassLoader;
+		return (ClassLoader)_servletContext.getAttribute(
+			PluginContextListener.PLUGIN_CLASS_LOADER);
 	}
 
 	public Set<String> getDependentServletContextNames() {
@@ -123,7 +122,6 @@ public class HotDeployEvent {
 
 	private static Log _log = LogFactoryUtil.getLog(HotDeployEvent.class);
 
-	private ClassLoader _contextClassLoader;
 	private boolean _dependencyManagementEnabled = true;
 	private Set<String> _dependentServletContextNames = new HashSet<String>();
 	private PluginPackage _pluginPackage;

@@ -19,6 +19,9 @@ import com.liferay.portal.kernel.deploy.hot.HotDeployUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.BasePortalLifecycle;
+import com.liferay.portal.kernel.util.ServerDetector;
+
+import java.util.concurrent.CountDownLatch;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextAttributeEvent;
@@ -101,6 +104,17 @@ public class PluginContextListener
 			servletContext.getServletContextName(), servletContext);
 
 		registerPortalLifecycle();
+
+		if (ServerDetector.isJBoss()) {
+			try {
+				_initializationLatch.await();
+
+				currentThread.setContextClassLoader(pluginClassLoader);
+			}
+			catch (InterruptedException ie) {
+				throw new RuntimeException(ie);
+			}
+		}
 	}
 
 	@Override
@@ -137,24 +151,31 @@ public class PluginContextListener
 			currentThread.setContextClassLoader(pluginClassLoader);
 		}
 
+		_addedPluginClassLoader = false;
+
 		try {
 			fireDeployEvent();
+
+			pluginClassLoader = (ClassLoader)servletContext.getAttribute(
+				PLUGIN_CLASS_LOADER);
 		}
 		finally {
 			PluginContextLifecycleThreadLocal.setInitializing(false);
 
 			currentThread.setContextClassLoader(contextClassLoader);
+
+			_initializationLatch.countDown();
+
+			_addedPluginClassLoader = true;
 		}
 	}
 
 	protected void fireDeployEvent() {
-		HotDeployUtil.fireDeployEvent(
-			new HotDeployEvent(servletContext, pluginClassLoader));
+		HotDeployUtil.fireDeployEvent(new HotDeployEvent(servletContext));
 	}
 
 	protected void fireUndeployEvent() {
-		HotDeployUtil.fireUndeployEvent(
-			new HotDeployEvent(servletContext, pluginClassLoader));
+		HotDeployUtil.fireUndeployEvent(new HotDeployEvent(servletContext));
 	}
 
 	protected ClassLoader pluginClassLoader;
@@ -164,5 +185,7 @@ public class PluginContextListener
 		PluginContextListener.class);
 
 	private boolean _addedPluginClassLoader;
+
+	private CountDownLatch _initializationLatch = new CountDownLatch(1);
 
 }

@@ -18,7 +18,10 @@ import java.lang.reflect.Method;
 
 import java.security.Permission;
 
+import java.util.Collections;
+import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 /**
  * @author Brian Wing Shun Chan
@@ -33,6 +36,14 @@ public class InactivePACLPolicy extends BasePACLPolicy {
 	}
 
 	public void checkPermission(Permission permission) {
+	}
+
+	public Map<String, Set<String>> getPortalBeanPropertyGetterWhiteList() {
+		return Collections.emptyMap();
+	}
+
+	public Map<String, Set<String>> getPortalBeanPropertySetterWhiteList() {
+		return Collections.emptyMap();
 	}
 
 	public boolean hasJNDI(String name) {

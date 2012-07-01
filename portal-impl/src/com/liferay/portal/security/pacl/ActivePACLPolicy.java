@@ -17,6 +17,7 @@ package com.liferay.portal.security.pacl;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.pacl.permission.PortalServicePermission;
+import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.security.pacl.checker.Checker;
 import com.liferay.portal.security.pacl.checker.JNDIChecker;
 import com.liferay.portal.security.pacl.checker.PortalServiceChecker;
@@ -26,7 +27,12 @@ import java.lang.reflect.Method;
 
 import java.security.Permission;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 /**
  * @author Brian Wing Shun Chan
@@ -41,6 +47,7 @@ public class ActivePACLPolicy extends BasePACLPolicy {
 
 		try {
 			initJNDIChecker();
+			initPortalBeanPropertyWhiteList();
 			initPortalServiceChecker();
 			initSQLChecker();
 		}
@@ -53,6 +60,14 @@ public class ActivePACLPolicy extends BasePACLPolicy {
 		Checker checker = getChecker(permission.getClass());
 
 		checker.checkPermission(permission);
+	}
+
+	public Map<String, Set<String>> getPortalBeanPropertyGetterWhiteList() {
+		return _portalBeanPropertyGetterWhiteList;
+	}
+
+	public Map<String, Set<String>> getPortalBeanPropertySetterWhiteList() {
+		return _portalBeanPropertySetterWhiteList;
 	}
 
 	public boolean hasJNDI(String name) {
@@ -79,6 +94,20 @@ public class ActivePACLPolicy extends BasePACLPolicy {
 		initChecker(_jndiChecker);
 	}
 
+	protected void initPortalBeanPropertyWhiteList() {
+		Set<String> beanPropertyGetterSet = getPropertySet(
+			"security-manager-get-bean-property");
+
+		_portalBeanPropertyGetterWhiteList = parsePortalBeanPropertyWhiteList(
+			beanPropertyGetterSet);
+
+		Set<String> beanPropertySetterSet = getPropertySet(
+			"security-manager-set-bean-property");
+
+		_portalBeanPropertySetterWhiteList = parsePortalBeanPropertyWhiteList(
+			beanPropertySetterSet);
+	}
+
 	protected void initPortalServiceChecker() {
 		_portalServiceChecker = (PortalServiceChecker)getChecker(
 			PortalServicePermission.class);
@@ -96,9 +125,53 @@ public class ActivePACLPolicy extends BasePACLPolicy {
 		initChecker(_sqlChecker);
 	}
 
+	protected Map<String, Set<String>> parsePortalBeanPropertyWhiteList(
+		Set<String> beanPropertySet) {
+
+		Map<String, Set<String>> beanPropertyWhiteList =
+			new HashMap<String, Set<String>>();
+
+		for (String beanProperty : beanPropertySet) {
+			String className = beanProperty;
+
+			int index = beanProperty.indexOf(CharPool.POUND);
+
+			if (index == -1) {
+				Set<String> methodNameSet = beanPropertyWhiteList.get(
+					className);
+
+				if (methodNameSet == null) {
+					beanPropertyWhiteList.put(
+						className, Collections.<String>emptySet());
+				}
+			}
+			else {
+				String methodName = className.substring(index + 1);
+				className = className.substring(0, index);
+
+				Set<String> methodNameSet = beanPropertyWhiteList.get(
+					className);
+
+				if ((methodNameSet == null) ||
+					(methodNameSet == Collections.<String>emptySet())) {
+
+					methodNameSet = new HashSet<String>();
+
+					beanPropertyWhiteList.put(className, methodNameSet);
+				}
+
+				methodNameSet.add(methodName);
+			}
+		}
+
+		return beanPropertyWhiteList;
+	}
+
 	private static Log _log = LogFactoryUtil.getLog(ActivePACLPolicy.class);
 
 	private JNDIChecker _jndiChecker;
+	private Map<String, Set<String>> _portalBeanPropertyGetterWhiteList;
+	private Map<String, Set<String>> _portalBeanPropertySetterWhiteList;
 	private PortalServiceChecker _portalServiceChecker;
 	private SQLChecker _sqlChecker;
 

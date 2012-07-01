@@ -19,6 +19,7 @@ import com.liferay.portal.kernel.cache.key.CacheKeyGeneratorUtil;
 import com.liferay.portal.kernel.concurrent.ConcurrentLFUCache;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.servlet.PluginContextListener;
 import com.liferay.portal.kernel.util.BasePortalLifecycle;
 import com.liferay.portal.kernel.util.ContextPathUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -61,14 +62,26 @@ public class InvokerFilter extends BasePortalLifecycle implements Filter {
 
 		request.setAttribute(WebKeys.INVOKER_FILTER_URI, uri);
 
+		Thread currentThread = Thread.currentThread();
+
+		ClassLoader contextClassLoader = currentThread.getContextClassLoader();
+
+		ServletContext servletContext = _filterConfig.getServletContext();
+
+		ClassLoader pluginClassLoader =
+			(ClassLoader)servletContext.getAttribute(
+				PluginContextListener.PLUGIN_CLASS_LOADER);
+
+		if (pluginClassLoader == null) {
+			pluginClassLoader = contextClassLoader;
+		}
+		else if (pluginClassLoader != contextClassLoader) {
+			currentThread.setContextClassLoader(pluginClassLoader);
+		}
+
 		try {
 			InvokerFilterChain invokerFilterChain = getInvokerFilterChain(
 				request, uri, filterChain);
-
-			Thread currentThread = Thread.currentThread();
-
-			ClassLoader contextClassLoader =
-				currentThread.getContextClassLoader();
 
 			invokerFilterChain.setContextClassLoader(contextClassLoader);
 
@@ -76,6 +89,10 @@ public class InvokerFilter extends BasePortalLifecycle implements Filter {
 		}
 		finally {
 			request.removeAttribute(WebKeys.INVOKER_FILTER_URI);
+
+			if (pluginClassLoader != contextClassLoader) {
+				currentThread.setContextClassLoader(contextClassLoader);
+			}
 		}
 	}
 
