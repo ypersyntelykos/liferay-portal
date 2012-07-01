@@ -14,13 +14,14 @@
 
 package com.liferay.portlet.journalcontent.util;
 
-import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+import com.liferay.portal.kernel.security.annotation.AccessControl;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portlet.journal.model.JournalArticleDisplay;
 
 /**
  * @author Raymond Augé
  */
+@AccessControl
 public class JournalContentUtil {
 
 	public static void clearCache() {
@@ -134,14 +135,10 @@ public class JournalContentUtil {
 	}
 
 	public static JournalContent getJournalContent() {
-		PortalRuntimePermission.checkGetBeanProperty(JournalContentUtil.class);
-
 		return _journalContent;
 	}
 
 	public void setJournalContent(JournalContent journalContent) {
-		PortalRuntimePermission.checkSetBeanProperty(getClass());
-
 		_journalContent = journalContent;
 	}
 

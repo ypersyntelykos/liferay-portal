@@ -18,7 +18,7 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.FileVersion;
-import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+import com.liferay.portal.kernel.security.annotation.AccessControl;
 
 /**
  * Document library processor responsible for the generation of raw metadata
@@ -35,6 +35,7 @@ import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermissio
  * @author Mika Koivisto
  * @author Miguel Pastor
  */
+@AccessControl
 public class RawMetadataProcessorUtil {
 
 	public static void cleanUp(FileEntry fileEntry) {
@@ -60,9 +61,6 @@ public class RawMetadataProcessorUtil {
 	}
 
 	public static RawMetadataProcessor getRawMetadataProcessor() {
-		PortalRuntimePermission.checkGetBeanProperty(
-			RawMetadataProcessorUtil.class);
-
 		return _rawMetadataProcessor;
 	}
 
@@ -109,8 +107,6 @@ public class RawMetadataProcessorUtil {
 
 	public void setRawMetadataProcessor(
 		RawMetadataProcessor rawMetadataProcessor) {
-
-		PortalRuntimePermission.checkSetBeanProperty(getClass());
 
 		_rawMetadataProcessor = rawMetadataProcessor;
 	}

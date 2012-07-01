@@ -14,7 +14,7 @@
 
 package com.liferay.portal.kernel.search;
 
-import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+import com.liferay.portal.kernel.security.annotation.AccessControl;
 
 import java.util.List;
 
@@ -22,6 +22,7 @@ import java.util.List;
  * @author Brian Wing Shun Chan
  * @author Raymond Augé
  */
+@AccessControl
 public class SortFactoryUtil {
 
 	public static Sort create(String fieldName, boolean reverse) {
@@ -43,8 +44,6 @@ public class SortFactoryUtil {
 	}
 
 	public static SortFactory getSortFactory() {
-		PortalRuntimePermission.checkGetBeanProperty(SortFactoryUtil.class);
-
 		return _sortFactory;
 	}
 
@@ -53,8 +52,6 @@ public class SortFactoryUtil {
 	}
 
 	public void setSortFactory(SortFactory sortFactory) {
-		PortalRuntimePermission.checkSetBeanProperty(getClass());
-
 		_sortFactory = sortFactory;
 	}
 

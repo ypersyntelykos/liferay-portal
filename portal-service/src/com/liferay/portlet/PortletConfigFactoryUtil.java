@@ -14,7 +14,7 @@
 
 package com.liferay.portlet;
 
-import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+import com.liferay.portal.kernel.security.annotation.AccessControl;
 import com.liferay.portal.model.Portlet;
 
 import javax.portlet.PortletConfig;
@@ -24,6 +24,7 @@ import javax.servlet.ServletContext;
 /**
  * @author Brian Wing Shun Chan
  */
+@AccessControl
 public class PortletConfigFactoryUtil {
 
 	public static PortletConfig create(
@@ -37,9 +38,6 @@ public class PortletConfigFactoryUtil {
 	}
 
 	public static PortletConfigFactory getPortletConfigFactory() {
-		PortalRuntimePermission.checkGetBeanProperty(
-			PortletConfigFactoryUtil.class);
-
 		return _portletConfigFactory;
 	}
 
@@ -49,8 +47,6 @@ public class PortletConfigFactoryUtil {
 
 	public void setPortletConfigFactory(
 		PortletConfigFactory portletConfigFactory) {
-
-		PortalRuntimePermission.checkSetBeanProperty(getClass());
 
 		_portletConfigFactory = portletConfigFactory;
 	}

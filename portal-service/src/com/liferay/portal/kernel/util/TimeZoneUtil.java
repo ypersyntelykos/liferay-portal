@@ -14,7 +14,7 @@
 
 package com.liferay.portal.kernel.util;
 
-import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+import com.liferay.portal.kernel.security.annotation.AccessControl;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -22,26 +22,20 @@ import java.util.TimeZone;
 
 /**
  * @author Brian Wing Shun Chan
- * @author Raymond Augé
  */
+@AccessControl
 public class TimeZoneUtil {
 
 	public static TimeZone getDefault() {
-		return getInstance()._getDefault();
-	}
-
-	public static TimeZoneUtil getInstance() {
-		PortalRuntimePermission.checkGetBeanProperty(TimeZoneUtil.class);
-
-		return _instance;
+		return _instance._getDefault();
 	}
 
 	public static TimeZone getTimeZone(String timeZoneId) {
-		return getInstance()._getTimeZone(timeZoneId);
+		return _instance._getTimeZone(timeZoneId);
 	}
 
 	public static void setDefault(String timeZoneId) {
-		getInstance()._setDefault(timeZoneId);
+		_instance._setDefault(timeZoneId);
 	}
 
 	private TimeZoneUtil() {
@@ -71,8 +65,6 @@ public class TimeZoneUtil {
 	}
 
 	private void _setDefault(String timeZoneId) {
-		PortalRuntimePermission.checkSetBeanProperty(getClass());
-
 		if (Validator.isNotNull(timeZoneId)) {
 			_timeZone = TimeZone.getTimeZone(timeZoneId);
 		}

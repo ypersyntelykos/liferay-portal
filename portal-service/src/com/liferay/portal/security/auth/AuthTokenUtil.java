@@ -15,13 +15,14 @@
 package com.liferay.portal.security.auth;
 
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+import com.liferay.portal.kernel.security.annotation.AccessControl;
 
 import javax.servlet.http.HttpServletRequest;
 
 /**
  * @author Amos Fong
  */
+@AccessControl
 public class AuthTokenUtil {
 
 	public static void check(HttpServletRequest request)
@@ -31,8 +32,6 @@ public class AuthTokenUtil {
 	}
 
 	public static AuthToken getAuthToken() {
-		PortalRuntimePermission.checkGetBeanProperty(AuthTokenUtil.class);
-
 		return _authToken;
 	}
 
@@ -47,8 +46,6 @@ public class AuthTokenUtil {
 	}
 
 	public void setAuthToken(AuthToken authToken) {
-		PortalRuntimePermission.checkSetBeanProperty(getClass());
-
 		_authToken = authToken;
 	}
 

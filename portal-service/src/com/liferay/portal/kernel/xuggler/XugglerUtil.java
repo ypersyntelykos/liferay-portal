@@ -14,17 +14,16 @@
 
 package com.liferay.portal.kernel.xuggler;
 
-import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+import com.liferay.portal.kernel.security.annotation.AccessControl;
 import com.liferay.portal.kernel.util.ProgressTracker;
 
 /**
  * @author Alexander Chow
  */
+@AccessControl
 public class XugglerUtil {
 
 	public static Xuggler getXuggler() {
-		PortalRuntimePermission.checkGetBeanProperty(XugglerUtil.class);
-
 		return _xuggler;
 	}
 
@@ -48,8 +47,6 @@ public class XugglerUtil {
 	}
 
 	public void setXuggler(Xuggler xuggler) {
-		PortalRuntimePermission.checkSetBeanProperty(getClass());
-
 		_xuggler = xuggler;
 	}
 

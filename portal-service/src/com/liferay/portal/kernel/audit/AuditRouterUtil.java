@@ -14,27 +14,23 @@
 
 package com.liferay.portal.kernel.audit;
 
-import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+import com.liferay.portal.kernel.security.annotation.AccessControl;
 
 /**
  * @author Michael C. Han
- * @author Raymond Augé
  */
+@AccessControl
 public class AuditRouterUtil {
 
 	public static AuditRouter getAuditRouter() {
-		PortalRuntimePermission.checkGetBeanProperty(AuditRouterUtil.class);
-
 		return _auditRouter;
 	}
 
 	public static void route(AuditMessage auditMessage) throws AuditException {
-		getAuditRouter().route(auditMessage);
+		_auditRouter.route(auditMessage);
 	}
 
 	public void setAuditRouter(AuditRouter auditRouter) {
-		PortalRuntimePermission.checkSetBeanProperty(getClass());
-
 		_auditRouter = auditRouter;
 	}
 

@@ -14,13 +14,14 @@
 
 package com.liferay.portal.service.permission;
 
-import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+import com.liferay.portal.kernel.security.annotation.AccessControl;
 import com.liferay.portal.security.auth.PrincipalException;
 import com.liferay.portal.security.permission.PermissionChecker;
 
 /**
  * @author Brian Wing Shun Chan
  */
+@AccessControl
 public class UserGroupPermissionUtil {
 
 	public static void check(
@@ -41,16 +42,11 @@ public class UserGroupPermissionUtil {
 	}
 
 	public static UserGroupPermission getUserGroupPermission() {
-		PortalRuntimePermission.checkGetBeanProperty(
-			UserGroupPermissionUtil.class);
-
 		return _userGroupPermission;
 	}
 
 	public void setUserGroupPermission(
 		UserGroupPermission userGroupPermission) {
-
-		PortalRuntimePermission.checkSetBeanProperty(getClass());
 
 		_userGroupPermission = userGroupPermission;
 	}

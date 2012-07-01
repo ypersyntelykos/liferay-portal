@@ -14,7 +14,7 @@
 
 package com.liferay.portal.kernel.mobile.device;
 
-import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+import com.liferay.portal.kernel.security.annotation.AccessControl;
 
 import java.util.Map;
 import java.util.Set;
@@ -23,30 +23,24 @@ import javax.servlet.http.HttpServletRequest;
 
 /**
  * @author Milen Dyankov
- * @author Raymond Augé
  */
+@AccessControl
 public class DeviceDetectionUtil {
 
 	public static Device detectDevice(HttpServletRequest request) {
-		return getDeviceRecognitionProvider().detectDevice(request);
-	}
-
-	public static DeviceRecognitionProvider getDeviceRecognitionProvider() {
-		PortalRuntimePermission.checkGetBeanProperty(DeviceDetectionUtil.class);
-
-		return _deviceRecognitionProvider;
+		return _deviceRecognitionProvider.detectDevice(request);
 	}
 
 	public static Set<VersionableName> getKnownBrands() {
 		KnownDevices knownDevices =
-			getDeviceRecognitionProvider().getKnownDevices();
+			_deviceRecognitionProvider.getKnownDevices();
 
 		return knownDevices.getBrands();
 	}
 
 	public static Set<VersionableName> getKnownBrowsers() {
 		KnownDevices knownDevices =
-			getDeviceRecognitionProvider().getKnownDevices();
+			_deviceRecognitionProvider.getKnownDevices();
 
 		return knownDevices.getBrowsers();
 	}
@@ -55,7 +49,7 @@ public class DeviceDetectionUtil {
 		Capability capability) {
 
 		KnownDevices knownDevices =
-			getDeviceRecognitionProvider().getKnownDevices();
+			_deviceRecognitionProvider.getKnownDevices();
 
 		Map<Capability, Set<String>> deviceIds = knownDevices.getDeviceIds();
 
@@ -64,22 +58,20 @@ public class DeviceDetectionUtil {
 
 	public static Set<VersionableName> getKnownOperatingSystems() {
 		KnownDevices knownDevices =
-			getDeviceRecognitionProvider().getKnownDevices();
+			_deviceRecognitionProvider.getKnownDevices();
 
 		return knownDevices.getOperatingSystems();
 	}
 
 	public static Set<String> getKnownPointingMethods() {
 		KnownDevices knownDevices =
-			getDeviceRecognitionProvider().getKnownDevices();
+			_deviceRecognitionProvider.getKnownDevices();
 
 		return knownDevices.getPointingMethods();
 	}
 
 	public void setDeviceRecognitionProvider(
 		DeviceRecognitionProvider deviceRecognitionProvider) {
-
-		PortalRuntimePermission.checkSetBeanProperty(getClass());
 
 		_deviceRecognitionProvider = deviceRecognitionProvider;
 	}

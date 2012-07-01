@@ -14,13 +14,14 @@
 
 package com.liferay.portal.kernel.dao.orm;
 
-import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+import com.liferay.portal.kernel.security.annotation.AccessControl;
 
 import java.io.Serializable;
 
 /**
  * @author Brian Wing Shun Chan
  */
+@AccessControl
 public class EntityCacheUtil {
 
 	public static void clearCache() {
@@ -36,8 +37,6 @@ public class EntityCacheUtil {
 	}
 
 	public static EntityCache getEntityCache() {
-		PortalRuntimePermission.checkGetBeanProperty(EntityCacheUtil.class);
-
 		return _entityCache;
 	}
 
@@ -79,8 +78,6 @@ public class EntityCacheUtil {
 	}
 
 	public void setEntityCache(EntityCache entityCache) {
-		PortalRuntimePermission.checkSetBeanProperty(getClass());
-
 		_entityCache = entityCache;
 	}
 

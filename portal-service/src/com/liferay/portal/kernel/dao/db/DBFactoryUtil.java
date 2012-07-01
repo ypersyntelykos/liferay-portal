@@ -14,11 +14,12 @@
 
 package com.liferay.portal.kernel.dao.db;
 
-import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+import com.liferay.portal.kernel.security.annotation.AccessControl;
 
 /**
  * @author Brian Wing Shun Chan
  */
+@AccessControl
 public class DBFactoryUtil {
 
 	public static DB getDB() {
@@ -34,8 +35,6 @@ public class DBFactoryUtil {
 	}
 
 	public static DBFactory getDBFactory() {
-		PortalRuntimePermission.checkGetBeanProperty(DBFactoryUtil.class);
-
 		return _dbFactory;
 	}
 
@@ -48,8 +47,6 @@ public class DBFactoryUtil {
 	}
 
 	public static void setDBFactory(DBFactory dbFactory) {
-		PortalRuntimePermission.checkSetBeanProperty(DBFactoryUtil.class);
-
 		_dbFactory = dbFactory;
 	}
 

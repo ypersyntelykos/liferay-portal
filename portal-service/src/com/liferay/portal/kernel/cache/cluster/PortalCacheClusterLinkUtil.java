@@ -16,17 +16,15 @@ package com.liferay.portal.kernel.cache.cluster;
 
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+import com.liferay.portal.kernel.security.annotation.AccessControl;
 
 /**
  * @author Shuyang Zhou
  */
+@AccessControl
 public class PortalCacheClusterLinkUtil {
 
 	public static PortalCacheClusterLink getPortalCacheClusterLink() {
-		PortalRuntimePermission.checkGetBeanProperty(
-			PortalCacheClusterLinkUtil.class);
-
 		if (_portalCacheClusterLink == null) {
 			if (_log.isWarnEnabled()) {
 				_log.warn(
@@ -40,33 +38,35 @@ public class PortalCacheClusterLinkUtil {
 	}
 
 	public static long getSubmittedEventNumber() {
-		PortalCacheClusterLink portalCacheClusterLink =
-			getPortalCacheClusterLink();
+		if (_portalCacheClusterLink == null) {
+			if (_log.isWarnEnabled()) {
+				_log.warn(
+					"PortalCacheClusterLinkUtil has not been initialized.");
+			}
 
-		if (portalCacheClusterLink == null) {
 			return -1;
 		}
 
-		return portalCacheClusterLink.getSubmittedEventNumber();
+		return _portalCacheClusterLink.getSubmittedEventNumber();
 	}
 
 	public static void sendEvent(
 		PortalCacheClusterEvent portalCacheClusterEvent) {
 
-		PortalCacheClusterLink portalCacheClusterLink =
-			getPortalCacheClusterLink();
+		if (_portalCacheClusterLink == null) {
+			if (_log.isWarnEnabled()) {
+				_log.warn(
+					"PortalCacheClusterLinkUtil has not been initialized.");
+			}
 
-		if (portalCacheClusterLink == null) {
 			return;
 		}
 
-		portalCacheClusterLink.sendEvent(portalCacheClusterEvent);
+		_portalCacheClusterLink.sendEvent(portalCacheClusterEvent);
 	}
 
 	public void setPortalCacheClusterLink(
 		PortalCacheClusterLink portalCacheClusterLink) {
-
-		PortalRuntimePermission.checkSetBeanProperty(getClass());
 
 		_portalCacheClusterLink = portalCacheClusterLink;
 	}

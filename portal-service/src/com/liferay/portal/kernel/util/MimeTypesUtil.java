@@ -14,7 +14,7 @@
 
 package com.liferay.portal.kernel.util;
 
-import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+import com.liferay.portal.kernel.security.annotation.AccessControl;
 
 import java.io.File;
 import java.io.InputStream;
@@ -26,6 +26,7 @@ import java.util.Set;
  * @author Brian Wing Shun Chan
  * @author Alexander Chow
  */
+@AccessControl
 public class MimeTypesUtil {
 
 	public static String getContentType(File file) {
@@ -76,14 +77,10 @@ public class MimeTypesUtil {
 	}
 
 	public static MimeTypes getMimeTypes() {
-		PortalRuntimePermission.checkGetBeanProperty(MimeTypesUtil.class);
-
 		return _mimeTypes;
 	}
 
 	public void setMimeTypes(MimeTypes mimeTypes) {
-		PortalRuntimePermission.checkSetBeanProperty(getClass());
-
 		_mimeTypes = mimeTypes;
 	}
 

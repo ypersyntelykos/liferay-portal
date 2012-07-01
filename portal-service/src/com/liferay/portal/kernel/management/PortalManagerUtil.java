@@ -19,7 +19,7 @@ import com.liferay.portal.kernel.cluster.ClusterNodeResponses;
 import com.liferay.portal.kernel.cluster.FutureClusterResponses;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+import com.liferay.portal.kernel.security.annotation.AccessControl;
 import com.liferay.portal.kernel.util.MethodHandler;
 import com.liferay.portal.model.ClusterGroup;
 import com.liferay.portal.service.ClusterGroupLocalServiceUtil;
@@ -28,20 +28,14 @@ import java.lang.reflect.Method;
 
 /**
  * @author Shuyang Zhou
- * @author Raymond Augé
  */
+@AccessControl
 public class PortalManagerUtil {
 
 	public static MethodHandler createManageActionMethodHandler(
 		ManageAction<?> manageAction) {
 
 		return new MethodHandler(_manageMethod, manageAction);
-	}
-
-	public static PortalManager getPortalManager() {
-		PortalRuntimePermission.checkGetBeanProperty(PortalManagerUtil.class);
-
-		return _portalManager;
 	}
 
 	public static FutureClusterResponses manage(
@@ -51,13 +45,13 @@ public class PortalManagerUtil {
 		ManageAction<FutureClusterResponses> manageActionWrapper =
 			new ClusterManageActionWrapper(clusterGroup, manageAction);
 
-		return getPortalManager().manage(manageActionWrapper);
+		return _portalManager.manage(manageActionWrapper);
 	}
 
 	public static <T> T manage(ManageAction<T> manageAction)
 		throws ManageActionException {
 
-		return getPortalManager().manage(manageAction);
+		return _portalManager.manage(manageAction);
 	}
 
 	public static void manageAsync(
@@ -92,8 +86,6 @@ public class PortalManagerUtil {
 	}
 
 	public void setPortalManager(PortalManager portalManager) {
-		PortalRuntimePermission.checkSetBeanProperty(getClass());
-
 		_portalManager = portalManager;
 	}
 

@@ -14,7 +14,7 @@
 
 package com.liferay.portal.kernel.deploy.sandbox;
 
-import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+import com.liferay.portal.kernel.security.annotation.AccessControl;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -22,26 +22,20 @@ import java.util.Map;
 /**
  * @author Igor Spasic
  * @author Brian Wing Shun Chan
- * @author Raymond Augé
  */
+@AccessControl
 public class SandboxDeployUtil {
 
 	public static SandboxDeployDir getDir(String name) {
-		return getInstance()._getDir(name);
-	}
-
-	public static SandboxDeployUtil getInstance() {
-		PortalRuntimePermission.checkGetBeanProperty(SandboxDeployUtil.class);
-
-		return _instance;
+		return _instance._getDir(name);
 	}
 
 	public static void registerDir(SandboxDeployDir sandboxDeployDir) {
-		getInstance()._registerDir(sandboxDeployDir);
+		_instance._registerDir(sandboxDeployDir);
 	}
 
 	public static void unregisterDir(String name) {
-		getInstance()._unregisterDir(name);
+		_instance._unregisterDir(name);
 	}
 
 	private SandboxDeployUtil() {

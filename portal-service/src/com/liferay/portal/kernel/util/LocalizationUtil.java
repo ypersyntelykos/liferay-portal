@@ -16,7 +16,7 @@ package com.liferay.portal.kernel.util;
 
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.language.LanguageUtil;
-import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+import com.liferay.portal.kernel.security.annotation.AccessControl;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -35,6 +35,7 @@ import javax.portlet.PortletRequest;
  * @author Brian Wing Shun Chan
  * @see    Localization
  */
+@AccessControl
 public class LocalizationUtil {
 
 	public static Object deserialize(JSONObject jsonObject) {
@@ -50,8 +51,6 @@ public class LocalizationUtil {
 	}
 
 	public static Localization getLocalization() {
-		PortalRuntimePermission.checkGetBeanProperty(LocalizationUtil.class);
-
 		return _localization;
 	}
 
@@ -261,8 +260,6 @@ public class LocalizationUtil {
 	}
 
 	public void setLocalization(Localization localization) {
-		PortalRuntimePermission.checkSetBeanProperty(getClass());
-
 		_localization = localization;
 	}
 

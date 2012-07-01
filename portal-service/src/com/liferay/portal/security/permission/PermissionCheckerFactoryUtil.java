@@ -14,13 +14,14 @@
 
 package com.liferay.portal.security.permission;
 
-import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+import com.liferay.portal.kernel.security.annotation.AccessControl;
 import com.liferay.portal.model.User;
 
 /**
  * @author Charles May
  * @author Brian Wing Shun Chan
  */
+@AccessControl
 public class PermissionCheckerFactoryUtil {
 
 	public static PermissionChecker create(User user) throws Exception {
@@ -37,16 +38,11 @@ public class PermissionCheckerFactoryUtil {
 	}
 
 	public static PermissionCheckerFactory getPermissionCheckerFactory() {
-		PortalRuntimePermission.checkGetBeanProperty(
-			PermissionCheckerFactoryUtil.class);
-
 		return _permissionCheckerFactory;
 	}
 
 	public void setPermissionCheckerFactory(
 		PermissionCheckerFactory permissionCheckerFactory) {
-
-		PortalRuntimePermission.checkSetBeanProperty(getClass());
 
 		_permissionCheckerFactory = permissionCheckerFactory;
 	}

@@ -14,11 +14,12 @@
 
 package com.liferay.portal.kernel.cache;
 
-import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+import com.liferay.portal.kernel.security.annotation.AccessControl;
 
 /**
  * @author Brian Wing Shun Chan
  */
+@AccessControl
 public class CacheRegistryUtil {
 
 	public static void clear() {
@@ -30,8 +31,6 @@ public class CacheRegistryUtil {
 	}
 
 	public static CacheRegistry getCacheRegistry() {
-		PortalRuntimePermission.checkGetBeanProperty(CacheRegistryUtil.class);
-
 		return _cacheRegistry;
 	}
 
@@ -48,8 +47,6 @@ public class CacheRegistryUtil {
 	}
 
 	public static void setCacheRegistry(CacheRegistry cacheRegistry) {
-		PortalRuntimePermission.checkSetBeanProperty(CacheRegistryUtil.class);
-
 		_cacheRegistry = cacheRegistry;
 	}
 

@@ -14,7 +14,7 @@
 
 package com.liferay.portal.kernel.workflow;
 
-import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+import com.liferay.portal.kernel.security.annotation.AccessControl;
 
 import java.io.Serializable;
 
@@ -22,28 +22,19 @@ import java.util.Map;
 
 /**
  * @author Bruno Farache
- * @author Raymond Augé
  */
+@AccessControl
 public class WorkflowStatusManagerUtil {
-
-	public static WorkflowStatusManager getWorkflowStatusManager() {
-		PortalRuntimePermission.checkGetBeanProperty(
-			WorkflowStatusManagerUtil.class);
-
-		return _workflowStatusManager;
-	}
 
 	public static void updateStatus(
 			int status, Map<String, Serializable> workflowContext)
 		throws WorkflowException {
 
-		getWorkflowStatusManager().updateStatus(status, workflowContext);
+		_workflowStatusManager.updateStatus(status, workflowContext);
 	}
 
 	public void setWorkflowStatusManager(
 		WorkflowStatusManager workflowStatusManager) {
-
-		PortalRuntimePermission.checkSetBeanProperty(getClass());
 
 		_workflowStatusManager = workflowStatusManager;
 	}

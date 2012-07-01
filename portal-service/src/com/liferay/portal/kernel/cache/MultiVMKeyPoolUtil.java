@@ -14,7 +14,7 @@
 
 package com.liferay.portal.kernel.cache;
 
-import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+import com.liferay.portal.kernel.security.annotation.AccessControl;
 
 import java.io.Serializable;
 
@@ -22,6 +22,7 @@ import java.io.Serializable;
  * @author Edward Han
  * @author Brian Wing Shun Chan
  */
+@AccessControl
 public class MultiVMKeyPoolUtil {
 
 	public static void clear() {
@@ -45,8 +46,6 @@ public class MultiVMKeyPoolUtil {
 	}
 
 	public static MultiVMPool getMultiVMPool() {
-		PortalRuntimePermission.checkGetBeanProperty(MultiVMKeyPoolUtil.class);
-
 		return _multiVMPool;
 	}
 
@@ -67,8 +66,6 @@ public class MultiVMKeyPoolUtil {
 	}
 
 	public void setMultiVMPool(MultiVMPool multiVMPool) {
-		PortalRuntimePermission.checkSetBeanProperty(getClass());
-
 		_multiVMPool = multiVMPool;
 	}
 

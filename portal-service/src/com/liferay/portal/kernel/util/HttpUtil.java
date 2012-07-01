@@ -14,7 +14,7 @@
 
 package com.liferay.portal.kernel.util;
 
-import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+import com.liferay.portal.kernel.security.annotation.AccessControl;
 
 import java.io.IOException;
 
@@ -31,6 +31,7 @@ import javax.servlet.http.HttpServletRequest;
 /**
  * @author Brian Wing Shun Chan
  */
+@AccessControl
 public class HttpUtil {
 
 	public static String addParameter(String url, String name, boolean value) {
@@ -104,8 +105,6 @@ public class HttpUtil {
 	}
 
 	public static Http getHttp() {
-		PortalRuntimePermission.checkGetBeanProperty(HttpUtil.class);
-
 		return _http;
 	}
 
@@ -295,8 +294,6 @@ public class HttpUtil {
 	}
 
 	public void setHttp(Http http) {
-		PortalRuntimePermission.checkSetBeanProperty(getClass());
-
 		_http = http;
 	}
 

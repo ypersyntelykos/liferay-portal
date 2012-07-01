@@ -14,7 +14,7 @@
 
 package com.liferay.portal.kernel.dao.orm;
 
-import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+import com.liferay.portal.kernel.security.annotation.AccessControl;
 
 import java.util.Collection;
 import java.util.Map;
@@ -22,6 +22,7 @@ import java.util.Map;
 /**
  * @author Raymond Augé
  */
+@AccessControl
 public class RestrictionsFactoryUtil {
 
 	public static Criterion allEq(Map<String, Criterion> propertyNameValues) {
@@ -67,9 +68,6 @@ public class RestrictionsFactoryUtil {
 	}
 
 	public static RestrictionsFactory getRestrictionsFactory() {
-		PortalRuntimePermission.checkGetBeanProperty(
-			RestrictionsFactoryUtil.class);
-
 		return _restrictionsFactory;
 	}
 
@@ -183,8 +181,6 @@ public class RestrictionsFactoryUtil {
 
 	public void setRestrictionsFactory(
 		RestrictionsFactory restrictionsFactory) {
-
-		PortalRuntimePermission.checkSetBeanProperty(getClass());
 
 		_restrictionsFactory = restrictionsFactory;
 	}

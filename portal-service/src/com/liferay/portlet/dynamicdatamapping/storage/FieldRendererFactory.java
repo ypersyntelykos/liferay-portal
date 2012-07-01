@@ -14,13 +14,14 @@
 
 package com.liferay.portlet.dynamicdatamapping.storage;
 
-import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+import com.liferay.portal.kernel.security.annotation.AccessControl;
 
 import java.util.Map;
 
 /**
  * @author Bruno Basto
  */
+@AccessControl
 public class FieldRendererFactory {
 
 	public static FieldRenderer getFieldRenderer(String dataType) {
@@ -34,8 +35,6 @@ public class FieldRendererFactory {
 	}
 
 	public void setFieldRenderers(Map<String, FieldRenderer> fieldRenderers) {
-		PortalRuntimePermission.checkSetBeanProperty(getClass());
-
 		_fieldRenderers = fieldRenderers;
 	}
 

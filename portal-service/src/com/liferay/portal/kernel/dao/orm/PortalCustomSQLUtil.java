@@ -14,11 +14,12 @@
 
 package com.liferay.portal.kernel.dao.orm;
 
-import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+import com.liferay.portal.kernel.security.annotation.AccessControl;
 
 /**
  * @author Brian Wing Shun Chan
  */
+@AccessControl
 public class PortalCustomSQLUtil {
 
 	public static String get(String id) {
@@ -26,14 +27,10 @@ public class PortalCustomSQLUtil {
 	}
 
 	public static PortalCustomSQL getPortalCustomSQL() {
-		PortalRuntimePermission.checkGetBeanProperty(PortalCustomSQLUtil.class);
-
 		return _portalCustomSQL;
 	}
 
 	public void setPortalCustomSQL(PortalCustomSQL portalCustomSQL) {
-		PortalRuntimePermission.checkSetBeanProperty(getClass());
-
 		_portalCustomSQL = portalCustomSQL;
 	}
 

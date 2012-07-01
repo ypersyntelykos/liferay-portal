@@ -14,7 +14,7 @@
 
 package com.liferay.portal.kernel.util;
 
-import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+import com.liferay.portal.kernel.security.annotation.AccessControl;
 
 import java.io.Reader;
 
@@ -27,6 +27,7 @@ import java.io.Reader;
  *
  * @author Julio Camarero
  */
+@AccessControl
 public class DiffHtmlUtil {
 
 	public static String diff(Reader source, Reader target) throws Exception {
@@ -34,14 +35,10 @@ public class DiffHtmlUtil {
 	}
 
 	public static DiffHtml getDiffHtml() {
-		PortalRuntimePermission.checkGetBeanProperty(DiffHtmlUtil.class);
-
 		return _diffHtml;
 	}
 
 	public void setDiffHtml(DiffHtml diffHtml) {
-		PortalRuntimePermission.checkSetBeanProperty(getClass());
-
 		_diffHtml = diffHtml;
 	}
 

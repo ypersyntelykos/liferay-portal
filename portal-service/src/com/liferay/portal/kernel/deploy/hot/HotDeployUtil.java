@@ -14,13 +14,14 @@
 
 package com.liferay.portal.kernel.deploy.hot;
 
-import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+import com.liferay.portal.kernel.security.annotation.AccessControl;
 
 /**
  * @author Ivica Cardic
  * @author Brian Wing Shun Chan
  * @author Raymond Augé
  */
+@AccessControl
 public class HotDeployUtil {
 
 	public static void fireDeployEvent(HotDeployEvent hotDeployEvent) {
@@ -32,8 +33,6 @@ public class HotDeployUtil {
 	}
 
 	public static HotDeploy getHotDeploy() {
-		PortalRuntimePermission.checkGetBeanProperty(HotDeployUtil.class);
-
 		return _hotDeploy;
 	}
 
@@ -60,8 +59,6 @@ public class HotDeployUtil {
 	}
 
 	public void setHotDeploy(HotDeploy hotDeploy) {
-		PortalRuntimePermission.checkSetBeanProperty(getClass());
-
 		_hotDeploy = hotDeploy;
 	}
 

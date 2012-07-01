@@ -14,7 +14,7 @@
 
 package com.liferay.portal.kernel.util;
 
-import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+import com.liferay.portal.kernel.security.annotation.AccessControl;
 
 import java.nio.ByteBuffer;
 
@@ -23,6 +23,7 @@ import java.nio.ByteBuffer;
  * @author Alexander Chow
  * @author Connor McKay
  */
+@AccessControl
 public class DigesterUtil {
 
 	public static String digest(ByteBuffer byteBuffer) {
@@ -90,14 +91,10 @@ public class DigesterUtil {
 	}
 
 	public static Digester getDigester() {
-		PortalRuntimePermission.checkGetBeanProperty(DigesterUtil.class);
-
 		return _digester;
 	}
 
 	public void setDigester(Digester digester) {
-		PortalRuntimePermission.checkSetBeanProperty(getClass());
-
 		_digester = digester;
 	}
 

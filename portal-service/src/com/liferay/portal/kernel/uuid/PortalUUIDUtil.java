@@ -14,16 +14,16 @@
 
 package com.liferay.portal.kernel.uuid;
 
-import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+import com.liferay.portal.kernel.security.annotation.AccessControl;
 
 /**
  * @author Brian Wing Shun Chan
- * @author Raymond Augé
  */
+@AccessControl
 public class PortalUUIDUtil {
 
 	public static String fromJsSafeUuid(String jsSafeUuid) {
-		return getPortalUUID().fromJsSafeUuid(jsSafeUuid);
+		return _portalUUID.fromJsSafeUuid(jsSafeUuid);
 	}
 
 	public static String generate() {
@@ -35,18 +35,14 @@ public class PortalUUIDUtil {
 	}
 
 	public static PortalUUID getPortalUUID() {
-		PortalRuntimePermission.checkGetBeanProperty(PortalUUIDUtil.class);
-
 		return _portalUUID;
 	}
 
 	public static String toJsSafeUuid(String uuid) {
-		return getPortalUUID().toJsSafeUuid(uuid);
+		return _portalUUID.toJsSafeUuid(uuid);
 	}
 
 	public void setPortalUUID(PortalUUID portalUUID) {
-		PortalRuntimePermission.checkSetBeanProperty(getClass());
-
 		_portalUUID = portalUUID;
 	}
 

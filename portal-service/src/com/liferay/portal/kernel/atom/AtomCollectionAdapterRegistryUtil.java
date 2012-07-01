@@ -14,13 +14,14 @@
 
 package com.liferay.portal.kernel.atom;
 
-import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+import com.liferay.portal.kernel.security.annotation.AccessControl;
 
 import java.util.List;
 
 /**
  * @author Igor Spasic
  */
+@AccessControl
 public class AtomCollectionAdapterRegistryUtil {
 
 	public static AtomCollectionAdapter<?> getAtomCollectionAdapter(
@@ -32,9 +33,6 @@ public class AtomCollectionAdapterRegistryUtil {
 
 	public static AtomCollectionAdapterRegistry
 		getAtomCollectionAdapterRegistry() {
-
-		PortalRuntimePermission.checkGetBeanProperty(
-			AtomCollectionAdapterRegistryUtil.class);
 
 		return _atomCollectionAdapterRegistry;
 	}
@@ -78,8 +76,6 @@ public class AtomCollectionAdapterRegistryUtil {
 
 	public void setAtomCollectionAdapterRegistry(
 		AtomCollectionAdapterRegistry atomCollectionAdapterRegistry) {
-
-		PortalRuntimePermission.checkSetBeanProperty(getClass());
 
 		_atomCollectionAdapterRegistry = atomCollectionAdapterRegistry;
 	}

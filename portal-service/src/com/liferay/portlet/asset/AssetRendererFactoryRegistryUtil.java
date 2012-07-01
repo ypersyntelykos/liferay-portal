@@ -14,7 +14,7 @@
 
 package com.liferay.portlet.asset;
 
-import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+import com.liferay.portal.kernel.security.annotation.AccessControl;
 import com.liferay.portlet.asset.model.AssetRendererFactory;
 
 import java.util.List;
@@ -23,6 +23,7 @@ import java.util.List;
  * @author Bruno Farache
  * @author Marcellus Tavares
  */
+@AccessControl
 public class AssetRendererFactoryRegistryUtil {
 
 	public static List<AssetRendererFactory> getAssetRendererFactories() {
@@ -45,9 +46,6 @@ public class AssetRendererFactoryRegistryUtil {
 
 	public static AssetRendererFactoryRegistry
 		getAssetRendererFactoryRegistry() {
-
-		PortalRuntimePermission.checkGetBeanProperty(
-			AssetRendererFactoryRegistryUtil.class);
 
 		return _assetRendererFactoryRegistry;
 	}
@@ -86,8 +84,6 @@ public class AssetRendererFactoryRegistryUtil {
 
 	public void setAssetRendererFactoryRegistry(
 		AssetRendererFactoryRegistry assetRendererFactoryRegistry) {
-
-		PortalRuntimePermission.checkSetBeanProperty(getClass());
 
 		_assetRendererFactoryRegistry = assetRendererFactoryRegistry;
 	}

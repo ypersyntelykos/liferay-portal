@@ -14,7 +14,7 @@
 
 package com.liferay.portal.kernel.util;
 
-import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+import com.liferay.portal.kernel.security.annotation.AccessControl;
 
 /**
  * @author Brian Wing Shun Chan
@@ -22,6 +22,7 @@ import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermissio
  * @author Harry Mark
  * @author Samuel Kong
  */
+@AccessControl
 public class HtmlUtil {
 
 	public static String escape(String html) {
@@ -61,8 +62,6 @@ public class HtmlUtil {
 	}
 
 	public static Html getHtml() {
-		PortalRuntimePermission.checkGetBeanProperty(HtmlUtil.class);
-
 		return _html;
 	}
 
@@ -99,8 +98,6 @@ public class HtmlUtil {
 	}
 
 	public void setHtml(Html html) {
-		PortalRuntimePermission.checkSetBeanProperty(getClass());
-
 		_html = html;
 	}
 

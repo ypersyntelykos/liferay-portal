@@ -14,13 +14,14 @@
 
 package com.liferay.portal.util;
 
-import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+import com.liferay.portal.kernel.security.annotation.AccessControl;
 
 /**
  * @author Jorge Ferrer
  * @author Dennis Ju
  * @author Brian Wing Shun Chan
  */
+@AccessControl
 public class PortletListerFactoryUtil {
 
 	public static PortletLister getPortletLister() {
@@ -28,16 +29,11 @@ public class PortletListerFactoryUtil {
 	}
 
 	public static PortletListerFactory getPortletListerFactory() {
-		PortalRuntimePermission.checkGetBeanProperty(
-			PortletListerFactoryUtil.class);
-
 		return _portletListerFactory;
 	}
 
 	public void setPortletListerFactory(
 		PortletListerFactory portletListerFactory) {
-
-		PortalRuntimePermission.checkSetBeanProperty(getClass());
 
 		_portletListerFactory = portletListerFactory;
 	}

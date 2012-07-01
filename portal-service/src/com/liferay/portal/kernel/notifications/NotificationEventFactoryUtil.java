@@ -15,32 +15,23 @@
 package com.liferay.portal.kernel.notifications;
 
 import com.liferay.portal.kernel.json.JSONObject;
-import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+import com.liferay.portal.kernel.security.annotation.AccessControl;
 
 /**
  * @author Edward Han
- * @author Raymond Augé
  */
+@AccessControl
 public class NotificationEventFactoryUtil {
 
 	public static NotificationEvent createNotificationEvent(
 		long timestamp, String type, JSONObject payloadJSONObject) {
 
-		return getNotificationEventFactory().createNotificationEvent(
+		return _notificationEventFactory.createNotificationEvent(
 			timestamp, type, payloadJSONObject);
-	}
-
-	public static NotificationEventFactory getNotificationEventFactory() {
-		PortalRuntimePermission.checkGetBeanProperty(
-			NotificationEventFactoryUtil.class);
-
-		return _notificationEventFactory;
 	}
 
 	public void setNotificationEventFactory(
 		NotificationEventFactory notificationEventFactory) {
-
-		PortalRuntimePermission.checkSetBeanProperty(getClass());
 
 		_notificationEventFactory = notificationEventFactory;
 	}

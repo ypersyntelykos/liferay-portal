@@ -15,12 +15,13 @@
 package com.liferay.portlet.expando.util;
 
 import com.liferay.portal.kernel.search.Document;
-import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+import com.liferay.portal.kernel.security.annotation.AccessControl;
 import com.liferay.portlet.expando.model.ExpandoBridge;
 
 /**
  * @author Raymond Augé
  */
+@AccessControl
 public class ExpandoBridgeIndexerUtil {
 
 	public static void addAttributes(
@@ -34,16 +35,11 @@ public class ExpandoBridgeIndexerUtil {
 	}
 
 	public static ExpandoBridgeIndexer getExpandoBridgeIndexer() {
-		PortalRuntimePermission.checkGetBeanProperty(
-			ExpandoBridgeIndexerUtil.class);
-
 		return _expandoBridgeIndexer;
 	}
 
 	public void setExpandoBridgeIndexer(
 		ExpandoBridgeIndexer expandoBridgeIndexer) {
-
-		PortalRuntimePermission.checkSetBeanProperty(getClass());
 
 		_expandoBridgeIndexer = expandoBridgeIndexer;
 	}

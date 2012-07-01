@@ -14,13 +14,14 @@
 
 package com.liferay.portal.kernel.template;
 
-import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+import com.liferay.portal.kernel.security.annotation.AccessControl;
 
 import java.util.List;
 
 /**
  * @author Juan Fernández
  */
+@AccessControl
 public class PortletDisplayTemplateHandlerRegistryUtil {
 
 	public static long[] getClassNameIds() {
@@ -51,9 +52,6 @@ public class PortletDisplayTemplateHandlerRegistryUtil {
 	public static PortletDisplayTemplateHandlerRegistry
 		getPortletDisplayTemplateRegistry() {
 
-		PortalRuntimePermission.checkGetBeanProperty(
-			PortletDisplayTemplateHandlerRegistryUtil.class);
-
 		return _portletDisplayTemplateHandlerRegistry;
 	}
 
@@ -74,8 +72,6 @@ public class PortletDisplayTemplateHandlerRegistryUtil {
 	public void setPortletDisplayTemplateHandlerRegistry(
 		PortletDisplayTemplateHandlerRegistry
 			portletDisplayTemplateHandlerRegistry) {
-
-		PortalRuntimePermission.checkSetBeanProperty(getClass());
 
 		_portletDisplayTemplateHandlerRegistry =
 			portletDisplayTemplateHandlerRegistry;

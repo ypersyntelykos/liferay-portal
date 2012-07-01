@@ -16,7 +16,7 @@ package com.liferay.portal.kernel.mobile.device.rulegroup;
 
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.mobile.device.rulegroup.rule.RuleHandler;
-import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+import com.liferay.portal.kernel.security.annotation.AccessControl;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portlet.mobiledevicerules.model.MDRRuleGroupInstance;
 
@@ -25,6 +25,7 @@ import java.util.Collection;
 /**
  * @author Edward Han
  */
+@AccessControl
 public class RuleGroupProcessorUtil {
 
 	public static MDRRuleGroupInstance evaluateRuleGroups(
@@ -35,9 +36,6 @@ public class RuleGroupProcessorUtil {
 	}
 
 	public static RuleGroupProcessor getRuleGroupProcessor() {
-		PortalRuntimePermission.checkGetBeanProperty(
-			RuleGroupProcessorUtil.class);
-
 		return _ruleGroupProcessor;
 	}
 
@@ -62,8 +60,6 @@ public class RuleGroupProcessorUtil {
 	}
 
 	public void setRuleGroupProcessor(RuleGroupProcessor ruleGroupProcessor) {
-		PortalRuntimePermission.checkSetBeanProperty(getClass());
-
 		_ruleGroupProcessor = ruleGroupProcessor;
 	}
 

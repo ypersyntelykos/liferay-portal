@@ -14,11 +14,12 @@
 
 package com.liferay.portal.kernel.dao.orm;
 
-import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+import com.liferay.portal.kernel.security.annotation.AccessControl;
 
 /**
  * @author Brian Wing Shun Chan
  */
+@AccessControl
 public class PropertyFactoryUtil {
 
 	public static Property forName(String propertyName) {
@@ -26,14 +27,10 @@ public class PropertyFactoryUtil {
 	}
 
 	public static PropertyFactory getPropertyFactory() {
-		PortalRuntimePermission.checkGetBeanProperty(PropertyFactoryUtil.class);
-
 		return _projectionFactory;
 	}
 
 	public void setPropertyFactory(PropertyFactory projectionFactory) {
-		PortalRuntimePermission.checkSetBeanProperty(getClass());
-
 		_projectionFactory = projectionFactory;
 	}
 

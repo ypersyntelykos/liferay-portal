@@ -14,13 +14,14 @@
 
 package com.liferay.portal.kernel.zip;
 
-import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+import com.liferay.portal.kernel.security.annotation.AccessControl;
 
 import java.io.File;
 
 /**
  * @author Raymond Augé
  */
+@AccessControl
 public class ZipWriterFactoryUtil {
 
 	public static ZipWriter getZipWriter() {
@@ -32,15 +33,10 @@ public class ZipWriterFactoryUtil {
 	}
 
 	public static ZipWriterFactory getZipWriterFactory() {
-		PortalRuntimePermission.checkGetBeanProperty(
-			ZipWriterFactoryUtil.class);
-
 		return _zipWriterFactory;
 	}
 
 	public void setZipWriterFactory(ZipWriterFactory zipWriterFactory) {
-		PortalRuntimePermission.checkSetBeanProperty(getClass());
-
 		_zipWriterFactory = zipWriterFactory;
 	}
 

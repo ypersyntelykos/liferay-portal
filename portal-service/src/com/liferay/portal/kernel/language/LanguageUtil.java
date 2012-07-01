@@ -14,7 +14,7 @@
 
 package com.liferay.portal.kernel.language;
 
-import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+import com.liferay.portal.kernel.security.annotation.AccessControl;
 
 import java.util.Locale;
 
@@ -28,6 +28,7 @@ import javax.servlet.jsp.PageContext;
 /**
  * @author Brian Wing Shun Chan
  */
+@AccessControl
 public class LanguageUtil {
 
 	public static String format(
@@ -184,8 +185,6 @@ public class LanguageUtil {
 	}
 
 	public static Language getLanguage() {
-		PortalRuntimePermission.checkGetBeanProperty(LanguageUtil.class);
-
 		return _language;
 	}
 
@@ -267,8 +266,6 @@ public class LanguageUtil {
 	}
 
 	public void setLanguage(Language language) {
-		PortalRuntimePermission.checkSetBeanProperty(getClass());
-
 		_language = language;
 	}
 

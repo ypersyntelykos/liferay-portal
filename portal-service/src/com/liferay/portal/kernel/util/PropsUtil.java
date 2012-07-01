@@ -15,13 +15,14 @@
 package com.liferay.portal.kernel.util;
 
 import com.liferay.portal.kernel.configuration.Filter;
-import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+import com.liferay.portal.kernel.security.annotation.AccessControl;
 
 import java.util.Properties;
 
 /**
  * @author Brian Wing Shun Chan
  */
+@AccessControl
 public class PropsUtil {
 
 	public static boolean contains(String key) {
@@ -55,14 +56,10 @@ public class PropsUtil {
 	}
 
 	public static Props getProps() {
-		PortalRuntimePermission.checkGetBeanProperty(PropsUtil.class);
-
 		return _props;
 	}
 
 	public static void setProps(Props props) {
-		PortalRuntimePermission.checkSetBeanProperty(PropsUtil.class);
-
 		_props = props;
 	}
 

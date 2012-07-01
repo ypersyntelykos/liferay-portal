@@ -14,7 +14,7 @@
 
 package com.liferay.portal.kernel.image;
 
-import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+import com.liferay.portal.kernel.security.annotation.AccessControl;
 
 import java.io.IOException;
 
@@ -28,6 +28,7 @@ import javax.servlet.ServletContext;
 /**
  * @author Brian Wing Shun Chan
  */
+@AccessControl
 public class SpriteProcessorUtil {
 
 	public static Properties generate(
@@ -43,14 +44,10 @@ public class SpriteProcessorUtil {
 	}
 
 	public static SpriteProcessor getSpriteProcessor() {
-		PortalRuntimePermission.checkGetBeanProperty(SpriteProcessorUtil.class);
-
 		return _spriteProcessor;
 	}
 
 	public void setSpriteProcessor(SpriteProcessor spriteProcessor) {
-		PortalRuntimePermission.checkSetBeanProperty(getClass());
-
 		_spriteProcessor = spriteProcessor;
 	}
 
