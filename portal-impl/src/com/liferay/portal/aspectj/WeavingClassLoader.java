@@ -26,6 +26,7 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.security.lang.PortalSecurityManagerThreadLocal;
 import com.liferay.portal.security.pacl.PACLPolicy;
 import com.liferay.portal.security.pacl.PACLPolicyManager;
+import com.liferay.portal.security.pacl.aspect.AcceptStatus;
 import com.liferay.portal.security.pacl.aspect.PACLAspect;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PropsValues;
@@ -200,15 +201,29 @@ public class WeavingClassLoader extends ClassLoader {
 					List<Class<? extends PACLAspect>> aspectClasses =
 						new ArrayList<Class<? extends PACLAspect>>();
 
+					boolean rejectClass = true;
+
 					for (Map.Entry
 						<Class<? extends PACLAspect>, PACLAspect> entry :
 							_aspectCheckers.entrySet()) {
 
 						PACLAspect paclAspect = entry.getValue();
 
-						if (paclAspect.acceptClass(paclPolicy, clazz)) {
+						AcceptStatus acceptStatus = paclAspect.acceptClass(
+							paclPolicy, clazz);
+
+						if (acceptStatus != AcceptStatus.FULL_ACCESS) {
 							aspectClasses.add(entry.getKey());
 						}
+
+						if (acceptStatus != AcceptStatus.REJECT_ACCESS) {
+							rejectClass = false;
+						}
+					}
+
+					if (rejectClass) {
+						throw new SecurityException(
+							"Undeclared access to class " + clazz);
 					}
 
 					if (aspectClasses.isEmpty()) {

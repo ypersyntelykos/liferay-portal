@@ -14,21 +14,11 @@
 
 package com.liferay.portal.security.pacl.aspect;
 
-import com.liferay.portal.security.pacl.PACLPolicy;
-
 /**
  * @author Shuyang Zhou
  */
-public class PACLAspect {
+public enum AcceptStatus {
 
-	public AcceptStatus acceptClass(PACLPolicy paclPolicy, Class<?> clazz) {
-		return AcceptStatus.FULL_ACCESS;
-	}
-
-	public void setPACLPolicy(PACLPolicy paclPolicy) {
-		this.paclPolicy = paclPolicy;
-	}
-
-	protected PACLPolicy paclPolicy;
+	FULL_ACCESS, PARTIAL_ACCESS, REJECT_ACCESS;
 
 }

@@ -16,9 +16,9 @@ package com.liferay.aspectj.aspects.security;
 
 import com.liferay.portal.kernel.security.annotation.AccessControl;
 import com.liferay.portal.security.pacl.PACLPolicy;
+import com.liferay.portal.security.pacl.aspect.AcceptStatus;
 import com.liferay.portal.security.pacl.aspect.PACLAspect;
 
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -26,47 +26,28 @@ import java.util.Set;
  */
 public abstract class BaseAccessControlAspect extends PACLAspect {
 
-	public boolean acceptClass(PACLPolicy paclPolicy, Class<?> clazz) {
+	public AcceptStatus acceptClass(PACLPolicy paclPolicy, Class<?> clazz) {
 		AccessControl accessControl = clazz.getAnnotation(AccessControl.class);
 
 		if (accessControl == null) {
-			return false;
+			return AcceptStatus.FULL_ACCESS;
 		}
 
-		String className = clazz.getName();
-
-		Map<String, Set<String>> portalBeanPropertyGetterWhiteList =
-			paclPolicy.getPortalBeanPropertyGetterWhiteList();
-
-		Map<String, Set<String>> portalBeanPropertySetterWhiteList =
-			paclPolicy.getPortalBeanPropertySetterWhiteList();
-
-		Set<String> getterMethodNameSet = portalBeanPropertyGetterWhiteList.get(
-			className);
-
-		Set<String> setterMethodNameSet = portalBeanPropertySetterWhiteList.get(
-			className);
-
-		if (accessControl.checkGetter() && (getterMethodNameSet == null) &&
-			accessControl.checkSetter() && (setterMethodNameSet == null)) {
-
-			throw new SecurityException("Undeclared access to " + clazz);
-		}
-
-		return acceptClass(
-			getterMethodNameSet, setterMethodNameSet, accessControl);
+		return acceptClass(paclPolicy, clazz, accessControl);
 	}
 
-	public abstract boolean acceptClass(
-		Set<String> getterMethodNameSet, Set<String> setterMethodNameSet,
-		AccessControl accessControl);
+	public abstract AcceptStatus acceptClass(
+		PACLPolicy paclPolicy, Class<?> clazz, AccessControl accessControl);
 
-	public boolean isFullAccess(Set<String> methodNameSet) {
-		if ((methodNameSet != null) && methodNameSet.isEmpty()) {
-			return false;
+	public AcceptStatus toAcceptStatus(Set<String> methodNameSet) {
+		if (methodNameSet == null) {
+			return AcceptStatus.REJECT_ACCESS;
+		}
+		else if (methodNameSet.isEmpty()) {
+			return AcceptStatus.FULL_ACCESS;
 		}
 		else {
-			return true;
+			return AcceptStatus.PARTIAL_ACCESS;
 		}
 	}
 

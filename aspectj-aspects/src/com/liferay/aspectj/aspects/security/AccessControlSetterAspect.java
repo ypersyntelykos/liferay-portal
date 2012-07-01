@@ -15,6 +15,8 @@
 package com.liferay.aspectj.aspects.security;
 
 import com.liferay.portal.kernel.security.annotation.AccessControl;
+import com.liferay.portal.security.pacl.PACLPolicy;
+import com.liferay.portal.security.pacl.aspect.AcceptStatus;
 
 import java.util.Map;
 import java.util.Set;
@@ -27,19 +29,26 @@ import org.aspectj.lang.annotation.Before;
 /**
  * @author Shuyang Zhou
  */
-@Aspect("pertypewithin(@com.liferay.portal.kernel.security.annotation.AccessControl *)")
+@Aspect("pertypewithin(*)")
 public class AccessControlSetterAspect extends BaseAccessControlAspect {
 
 	@Override
-	public boolean acceptClass(
-		Set<String> getterMethodNameSet, Set<String> setterMethodNameSet,
-		AccessControl accessControl) {
+	public AcceptStatus acceptClass(
+		PACLPolicy paclPolicy, Class<?> clazz, AccessControl accessControl) {
 
 		if (!accessControl.checkGetter()) {
-			return false;
+			return AcceptStatus.FULL_ACCESS;
 		}
 
-		return isFullAccess(setterMethodNameSet);
+		Map<String, Set<String>> portalBeanPropertySetterWhiteList =
+			paclPolicy.getPortalBeanPropertySetterWhiteList();
+
+		String className = clazz.getName();
+
+		Set<String> setterMethodNameSet = portalBeanPropertySetterWhiteList.get(
+			className);
+
+		return toAcceptStatus(setterMethodNameSet);
 	}
 
 	@Before("set(* (@com.liferay.portal.kernel.security.annotation.AccessControl *).*)")
