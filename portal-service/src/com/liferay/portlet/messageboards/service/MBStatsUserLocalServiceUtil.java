@@ -15,6 +15,7 @@
 package com.liferay.portlet.messageboards.service;
 
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
+import com.liferay.portal.kernel.security.annotation.AccessControl;
 import com.liferay.portal.kernel.util.ReferenceRegistry;
 
 /**
@@ -30,6 +31,7 @@ import com.liferay.portal.kernel.util.ReferenceRegistry;
  * @see com.liferay.portlet.messageboards.service.impl.MBStatsUserLocalServiceImpl
  * @generated
  */
+@AccessControl(service = true)
 public class MBStatsUserLocalServiceUtil {
 	/*
 	 * NOTE FOR DEVELOPERS:

@@ -15,6 +15,7 @@
 package com.liferay.portlet.asset.service;
 
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
+import com.liferay.portal.kernel.security.annotation.AccessControl;
 import com.liferay.portal.kernel.util.ReferenceRegistry;
 
 /**
@@ -30,6 +31,7 @@ import com.liferay.portal.kernel.util.ReferenceRegistry;
  * @see com.liferay.portlet.asset.service.impl.AssetCategoryLocalServiceImpl
  * @generated
  */
+@AccessControl(service = true)
 public class AssetCategoryLocalServiceUtil {
 	/*
 	 * NOTE FOR DEVELOPERS:

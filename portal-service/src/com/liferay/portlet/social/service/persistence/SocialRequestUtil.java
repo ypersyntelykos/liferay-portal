@@ -17,6 +17,7 @@ package com.liferay.portlet.social.service.persistence;
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.security.annotation.AccessControl;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ReferenceRegistry;
 import com.liferay.portal.service.ServiceContext;
@@ -37,6 +38,7 @@ import java.util.List;
  * @see SocialRequestPersistenceImpl
  * @generated
  */
+@AccessControl(persistence = true)
 public class SocialRequestUtil {
 	/*
 	 * NOTE FOR DEVELOPERS:
