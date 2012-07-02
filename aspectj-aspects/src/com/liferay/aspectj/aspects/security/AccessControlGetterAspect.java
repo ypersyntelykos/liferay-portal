@@ -25,6 +25,7 @@ import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.Signature;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
+import org.aspectj.lang.annotation.Pointcut;
 
 /**
  * @author Shuyang Zhou
@@ -53,7 +54,7 @@ public class AccessControlGetterAspect extends BaseAccessControlAspect {
 		return toAcceptStatus(getterMethodNameSet);
 	}
 
-	@Before("execution(public static * (@com.liferay.portal.kernel.security.annotation.AccessControl *).*(..))")
+	@Before("getterMethod() && !cflowbelow(getterMethod())")
 	public void doAccessControl(JoinPoint.StaticPart joinPointStaticPart) {
 		if (paclPolicy == null) {
 			return;
@@ -78,6 +79,10 @@ public class AccessControlGetterAspect extends BaseAccessControlAspect {
 		if (!getterMethodNameSet.contains(methodName)) {
 			throw new SecurityException("Undeclared access to " + signature);
 		}
+	}
+
+	@Pointcut("execution(public static * (@com.liferay.portal.kernel.security.annotation.AccessControl *).*(..))")
+	public void getterMethod() {
 	}
 
 }
