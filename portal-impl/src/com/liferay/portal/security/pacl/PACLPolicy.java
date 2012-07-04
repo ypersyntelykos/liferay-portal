@@ -18,6 +18,7 @@ import java.lang.reflect.Method;
 
 import java.security.Permission;
 
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
@@ -29,6 +30,10 @@ public interface PACLPolicy {
 	public void checkPermission(Permission permission);
 
 	public ClassLoader getClassLoader();
+
+	public Map<String, Set<String>> getPortalBeanPropertyGetterWhiteList();
+
+	public Map<String, Set<String>> getPortalBeanPropertySetterWhiteList();
 
 	public Properties getProperties();
 

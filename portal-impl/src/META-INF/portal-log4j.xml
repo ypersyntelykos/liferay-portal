@@ -54,6 +54,10 @@
 		<priority value="ERROR" />
 	</category>
 
+	<category name="com.liferay.portal.aspectj">
+		<priority value="INFO" />
+	</category>
+
 	<category name="com.liferay.portal.action.JSONServiceAction">
 		<priority value="INFO" />
 	</category>

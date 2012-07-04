@@ -14,16 +14,19 @@
 
 package com.liferay.portal.deploy.hot;
 
+import com.liferay.portal.aspectj.WeavingClassLoader;
 import com.liferay.portal.kernel.deploy.hot.HotDeploy;
 import com.liferay.portal.kernel.deploy.hot.HotDeployEvent;
 import com.liferay.portal.kernel.deploy.hot.HotDeployException;
 import com.liferay.portal.kernel.deploy.hot.HotDeployListener;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.servlet.ServletContextPool;
+import com.liferay.portal.kernel.servlet.PluginContextListener;
 import com.liferay.portal.kernel.template.TemplateManagerUtil;
 import com.liferay.portal.kernel.util.BasePortalLifecycle;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HttpUtil;
+import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
 import com.liferay.portal.kernel.util.PortalLifecycle;
 import com.liferay.portal.kernel.util.PortalLifecycleUtil;
 import com.liferay.portal.kernel.util.PropertiesUtil;
@@ -32,6 +35,10 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.security.pacl.PACLClassLoaderUtil;
 import com.liferay.portal.security.pacl.PACLPolicy;
 import com.liferay.portal.security.pacl.PACLPolicyManager;
+import com.liferay.portal.security.pacl.aspect.PACLAspect;
+import com.liferay.portal.util.PropsValues;
+
+import java.io.IOException;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -47,6 +54,7 @@ import javax.servlet.ServletContext;
  * @author Ivica Cardic
  * @author Brian Wing Shun Chan
  * @author Raymond Augé
+ * @author Shuyang Zhou
  */
 public class HotDeployImpl implements HotDeploy {
 
@@ -61,9 +69,7 @@ public class HotDeployImpl implements HotDeploy {
 	}
 
 	public void fireDeployEvent(final HotDeployEvent hotDeployEvent) {
-		PortalLifecycleUtil.register(
-			new PACLPortalLifecycle(hotDeployEvent),
-			PortalLifecycle.METHOD_INIT);
+		registerPACLPolicy(hotDeployEvent);
 
 		if (_capturePrematureEvents) {
 
@@ -254,6 +260,80 @@ public class HotDeployImpl implements HotDeploy {
 		return StringUtil.merge(requiredServletContextNames, ", ");
 	}
 
+	protected void registerPACLPolicy(HotDeployEvent hotDeployEvent) {
+		ServletContext servletContext = hotDeployEvent.getServletContext();
+		ClassLoader oldClassLoader = hotDeployEvent.getContextClassLoader();
+
+		Properties properties = null;
+
+		try {
+			String propertiesString = HttpUtil.URLtoString(
+				servletContext.getResource(
+					"/WEB-INF/liferay-plugin-package.properties"));
+
+			if (propertiesString != null) {
+				properties = PropertiesUtil.load(propertiesString);
+			}
+			else {
+				properties = new Properties();
+			}
+		}
+		catch (IOException ioe) {
+			throw new RuntimeException(ioe);
+		}
+
+		ClassLoader newClassLoader = oldClassLoader;
+
+		boolean active = GetterUtil.getBoolean(
+			properties.get("security-manager-enabled"));
+
+		if (active) {
+			try {
+				ClassLoader portalClassLoader =
+					PortalClassLoaderUtil.getClassLoader();
+
+				List<Class<? extends PACLAspect>> aspectClassesList =
+					new ArrayList<Class<? extends PACLAspect>>();
+
+				for (String aspectClassName :
+					PropsValues.PORTAL_SECURITY_ASPECTJ_ASPECTS) {
+
+					Class<? extends PACLAspect> aspectClass =
+						(Class<? extends PACLAspect>)
+							portalClassLoader.loadClass(aspectClassName);
+
+					aspectClassesList.add(aspectClass);
+				}
+
+				newClassLoader = new WeavingClassLoader(
+					servletContext, newClassLoader, aspectClassesList);
+			}
+			catch (Exception e) {
+				_log.error(
+					"Failed creating " + WeavingClassLoader.class.getName(), e);
+
+				throw new RuntimeException(e);
+			}
+		}
+
+		Thread currentThread = Thread.currentThread();
+
+		currentThread.setContextClassLoader(newClassLoader);
+
+		servletContext.setAttribute(
+			PluginContextListener.PLUGIN_CLASS_LOADER, newClassLoader);
+
+		PACLPolicy paclPolicy = PACLPolicyManager.buildPACLPolicy(
+			servletContext.getServletContextName(), newClassLoader, properties);
+
+		PACLPolicyManager.register(newClassLoader, paclPolicy);
+
+		if (newClassLoader != oldClassLoader) {
+			PACLClassLoaderUtil.addClassLoaderMapping(
+				oldClassLoader, newClassLoader);
+		}
+	}
+
 	protected void setContextClassLoader(ClassLoader contextClassLoader) {
 		PACLClassLoaderUtil.setContextClassLoader(contextClassLoader);
 	}
@@ -264,46 +344,5 @@ public class HotDeployImpl implements HotDeploy {
 	private List<HotDeployEvent> _dependentHotDeployEvents;
 	private Set<String> _deployedServletContextNames;
 	private List<HotDeployListener> _hotDeployListeners;
-
-	private class PACLPortalLifecycle extends BasePortalLifecycle {
-
-		public PACLPortalLifecycle(HotDeployEvent hotDeployEvent) {
-			_servletContext = hotDeployEvent.getServletContext();
-			_classLoader = hotDeployEvent.getContextClassLoader();
-
-			ServletContextPool.put(
-				_servletContext.getServletContextName(), _servletContext);
-		}
-
-		@Override
-		protected void doPortalDestroy() {
-		}
-
-		@Override
-		protected void doPortalInit() throws Exception {
-			Properties properties = null;
-
-			String propertiesString = HttpUtil.URLtoString(
-				_servletContext.getResource(
-					"/WEB-INF/liferay-plugin-package.properties"));
-
-			if (propertiesString != null) {
-				properties = PropertiesUtil.load(propertiesString);
-			}
-			else {
-				properties = new Properties();
-			}
-
-			PACLPolicy paclPolicy = PACLPolicyManager.buildPACLPolicy(
-				_servletContext.getServletContextName(), _classLoader,
-				properties);
-
-			PACLPolicyManager.register(_classLoader, paclPolicy);
-		}
-
-		private ClassLoader _classLoader;
-		private ServletContext _servletContext;
-
-	};
 
 }

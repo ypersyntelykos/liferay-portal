@@ -40,49 +40,7 @@ import javax.servlet.ServletException;
  */
 public class ClassPathUtil {
 
-	public static String getGlobalClassPath() {
-		return _globalClassPath;
-	}
-
-	public static String getPortalClassPath() {
-		return _portalClassPath;
-	}
-
-	public static void initializeClassPaths(ServletContext servletContext) {
-		ClassLoader classLoader = PortalClassLoaderUtil.getClassLoader();
-
-		if (classLoader == null) {
-			_log.error("Portal ClassLoader is null");
-
-			return;
-		}
-
-		StringBundler sb = new StringBundler(7);
-
-		String appServerGlobalClassPath = _buildClassPath(
-			classLoader, ServletException.class.getName());
-
-		sb.append(appServerGlobalClassPath);
-		sb.append(File.pathSeparator);
-
-		String portalGlobalClassPath = _buildClassPath(
-			classLoader, PortalException.class.getName());
-
-		sb.append(portalGlobalClassPath);
-
-		_globalClassPath = sb.toString();
-
-		sb.append(File.pathSeparator);
-		sb.append(
-			_buildClassPath(
-				classLoader, "com.liferay.portal.servlet.MainServlet"));
-		sb.append(File.pathSeparator);
-		sb.append(servletContext.getRealPath("").concat("/WEB-INF/classes"));
-
-		_portalClassPath = sb.toString();
-	}
-
-	private static String _buildClassPath(
+	public static File[] getClassPathFiles(
 		ClassLoader classloader, String className) {
 
 		String pathOfClass = StringUtil.replace(
@@ -114,7 +72,7 @@ public class ClassPathUtil {
 			catch (Exception e) {
 				_log.error("Unable to resolve local URL from bundle", e);
 
-				return StringPool.BLANK;
+				return new File[0];
 			}
 		}
 
@@ -163,7 +121,7 @@ public class ClassPathUtil {
 				_log.error(
 					"Class " + className + " is not loaded from a JAR file");
 
-				return StringPool.BLANK;
+				return new File[0];
 			}
 
 			String classesDirName = path.substring(
@@ -174,7 +132,7 @@ public class ClassPathUtil {
 					"Class " + className + " is not loaded from a standard " +
 						"location (/WEB-INF/classes)");
 
-				return StringPool.BLANK;
+				return new File[0];
 			}
 
 			String libDirName = classesDirName.substring(
@@ -193,10 +151,62 @@ public class ClassPathUtil {
 		if (!dir.isDirectory()) {
 			_log.error(dir.toString() + " is not a directory");
 
-			return StringPool.BLANK;
+			return new File[0];
 		}
 
-		File[] files = dir.listFiles();
+		return dir.listFiles();
+	}
+
+	public static String getGlobalClassPath() {
+		return _globalClassPath;
+	}
+
+	public static String getPortalClassPath() {
+		return _portalClassPath;
+	}
+
+	public static void initializeClassPaths(ServletContext servletContext) {
+		ClassLoader classLoader = PortalClassLoaderUtil.getClassLoader();
+
+		if (classLoader == null) {
+			_log.error("Portal ClassLoader is null");
+
+			return;
+		}
+
+		StringBundler sb = new StringBundler(7);
+
+		String appServerGlobalClassPath = _buildClassPath(
+			classLoader, ServletException.class.getName());
+
+		sb.append(appServerGlobalClassPath);
+		sb.append(File.pathSeparator);
+
+		String portalGlobalClassPath = _buildClassPath(
+			classLoader, PortalException.class.getName());
+
+		sb.append(portalGlobalClassPath);
+
+		_globalClassPath = sb.toString();
+
+		sb.append(File.pathSeparator);
+		sb.append(
+			_buildClassPath(
+				classLoader, "com.liferay.portal.servlet.MainServlet"));
+		sb.append(File.pathSeparator);
+		sb.append(servletContext.getRealPath("").concat("/WEB-INF/classes"));
+
+		_portalClassPath = sb.toString();
+	}
+
+	private static String _buildClassPath(
+		ClassLoader classloader, String className) {
+
+		File[] files = getClassPathFiles(classloader, className);
+
+		if ((files == null) || (files.length == 0)) {
+			return StringPool.BLANK;
+		}
 
 		StringBundler sb = new StringBundler(files.length * 2);
 

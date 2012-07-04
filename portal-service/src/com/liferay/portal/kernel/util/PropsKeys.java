@@ -1739,6 +1739,10 @@ public interface PropsKeys {
 
 	public static final String PORTAL_PROXY_PATH = "portal.proxy.path";
 
+	public static final String PORTAL_SECURITY_ASPECTJ_ASPECTS = "portal.security.aspectj.aspects";
+
+	public static final String PORTAL_SECURITY_ASPECTJ_WOVEN_DUMP_FOLDER = "portal.security.aspectj.woven.dump.folder";
+
 	public static final String PORTAL_SECURITY_MANAGER_FILE_CHECKER_DEFAULT_READ_PATHS = "portal.security.manager.file.checker.default.read.paths";
 
 	public static final String PORTAL_SECURITY_MANAGER_PRELOAD_CLASSLOADER_CLASSES = "portal.security.manager.preload.classloader.classes";
