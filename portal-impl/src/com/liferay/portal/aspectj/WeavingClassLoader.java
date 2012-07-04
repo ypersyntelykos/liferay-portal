@@ -533,7 +533,7 @@ public class WeavingClassLoader extends URLClassLoader {
 
 		for (String classPathElement : classPathElements) {
 			try {
-				URL fileURL = new URL("file:" + classPathElement);
+				URL fileURL = new File(classPathElement).toURI().toURL();
 
 				urlSet.add(fileURL);
 			}
