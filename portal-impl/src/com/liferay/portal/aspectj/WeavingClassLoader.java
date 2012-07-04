@@ -20,6 +20,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.process.ClassPathUtil;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
+import com.liferay.portal.kernel.util.ServerDetector;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -38,6 +39,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
 import java.net.MalformedURLException;
@@ -79,7 +81,7 @@ public class WeavingClassLoader extends URLClassLoader {
 		ServletContext servletContext, ClassLoader webappClassLoader,
 		List<Class<? extends PACLAspect>> aspectClasses) {
 
-		super(new URL[0], webappClassLoader.getParent());
+		super(new URL[0], _getParentClassLoader(webappClassLoader));
 
 		_webappClassLoader = webappClassLoader;
 
@@ -337,6 +339,44 @@ public class WeavingClassLoader extends URLClassLoader {
 		}
 	}
 
+	private static ClassLoader _getParentClassLoader(ClassLoader classLoader) {
+		ClassLoader parentClassLoader = classLoader.getParent();
+
+		if (ServerDetector.isResin()) {
+			Class<?> clazz = classLoader.getClass();
+
+			if (clazz.getName().equals(RESIN_ENVIROMENT_CLASSLOADER)) {
+
+				try {
+					Method getAttributeMethod = clazz.getMethod(
+						"getAttribute", String.class);
+
+					Object webApp = getAttributeMethod.invoke(
+						classLoader, RESIN_WEBAPP_KEY);
+
+					Method createMethod = clazz.getMethod(
+						"create", ClassLoader.class);
+
+					ClassLoader newClassLoader =
+						(ClassLoader)createMethod.invoke(null, classLoader);
+
+					Method setAttributeMethod = clazz.getMethod(
+						"setAttribute", String.class, Object.class);
+
+					setAttributeMethod.invoke(
+						newClassLoader, RESIN_WEBAPP_KEY, webApp);
+
+					parentClassLoader = newClassLoader;
+				}
+				catch (Exception e) {
+					_log.error("Failed to wrap ClassLoader for Resin", e);
+				}
+			}
+		}
+
+		return parentClassLoader;
+	}
+
 	private void _copyStaticFields(Class<?> clazz, Class<?> wovenClass) {
 		Field[] fields = clazz.getDeclaredFields();
 
@@ -451,7 +491,32 @@ public class WeavingClassLoader extends URLClassLoader {
 			if (classLoader instanceof URLClassLoader) {
 				URL[] urls = ((URLClassLoader)classLoader).getURLs();
 
-				urlSet.addAll(Arrays.asList(urls));
+				for (URL url : urls) {
+					if (url.getProtocol().equals("jar")) {
+						String path = url.getPath();
+
+						int index = path.lastIndexOf("!/");
+
+						if (index != -1) {
+							path = path.substring(0, index);
+						}
+
+						try {
+							url = new URL(path);
+						}
+						catch (MalformedURLException murle) {
+							if (_log.isWarnEnabled()) {
+								_log.warn(
+									"Can not convert jar " + url + "'s path " +
+									path + " to a file URL", murle);
+							}
+
+							continue;
+						}
+					}
+
+					urlSet.add(url);
+				}
 			}
 			else if (_log.isDebugEnabled()) {
 				_log.debug(
@@ -490,6 +555,11 @@ public class WeavingClassLoader extends URLClassLoader {
 
 		return resourcePath.concat(".class");
 	}
+
+	private static final String RESIN_ENVIROMENT_CLASSLOADER =
+		"com.caucho.loader.EnvironmentClassLoader";
+
+	private static final String RESIN_WEBAPP_KEY = "caucho.application";
 
 	private static Log _log = LogFactoryUtil.getLog(WeavingClassLoader.class);
 
