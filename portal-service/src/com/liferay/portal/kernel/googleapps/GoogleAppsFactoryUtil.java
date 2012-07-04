@@ -14,11 +14,12 @@
 
 package com.liferay.portal.kernel.googleapps;
 
-import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+import com.liferay.portal.kernel.security.annotation.AccessControl;
 
 /**
  * @author Brian Wing Shun Chan
  */
+@AccessControl
 public class GoogleAppsFactoryUtil {
 
 	public static GEmailSettingsManager getGEmailSettingsManager(
@@ -36,9 +37,6 @@ public class GoogleAppsFactoryUtil {
 	}
 
 	public static GoogleAppsFactory getGoogleAppsFactory() {
-		PortalRuntimePermission.checkGetBeanProperty(
-			GoogleAppsFactoryUtil.class);
-
 		return _googleAppsFactory;
 	}
 
@@ -47,8 +45,6 @@ public class GoogleAppsFactoryUtil {
 	}
 
 	public void setGoogleAppsFactory(GoogleAppsFactory googleAppsFactory) {
-		PortalRuntimePermission.checkSetBeanProperty(getClass());
-
 		_googleAppsFactory = googleAppsFactory;
 	}
 

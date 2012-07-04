@@ -14,22 +14,22 @@
 
 package com.liferay.portal.kernel.bi.rules;
 
-import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+import com.liferay.portal.kernel.security.annotation.AccessControl;
 
 import java.util.List;
 import java.util.Map;
 
 /**
  * @author Michael C. Han
- * @author Raymond Augé
  */
+@AccessControl
 public class RulesEngineUtil {
 
 	public static void add(
 			String domainName, RulesResourceRetriever rulesResourceRetriever)
 		throws RulesEngineException {
 
-		getRulesEngine().add(domainName, rulesResourceRetriever);
+		_rulesEngine.add(domainName, rulesResourceRetriever);
 	}
 
 	public static void add(
@@ -37,20 +37,20 @@ public class RulesEngineUtil {
 			ClassLoader... classloaders)
 		throws RulesEngineException {
 
-		getRulesEngine().add(domainName, rulesResourceRetriever, classloaders);
+		_rulesEngine.add(domainName, rulesResourceRetriever, classloaders);
 	}
 
 	public static boolean containsRuleDomain(String domainName)
 		throws RulesEngineException {
 
-		return getRulesEngine().containsRuleDomain(domainName);
+		return _rulesEngine.containsRuleDomain(domainName);
 	}
 
 	public static void execute(
 			RulesResourceRetriever rulesResourceRetriever, List<Fact<?>> facts)
 		throws RulesEngineException {
 
-		getRulesEngine().execute(rulesResourceRetriever, facts);
+		_rulesEngine.execute(rulesResourceRetriever, facts);
 	}
 
 	public static void execute(
@@ -58,7 +58,7 @@ public class RulesEngineUtil {
 			ClassLoader... classloaders)
 		throws RulesEngineException {
 
-		getRulesEngine().execute(rulesResourceRetriever, facts, classloaders);
+		_rulesEngine.execute(rulesResourceRetriever, facts, classloaders);
 	}
 
 	public static Map<String, ?> execute(
@@ -66,7 +66,7 @@ public class RulesEngineUtil {
 			Query query)
 		throws RulesEngineException {
 
-		return getRulesEngine().execute(rulesResourceRetriever, facts, query);
+		return _rulesEngine.execute(rulesResourceRetriever, facts, query);
 	}
 
 	public static Map<String, ?> execute(
@@ -74,28 +74,28 @@ public class RulesEngineUtil {
 			Query query, ClassLoader... classloaders)
 		throws RulesEngineException {
 
-		return getRulesEngine().execute(
+		return _rulesEngine.execute(
 			rulesResourceRetriever, facts, query, classloaders);
 	}
 
 	public static void execute(String domainName, List<Fact<?>> facts)
 		throws RulesEngineException {
 
-		getRulesEngine().execute(domainName, facts);
+		_rulesEngine.execute(domainName, facts);
 	}
 
 	public static void execute(
 			String domainName, List<Fact<?>> facts, ClassLoader... classloaders)
 		throws RulesEngineException {
 
-		getRulesEngine().execute(domainName, facts, classloaders);
+		_rulesEngine.execute(domainName, facts, classloaders);
 	}
 
 	public static Map<String, ?> execute(
 			String domainName, List<Fact<?>> facts, Query query)
 		throws RulesEngineException {
 
-		return getRulesEngine().execute(domainName, facts, query);
+		return _rulesEngine.execute(domainName, facts, query);
 	}
 
 	public static Map<String, ?> execute(
@@ -103,24 +103,18 @@ public class RulesEngineUtil {
 			ClassLoader... classloaders)
 		throws RulesEngineException {
 
-		return getRulesEngine().execute(domainName, facts, query, classloaders);
-	}
-
-	public static RulesEngine getRulesEngine() {
-		PortalRuntimePermission.checkGetBeanProperty(RulesEngineUtil.class);
-
-		return _rulesEngine;
+		return _rulesEngine.execute(domainName, facts, query, classloaders);
 	}
 
 	public static void remove(String domainName) throws RulesEngineException {
-		getRulesEngine().remove(domainName);
+		_rulesEngine.remove(domainName);
 	}
 
 	public static void update(
 			String domainName, RulesResourceRetriever rulesResourceRetriever)
 		throws RulesEngineException {
 
-		getRulesEngine().update(domainName, rulesResourceRetriever);
+		_rulesEngine.update(domainName, rulesResourceRetriever);
 	}
 
 	public static void update(
@@ -128,13 +122,10 @@ public class RulesEngineUtil {
 			ClassLoader... classloaders)
 		throws RulesEngineException {
 
-		getRulesEngine().update(
-			domainName, rulesResourceRetriever, classloaders);
+		_rulesEngine.update(domainName, rulesResourceRetriever, classloaders);
 	}
 
 	public void setRulesEngine(RulesEngine rulesEngine) {
-		PortalRuntimePermission.checkSetBeanProperty(getClass());
-
 		_rulesEngine = rulesEngine;
 	}
 

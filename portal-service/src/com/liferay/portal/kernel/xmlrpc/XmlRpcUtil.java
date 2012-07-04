@@ -14,11 +14,12 @@
 
 package com.liferay.portal.kernel.xmlrpc;
 
-import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+import com.liferay.portal.kernel.security.annotation.AccessControl;
 
 /**
  * @author Brian Wing Shun Chan
  */
+@AccessControl
 public class XmlRpcUtil {
 
 	public static Fault createFault(int code, String description) {
@@ -37,14 +38,10 @@ public class XmlRpcUtil {
 	}
 
 	public static XmlRpc getXmlRpc() {
-		PortalRuntimePermission.checkGetBeanProperty(XmlRpcUtil.class);
-
 		return _xmlRpc;
 	}
 
 	public void setXmlRpc(XmlRpc xmlRpc) {
-		PortalRuntimePermission.checkSetBeanProperty(getClass());
-
 		_xmlRpc = xmlRpc;
 	}
 

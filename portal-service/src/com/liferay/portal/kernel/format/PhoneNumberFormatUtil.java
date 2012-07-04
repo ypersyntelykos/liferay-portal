@@ -14,12 +14,13 @@
 
 package com.liferay.portal.kernel.format;
 
-import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+import com.liferay.portal.kernel.security.annotation.AccessControl;
 
 /**
  * @author Brian Wing Shun Chan
  * @author Manuel de la Peña
  */
+@AccessControl
 public class PhoneNumberFormatUtil {
 
 	public static String format(String phoneNumber) {
@@ -27,9 +28,6 @@ public class PhoneNumberFormatUtil {
 	}
 
 	public static PhoneNumberFormat getPhoneNumberFormat() {
-		PortalRuntimePermission.checkGetBeanProperty(
-			PhoneNumberFormatUtil.class);
-
 		return _phoneNumberFormat;
 	}
 
@@ -42,8 +40,6 @@ public class PhoneNumberFormatUtil {
 	}
 
 	public void setPhoneNumberFormat(PhoneNumberFormat phoneNumberFormat) {
-		PortalRuntimePermission.checkSetBeanProperty(getClass());
-
 		_phoneNumberFormat = phoneNumberFormat;
 	}
 

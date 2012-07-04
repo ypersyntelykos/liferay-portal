@@ -14,11 +14,12 @@
 
 package com.liferay.portal.kernel.util;
 
-import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+import com.liferay.portal.kernel.security.annotation.AccessControl;
 
 /**
  * @author Brian Wing Shun Chan
  */
+@AccessControl
 public class MultiValueMapFactoryUtil {
 
 	public static MultiValueMap<?, ?> getMultiValueMap(int type) {
@@ -30,16 +31,11 @@ public class MultiValueMapFactoryUtil {
 	}
 
 	public static MultiValueMapFactory getMultiValueMapFactory() {
-		PortalRuntimePermission.checkGetBeanProperty(
-			MultiValueMapFactoryUtil.class);
-
 		return _multiValueMapFactory;
 	}
 
 	public void setMultiValueMapFactory(
 		MultiValueMapFactory multiValueMapFactory) {
-
-		PortalRuntimePermission.checkSetBeanProperty(getClass());
 
 		_multiValueMapFactory = multiValueMapFactory;
 	}

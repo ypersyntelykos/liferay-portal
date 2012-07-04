@@ -14,13 +14,14 @@
 
 package com.liferay.portal.kernel.dao.jdbc;
 
-import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+import com.liferay.portal.kernel.security.annotation.AccessControl;
 
 import javax.sql.DataSource;
 
 /**
  * @author Brian Wing Shun Chan
  */
+@AccessControl
 public class SqlUpdateFactoryUtil {
 
 	public static SqlUpdate getSqlUpdate(
@@ -30,15 +31,10 @@ public class SqlUpdateFactoryUtil {
 	}
 
 	public static SqlUpdateFactory getSqlUpdateFactory() {
-		PortalRuntimePermission.checkGetBeanProperty(
-			SqlUpdateFactoryUtil.class);
-
 		return _sqlUpdateFactory;
 	}
 
 	public void setSqlUpdateFactory(SqlUpdateFactory sqlUpdateFactory) {
-		PortalRuntimePermission.checkSetBeanProperty(getClass());
-
 		_sqlUpdateFactory = sqlUpdateFactory;
 	}
 

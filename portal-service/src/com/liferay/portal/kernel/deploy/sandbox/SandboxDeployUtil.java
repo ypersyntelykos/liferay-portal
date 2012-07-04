@@ -14,7 +14,7 @@
 
 package com.liferay.portal.kernel.deploy.sandbox;
 
-import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+import com.liferay.portal.kernel.security.annotation.AccessControl;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -22,43 +22,21 @@ import java.util.Map;
 /**
  * @author Igor Spasic
  * @author Brian Wing Shun Chan
- * @author Raymond Augé
  */
+@AccessControl
 public class SandboxDeployUtil {
 
 	public static SandboxDeployDir getDir(String name) {
-		return getInstance()._getDir(name);
-	}
-
-	public static SandboxDeployUtil getInstance() {
-		PortalRuntimePermission.checkGetBeanProperty(SandboxDeployUtil.class);
-
-		return _instance;
-	}
-
-	public static void registerDir(SandboxDeployDir sandboxDeployDir) {
-		getInstance()._registerDir(sandboxDeployDir);
-	}
-
-	public static void unregisterDir(String name) {
-		getInstance()._unregisterDir(name);
-	}
-
-	private SandboxDeployUtil() {
-		_sandboxDeployDirs = new HashMap<String, SandboxDeployDir>();
-	}
-
-	private SandboxDeployDir _getDir(String name) {
 		return _sandboxDeployDirs.get(name);
 	}
 
-	private void _registerDir(SandboxDeployDir sandboxDeployDir) {
+	public static void registerDir(SandboxDeployDir sandboxDeployDir) {
 		_sandboxDeployDirs.put(sandboxDeployDir.getName(), sandboxDeployDir);
 
 		sandboxDeployDir.start();
 	}
 
-	private void _unregisterDir(String name) {
+	public static void unregisterDir(String name) {
 		SandboxDeployDir sandboxDeployDir = _sandboxDeployDirs.remove(name);
 
 		if (sandboxDeployDir != null) {
@@ -66,8 +44,7 @@ public class SandboxDeployUtil {
 		}
 	}
 
-	private static SandboxDeployUtil _instance = new SandboxDeployUtil();
-
-	private Map<String, SandboxDeployDir> _sandboxDeployDirs;
+	private static Map<String, SandboxDeployDir> _sandboxDeployDirs =
+		new HashMap<String, SandboxDeployDir>();
 
 }

@@ -15,7 +15,7 @@
 package com.liferay.portlet.dynamicdatalists.util;
 
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+import com.liferay.portal.kernel.security.annotation.AccessControl;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -23,6 +23,7 @@ import java.util.Map;
 /**
  * @author Marcellus Tavares
  */
+@AccessControl
 public class DDLExporterFactory {
 
 	public static DDLExporter getDDLExporter(DDLExportFormat exportFormat)
@@ -38,8 +39,6 @@ public class DDLExporterFactory {
 	}
 
 	public void setDDLExporters(Map<String, DDLExporter> exporters) {
-		PortalRuntimePermission.checkSetBeanProperty(getClass());
-
 		_exporters = new HashMap<DDLExportFormat, DDLExporter>();
 
 		for (Map.Entry<String, DDLExporter> entry : exporters.entrySet()) {

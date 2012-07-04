@@ -14,7 +14,7 @@
 
 package com.liferay.portal.util;
 
-import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+import com.liferay.portal.kernel.security.annotation.AccessControl;
 
 import java.util.Set;
 
@@ -22,6 +22,7 @@ import java.util.Set;
  * @author Ryan Park
  * @author Brian Wing Shun Chan
  */
+@AccessControl
 public class CustomJspRegistryUtil {
 
 	public static String getCustomJspFileName(
@@ -32,9 +33,6 @@ public class CustomJspRegistryUtil {
 	}
 
 	public static CustomJspRegistry getCustomJspRegistry() {
-		PortalRuntimePermission.checkGetBeanProperty(
-			CustomJspRegistryUtil.class);
-
 		return _customJspRegistry;
 	}
 
@@ -58,8 +56,6 @@ public class CustomJspRegistryUtil {
 	}
 
 	public void setCustomJspRegistry(CustomJspRegistry customJspRegistry) {
-		PortalRuntimePermission.checkSetBeanProperty(getClass());
-
 		_customJspRegistry = customJspRegistry;
 	}
 

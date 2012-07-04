@@ -14,7 +14,7 @@
 
 package com.liferay.portal.kernel.portlet;
 
-import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+import com.liferay.portal.kernel.security.annotation.AccessControl;
 import com.liferay.portal.kernel.servlet.TempAttributesServletRequest;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
@@ -31,22 +31,15 @@ import javax.servlet.http.HttpServletResponse;
 
 /**
  * @author Shuyang Zhou
- * @author Raymond Augé
  */
+@AccessControl
 public class PortletContainerUtil {
-
-	public static PortletContainer getPortletContainer() {
-		PortalRuntimePermission.checkGetBeanProperty(
-			PortletContainerUtil.class);
-
-		return _portletContainer;
-	}
 
 	public static void preparePortlet(
 			HttpServletRequest request, Portlet portlet)
 		throws PortletContainerException {
 
-		getPortletContainer().preparePortlet(request, portlet);
+		_portletContainer.preparePortlet(request, portlet);
 	}
 
 	public static void processAction(
@@ -54,7 +47,7 @@ public class PortletContainerUtil {
 			Portlet portlet)
 		throws PortletContainerException {
 
-		getPortletContainer().processAction(request, response, portlet);
+		_portletContainer.processAction(request, response, portlet);
 	}
 
 	public static void processEvent(
@@ -62,7 +55,7 @@ public class PortletContainerUtil {
 			Portlet portlet, Layout layout, Event event)
 		throws PortletContainerException {
 
-		getPortletContainer().processEvent(
+		_portletContainer.processEvent(
 			request, response, portlet, layout, event);
 	}
 
@@ -71,7 +64,7 @@ public class PortletContainerUtil {
 			Portlet portlet)
 		throws PortletContainerException {
 
-		getPortletContainer().render(request, response, portlet);
+		_portletContainer.render(request, response, portlet);
 	}
 
 	public static void serveResource(
@@ -79,7 +72,7 @@ public class PortletContainerUtil {
 			Portlet portlet)
 		throws PortletContainerException {
 
-		getPortletContainer().serveResource(request, response, portlet);
+		_portletContainer.serveResource(request, response, portlet);
 	}
 
 	public static HttpServletRequest setupOptionalRenderParameters(
@@ -143,8 +136,6 @@ public class PortletContainerUtil {
 	}
 
 	public void setPortletContainer(PortletContainer portletContainer) {
-		PortalRuntimePermission.checkSetBeanProperty(getClass());
-
 		if ((_LAYOUT_PARALLEL_RENDER_ENABLE && ServerDetector.isTomcat()) ||
 			_PORTLET_CONTAINER_RESTRICT) {
 

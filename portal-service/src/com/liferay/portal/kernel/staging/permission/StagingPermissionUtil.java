@@ -14,19 +14,17 @@
 
 package com.liferay.portal.kernel.staging.permission;
 
-import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+import com.liferay.portal.kernel.security.annotation.AccessControl;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.security.permission.PermissionChecker;
 
 /**
  * @author Jorge Ferrer
  */
+@AccessControl
 public class StagingPermissionUtil {
 
 	public static StagingPermission getStagingPermission() {
-		PortalRuntimePermission.checkGetBeanProperty(
-			StagingPermissionUtil.class);
-
 		return _stagingPermission;
 	}
 
@@ -48,8 +46,6 @@ public class StagingPermissionUtil {
 	}
 
 	public void setStagingPermission(StagingPermission stagingPermission) {
-		PortalRuntimePermission.checkSetBeanProperty(getClass());
-
 		_stagingPermission = stagingPermission;
 	}
 

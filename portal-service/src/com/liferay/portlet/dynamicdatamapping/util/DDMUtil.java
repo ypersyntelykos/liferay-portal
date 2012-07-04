@@ -16,7 +16,7 @@ package com.liferay.portlet.dynamicdatamapping.util;
 
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+import com.liferay.portal.kernel.security.annotation.AccessControl;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.model.BaseModel;
 import com.liferay.portal.service.ServiceContext;
@@ -29,11 +29,10 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * @author Eduardo Lundgren
  */
+@AccessControl
 public class DDMUtil {
 
 	public static DDM getDDM() {
-		PortalRuntimePermission.checkGetBeanProperty(DDMUtil.class);
-
 		return _ddm;
 	}
 
@@ -116,8 +115,6 @@ public class DDMUtil {
 	}
 
 	public void setDDM(DDM ddm) {
-		PortalRuntimePermission.checkSetBeanProperty(getClass());
-
 		_ddm = ddm;
 	}
 

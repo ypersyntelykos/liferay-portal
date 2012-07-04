@@ -16,7 +16,7 @@ package com.liferay.portal.service.permission;
 
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+import com.liferay.portal.kernel.security.annotation.AccessControl;
 import com.liferay.portal.model.Layout;
 import com.liferay.portal.security.permission.PermissionChecker;
 
@@ -24,6 +24,7 @@ import com.liferay.portal.security.permission.PermissionChecker;
  * @author Brian Wing Shun Chan
  * @author Raymond Augé
  */
+@AccessControl
 public class LayoutPermissionUtil {
 
 	public static void check(
@@ -135,15 +136,10 @@ public class LayoutPermissionUtil {
 	}
 
 	public static LayoutPermission getLayoutPermission() {
-		PortalRuntimePermission.checkGetBeanProperty(
-			LayoutPermissionUtil.class);
-
 		return _layoutPermission;
 	}
 
 	public void setLayoutPermission(LayoutPermission layoutPermission) {
-		PortalRuntimePermission.checkSetBeanProperty(getClass());
-
 		_layoutPermission = layoutPermission;
 	}
 

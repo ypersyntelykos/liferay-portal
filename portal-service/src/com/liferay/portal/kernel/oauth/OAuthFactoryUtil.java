@@ -14,11 +14,12 @@
 
 package com.liferay.portal.kernel.oauth;
 
-import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+import com.liferay.portal.kernel.security.annotation.AccessControl;
 
 /**
  * @author Brian Wing Shun Chan
  */
+@AccessControl
 public class OAuthFactoryUtil {
 
 	public static OAuthManager createOAuthManager(
@@ -49,14 +50,10 @@ public class OAuthFactoryUtil {
 	}
 
 	public static OAuthFactory getOAuthFactory() {
-		PortalRuntimePermission.checkGetBeanProperty(OAuthFactoryUtil.class);
-
 		return _oAuthFactory;
 	}
 
 	public void setOAuthFactory(OAuthFactory oAuthFactory) {
-		PortalRuntimePermission.checkSetBeanProperty(getClass());
-
 		_oAuthFactory = oAuthFactory;
 	}
 

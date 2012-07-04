@@ -14,7 +14,7 @@
 
 package com.liferay.portal.security.ldap;
 
-import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+import com.liferay.portal.kernel.security.annotation.AccessControl;
 import com.liferay.portal.model.Contact;
 import com.liferay.portal.model.User;
 
@@ -27,42 +27,32 @@ import java.util.Map;
  * @author Michael C. Han
  * @author Brian Wing Shun Chan
  * @author Marcellus Tavares
- * @author Raymond Augé
  */
+@AccessControl
 public class PortalLDAPExporterUtil {
 
 	public static void exportToLDAP(
 			Contact contact, Map<String, Serializable> contactExpandoAttributes)
 		throws Exception {
 
-		getPortalLDAPExporter().exportToLDAP(contact, contactExpandoAttributes);
+		_portalLDAPExporter.exportToLDAP(contact, contactExpandoAttributes);
 	}
 
 	public static void exportToLDAP(
 			long userId, long userGroupId, LDAPOperation ldapOperation)
 		throws Exception {
 
-		getPortalLDAPExporter().exportToLDAP(
-			userId, userGroupId, ldapOperation);
+		_portalLDAPExporter.exportToLDAP(userId, userGroupId, ldapOperation);
 	}
 
 	public static void exportToLDAP(
 			User user, Map<String, Serializable> userExpandoAttributes)
 		throws Exception {
 
-		getPortalLDAPExporter().exportToLDAP(user, userExpandoAttributes);
-	}
-
-	public static PortalLDAPExporter getPortalLDAPExporter() {
-		PortalRuntimePermission.checkGetBeanProperty(
-			PortalLDAPExporterUtil.class);
-
-		return _portalLDAPExporter;
+		_portalLDAPExporter.exportToLDAP(user, userExpandoAttributes);
 	}
 
 	public void setPortalLDAPExporter(PortalLDAPExporter portalLDAPExporter) {
-		PortalRuntimePermission.checkSetBeanProperty(getClass());
-
 		_portalLDAPExporter = portalLDAPExporter;
 	}
 

@@ -16,13 +16,14 @@ package com.liferay.portlet.mobiledevicerules.service.permission;
 
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+import com.liferay.portal.kernel.security.annotation.AccessControl;
 import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portlet.mobiledevicerules.model.MDRRuleGroupInstance;
 
 /**
  * @author Michael C. Han
  */
+@AccessControl
 public class MDRRuleGroupInstancePermissionUtil {
 
 	public static void check(
@@ -68,8 +69,6 @@ public class MDRRuleGroupInstancePermissionUtil {
 
 	public void setMDRRuleGroupInstancePermission(
 		MDRRuleGroupInstancePermission mdrRuleGroupInstancePermission) {
-
-		PortalRuntimePermission.checkSetBeanProperty(getClass());
 
 		_mdrRuleGroupInstancePermission = mdrRuleGroupInstancePermission;
 	}

@@ -14,7 +14,7 @@
 
 package com.liferay.portal.kernel.servlet;
 
-import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+import com.liferay.portal.kernel.security.annotation.AccessControl;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -24,6 +24,7 @@ import javax.servlet.http.HttpServletRequest;
  * @author Brian Wing Shun Chan
  * @author Eduardo Lundgren
  */
+@AccessControl
 public class BrowserSnifferUtil {
 
 	public static boolean acceptsGzip(HttpServletRequest request) {
@@ -35,8 +36,6 @@ public class BrowserSnifferUtil {
 	}
 
 	public static BrowserSniffer getBrowserSniffer() {
-		PortalRuntimePermission.checkGetBeanProperty(BrowserSnifferUtil.class);
-
 		return _browserSniffer;
 	}
 
@@ -129,8 +128,6 @@ public class BrowserSnifferUtil {
 	}
 
 	public void setBrowserSniffer(BrowserSniffer browserSniffer) {
-		PortalRuntimePermission.checkSetBeanProperty(getClass());
-
 		_browserSniffer = browserSniffer;
 	}
 

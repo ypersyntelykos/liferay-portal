@@ -14,11 +14,12 @@
 
 package com.liferay.portal.kernel.microsofttranslator;
 
-import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+import com.liferay.portal.kernel.security.annotation.AccessControl;
 
 /**
  * @author Hugo Huijser
  */
+@AccessControl
 public class MicrosoftTranslatorFactoryUtil {
 
 	public static MicrosoftTranslator getMicrosoftTranslator() {
@@ -33,16 +34,11 @@ public class MicrosoftTranslatorFactoryUtil {
 	}
 
 	public static MicrosoftTranslatorFactory getMicrosoftTranslatorFactory() {
-		PortalRuntimePermission.checkGetBeanProperty(
-			MicrosoftTranslatorFactoryUtil.class);
-
 		return _microsoftTranslatorFactory;
 	}
 
 	public void setMicrosoftTranslatorFactory(
 		MicrosoftTranslatorFactory microsoftTranslatorFactory) {
-
-		PortalRuntimePermission.checkSetBeanProperty(getClass());
 
 		_microsoftTranslatorFactory = microsoftTranslatorFactory;
 	}

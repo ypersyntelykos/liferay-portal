@@ -15,7 +15,7 @@
 package com.liferay.portlet.documentlibrary.util;
 
 import com.liferay.portal.kernel.repository.model.FileVersion;
-import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+import com.liferay.portal.kernel.security.annotation.AccessControl;
 
 import java.io.InputStream;
 
@@ -24,6 +24,7 @@ import java.util.Set;
 /**
  * @author Sergio González
  */
+@AccessControl
 public class AudioProcessorUtil {
 
 	public static void generateAudio(
@@ -39,8 +40,6 @@ public class AudioProcessorUtil {
 	}
 
 	public static AudioProcessor getAudioProcessor() {
-		PortalRuntimePermission.checkGetBeanProperty(AudioProcessorUtil.class);
-
 		return _audioProcessor;
 	}
 
@@ -80,8 +79,6 @@ public class AudioProcessorUtil {
 	}
 
 	public void setAudioProcessor(AudioProcessor audioProcessor) {
-		PortalRuntimePermission.checkSetBeanProperty(getClass());
-
 		_audioProcessor = audioProcessor;
 	}
 

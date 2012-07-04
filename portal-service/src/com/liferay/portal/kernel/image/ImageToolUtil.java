@@ -14,7 +14,7 @@
 
 package com.liferay.portal.kernel.image;
 
-import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+import com.liferay.portal.kernel.security.annotation.AccessControl;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
@@ -30,6 +30,7 @@ import java.io.OutputStream;
  * @author Brian Wing Shun Chan
  * @author Alexander Chow
  */
+@AccessControl
 public class ImageToolUtil {
 
 	/**
@@ -119,8 +120,6 @@ public class ImageToolUtil {
 	}
 
 	public static ImageTool getImageTool() {
-		PortalRuntimePermission.checkGetBeanProperty(ImageToolUtil.class);
-
 		return _imageTool;
 	}
 
@@ -199,8 +198,6 @@ public class ImageToolUtil {
 	}
 
 	public void setImageTool(ImageTool imageTool) {
-		PortalRuntimePermission.checkSetBeanProperty(getClass());
-
 		_imageTool = imageTool;
 	}
 

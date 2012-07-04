@@ -17,11 +17,12 @@ package com.liferay.portal.kernel.repository.cmis.search;
 import com.liferay.portal.kernel.search.Query;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.SearchException;
-import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+import com.liferay.portal.kernel.security.annotation.AccessControl;
 
 /**
  * @author Mika Koivisto
  */
+@AccessControl
 public class CMISSearchQueryBuilderUtil {
 
 	public static String buildQuery(SearchContext searchContext, Query query)
@@ -31,16 +32,11 @@ public class CMISSearchQueryBuilderUtil {
 	}
 
 	public static CMISSearchQueryBuilder getCmisSearchQueryBuilder() {
-		PortalRuntimePermission.checkGetBeanProperty(
-			CMISSearchQueryBuilderUtil.class);
-
 		return _cmisSearchQueryBuilder;
 	}
 
 	public void setCmisSearchQueryBuilder(
 		CMISSearchQueryBuilder cmisSearchQueryBuilder) {
-
-		PortalRuntimePermission.checkSetBeanProperty(getClass());
 
 		_cmisSearchQueryBuilder = cmisSearchQueryBuilder;
 	}

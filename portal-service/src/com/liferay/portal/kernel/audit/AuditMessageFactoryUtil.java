@@ -16,19 +16,17 @@ package com.liferay.portal.kernel.audit;
 
 import com.liferay.portal.kernel.json.JSONException;
 import com.liferay.portal.kernel.json.JSONObject;
-import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+import com.liferay.portal.kernel.security.annotation.AccessControl;
 
 import java.util.Date;
 
 /**
  * @author Amos Fong
  */
+@AccessControl
 public class AuditMessageFactoryUtil {
 
 	public static AuditMessageFactory getAuditMessageFactory() {
-		PortalRuntimePermission.checkGetBeanProperty(
-			AuditMessageFactoryUtil.class);
-
 		return _auditMessageFactory;
 	}
 
@@ -82,8 +80,6 @@ public class AuditMessageFactoryUtil {
 
 	public void setAuditMessageFactory(
 		AuditMessageFactory auditMessageFactory) {
-
-		PortalRuntimePermission.checkSetBeanProperty(getClass());
 
 		_auditMessageFactory = auditMessageFactory;
 	}

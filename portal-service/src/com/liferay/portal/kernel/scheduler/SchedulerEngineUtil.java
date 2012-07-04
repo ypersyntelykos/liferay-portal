@@ -26,7 +26,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.messaging.DestinationNames;
 import com.liferay.portal.kernel.messaging.Message;
 import com.liferay.portal.kernel.scheduler.messaging.SchedulerResponse;
-import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+import com.liferay.portal.kernel.security.annotation.AccessControl;
 import com.liferay.portal.kernel.util.CalendarFactoryUtil;
 import com.liferay.portal.kernel.util.InetAddressUtil;
 import com.liferay.portal.kernel.util.ObjectValuePair;
@@ -47,341 +47,11 @@ import javax.portlet.PortletRequest;
  * @author Bruno Farache
  * @author Shuyang Zhou
  * @author Tina Tian
- * @author Raymond Augé
  */
+@AccessControl
 public class SchedulerEngineUtil {
 
 	public static void addJob(
-			Trigger trigger, StorageType storageType, String description,
-			String destinationName, Message message,
-			String messageListenerClassName, String portletId,
-			int exceptionsMaxSize)
-		throws SchedulerException {
-
-		getInstance()._addJob(
-			trigger, storageType, description, destinationName, message,
-			messageListenerClassName, portletId, exceptionsMaxSize);
-	}
-
-	public static void addJob(
-			Trigger trigger, StorageType storageType, String description,
-			String destinationName, Object payload,
-			String messageListenerClassName, String portletId,
-			int exceptionsMaxSize)
-		throws SchedulerException {
-
-		getInstance()._addJob(
-			trigger, storageType, description, destinationName, payload,
-			messageListenerClassName, portletId, exceptionsMaxSize);
-	}
-
-	public static void addScriptingJob(
-			Trigger trigger, StorageType storageType, String description,
-			String language, String script, int exceptionsMaxSize)
-		throws SchedulerException {
-
-		getInstance()._addScriptingJob(
-			trigger, storageType, description, language, script,
-			exceptionsMaxSize);
-	}
-
-	public static void auditSchedulerJobs(
-			Message message, TriggerState triggerState)
-		throws SchedulerException {
-
-		getInstance()._auditSchedulerJobs(message, triggerState);
-	}
-
-	public static void delete(
-			SchedulerEntry schedulerEntry, StorageType storageType)
-		throws SchedulerException {
-
-		getInstance()._delete(schedulerEntry, storageType);
-	}
-
-	public static void delete(String groupName, StorageType storageType)
-		throws SchedulerException {
-
-		getInstance()._delete(groupName, storageType);
-	}
-
-	public static void delete(
-			String jobName, String groupName, StorageType storageType)
-		throws SchedulerException {
-
-		getInstance()._delete(jobName, groupName, storageType);
-	}
-
-	public static String getCronText(
-		Calendar calendar, boolean timeZoneSensitive) {
-
-		return getInstance()._getCronText(calendar, timeZoneSensitive);
-	}
-
-	public static String getCronText(
-		PortletRequest portletRequest, Calendar calendar,
-		boolean timeZoneSensitive, int recurrenceType) {
-
-		return getInstance()._getCronText(
-			portletRequest, calendar, timeZoneSensitive, recurrenceType);
-	}
-
-	public static Date getEndTime(SchedulerResponse schedulerResponse) {
-		return getInstance()._getEndTime(schedulerResponse);
-	}
-
-	public static Date getEndTime(
-			String jobName, String groupName, StorageType storageType)
-		throws SchedulerException {
-
-		return getInstance()._getEndTime(jobName, groupName, storageType);
-	}
-
-	public static Date getFinalFireTime(SchedulerResponse schedulerResponse) {
-		return getInstance()._getFinalFireTime(schedulerResponse);
-	}
-
-	public static Date getFinalFireTime(
-			String jobName, String groupName, StorageType storageType)
-		throws SchedulerException {
-
-		return getInstance()._getFinalFireTime(jobName, groupName, storageType);
-	}
-
-	public static SchedulerEngineUtil getInstance() {
-		PortalRuntimePermission.checkGetBeanProperty(SchedulerEngineUtil.class);
-
-		return _instance;
-	}
-
-	public static ObjectValuePair<Exception, Date>[] getJobExceptions(
-		SchedulerResponse schedulerResponse) {
-
-		return getInstance()._getJobExceptions(schedulerResponse);
-	}
-
-	public static ObjectValuePair<Exception, Date>[] getJobExceptions(
-			String jobName, String groupName, StorageType storageType)
-		throws SchedulerException {
-
-		return getInstance()._getJobExceptions(jobName, groupName, storageType);
-	}
-
-	public static TriggerState getJobState(
-		SchedulerResponse schedulerResponse) {
-
-		return getInstance()._getJobState(schedulerResponse);
-	}
-
-	public static TriggerState getJobState(
-			String jobName, String groupName, StorageType storageType)
-		throws SchedulerException {
-
-		return getInstance()._getJobState(jobName, groupName, storageType);
-	}
-
-	public static Date getNextFireTime(SchedulerResponse schedulerResponse) {
-		return getInstance()._getNextFireTime(schedulerResponse);
-	}
-
-	public static Date getNextFireTime(
-			String jobName, String groupName, StorageType storageType)
-		throws SchedulerException {
-
-		return getInstance()._getNextFireTime(jobName, groupName, storageType);
-	}
-
-	public static Date getPreviousFireTime(
-		SchedulerResponse schedulerResponse) {
-
-		return getInstance()._getPreviousFireTime(schedulerResponse);
-	}
-
-	public static Date getPreviousFireTime(
-			String jobName, String groupName, StorageType storageType)
-		throws SchedulerException {
-
-		return getInstance()._getPreviousFireTime(
-			jobName, groupName, storageType);
-	}
-
-	public static SchedulerResponse getScheduledJob(
-			String jobName, String groupName, StorageType storageType)
-		throws SchedulerException {
-
-		return getInstance()._getScheduledJob(jobName, groupName, storageType);
-	}
-
-	public static List<SchedulerResponse> getScheduledJobs()
-		throws SchedulerException {
-
-		return getInstance()._getScheduledJobs();
-	}
-
-	public static List<SchedulerResponse> getScheduledJobs(
-			StorageType storageType)
-		throws SchedulerException {
-
-		return getInstance()._getScheduledJobs(storageType);
-	}
-
-	public static List<SchedulerResponse> getScheduledJobs(
-			String groupName, StorageType storageType)
-		throws SchedulerException {
-
-		return getInstance()._getScheduledJobs(groupName, storageType);
-	}
-
-	public static Date getStartTime(SchedulerResponse schedulerResponse) {
-		return getInstance()._getStartTime(schedulerResponse);
-	}
-
-	public static Date getStartTime(
-			String jobName, String groupName, StorageType storageType)
-		throws SchedulerException {
-
-		return getInstance()._getStartTime(jobName, groupName, storageType);
-	}
-
-	public static void initialize() throws SchedulerException {
-		getInstance()._initialize();
-
-		SchedulerLifecycle schedulerLifecycle = new SchedulerLifecycle();
-
-		schedulerLifecycle.registerPortalLifecycle(PortalLifecycle.METHOD_INIT);
-	}
-
-	public static String namespaceGroupName(
-		String groupName, StorageType storageType) {
-
-		return getInstance()._namespaceGroupName(groupName, storageType);
-	}
-
-	public static void pause(String groupName, StorageType storageType)
-		throws SchedulerException {
-
-		getInstance()._pause(groupName, storageType);
-	}
-
-	public static void pause(
-			String jobName, String groupName, StorageType storageType)
-		throws SchedulerException {
-
-		getInstance()._pause(jobName, groupName, storageType);
-	}
-
-	public static void resume(String groupName, StorageType storageType)
-		throws SchedulerException {
-
-		getInstance()._resume(groupName, storageType);
-	}
-
-	public static void resume(
-			String jobName, String groupName, StorageType storageType)
-		throws SchedulerException {
-
-		getInstance()._resume(jobName, groupName, storageType);
-	}
-
-	public static void schedule(
-			SchedulerEntry schedulerEntry, StorageType storageType,
-			String portletId, int exceptionsMaxSize)
-		throws SchedulerException {
-
-		getInstance()._schedule(
-			schedulerEntry, storageType, portletId, exceptionsMaxSize);
-	}
-
-	public static void schedule(
-			Trigger trigger, StorageType storageType, String description,
-			String destinationName, Message message, int exceptionsMaxSize)
-		throws SchedulerException {
-
-		getInstance()._schedule(
-			trigger, storageType, description, destinationName, message,
-			exceptionsMaxSize);
-	}
-
-	public static void schedule(
-			Trigger trigger, StorageType storageType, String description,
-			String destinationName, Object payload, int exceptionsMaxSize)
-		throws SchedulerException {
-
-		getInstance()._schedule(
-			trigger, storageType, description, destinationName, payload,
-			exceptionsMaxSize);
-	}
-
-	public static void shutdown() throws SchedulerException {
-		getInstance()._shutdown();
-	}
-
-	public static void start() throws SchedulerException {
-		getInstance()._start();
-	}
-
-	public static void suppressError(
-			String jobName, String groupName, StorageType storageType)
-		throws SchedulerException {
-
-		getInstance()._suppressError(jobName, groupName, storageType);
-	}
-
-	public static void unschedule(
-			SchedulerEntry schedulerEntry, StorageType storageType)
-		throws SchedulerException {
-
-		getInstance()._unschedule(schedulerEntry, storageType);
-	}
-
-	public static void unschedule(String groupName, StorageType storageType)
-		throws SchedulerException {
-
-		getInstance()._unschedule(groupName, storageType);
-	}
-
-	public static void unschedule(
-			String jobName, String groupName, StorageType storageType)
-		throws SchedulerException {
-
-		getInstance()._unschedule(jobName, groupName, storageType);
-	}
-
-	public static void update(
-			String jobName, String groupName, StorageType storageType,
-			String description, String language, String script,
-			int exceptionsMaxSize)
-		throws SchedulerException {
-
-		getInstance()._update(
-			jobName, groupName, storageType, description, language, script,
-			exceptionsMaxSize);
-	}
-
-	public static void update(Trigger trigger, StorageType storageType)
-		throws SchedulerException {
-
-		getInstance()._update(trigger, storageType);
-	}
-
-	public static void updateMemorySchedulerClusterMaster()
-		throws SchedulerException {
-
-		getInstance()._updateMemorySchedulerClusterMaster();
-	}
-
-	public void setSchedulerEngine(SchedulerEngine schedulerEngine) {
-		PortalRuntimePermission.checkSetBeanProperty(getClass());
-
-		_instance._schedulerEngine = schedulerEngine;
-
-		if (schedulerEngine instanceof SchedulerEngineClusterManager) {
-			_instance._schedulerEngineClusterManager =
-				(SchedulerEngineClusterManager)schedulerEngine;
-		}
-	}
-
-	private void _addJob(
 			Trigger trigger, StorageType storageType, String description,
 			String destinationName, Message message,
 			String messageListenerClassName, String portletId,
@@ -397,12 +67,12 @@ public class SchedulerEngineUtil {
 			messageListenerClassName);
 		message.put(SchedulerEngine.PORTLET_ID, portletId);
 
-		_schedule(
+		schedule(
 			trigger, storageType, description, destinationName, message,
 			exceptionsMaxSize);
 	}
 
-	private void _addJob(
+	public static void addJob(
 			Trigger trigger, StorageType storageType, String description,
 			String destinationName, Object payload,
 			String messageListenerClassName, String portletId,
@@ -413,12 +83,12 @@ public class SchedulerEngineUtil {
 
 		message.setPayload(payload);
 
-		_addJob(
+		addJob(
 			trigger, storageType, description, destinationName, message,
 			messageListenerClassName, portletId, exceptionsMaxSize);
 	}
 
-	private void _addScriptingJob(
+	public static void addScriptingJob(
 			Trigger trigger, StorageType storageType, String description,
 			String language, String script, int exceptionsMaxSize)
 		throws SchedulerException {
@@ -428,20 +98,13 @@ public class SchedulerEngineUtil {
 		message.put(SchedulerEngine.LANGUAGE, language);
 		message.put(SchedulerEngine.SCRIPT, script);
 
-		_schedule(
+		schedule(
 			trigger, storageType, description,
 			DestinationNames.SCHEDULER_SCRIPTING, message, exceptionsMaxSize);
 	}
 
-	private void _addWeeklyDayPos(
-		PortletRequest portletRequest, List<DayAndPosition> list, int day) {
-
-		if (ParamUtil.getBoolean(portletRequest, "weeklyDayPos" + day)) {
-			list.add(new DayAndPosition(day, 0));
-		}
-	}
-
-	private void _auditSchedulerJobs(Message message, TriggerState triggerState)
+	public static void auditSchedulerJobs(
+			Message message, TriggerState triggerState)
 		throws SchedulerException {
 
 		try {
@@ -462,34 +125,37 @@ public class SchedulerEngineUtil {
 		}
 	}
 
-	private void _delete(SchedulerEntry schedulerEntry, StorageType storageType)
+	public static void delete(
+			SchedulerEntry schedulerEntry, StorageType storageType)
 		throws SchedulerException {
 
 		Trigger trigger = schedulerEntry.getTrigger();
 
-		_delete(trigger.getJobName(), trigger.getGroupName(), storageType);
+		delete(trigger.getJobName(), trigger.getGroupName(), storageType);
 	}
 
-	private void _delete(String groupName, StorageType storageType)
+	public static void delete(String groupName, StorageType storageType)
 		throws SchedulerException {
 
-		_schedulerEngine.delete(_namespaceGroupName(groupName, storageType));
+		_schedulerEngine.delete(namespaceGroupName(groupName, storageType));
 	}
 
-	private void _delete(
+	public static void delete(
 			String jobName, String groupName, StorageType storageType)
 		throws SchedulerException {
 
 		_schedulerEngine.delete(
-			jobName, _namespaceGroupName(groupName, storageType));
+			jobName, namespaceGroupName(groupName, storageType));
 	}
 
-	private String _getCronText(Calendar calendar, boolean timeZoneSensitive) {
-		return _getCronText(
+	public static String getCronText(
+		Calendar calendar, boolean timeZoneSensitive) {
+
+		return getCronText(
 			null, calendar, timeZoneSensitive, Recurrence.NO_RECURRENCE);
 	}
 
-	private String _getCronText(
+	public static String getCronText(
 		PortletRequest portletRequest, Calendar calendar,
 		boolean timeZoneSensitive, int recurrenceType) {
 
@@ -625,7 +291,7 @@ public class SchedulerEngineUtil {
 		return RecurrenceSerializer.toCronText(recurrence);
 	}
 
-	private Date _getEndTime(SchedulerResponse schedulerResponse) {
+	public static Date getEndTime(SchedulerResponse schedulerResponse) {
 		Message message = schedulerResponse.getMessage();
 
 		JobState jobState = (JobState)message.get(SchedulerEngine.JOB_STATE);
@@ -642,21 +308,21 @@ public class SchedulerEngineUtil {
 		}
 	}
 
-	private Date _getEndTime(
+	public static Date getEndTime(
 			String jobName, String groupName, StorageType storageType)
 		throws SchedulerException {
 
-		SchedulerResponse schedulerResponse = _getScheduledJob(
+		SchedulerResponse schedulerResponse = getScheduledJob(
 			jobName, groupName, storageType);
 
 		if (schedulerResponse != null) {
-			return _getEndTime(schedulerResponse);
+			return getEndTime(schedulerResponse);
 		}
 
 		return null;
 	}
 
-	private Date _getFinalFireTime(SchedulerResponse schedulerResponse) {
+	public static Date getFinalFireTime(SchedulerResponse schedulerResponse) {
 		Message message = schedulerResponse.getMessage();
 
 		JobState jobState = (JobState)message.get(SchedulerEngine.JOB_STATE);
@@ -673,21 +339,21 @@ public class SchedulerEngineUtil {
 		}
 	}
 
-	private Date _getFinalFireTime(
+	public static Date getFinalFireTime(
 			String jobName, String groupName, StorageType storageType)
 		throws SchedulerException {
 
-		SchedulerResponse schedulerResponse = _getScheduledJob(
+		SchedulerResponse schedulerResponse = getScheduledJob(
 			jobName, groupName, storageType);
 
 		if (schedulerResponse != null) {
-			return _getFinalFireTime(schedulerResponse);
+			return getFinalFireTime(schedulerResponse);
 		}
 
 		return null;
 	}
 
-	private ObjectValuePair<Exception, Date>[] _getJobExceptions(
+	public static ObjectValuePair<Exception, Date>[] getJobExceptions(
 		SchedulerResponse schedulerResponse) {
 
 		Message message = schedulerResponse.getMessage();
@@ -697,21 +363,23 @@ public class SchedulerEngineUtil {
 		return jobState.getExceptions();
 	}
 
-	private ObjectValuePair<Exception, Date>[] _getJobExceptions(
+	public static ObjectValuePair<Exception, Date>[] getJobExceptions(
 			String jobName, String groupName, StorageType storageType)
 		throws SchedulerException {
 
-		SchedulerResponse schedulerResponse = _getScheduledJob(
+		SchedulerResponse schedulerResponse = getScheduledJob(
 			jobName, groupName, storageType);
 
 		if (schedulerResponse != null) {
-			return _getJobExceptions(schedulerResponse);
+			return getJobExceptions(schedulerResponse);
 		}
 
 		return null;
 	}
 
-	private TriggerState _getJobState(SchedulerResponse schedulerResponse) {
+	public static TriggerState getJobState(
+		SchedulerResponse schedulerResponse) {
+
 		Message message = schedulerResponse.getMessage();
 
 		JobState jobState = (JobState)message.get(SchedulerEngine.JOB_STATE);
@@ -719,21 +387,21 @@ public class SchedulerEngineUtil {
 		return jobState.getTriggerState();
 	}
 
-	private TriggerState _getJobState(
+	public static TriggerState getJobState(
 			String jobName, String groupName, StorageType storageType)
 		throws SchedulerException {
 
-		SchedulerResponse schedulerResponse = _getScheduledJob(
+		SchedulerResponse schedulerResponse = getScheduledJob(
 			jobName, groupName, storageType);
 
 		if (schedulerResponse != null) {
-			return _getJobState(schedulerResponse);
+			return getJobState(schedulerResponse);
 		}
 
 		return null;
 	}
 
-	private Date _getNextFireTime(SchedulerResponse schedulerResponse) {
+	public static Date getNextFireTime(SchedulerResponse schedulerResponse) {
 		Message message = schedulerResponse.getMessage();
 
 		JobState jobState = (JobState)message.get(SchedulerEngine.JOB_STATE);
@@ -750,21 +418,23 @@ public class SchedulerEngineUtil {
 		}
 	}
 
-	private Date _getNextFireTime(
+	public static Date getNextFireTime(
 			String jobName, String groupName, StorageType storageType)
 		throws SchedulerException {
 
-		SchedulerResponse schedulerResponse = _getScheduledJob(
+		SchedulerResponse schedulerResponse = getScheduledJob(
 			jobName, groupName, storageType);
 
 		if (schedulerResponse != null) {
-			return _getNextFireTime(schedulerResponse);
+			return getNextFireTime(schedulerResponse);
 		}
 
 		return null;
 	}
 
-	private Date _getPreviousFireTime(SchedulerResponse schedulerResponse) {
+	public static Date getPreviousFireTime(
+		SchedulerResponse schedulerResponse) {
+
 		Message message = schedulerResponse.getMessage();
 
 		JobState jobState = (JobState)message.get(SchedulerEngine.JOB_STATE);
@@ -781,35 +451,36 @@ public class SchedulerEngineUtil {
 		}
 	}
 
-	private Date _getPreviousFireTime(
+	public static Date getPreviousFireTime(
 			String jobName, String groupName, StorageType storageType)
 		throws SchedulerException {
 
-		SchedulerResponse schedulerResponse = _getScheduledJob(
+		SchedulerResponse schedulerResponse = getScheduledJob(
 			jobName, groupName, storageType);
 
 		if (schedulerResponse != null) {
-			return _getPreviousFireTime(schedulerResponse);
+			return getPreviousFireTime(schedulerResponse);
 		}
 
 		return null;
 	}
 
-	private SchedulerResponse _getScheduledJob(
+	public static SchedulerResponse getScheduledJob(
 			String jobName, String groupName, StorageType storageType)
 		throws SchedulerException {
 
 		return _schedulerEngine.getScheduledJob(
-			jobName, _namespaceGroupName(groupName, storageType));
+			jobName, namespaceGroupName(groupName, storageType));
 	}
 
-	private List<SchedulerResponse> _getScheduledJobs()
+	public static List<SchedulerResponse> getScheduledJobs()
 		throws SchedulerException {
 
 		return _schedulerEngine.getScheduledJobs();
 	}
 
-	private List<SchedulerResponse> _getScheduledJobs(StorageType storageType)
+	public static List<SchedulerResponse> getScheduledJobs(
+			StorageType storageType)
 		throws SchedulerException {
 
 		List<SchedulerResponse> schedulerResponses =
@@ -826,15 +497,15 @@ public class SchedulerEngineUtil {
 		return schedulerResponses;
 	}
 
-	private List<SchedulerResponse> _getScheduledJobs(
+	public static List<SchedulerResponse> getScheduledJobs(
 			String groupName, StorageType storageType)
 		throws SchedulerException {
 
 		return _schedulerEngine.getScheduledJobs(
-			_namespaceGroupName(groupName, storageType));
+			namespaceGroupName(groupName, storageType));
 	}
 
-	private Date _getStartTime(SchedulerResponse schedulerResponse) {
+	public static Date getStartTime(SchedulerResponse schedulerResponse) {
 		Message message = schedulerResponse.getMessage();
 
 		JobState jobState = (JobState)message.get(SchedulerEngine.JOB_STATE);
@@ -851,62 +522,66 @@ public class SchedulerEngineUtil {
 		}
 	}
 
-	private Date _getStartTime(
+	public static Date getStartTime(
 			String jobName, String groupName, StorageType storageType)
 		throws SchedulerException {
 
-		SchedulerResponse schedulerResponse = _getScheduledJob(
+		SchedulerResponse schedulerResponse = getScheduledJob(
 			jobName, groupName, storageType);
 
 		if (schedulerResponse != null) {
-			return _getStartTime(schedulerResponse);
+			return getStartTime(schedulerResponse);
 		}
 
 		return null;
 	}
 
-	private void _initialize() throws SchedulerException {
+	public static void initialize() throws SchedulerException {
 		if (_schedulerEngineClusterManager != null) {
 			_schedulerEngineClusterManager.initialize();
 		}
+
+		SchedulerLifecycle schedulerLifecycle = new SchedulerLifecycle();
+
+		schedulerLifecycle.registerPortalLifecycle(PortalLifecycle.METHOD_INIT);
 	}
 
-	private String _namespaceGroupName(
+	public static String namespaceGroupName(
 		String groupName, StorageType storageType) {
 
 		return storageType.toString().concat(StringPool.POUND).concat(
 			groupName);
 	}
 
-	private void _pause(String groupName, StorageType storageType)
+	public static void pause(String groupName, StorageType storageType)
 		throws SchedulerException {
 
-		_schedulerEngine.pause(_namespaceGroupName(groupName, storageType));
+		_schedulerEngine.pause(namespaceGroupName(groupName, storageType));
 	}
 
-	private void _pause(
+	public static void pause(
 			String jobName, String groupName, StorageType storageType)
 		throws SchedulerException {
 
 		_schedulerEngine.pause(
-			jobName, _namespaceGroupName(groupName, storageType));
+			jobName, namespaceGroupName(groupName, storageType));
 	}
 
-	private void _resume(String groupName, StorageType storageType)
+	public static void resume(String groupName, StorageType storageType)
 		throws SchedulerException {
 
-		_schedulerEngine.resume(_namespaceGroupName(groupName, storageType));
+		_schedulerEngine.resume(namespaceGroupName(groupName, storageType));
 	}
 
-	private void _resume(
+	public static void resume(
 			String jobName, String groupName, StorageType storageType)
 		throws SchedulerException {
 
 		_schedulerEngine.resume(
-			jobName, _namespaceGroupName(groupName, storageType));
+			jobName, namespaceGroupName(groupName, storageType));
 	}
 
-	private void _schedule(
+	public static void schedule(
 			SchedulerEntry schedulerEntry, StorageType storageType,
 			String portletId, int exceptionsMaxSize)
 		throws SchedulerException {
@@ -920,13 +595,13 @@ public class SchedulerEngineUtil {
 			schedulerEntry.getEventListenerClass());
 		message.put(SchedulerEngine.PORTLET_ID, portletId);
 
-		_schedule(
+		schedule(
 			schedulerEntry.getTrigger(), storageType,
 			schedulerEntry.getDescription(),
 			DestinationNames.SCHEDULER_DISPATCH, message, exceptionsMaxSize);
 	}
 
-	private void _schedule(
+	public static void schedule(
 			Trigger trigger, StorageType storageType, String description,
 			String destinationName, Message message, int exceptionsMaxSize)
 		throws SchedulerException {
@@ -939,7 +614,7 @@ public class SchedulerEngineUtil {
 
 		trigger = TriggerFactoryUtil.buildTrigger(
 			trigger.getTriggerType(), trigger.getJobName(),
-			_namespaceGroupName(trigger.getGroupName(), storageType),
+			namespaceGroupName(trigger.getGroupName(), storageType),
 			trigger.getStartDate(), trigger.getEndDate(),
 			trigger.getTriggerContent());
 
@@ -947,7 +622,7 @@ public class SchedulerEngineUtil {
 			trigger, description, destinationName, message);
 	}
 
-	private void _schedule(
+	public static void schedule(
 			Trigger trigger, StorageType storageType, String description,
 			String destinationName, Object payload, int exceptionsMaxSize)
 		throws SchedulerException {
@@ -956,58 +631,57 @@ public class SchedulerEngineUtil {
 
 		message.setPayload(payload);
 
-		_schedule(
+		schedule(
 			trigger, storageType, description, destinationName, message,
 			exceptionsMaxSize);
 	}
 
-	private void _shutdown() throws SchedulerException {
+	public static void shutdown() throws SchedulerException {
 		_schedulerEngine.shutdown();
 	}
 
-	private void _start() throws SchedulerException {
+	public static void start() throws SchedulerException {
 		_schedulerEngine.start();
 	}
 
-	private void _suppressError(
+	public static void suppressError(
 			String jobName, String groupName, StorageType storageType)
 		throws SchedulerException {
 
 		_schedulerEngine.suppressError(
-			jobName, _namespaceGroupName(groupName, storageType));
+			jobName, namespaceGroupName(groupName, storageType));
 	}
 
-	private void _unschedule(
+	public static void unschedule(
 			SchedulerEntry schedulerEntry, StorageType storageType)
 		throws SchedulerException {
 
 		Trigger trigger = schedulerEntry.getTrigger();
 
-		_unschedule(trigger.getJobName(), trigger.getGroupName(), storageType);
+		unschedule(trigger.getJobName(), trigger.getGroupName(), storageType);
 	}
 
-	private void _unschedule(String groupName, StorageType storageType)
+	public static void unschedule(String groupName, StorageType storageType)
 		throws SchedulerException {
 
-		_schedulerEngine.unschedule(
-			_namespaceGroupName(groupName, storageType));
+		_schedulerEngine.unschedule(namespaceGroupName(groupName, storageType));
 	}
 
-	private void _unschedule(
+	public static void unschedule(
 			String jobName, String groupName, StorageType storageType)
 		throws SchedulerException {
 
 		_schedulerEngine.unschedule(
-			jobName, _namespaceGroupName(groupName, storageType));
+			jobName, namespaceGroupName(groupName, storageType));
 	}
 
-	private void _update(
+	public static void update(
 			String jobName, String groupName, StorageType storageType,
 			String description, String language, String script,
 			int exceptionsMaxSize)
 		throws SchedulerException {
 
-		SchedulerResponse schedulerResponse = _getScheduledJob(
+		SchedulerResponse schedulerResponse = getScheduledJob(
 			jobName, groupName, storageType);
 
 		if (schedulerResponse == null) {
@@ -1026,24 +700,24 @@ public class SchedulerEngineUtil {
 			return;
 		}
 
-		_addScriptingJob(
+		addScriptingJob(
 			trigger, storageType, description, language, script,
 			exceptionsMaxSize);
 	}
 
-	private void _update(Trigger trigger, StorageType storageType)
+	public static void update(Trigger trigger, StorageType storageType)
 		throws SchedulerException {
 
 		trigger = TriggerFactoryUtil.buildTrigger(
 			trigger.getTriggerType(), trigger.getJobName(),
-			_namespaceGroupName(trigger.getGroupName(), storageType),
+			namespaceGroupName(trigger.getGroupName(), storageType),
 			trigger.getStartDate(), trigger.getEndDate(),
 			trigger.getTriggerContent());
 
 		_schedulerEngine.update(trigger);
 	}
 
-	private void _updateMemorySchedulerClusterMaster()
+	public static void updateMemorySchedulerClusterMaster()
 		throws SchedulerException {
 
 		if (_schedulerEngineClusterManager == null) {
@@ -1057,11 +731,26 @@ public class SchedulerEngineUtil {
 		_schedulerEngineClusterManager.updateMemorySchedulerClusterMaster();
 	}
 
+	public void setSchedulerEngine(SchedulerEngine schedulerEngine) {
+		_schedulerEngine = schedulerEngine;
+
+		if (schedulerEngine instanceof SchedulerEngineClusterManager) {
+			_schedulerEngineClusterManager =
+				(SchedulerEngineClusterManager)schedulerEngine;
+		}
+	}
+
+	private static void _addWeeklyDayPos(
+		PortletRequest portletRequest, List<DayAndPosition> list, int day) {
+
+		if (ParamUtil.getBoolean(portletRequest, "weeklyDayPos" + day)) {
+			list.add(new DayAndPosition(day, 0));
+		}
+	}
+
 	private static Log _log = LogFactoryUtil.getLog(SchedulerEngineUtil.class);
 
-	private static SchedulerEngineUtil _instance = new SchedulerEngineUtil();
-
-	private SchedulerEngine _schedulerEngine;
-	private SchedulerEngineClusterManager _schedulerEngineClusterManager;
+	private static SchedulerEngine _schedulerEngine;
+	private static SchedulerEngineClusterManager _schedulerEngineClusterManager;
 
 }

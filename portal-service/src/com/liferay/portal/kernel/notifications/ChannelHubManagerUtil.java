@@ -14,7 +14,7 @@
 
 package com.liferay.portal.kernel.notifications;
 
-import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+import com.liferay.portal.kernel.security.annotation.AccessControl;
 
 import java.util.Collection;
 import java.util.List;
@@ -22,6 +22,7 @@ import java.util.List;
 /**
  * @author Edward Han
  */
+@AccessControl
 public class ChannelHubManagerUtil {
 
 	public static void confirmDelivery(
@@ -164,9 +165,6 @@ public class ChannelHubManagerUtil {
 	}
 
 	public static ChannelHubManager getChannelHubManager() {
-		PortalRuntimePermission.checkGetBeanProperty(
-			ChannelHubManagerUtil.class);
-
 		return _channelHubManager;
 	}
 
@@ -243,8 +241,6 @@ public class ChannelHubManagerUtil {
 	}
 
 	public void setChannelHubManager(ChannelHubManager channelHubManager) {
-		PortalRuntimePermission.checkSetBeanProperty(getClass());
-
 		_channelHubManager = channelHubManager;
 	}
 

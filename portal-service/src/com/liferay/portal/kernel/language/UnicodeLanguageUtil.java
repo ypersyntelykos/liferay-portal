@@ -14,7 +14,7 @@
 
 package com.liferay.portal.kernel.language;
 
-import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+import com.liferay.portal.kernel.security.annotation.AccessControl;
 
 import java.util.Locale;
 
@@ -25,6 +25,7 @@ import javax.servlet.jsp.PageContext;
 /**
  * @author Brian Wing Shun Chan
  */
+@AccessControl
 public class UnicodeLanguageUtil {
 
 	public static String format(
@@ -190,14 +191,10 @@ public class UnicodeLanguageUtil {
 	}
 
 	public static UnicodeLanguage getUnicodeLanguage() {
-		PortalRuntimePermission.checkGetBeanProperty(UnicodeLanguageUtil.class);
-
 		return _unicodeLanguage;
 	}
 
 	public void setUnicodeLanguage(UnicodeLanguage unicodeLanguage) {
-		PortalRuntimePermission.checkSetBeanProperty(getClass());
-
 		_unicodeLanguage = unicodeLanguage;
 	}
 

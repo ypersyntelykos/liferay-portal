@@ -14,12 +14,13 @@
 
 package com.liferay.portal.kernel.search;
 
-import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+import com.liferay.portal.kernel.security.annotation.AccessControl;
 
 /**
  * @author Raymond Augé
  * @author Brian Wing Shun Chan
  */
+@AccessControl
 public class StringQueryFactoryUtil {
 
 	public static Query create(String query) {
@@ -27,15 +28,10 @@ public class StringQueryFactoryUtil {
 	}
 
 	public static StringQueryFactory getStringQueryFactory() {
-		PortalRuntimePermission.checkGetBeanProperty(
-			StringQueryFactoryUtil.class);
-
 		return _stringQueryFactory;
 	}
 
 	public void setStringQueryFactory(StringQueryFactory stringQueryFactory) {
-		PortalRuntimePermission.checkSetBeanProperty(getClass());
-
 		_stringQueryFactory = stringQueryFactory;
 	}
 

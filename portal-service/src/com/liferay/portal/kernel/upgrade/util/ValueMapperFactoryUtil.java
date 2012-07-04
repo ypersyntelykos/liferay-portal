@@ -14,11 +14,12 @@
 
 package com.liferay.portal.kernel.upgrade.util;
 
-import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+import com.liferay.portal.kernel.security.annotation.AccessControl;
 
 /**
  * @author Brian Wing Shun Chan
  */
+@AccessControl
 public class ValueMapperFactoryUtil {
 
 	public static ValueMapper getValueMapper() {
@@ -26,15 +27,10 @@ public class ValueMapperFactoryUtil {
 	}
 
 	public static ValueMapperFactory getValueMapperFactory() {
-		PortalRuntimePermission.checkGetBeanProperty(
-			ValueMapperFactoryUtil.class);
-
 		return _valueMapperFactory;
 	}
 
 	public void setValueMapperFactory(ValueMapperFactory valueMapperFactory) {
-		PortalRuntimePermission.checkSetBeanProperty(getClass());
-
 		_valueMapperFactory = valueMapperFactory;
 	}
 

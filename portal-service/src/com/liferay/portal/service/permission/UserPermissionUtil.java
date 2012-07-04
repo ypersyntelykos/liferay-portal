@@ -14,13 +14,14 @@
 
 package com.liferay.portal.service.permission;
 
-import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+import com.liferay.portal.kernel.security.annotation.AccessControl;
 import com.liferay.portal.security.auth.PrincipalException;
 import com.liferay.portal.security.permission.PermissionChecker;
 
 /**
  * @author Brian Wing Shun Chan
  */
+@AccessControl
 public class UserPermissionUtil {
 
 	/**
@@ -80,14 +81,10 @@ public class UserPermissionUtil {
 	}
 
 	public static UserPermission getUserPermission() {
-		PortalRuntimePermission.checkGetBeanProperty(UserPermissionUtil.class);
-
 		return _userPermission;
 	}
 
 	public void setUserPermission(UserPermission userPermission) {
-		PortalRuntimePermission.checkSetBeanProperty(getClass());
-
 		_userPermission = userPermission;
 	}
 

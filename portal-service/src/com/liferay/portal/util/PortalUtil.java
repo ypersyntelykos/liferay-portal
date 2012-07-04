@@ -20,7 +20,7 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
-import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+import com.liferay.portal.kernel.security.annotation.AccessControl;
 import com.liferay.portal.kernel.servlet.taglib.ui.BreadcrumbEntry;
 import com.liferay.portal.kernel.upload.UploadPortletRequest;
 import com.liferay.portal.kernel.upload.UploadServletRequest;
@@ -72,6 +72,7 @@ import javax.servlet.jsp.PageContext;
  * @author Eduardo Lundgren
  * @author Juan Fernández
  */
+@AccessControl
 public class PortalUtil {
 
 	/**
@@ -811,8 +812,6 @@ public class PortalUtil {
 	}
 
 	public static Portal getPortal() {
-		PortalRuntimePermission.checkGetBeanProperty(PortalUtil.class);
-
 		return _portal;
 	}
 
@@ -1580,8 +1579,6 @@ public class PortalUtil {
 	}
 
 	public void setPortal(Portal portal) {
-		PortalRuntimePermission.checkSetBeanProperty(getClass());
-
 		_portal = portal;
 	}
 

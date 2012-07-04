@@ -14,11 +14,12 @@
 
 package com.liferay.portal.kernel.dao.orm;
 
-import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+import com.liferay.portal.kernel.security.annotation.AccessControl;
 
 /**
  * @author Brian Wing Shun Chan
  */
+@AccessControl
 public class DynamicQueryFactoryUtil {
 
 	public static DynamicQuery forClass(Class<?> clazz) {
@@ -42,16 +43,11 @@ public class DynamicQueryFactoryUtil {
 	}
 
 	public static DynamicQueryFactory getDynamicQueryFactory() {
-		PortalRuntimePermission.checkGetBeanProperty(
-			DynamicQueryFactoryUtil.class);
-
 		return _dynamicQueryFactory;
 	}
 
 	public void setDynamicQueryFactory(
 		DynamicQueryFactory dynamicQueryFactory) {
-
-		PortalRuntimePermission.checkSetBeanProperty(getClass());
 
 		_dynamicQueryFactory = dynamicQueryFactory;
 	}

@@ -14,18 +14,16 @@
 
 package com.liferay.portlet.passwordpoliciesadmin.util;
 
-import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+import com.liferay.portal.kernel.security.annotation.AccessControl;
 import com.liferay.portal.kernel.util.OrderByComparator;
 
 /**
  * @author Brian Wing Shun Chan
  */
+@AccessControl
 public class PasswordPoliciesAdminUtil {
 
 	public static PasswordPoliciesAdmin getPasswordPoliciesAdmin() {
-		PortalRuntimePermission.checkGetBeanProperty(
-			PasswordPoliciesAdminUtil.class);
-
 		return _passwordPoliciesAdmin;
 	}
 
@@ -38,8 +36,6 @@ public class PasswordPoliciesAdminUtil {
 
 	public void setPasswordPoliciesAdmin(
 		PasswordPoliciesAdmin passwordPoliciesAdmin) {
-
-		PortalRuntimePermission.checkSetBeanProperty(getClass());
 
 		_passwordPoliciesAdmin = passwordPoliciesAdmin;
 	}

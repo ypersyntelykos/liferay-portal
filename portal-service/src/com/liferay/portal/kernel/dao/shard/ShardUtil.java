@@ -14,22 +14,20 @@
 
 package com.liferay.portal.kernel.dao.shard;
 
-import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+import com.liferay.portal.kernel.security.annotation.AccessControl;
 import com.liferay.portal.kernel.util.StringPool;
 
 import javax.sql.DataSource;
 
 /**
  * @author Alexander Chow
- * @author Raymond Augé
  */
+@AccessControl
 public class ShardUtil {
 
 	public static String[] getAvailableShardNames() {
-		Shard shard = getShard();
-
-		if (shard != null) {
-			String[] availableShardNames = shard.getAvailableShardNames();
+		if (_shard != null) {
+			String[] availableShardNames = _shard.getAvailableShardNames();
 
 			if (availableShardNames != null) {
 				return availableShardNames;
@@ -40,46 +38,32 @@ public class ShardUtil {
 	}
 
 	public static String getCurrentShardName() {
-		Shard shard = getShard();
-
-		if (shard != null) {
-			return shard.getCurrentShardName();
+		if (_shard != null) {
+			return _shard.getCurrentShardName();
 		}
 
 		return StringPool.BLANK;
 	}
 
 	public static DataSource getDataSource() {
-		Shard shard = getShard();
-
-		if (shard != null) {
-			return shard.getDataSource();
+		if (_shard != null) {
+			return _shard.getDataSource();
 		}
 
 		return null;
 	}
 
 	public static String getDefaultShardName() {
-		Shard shard = getShard();
-
-		if (shard != null) {
-			return shard.getDefaultShardName();
+		if (_shard != null) {
+			return _shard.getDefaultShardName();
 		}
 
 		return null;
 	}
 
-	public static Shard getShard() {
-		PortalRuntimePermission.checkGetBeanProperty(ShardUtil.class);
-
-		return _shard;
-	}
-
 	public static boolean isEnabled() {
-		Shard shard = getShard();
-
-		if (shard != null) {
-			return shard.isEnabled();
+		if (_shard != null) {
+			return _shard.isEnabled();
 		}
 
 		return false;
@@ -88,34 +72,26 @@ public class ShardUtil {
 	public static String popCompanyService() {
 		String value = null;
 
-		Shard shard = getShard();
-
-		if (shard != null) {
-			value = shard.popCompanyService();
+		if (_shard != null) {
+			value = _shard.popCompanyService();
 		}
 
 		return value;
 	}
 
 	public static void pushCompanyService(long companyId) {
-		Shard shard = getShard();
-
-		if (shard != null) {
-			shard.pushCompanyService(companyId);
+		if (_shard != null) {
+			_shard.pushCompanyService(companyId);
 		}
 	}
 
 	public static void pushCompanyService(String shardName) {
-		Shard shard = getShard();
-
-		if (shard != null) {
-			shard.pushCompanyService(shardName);
+		if (_shard != null) {
+			_shard.pushCompanyService(shardName);
 		}
 	}
 
 	public void setShard(Shard shard) {
-		PortalRuntimePermission.checkSetBeanProperty(getClass());
-
 		_shard = shard;
 	}
 

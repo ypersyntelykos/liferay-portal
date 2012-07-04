@@ -14,7 +14,7 @@
 
 package com.liferay.portal.kernel.dao.jdbc;
 
-import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+import com.liferay.portal.kernel.security.annotation.AccessControl;
 
 import java.util.Properties;
 
@@ -23,6 +23,7 @@ import javax.sql.DataSource;
 /**
  * @author Brian Wing Shun Chan
  */
+@AccessControl
 public class DataSourceFactoryUtil {
 
 	public static void destroyDataSource(DataSource dataSource)
@@ -32,9 +33,6 @@ public class DataSourceFactoryUtil {
 	}
 
 	public static DataSourceFactory getDataSourceFactory() {
-		PortalRuntimePermission.checkGetBeanProperty(
-			DataSourceFactoryUtil.class);
-
 		return _dataSourceFactory;
 	}
 
@@ -55,9 +53,6 @@ public class DataSourceFactoryUtil {
 
 	public static void setDataSourceFactory(
 		DataSourceFactory dataSourceFactory) {
-
-		PortalRuntimePermission.checkSetBeanProperty(
-			DataSourceFactoryUtil.class);
 
 		_dataSourceFactory = dataSourceFactory;
 	}

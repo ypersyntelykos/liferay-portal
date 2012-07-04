@@ -16,12 +16,13 @@ package com.liferay.portlet.layoutsadmin.util;
 
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+import com.liferay.portal.kernel.security.annotation.AccessControl;
 import com.liferay.portal.theme.ThemeDisplay;
 
 /**
  * @author Raymond Augé
  */
+@AccessControl
 public class SitemapUtil {
 
 	public static String encodeXML(String input) {
@@ -29,8 +30,6 @@ public class SitemapUtil {
 	}
 
 	public static Sitemap getSitemap() {
-		PortalRuntimePermission.checkGetBeanProperty(SitemapUtil.class);
-
 		return _sitemap;
 	}
 
@@ -42,8 +41,6 @@ public class SitemapUtil {
 	}
 
 	public void setSitemap(Sitemap sitemap) {
-		PortalRuntimePermission.checkSetBeanProperty(getClass());
-
 		_sitemap = sitemap;
 	}
 

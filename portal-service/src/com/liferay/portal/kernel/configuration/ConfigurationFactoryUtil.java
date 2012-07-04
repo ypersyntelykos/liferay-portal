@@ -14,11 +14,12 @@
 
 package com.liferay.portal.kernel.configuration;
 
-import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+import com.liferay.portal.kernel.security.annotation.AccessControl;
 
 /**
  * @author Brian Wing Shun Chan
  */
+@AccessControl
 public class ConfigurationFactoryUtil {
 
 	public static Configuration getConfiguration(
@@ -28,17 +29,11 @@ public class ConfigurationFactoryUtil {
 	}
 
 	public static ConfigurationFactory getConfigurationFactory() {
-		PortalRuntimePermission.checkGetBeanProperty(
-			ConfigurationFactoryUtil.class);
-
 		return _configurationFactory;
 	}
 
 	public static void setConfigurationFactory(
 		ConfigurationFactory configurationFactory) {
-
-		PortalRuntimePermission.checkSetBeanProperty(
-			ConfigurationFactoryUtil.class);
 
 		_configurationFactory = configurationFactory;
 	}

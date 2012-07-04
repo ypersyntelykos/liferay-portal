@@ -14,7 +14,7 @@
 
 package com.liferay.portal.kernel.util;
 
-import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+import com.liferay.portal.kernel.security.annotation.AccessControl;
 
 import java.text.Format;
 
@@ -24,6 +24,7 @@ import java.util.TimeZone;
 /**
  * @author Brian Wing Shun Chan
  */
+@AccessControl
 public class FastDateFormatFactoryUtil {
 
 	public static Format getDate(int style, Locale locale, TimeZone timeZone) {
@@ -62,9 +63,6 @@ public class FastDateFormatFactoryUtil {
 	}
 
 	public static FastDateFormatFactory getFastDateFormatFactory() {
-		PortalRuntimePermission.checkGetBeanProperty(
-			FastDateFormatFactoryUtil.class);
-
 		return _fastDateFormatFactory;
 	}
 
@@ -108,8 +106,6 @@ public class FastDateFormatFactoryUtil {
 
 	public void setFastDateFormatFactory(
 		FastDateFormatFactory fastDateFormatFactory) {
-
-		PortalRuntimePermission.checkSetBeanProperty(getClass());
 
 		_fastDateFormatFactory = fastDateFormatFactory;
 	}

@@ -14,8 +14,8 @@
 
 package com.liferay.portal.kernel.util;
 
+import com.liferay.portal.kernel.security.annotation.AccessControl;
 import com.liferay.portal.kernel.security.pacl.PACLConstants;
-import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
 
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -25,6 +25,7 @@ import java.security.Permission;
 /**
  * @author Brian Wing Shun Chan
  */
+@AccessControl
 public class PortalClassLoaderUtil {
 
 	public static ClassLoader getClassLoader() {
@@ -42,9 +43,6 @@ public class PortalClassLoaderUtil {
 	}
 
 	public static void setClassLoader(ClassLoader classLoader) {
-		PortalRuntimePermission.checkSetBeanProperty(
-			PortalClassLoaderUtil.class);
-
 		if (ServerDetector.isJOnAS() && JavaDetector.isJDK6()) {
 			_classLoader = new URLClassLoader(new URL[0], classLoader);
 		}

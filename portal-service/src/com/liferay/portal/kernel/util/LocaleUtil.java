@@ -16,7 +16,7 @@ package com.liferay.portal.kernel.util;
 
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+import com.liferay.portal.kernel.security.annotation.AccessControl;
 
 import java.util.HashMap;
 import java.util.Locale;
@@ -25,67 +25,12 @@ import java.util.TreeMap;
 
 /**
  * @author Brian Wing Shun Chan
- * @author Raymond Augé
+ * @author Shuyang Zhou
  */
+@AccessControl
 public class LocaleUtil {
 
 	public static Locale fromLanguageId(String languageId) {
-		return getInstance()._fromLanguageId(languageId);
-	}
-
-	public static Locale[] fromLanguageIds(String[] languageIds) {
-		return getInstance()._fromLanguageIds(languageIds);
-	}
-
-	public static Locale getDefault() {
-		return getInstance()._getDefault();
-	}
-
-	public static LocaleUtil getInstance() {
-		PortalRuntimePermission.checkGetBeanProperty(LocaleUtil.class);
-
-		return _instance;
-	}
-
-	public static Map<String, String> getISOLanguages(Locale locale) {
-		return getInstance()._getISOLanguages(locale);
-	}
-
-	public static void setDefault(
-		String userLanguage, String userCountry, String userVariant) {
-
-		getInstance()._setDefault(userLanguage, userCountry, userVariant);
-	}
-
-	public static String toLanguageId(Locale locale) {
-		return getInstance()._toLanguageId(locale);
-	}
-
-	public static String[] toLanguageIds(Locale[] locales) {
-		return getInstance()._toLanguageIds(locales);
-	}
-
-	public static String toW3cLanguageId(Locale locale) {
-		return getInstance()._toW3cLanguageId(locale);
-	}
-
-	public static String toW3cLanguageId(String languageId) {
-		return getInstance()._toW3cLanguageId(languageId);
-	}
-
-	public static String[] toW3cLanguageIds(Locale[] locales) {
-		return getInstance()._toW3cLanguageIds(locales);
-	}
-
-	public static String[] toW3cLanguageIds(String[] languageIds) {
-		return getInstance()._toW3cLanguageIds(languageIds);
-	}
-
-	private LocaleUtil() {
-		_locale = new Locale("en", "US");
-	}
-
-	private Locale _fromLanguageId(String languageId) {
 		if (languageId == null) {
 			return _locale;
 		}
@@ -145,17 +90,17 @@ public class LocaleUtil {
 		return locale;
 	}
 
-	private Locale[] _fromLanguageIds(String[] languageIds) {
+	public static Locale[] fromLanguageIds(String[] languageIds) {
 		Locale[] locales = new Locale[languageIds.length];
 
 		for (int i = 0; i < languageIds.length; i++) {
-			locales[i] = _fromLanguageId(languageIds[i]);
+			locales[i] = fromLanguageId(languageIds[i]);
 		}
 
 		return locales;
 	}
 
-	private Locale _getDefault() {
+	public static Locale getDefault() {
 		Locale locale = LocaleThreadLocal.getDefaultLocale();
 
 		if (locale != null) {
@@ -165,12 +110,19 @@ public class LocaleUtil {
 		return _locale;
 	}
 
-	private Map<String, String> _getISOLanguages(Locale locale) {
+	public static LocaleUtil getInstance() {
+		// Don't try to change this to a static field, in pacl env, all static
+		// fields will be copied to modified verion of this class, holding a
+		// reference of original class instance will cause ClassCastException.
+		return new LocaleUtil();
+	}
+
+	public static Map<String, String> getISOLanguages(Locale locale) {
 		Map<String, String> isoLanguages = new TreeMap<String, String>(
 			String.CASE_INSENSITIVE_ORDER);
 
 		for (String isoLanguageId : Locale.getISOLanguages()) {
-			Locale isoLocale = _fromLanguageId(isoLanguageId);
+			Locale isoLocale = fromLanguageId(isoLanguageId);
 
 			isoLanguages.put(
 				isoLocale.getDisplayLanguage(locale), isoLanguageId);
@@ -179,10 +131,8 @@ public class LocaleUtil {
 		return isoLanguages;
 	}
 
-	private void _setDefault(
+	public static void setDefault(
 		String userLanguage, String userCountry, String userVariant) {
-
-		PortalRuntimePermission.checkSetBeanProperty(getClass());
 
 		if (Validator.isNotNull(userLanguage) &&
 			Validator.isNull(userCountry) && Validator.isNull(userVariant)) {
@@ -203,7 +153,7 @@ public class LocaleUtil {
 		}
 	}
 
-	private String _toLanguageId(Locale locale) {
+	public static String toLanguageId(Locale locale) {
 		if (locale == null) {
 			locale = _locale;
 		}
@@ -251,34 +201,34 @@ public class LocaleUtil {
 		return sb.toString();
 	}
 
-	private String[] _toLanguageIds(Locale[] locales) {
+	public static String[] toLanguageIds(Locale[] locales) {
 		String[] languageIds = new String[locales.length];
 
 		for (int i = 0; i < locales.length; i++) {
-			languageIds[i] = _toLanguageId(locales[i]);
+			languageIds[i] = toLanguageId(locales[i]);
 		}
 
 		return languageIds;
 	}
 
-	private String _toW3cLanguageId(Locale locale) {
-		return _toW3cLanguageId(_toLanguageId(locale));
+	public static String toW3cLanguageId(Locale locale) {
+		return toW3cLanguageId(toLanguageId(locale));
 	}
 
-	private String _toW3cLanguageId(String languageId) {
+	public static String toW3cLanguageId(String languageId) {
 		return StringUtil.replace(
 			languageId, CharPool.UNDERLINE, CharPool.MINUS);
 	}
 
-	private String[] _toW3cLanguageIds(Locale[] locales) {
-		return _toW3cLanguageIds(_toLanguageIds(locales));
+	public static String[] toW3cLanguageIds(Locale[] locales) {
+		return toW3cLanguageIds(toLanguageIds(locales));
 	}
 
-	private String[] _toW3cLanguageIds(String[] languageIds) {
+	public static String[] toW3cLanguageIds(String[] languageIds) {
 		String[] w3cLanguageIds = new String[languageIds.length];
 
 		for (int i = 0; i < languageIds.length; i++) {
-			w3cLanguageIds[i] = _toW3cLanguageId(languageIds[i]);
+			w3cLanguageIds[i] = toW3cLanguageId(languageIds[i]);
 		}
 
 		return w3cLanguageIds;
@@ -288,9 +238,7 @@ public class LocaleUtil {
 
 	private static Log _log = LogFactoryUtil.getLog(LocaleUtil.class);
 
-	private static LocaleUtil _instance = new LocaleUtil();
-
-	private Locale _locale;
-	private Map<String, Locale> _locales = new HashMap<String, Locale>();
+	private static Locale _locale = new Locale("en", "US");;
+	private static Map<String, Locale> _locales = new HashMap<String, Locale>();
 
 }

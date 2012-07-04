@@ -14,7 +14,7 @@
 
 package com.liferay.portal.kernel.cache;
 
-import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+import com.liferay.portal.kernel.security.annotation.AccessControl;
 
 import java.io.Serializable;
 
@@ -22,6 +22,7 @@ import java.io.Serializable;
  * @author Brian Wing Shun Chan
  * @author Michael Young
  */
+@AccessControl
 public class SingleVMPoolUtil {
 
 	public static void clear() {
@@ -52,8 +53,6 @@ public class SingleVMPoolUtil {
 	}
 
 	public static SingleVMPool getSingleVMPool() {
-		PortalRuntimePermission.checkGetBeanProperty(SingleVMPoolUtil.class);
-
 		return _singleVMPool;
 	}
 
@@ -116,8 +115,6 @@ public class SingleVMPoolUtil {
 	}
 
 	public void setSingleVMPool(SingleVMPool singleVMPool) {
-		PortalRuntimePermission.checkSetBeanProperty(getClass());
-
 		_singleVMPool = singleVMPool;
 	}
 

@@ -14,13 +14,14 @@
 
 package com.liferay.portal.kernel.bean;
 
-import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+import com.liferay.portal.kernel.security.annotation.AccessControl;
 
 import javax.servlet.http.HttpServletRequest;
 
 /**
  * @author Brian Wing Shun Chan
  */
+@AccessControl
 public class BeanPropertiesUtil {
 
 	public static void copyProperties(Object source, Object target) {
@@ -40,8 +41,6 @@ public class BeanPropertiesUtil {
 	}
 
 	public static BeanProperties getBeanProperties() {
-		PortalRuntimePermission.checkGetBeanProperty(BeanPropertiesUtil.class);
-
 		return _beanProperties;
 	}
 
@@ -248,8 +247,6 @@ public class BeanPropertiesUtil {
 	}
 
 	public void setBeanProperties(BeanProperties beanProperties) {
-		PortalRuntimePermission.checkSetBeanProperty(getClass());
-
 		_beanProperties = beanProperties;
 	}
 

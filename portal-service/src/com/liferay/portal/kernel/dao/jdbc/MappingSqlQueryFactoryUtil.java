@@ -14,13 +14,14 @@
 
 package com.liferay.portal.kernel.dao.jdbc;
 
-import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+import com.liferay.portal.kernel.security.annotation.AccessControl;
 
 import javax.sql.DataSource;
 
 /**
  * @author Brian Wing Shun Chan
  */
+@AccessControl
 public class MappingSqlQueryFactoryUtil {
 
 	public static <T> MappingSqlQuery<T> getMappingSqlQuery(
@@ -32,16 +33,11 @@ public class MappingSqlQueryFactoryUtil {
 	}
 
 	public static MappingSqlQueryFactory getMappingSqlQueryFactory() {
-		PortalRuntimePermission.checkGetBeanProperty(
-			MappingSqlQueryFactoryUtil.class);
-
 		return _mappingSqlUpdateFactory;
 	}
 
 	public void setMappingSqlQueryFactory(
 		MappingSqlQueryFactory mappingSqlUpdateFactory) {
-
-		PortalRuntimePermission.checkSetBeanProperty(getClass());
 
 		_mappingSqlUpdateFactory = mappingSqlUpdateFactory;
 	}

@@ -15,12 +15,13 @@
 package com.liferay.portlet.mobiledevicerules.service.permission;
 
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+import com.liferay.portal.kernel.security.annotation.AccessControl;
 import com.liferay.portal.security.permission.PermissionChecker;
 
 /**
  * @author Edward Han
  */
+@AccessControl
 public class MDRPermissionUtil {
 
 	public static void check(
@@ -42,8 +43,6 @@ public class MDRPermissionUtil {
 	}
 
 	public void setMDRPermission(MDRPermission mdrPermission) {
-		PortalRuntimePermission.checkSetBeanProperty(getClass());
-
 		_mdrPermission = mdrPermission;
 	}
 

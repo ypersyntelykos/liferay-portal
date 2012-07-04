@@ -14,24 +14,20 @@
 
 package com.liferay.portlet.dynamicdatalists.lar;
 
-import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+import com.liferay.portal.kernel.security.annotation.AccessControl;
 
 /**
  * @author Michael C. Han
  */
+@AccessControl
 public class DDLPortletDataHandlerUtil {
 
 	public static DDLPortletDataHandler getDDLPortletDataHandler() {
-		PortalRuntimePermission.checkGetBeanProperty(
-			DDLPortletDataHandlerUtil.class);
-
 		return _ddlPortletDataHandler;
 	}
 
 	public void setDDLPortletDataHandler(
 		DDLPortletDataHandler ddlPortletDataHandler) {
-
-		PortalRuntimePermission.checkSetBeanProperty(getClass());
 
 		_ddlPortletDataHandler = ddlPortletDataHandler;
 	}

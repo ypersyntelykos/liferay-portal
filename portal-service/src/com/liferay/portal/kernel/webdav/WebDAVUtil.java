@@ -19,7 +19,7 @@ import com.liferay.portal.NoSuchUserException;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+import com.liferay.portal.kernel.security.annotation.AccessControl;
 import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HttpUtil;
@@ -51,8 +51,8 @@ import javax.servlet.http.HttpServletRequest;
 /**
  * @author Brian Wing Shun Chan
  * @author Alexander Chow
- * @author Raymond Augé
  */
+@AccessControl
 public class WebDAVUtil {
 
 	public static final Namespace DAV_URI = SAXReaderUtil.createNamespace(
@@ -65,7 +65,7 @@ public class WebDAVUtil {
 	public static final String TOKEN_PREFIX = "opaquelocktoken:";
 
 	public static void addStorage(WebDAVStorage storage) {
-		getInstance()._addStorage(storage);
+		_storageMap.put(storage.getToken(), storage);
 	}
 
 	public static Namespace createNamespace(String prefix, String uri) {
@@ -85,7 +85,9 @@ public class WebDAVUtil {
 	}
 
 	public static void deleteStorage(WebDAVStorage storage) {
-		getInstance()._deleteStorage(storage);
+		if (storage != null) {
+			_storageMap.remove(storage.getToken());
+		}
 	}
 
 	public static long getDepth(HttpServletRequest request) {
@@ -220,12 +222,6 @@ public class WebDAVUtil {
 		return groups;
 	}
 
-	public static WebDAVUtil getInstance() {
-		PortalRuntimePermission.checkGetBeanProperty(WebDAVUtil.class);
-
-		return _instance;
-	}
-
 	public static String getLockUuid(HttpServletRequest request)
 		throws WebDAVException {
 
@@ -280,11 +276,11 @@ public class WebDAVUtil {
 	}
 
 	public static WebDAVStorage getStorage(String token) {
-		return getInstance()._getStorage(token);
+		return _storageMap.get(token);
 	}
 
 	public static Collection<String> getStorageTokens() {
-		return getInstance()._getStorageTokens();
+		return _storageMap.keySet();
 	}
 
 	public static long getTimeout(HttpServletRequest request) {
@@ -312,32 +308,6 @@ public class WebDAVUtil {
 	}
 
 	public static boolean isOverwrite(HttpServletRequest request) {
-		return getInstance()._isOverwrite(request);
-	}
-
-	private WebDAVUtil() {
-		_storageMap = new TreeMap<String, WebDAVStorage>();
-	}
-
-	private void _addStorage(WebDAVStorage storage) {
-		_storageMap.put(storage.getToken(), storage);
-	}
-
-	private void _deleteStorage(WebDAVStorage storage) {
-		if (storage != null) {
-			_storageMap.remove(storage.getToken());
-		}
-	}
-
-	private WebDAVStorage _getStorage(String token) {
-		return _storageMap.get(token);
-	}
-
-	private Collection<String> _getStorageTokens() {
-		return _storageMap.keySet();
-	}
-
-	private boolean _isOverwrite(HttpServletRequest request) {
 		String value = GetterUtil.getString(request.getHeader("Overwrite"));
 
 		if (value.equalsIgnoreCase("F") || !GetterUtil.getBoolean(value)) {
@@ -352,6 +322,7 @@ public class WebDAVUtil {
 
 	private static WebDAVUtil _instance = new WebDAVUtil();
 
-	private Map<String, WebDAVStorage> _storageMap;
+	private static Map<String, WebDAVStorage> _storageMap =
+		new TreeMap<String, WebDAVStorage>();;
 
 }

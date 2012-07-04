@@ -15,7 +15,7 @@
 package com.liferay.portlet;
 
 import com.liferay.portal.kernel.portlet.LiferayPortletURL;
-import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+import com.liferay.portal.kernel.security.annotation.AccessControl;
 
 import javax.portlet.PortletRequest;
 
@@ -24,6 +24,7 @@ import javax.servlet.http.HttpServletRequest;
 /**
  * @author Brian Wing Shun Chan
  */
+@AccessControl
 public class PortletURLFactoryUtil {
 
 	public static LiferayPortletURL create(
@@ -43,15 +44,10 @@ public class PortletURLFactoryUtil {
 	}
 
 	public static PortletURLFactory getPortletURLFactory() {
-		PortalRuntimePermission.checkGetBeanProperty(
-			PortletURLFactoryUtil.class);
-
 		return _portletURLFactory;
 	}
 
 	public void setPortletURLFactory(PortletURLFactory portletURLFactory) {
-		PortalRuntimePermission.checkSetBeanProperty(getClass());
-
 		_portletURLFactory = portletURLFactory;
 	}
 

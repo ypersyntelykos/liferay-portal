@@ -14,13 +14,14 @@
 
 package com.liferay.portal.kernel.json;
 
-import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+import com.liferay.portal.kernel.security.annotation.AccessControl;
 
 import java.util.List;
 
 /**
  * @author Brian Wing Shun Chan
  */
+@AccessControl
 public class JSONFactoryUtil {
 
 	public static String convertJSONMLArrayToXML(String jsonml) {
@@ -81,8 +82,6 @@ public class JSONFactoryUtil {
 	}
 
 	public static JSONFactory getJSONFactory() {
-		PortalRuntimePermission.checkGetBeanProperty(JSONFactoryUtil.class);
-
 		return _jsonFactory;
 	}
 
@@ -140,8 +139,6 @@ public class JSONFactoryUtil {
 	}
 
 	public void setJSONFactory(JSONFactory jsonFactory) {
-		PortalRuntimePermission.checkSetBeanProperty(getClass());
-
 		_jsonFactory = jsonFactory;
 	}
 

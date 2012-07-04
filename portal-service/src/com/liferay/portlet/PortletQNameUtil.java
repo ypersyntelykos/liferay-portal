@@ -14,13 +14,14 @@
 
 package com.liferay.portlet;
 
-import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+import com.liferay.portal.kernel.security.annotation.AccessControl;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.kernel.xml.QName;
 
 /**
  * @author Brian Wing Shun Chan
  */
+@AccessControl
 public class PortletQNameUtil {
 
 	public static String getKey(QName qName) {
@@ -32,8 +33,6 @@ public class PortletQNameUtil {
 	}
 
 	public static PortletQName getPortletQName() {
-		PortalRuntimePermission.checkGetBeanProperty(PortletQNameUtil.class);
-
 		return _portletQName;
 	}
 
@@ -70,8 +69,6 @@ public class PortletQNameUtil {
 	}
 
 	public void setPortletQName(PortletQName portletQName) {
-		PortalRuntimePermission.checkSetBeanProperty(getClass());
-
 		_portletQName = portletQName;
 	}
 

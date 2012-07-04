@@ -14,11 +14,12 @@
 
 package com.liferay.portal.kernel.util;
 
-import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+import com.liferay.portal.kernel.security.annotation.AccessControl;
 
 /**
  * @author Brian Wing Shun Chan
  */
+@AccessControl
 public class OrderByComparatorFactoryUtil {
 
 	public static OrderByComparator create(
@@ -28,16 +29,11 @@ public class OrderByComparatorFactoryUtil {
 	}
 
 	public static OrderByComparatorFactory getOrderByComparatorFactory() {
-		PortalRuntimePermission.checkGetBeanProperty(
-			OrderByComparatorFactoryUtil.class);
-
 		return _orderByComparatorFactory;
 	}
 
 	public void setOrderByComparatorFactory(
 		OrderByComparatorFactory orderByComparatorFactory) {
-
-		PortalRuntimePermission.checkSetBeanProperty(getClass());
 
 		_orderByComparatorFactory = orderByComparatorFactory;
 	}

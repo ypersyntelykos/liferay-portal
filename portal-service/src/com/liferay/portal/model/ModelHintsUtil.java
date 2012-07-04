@@ -14,7 +14,7 @@
 
 package com.liferay.portal.model;
 
-import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+import com.liferay.portal.kernel.security.annotation.AccessControl;
 import com.liferay.portal.kernel.util.Tuple;
 import com.liferay.portal.kernel.xml.Element;
 
@@ -24,6 +24,7 @@ import java.util.Map;
 /**
  * @author Brian Wing Shun Chan
  */
+@AccessControl
 public class ModelHintsUtil {
 
 	public static String buildCustomValidatorName(String validatorName) {
@@ -43,8 +44,6 @@ public class ModelHintsUtil {
 	}
 
 	public static ModelHints getModelHints() {
-		PortalRuntimePermission.checkGetBeanProperty(ModelHintsUtil.class);
-
 		return _modelHints;
 	}
 
@@ -87,8 +86,6 @@ public class ModelHintsUtil {
 	}
 
 	public void setModelHints(ModelHints modelHints) {
-		PortalRuntimePermission.checkSetBeanProperty(getClass());
-
 		_modelHints = modelHints;
 	}
 

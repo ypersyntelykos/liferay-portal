@@ -17,6 +17,7 @@ package com.liferay.portal.kernel.search;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.messaging.DestinationNames;
+import com.liferay.portal.kernel.security.annotation.AccessControl;
 import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
@@ -36,6 +37,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author Raymond Augé
  * @author Michael C. Han
  */
+@AccessControl
 public class SearchEngineUtil {
 
 	/**
@@ -127,9 +129,7 @@ public class SearchEngineUtil {
 	public static void addSearchEngine(SearchEngine searchEngine) {
 		String searchEngineId = getDefaultSearchEngineId();
 
-		PortalRuntimePermission.checkSearchEngine(searchEngineId);
-
-		_searchEngines.put(searchEngineId, searchEngine);
+		setSearchEngine(searchEngineId, searchEngine);
 	}
 
 	/**
@@ -282,9 +282,6 @@ public class SearchEngineUtil {
 	}
 
 	public static Set<String> getSearchEngineIds() {
-		PortalRuntimePermission.checkGetBeanProperty(
-			SearchEngineUtil.class, "searchEngineIds");
-
 		return _searchEngines.keySet();
 	}
 
@@ -295,9 +292,6 @@ public class SearchEngineUtil {
 	}
 
 	public static SearchPermissionChecker getSearchPermissionChecker() {
-		PortalRuntimePermission.checkGetBeanProperty(
-			SearchEngineUtil.class, "searchPermissionChecker");
-
 		return _searchPermissionChecker;
 	}
 
@@ -312,9 +306,6 @@ public class SearchEngineUtil {
 	}
 
 	public static boolean isIndexReadOnly() {
-		PortalRuntimePermission.checkGetBeanProperty(
-			SearchEngineUtil.class, "indexReadOnly");
-
 		return _indexReadOnly;
 	}
 
@@ -484,16 +475,10 @@ public class SearchEngineUtil {
 	}
 
 	public static void setDefaultSearchEngineId(String defaultSearchEngineId) {
-		PortalRuntimePermission.checkSetBeanProperty(
-			SearchEngineUtil.class, "defaultSearchEngineId");
-
 		_defaultSearchEngineId = defaultSearchEngineId;
 	}
 
 	public static void setIndexReadOnly(boolean indexReadOnly) {
-		PortalRuntimePermission.checkSetBeanProperty(
-			SearchEngineUtil.class, "indexReadOnly");
-
 		_indexReadOnly = indexReadOnly;
 	}
 
@@ -590,9 +575,6 @@ public class SearchEngineUtil {
 	public void setExcludedEntryClassNames(
 		List<String> excludedEntryClassNames) {
 
-		PortalRuntimePermission.checkSetBeanProperty(
-			getClass(), "excludedEntryClassNames");
-
 		_excludedEntryClassNames.addAll(excludedEntryClassNames);
 	}
 
@@ -602,16 +584,11 @@ public class SearchEngineUtil {
 	public void setSearchEngine(SearchEngine searchEngine) {
 		String searchEngineId = getDefaultSearchEngineId();
 
-		PortalRuntimePermission.checkSearchEngine(searchEngineId);
-
-		_searchEngines.put(searchEngineId, searchEngine);
+		setSearchEngine(searchEngineId, searchEngine);
 	}
 
 	public void setSearchPermissionChecker(
 		SearchPermissionChecker searchPermissionChecker) {
-
-		PortalRuntimePermission.checkSetBeanProperty(
-			getClass(), "searchPermissionChecker");
 
 		_searchPermissionChecker = searchPermissionChecker;
 	}

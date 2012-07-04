@@ -14,7 +14,7 @@
 
 package com.liferay.portal.kernel.scripting;
 
-import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+import com.liferay.portal.kernel.security.annotation.AccessControl;
 
 import java.util.Map;
 import java.util.Set;
@@ -28,6 +28,7 @@ import javax.portlet.PortletResponse;
  * @author Alberto Montero
  * @author Brian Wing Shun Chan
  */
+@AccessControl
 public class ScriptingUtil {
 
 	public static void clearCache(String language) throws ScriptingException {
@@ -63,8 +64,6 @@ public class ScriptingUtil {
 	}
 
 	public static Scripting getScripting() {
-		PortalRuntimePermission.checkGetBeanProperty(ScriptingUtil.class);
-
 		return _scripting;
 	}
 
@@ -73,8 +72,6 @@ public class ScriptingUtil {
 	}
 
 	public void setScripting(Scripting scripting) {
-		PortalRuntimePermission.checkSetBeanProperty(getClass());
-
 		_scripting = scripting;
 	}
 

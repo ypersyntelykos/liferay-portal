@@ -14,11 +14,12 @@
 
 package com.liferay.portal.kernel.util;
 
-import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+import com.liferay.portal.kernel.security.annotation.AccessControl;
 
 /**
  * @author Brian Wing Shun Chan
  */
+@AccessControl
 public class HashCodeFactoryUtil {
 
 	public static HashCode getHashCode() {
@@ -33,14 +34,10 @@ public class HashCodeFactoryUtil {
 	}
 
 	public static HashCodeFactory getHashCodeFactory() {
-		PortalRuntimePermission.checkGetBeanProperty(HashCodeFactoryUtil.class);
-
 		return _hashCodeFactory;
 	}
 
 	public void setHashCodeFactory(HashCodeFactory hashCodeFactory) {
-		PortalRuntimePermission.checkSetBeanProperty(getClass());
-
 		_hashCodeFactory = hashCodeFactory;
 	}
 
