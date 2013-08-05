@@ -14,7 +14,7 @@
 
 package com.liferay.portal.servlet.filters.etag;
 
-import com.liferay.portal.kernel.servlet.BufferCacheServletResponse;
+import com.liferay.portal.kernel.servlet.RestrictedByteBufferCacheServletResponse;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.servlet.filters.BasePortalFilter;
 
@@ -61,19 +61,26 @@ public class ETagFilter extends BasePortalFilter {
 			FilterChain filterChain)
 		throws Exception {
 
-		BufferCacheServletResponse bufferCacheServletResponse =
-			new BufferCacheServletResponse(response);
+		RestrictedByteBufferCacheServletResponse
+			restrictedByteBufferCacheServletResponse =
+				new RestrictedByteBufferCacheServletResponse(
+					response, 1024 * 1024);
 
 		processFilter(
-			ETagFilter.class, request, bufferCacheServletResponse, filterChain);
+			ETagFilter.class, request, restrictedByteBufferCacheServletResponse,
+			filterChain);
 
-		ByteBuffer byteBuffer = bufferCacheServletResponse.getByteBuffer();
+		if (!restrictedByteBufferCacheServletResponse.isOverflowed()) {
+			ByteBuffer byteBuffer =
+				restrictedByteBufferCacheServletResponse.getByteBuffer();
 
-		if (!isEligibleForEtag(bufferCacheServletResponse.getStatus()) ||
-			!ETagUtil.processETag(request, response, byteBuffer)) {
+			if (!isEligibleForEtag(
+					restrictedByteBufferCacheServletResponse.getStatus()) ||
+				!ETagUtil.processETag(request, response, byteBuffer)) {
 
-			bufferCacheServletResponse.finishResponse();
-			bufferCacheServletResponse.outputBuffer();
+				restrictedByteBufferCacheServletResponse.finishResponse();
+				restrictedByteBufferCacheServletResponse.flushCache();
+			}
 		}
 	}
 
