@@ -64,7 +64,7 @@ public class ETagFilter extends BasePortalFilter {
 		RestrictedByteBufferCacheServletResponse
 			restrictedByteBufferCacheServletResponse =
 				new RestrictedByteBufferCacheServletResponse(
-					response, 1024 * 1024);
+					response, 1024 * 2);
 
 		processFilter(
 			ETagFilter.class, request, restrictedByteBufferCacheServletResponse,
@@ -81,6 +81,9 @@ public class ETagFilter extends BasePortalFilter {
 				restrictedByteBufferCacheServletResponse.finishResponse();
 				restrictedByteBufferCacheServletResponse.flushCache();
 			}
+		}
+		else {
+			System.out.println("############Cache overflowed, give up etag..........");
 		}
 	}
 

@@ -110,7 +110,9 @@ public class RestrictedByteArrayCacheOutputStream extends OutputStream {
 
 		int newIndex = index + length;
 
-		flushOnOverflow(newIndex);
+		if (newIndex > cacheCapacity) {
+			flush();
+		}
 
 		if (overflowed) {
 			outputStream.write(bytes, offset, length);
@@ -129,7 +131,9 @@ public class RestrictedByteArrayCacheOutputStream extends OutputStream {
 	public void write(int b) throws IOException {
 		int newIndex = index + 1;
 
-		flushOnOverflow(newIndex);
+		if (newIndex > cacheCapacity) {
+			flush();
+		}
 
 		if (overflowed) {
 			outputStream.write(b);
@@ -162,8 +166,9 @@ public class RestrictedByteArrayCacheOutputStream extends OutputStream {
 		cache = newCache;
 	}
 
-	protected void flushOnOverflow(int newIndex) throws IOException {
-		if (overflowed || (newIndex <= cacheCapacity)) {
+	@Override
+	public void flush() throws IOException {
+		if (overflowed) {
 			return;
 		}
 
