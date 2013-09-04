@@ -71,8 +71,10 @@ import java.io.IOException;
 
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.portlet.PortletConfig;
 import javax.portlet.PortletContext;
@@ -91,10 +93,13 @@ import javax.servlet.jsp.PageContext;
 import org.apache.struts.Globals;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionMapping;
+import org.apache.struts.action.ActionServlet;
 import org.apache.struts.config.ActionConfig;
 import org.apache.struts.config.ForwardConfig;
+import org.apache.struts.config.ModuleConfig;
 import org.apache.struts.tiles.TilesRequestProcessor;
 import org.apache.struts.util.MessageResources;
+import org.apache.struts.util.RequestUtils;
 
 /**
  * @author Brian Wing Shun Chan
@@ -105,6 +110,8 @@ import org.apache.struts.util.MessageResources;
 public class PortalRequestProcessor extends TilesRequestProcessor {
 
 	public PortalRequestProcessor() {
+
+		_actions = new ConcurrentHashMap<String, Action>();
 
 		// auth.forward.last.path.
 
@@ -135,6 +142,37 @@ public class PortalRequestProcessor extends TilesRequestProcessor {
 		_trackerIgnorePaths = new HashSet<String>();
 
 		addPaths(_trackerIgnorePaths, PropsKeys.SESSION_TRACKER_IGNORE_PATHS);
+	}
+
+	@Override
+	public void destroy() {
+		Set<Map.Entry<String, Action>> entries = _actions.entrySet();
+
+		Iterator<Map.Entry<String, Action>> iterator = entries.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, Action> entry = iterator.next();
+
+			Action action = entry.getValue();
+
+			action.setServlet(null);
+
+			iterator.remove();
+		}
+
+		servlet = null;
+	}
+
+	@Override
+	public void init(ActionServlet servlet, ModuleConfig moduleConfig)
+		throws ServletException {
+
+		_actions.clear();
+
+		this.servlet = servlet;
+		this.moduleConfig = moduleConfig;
+
+		initDefinitionsMapping();
 	}
 
 	@Override
@@ -493,7 +531,35 @@ public class PortalRequestProcessor extends TilesRequestProcessor {
 			return actionAdapter;
 		}
 
-		return super.processActionCreate(request, response, actionMapping);
+		String type = actionMapping.getType();
+
+		Action action = _actions.get(type);
+
+		if (action == null) {
+			try {
+				action = (Action)RequestUtils.applicationInstance(type);
+			}
+			catch (Exception e) {
+				MessageResources messageResources = getInternal();
+
+				_log.error(
+					messageResources.getMessage(
+						"actionCreate", actionMapping.getPath()), e);
+
+				response.sendError(
+					HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+					messageResources.getMessage(
+						"actionCreate", actionMapping.getPath()));
+
+				return null;
+			}
+
+			action.setServlet(servlet);
+
+			_actions.put(type, action);
+		}
+
+		return action;
 	}
 
 	@Override
@@ -1030,6 +1096,7 @@ public class PortalRequestProcessor extends TilesRequestProcessor {
 	private static Log _log = LogFactoryUtil.getLog(
 		PortalRequestProcessor.class);
 
+	private Map<String, Action> _actions;
 	private Set<String> _lastPaths;
 	private Set<String> _publicPaths;
 	private Set<String> _trackerIgnorePaths;
