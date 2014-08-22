@@ -16,6 +16,7 @@ package com.liferay.portal.fabric.local.worker;
 
 import com.liferay.portal.fabric.worker.FabricWorker;
 import com.liferay.portal.kernel.concurrent.NoticeableFuture;
+import com.liferay.portal.kernel.concurrent.NoticeableFutureConverter;
 
 import java.io.Serializable;
 
@@ -23,17 +24,15 @@ import java.io.Serializable;
  * @author Shuyang Zhou
  */
 public class LocalFabricWorker<T extends Serializable>
-	implements FabricWorker<T> {
+	extends NoticeableFutureConverter<T, T> implements FabricWorker<T> {
 
 	public LocalFabricWorker(NoticeableFuture<T> noticeableFuture) {
-		_noticeableFuture = noticeableFuture;
+		super(noticeableFuture);
 	}
 
 	@Override
-	public NoticeableFuture<T> getFuture() {
-		return _noticeableFuture;
+	protected T convert(T t) throws Throwable {
+		return t;
 	}
-
-	private final NoticeableFuture<T> _noticeableFuture;
 
 }

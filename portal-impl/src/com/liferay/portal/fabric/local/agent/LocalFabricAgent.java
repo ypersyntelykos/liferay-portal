@@ -18,7 +18,6 @@ import com.liferay.portal.fabric.FabricException;
 import com.liferay.portal.fabric.agent.FabricAgent;
 import com.liferay.portal.fabric.local.worker.LocalFabricWorker;
 import com.liferay.portal.fabric.worker.FabricWorker;
-import com.liferay.portal.kernel.concurrent.NoticeableFuture;
 import com.liferay.portal.kernel.process.ProcessCallable;
 import com.liferay.portal.kernel.process.ProcessConfig;
 import com.liferay.portal.kernel.process.ProcessException;
@@ -40,11 +39,8 @@ public class LocalFabricAgent implements FabricAgent {
 		throws FabricException {
 
 		try {
-			NoticeableFuture<T> future = ProcessExecutorUtil.execute(
-				processConfig, processCallable);
-
 			LocalFabricWorker<T> localFabricWorker = new LocalFabricWorker<T>(
-				future);
+				ProcessExecutorUtil.execute(processConfig, processCallable));
 
 			_fabricWorkerQueue.add(localFabricWorker);
 

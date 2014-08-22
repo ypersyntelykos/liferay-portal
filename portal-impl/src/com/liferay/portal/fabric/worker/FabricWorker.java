@@ -21,9 +21,8 @@ import java.io.Serializable;
 /**
  * @author Shuyang Zhou
  */
-public interface FabricWorker<T extends Serializable> {
-
-	public NoticeableFuture<T> getFuture();
+public interface FabricWorker<T extends Serializable>
+	extends NoticeableFuture<T> {
 
 	// TODO, all sorts of process status query support
 
