@@ -69,12 +69,13 @@ public class LocalProcessExecutor implements ProcessExecutor {
 				// destroy the same process, but this is JDK's job to ensure
 				// that processes are destroyed in a thread safe manner.
 
-				Iterator<Process> iterator = _managedProcesses.iterator();
+				Iterator<NoticeableFuture<?>> iterator =
+					_managedNoticeableFutures.iterator();
 
 				while (iterator.hasNext()) {
-					Process process = iterator.next();
+					NoticeableFuture<?> noticeableFuture = iterator.next();
 
-					process.destroy();
+					noticeableFuture.cancel(true);
 
 					iterator.remove();
 				}
@@ -84,7 +85,7 @@ public class LocalProcessExecutor implements ProcessExecutor {
 				// previous iteration, we are safe to clear the list of managed
 				// processes.
 
-				_managedProcesses.clear();
+				_managedNoticeableFutures.clear();
 
 				_threadPoolExecutor = null;
 			}
@@ -157,7 +158,7 @@ public class LocalProcessExecutor implements ProcessExecutor {
 				// Consider the newly created process as a managed process only
 				// after the subprocess reactor is taken by the thread pool
 
-				_managedProcesses.add(process);
+				_managedNoticeableFutures.add(processCallableNoticeableFuture);
 
 				return new NoticeableFutureConverter
 					<T, ProcessCallable<? extends Serializable>>(
@@ -218,7 +219,8 @@ public class LocalProcessExecutor implements ProcessExecutor {
 
 	private static Log _log = LogFactoryUtil.getLog(LocalProcessExecutor.class);
 
-	private Set<Process> _managedProcesses = new ConcurrentHashSet<Process>();
+	private final Set<NoticeableFuture<?>> _managedNoticeableFutures =
+		new ConcurrentHashSet<NoticeableFuture<?>>();
 	private volatile ThreadPoolExecutor _threadPoolExecutor;
 
 	private class SubprocessReactor
@@ -337,7 +339,7 @@ public class LocalProcessExecutor implements ProcessExecutor {
 						"Forcibly killed subprocess on interruption", ie);
 				}
 
-				_managedProcesses.remove(_process);
+				_managedNoticeableFutures.remove(_process);
 
 				if (resultProcessCallable != null) {
 
