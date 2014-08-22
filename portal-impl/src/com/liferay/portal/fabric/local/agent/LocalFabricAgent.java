@@ -17,6 +17,7 @@ package com.liferay.portal.fabric.local.agent;
 import com.liferay.portal.fabric.FabricException;
 import com.liferay.portal.fabric.agent.FabricAgent;
 import com.liferay.portal.fabric.local.worker.LocalFabricWorker;
+import com.liferay.portal.fabric.worker.FabricWorker;
 import com.liferay.portal.kernel.concurrent.NoticeableFuture;
 import com.liferay.portal.kernel.process.ProcessCallable;
 import com.liferay.portal.kernel.process.ProcessConfig;
@@ -34,7 +35,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 public class LocalFabricAgent implements FabricAgent {
 
 	@Override
-	public <T extends Serializable> LocalFabricWorker<T> execute(
+	public <T extends Serializable> FabricWorker<T> execute(
 			ProcessConfig processConfig, ProcessCallable<T> processCallable)
 		throws FabricException {
 

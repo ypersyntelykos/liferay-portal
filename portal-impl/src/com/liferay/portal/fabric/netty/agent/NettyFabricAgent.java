@@ -18,9 +18,8 @@ import com.liferay.portal.fabric.FabricException;
 import com.liferay.portal.fabric.FabricRemote;
 import com.liferay.portal.fabric.agent.FabricAgent;
 import com.liferay.portal.fabric.local.agent.LocalFabricAgent;
-import com.liferay.portal.fabric.local.worker.LocalFabricWorker;
 import com.liferay.portal.fabric.netty.repository.Repository;
-import com.liferay.portal.fabric.netty.worker.NettyFabricWorker;
+import com.liferay.portal.fabric.worker.FabricWorker;
 import com.liferay.portal.kernel.concurrent.AsyncBroker;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -57,7 +56,7 @@ public class NettyFabricAgent
 	}
 
 	@Override
-	public <T extends Serializable> NettyFabricWorker<T> execute(
+	public <T extends Serializable> FabricWorker<T> execute(
 			ProcessConfig processConfig, ProcessCallable<T> processCallable)
 		throws FabricException {
 
@@ -70,10 +69,7 @@ public class NettyFabricAgent
 		builder.setRuntimeClassPath(
 			convertClassPath(processConfig.getRuntimeClassPath()));
 
-		LocalFabricWorker<T> localFabricWorker = _localFabricAgent.execute(
-			builder.build(), processCallable);
-
-		return new NettyFabricWorker<T>(localFabricWorker);
+		return _localFabricAgent.execute(builder.build(), processCallable);
 	}
 
 	public void initialize(Channel channel, AsyncBroker asyncBroker) {
