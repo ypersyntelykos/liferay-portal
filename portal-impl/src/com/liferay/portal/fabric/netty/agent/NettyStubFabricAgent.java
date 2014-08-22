@@ -18,7 +18,6 @@ import com.liferay.portal.fabric.FabricException;
 import com.liferay.portal.fabric.agent.FabricAgent;
 import com.liferay.portal.fabric.netty.worker.NettyStubFabricWorker;
 import com.liferay.portal.fabric.worker.FabricWorker;
-import com.liferay.portal.kernel.concurrent.DefaultNoticeableFuture;
 import com.liferay.portal.kernel.process.ProcessCallable;
 import com.liferay.portal.kernel.process.ProcessConfig;
 
@@ -57,14 +56,11 @@ public class NettyStubFabricAgent implements FabricAgent, Serializable {
 
 			@Override
 			public void operationComplete(ChannelFuture channelFuture) {
-				DefaultNoticeableFuture<T> defaultNoticeableFuture =
-					nettyStubFabricWorker.getFuture();
-
 				if (channelFuture.isCancelled()) {
-					defaultNoticeableFuture.cancel(true);
+					nettyStubFabricWorker.cancel(true);
 				}
 				else if (!channelFuture.isSuccess()) {
-					defaultNoticeableFuture.setException(channelFuture.cause());
+					nettyStubFabricWorker.setException(channelFuture.cause());
 				}
 			}
 

@@ -18,6 +18,7 @@ import com.liferay.portal.fabric.FabricException;
 import com.liferay.portal.fabric.FabricRemote;
 import com.liferay.portal.fabric.agent.FabricAgent;
 import com.liferay.portal.fabric.local.agent.LocalFabricAgent;
+import com.liferay.portal.fabric.netty.fileserver.FileResponse;
 import com.liferay.portal.fabric.netty.repository.Repository;
 import com.liferay.portal.fabric.worker.FabricWorker;
 import com.liferay.portal.kernel.concurrent.AsyncBroker;
@@ -72,7 +73,9 @@ public class NettyFabricAgent
 		return _localFabricAgent.execute(builder.build(), processCallable);
 	}
 
-	public void initialize(Channel channel, AsyncBroker asyncBroker) {
+	public void initialize(
+		Channel channel, AsyncBroker<String, FileResponse> asyncBroker) {
+
 		_channel = channel;
 		_repository = new Repository(_repositoryFolder, channel, asyncBroker);
 	}
@@ -83,30 +86,31 @@ public class NettyFabricAgent
 	}
 
 	private String convertClassPath(String classPath) {
-		String[] paths = StringUtil.split(classPath, File.pathSeparatorChar);
-
 		List<String> localPaths = new ArrayList<String>();
 
-		for (String path : paths) {
-			Path file = _repository.getFile(path);
+		for (String path :
+				StringUtil.split(classPath, File.pathSeparatorChar)) {
 
-			if (file == null) {
+			Path filePath = _repository.getFile(path);
+
+			if (filePath == null) {
 				if (_log.isWarnEnabled()) {
 					_log.warn(
 						"Unable to map remote path : " + path +
 							", removed it from class path");
 				}
+
+				continue;
 			}
-			else {
-				file = file.toAbsolutePath();
 
-				localPaths.add(file.toString());
+			filePath = filePath.toAbsolutePath();
 
-				if (_log.isDebugEnabled()) {
-					_log.debug(
-						"Class path file mapped, remote path : " + path +
-							", local path : " + file);
-				}
+			localPaths.add(filePath.toString());
+
+			if (_log.isDebugEnabled()) {
+				_log.debug(
+					"Class path file mapped, remote path : " + path +
+						", local path : " + filePath);
 			}
 		}
 

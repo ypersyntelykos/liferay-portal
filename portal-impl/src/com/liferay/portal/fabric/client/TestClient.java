@@ -50,7 +50,7 @@ public class TestClient {
 
 		//--------------------------------------------------------------------//
 
-		Path repositoryFolder = Paths.get("/home/zsyxc/test-repo");
+		Path repositoryFolder = Paths.get("~/test-repo");
 
 		Files.createDirectories(repositoryFolder);
 

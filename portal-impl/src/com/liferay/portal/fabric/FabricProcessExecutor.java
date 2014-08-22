@@ -17,7 +17,6 @@ package com.liferay.portal.fabric;
 import com.liferay.portal.fabric.agent.FabricAgent;
 import com.liferay.portal.fabric.agent.FabricAgentRegistry;
 import com.liferay.portal.fabric.agent.FabricAgentSelector;
-import com.liferay.portal.fabric.worker.FabricWorker;
 import com.liferay.portal.kernel.concurrent.NoticeableFuture;
 import com.liferay.portal.kernel.process.ProcessCallable;
 import com.liferay.portal.kernel.process.ProcessConfig;
@@ -57,10 +56,7 @@ public class FabricProcessExecutor implements ProcessExecutor {
 
 		FabricAgent fabricAgent = getFabricAgent(processCallable);
 
-		FabricWorker<T> fabricWorker = fabricAgent.execute(
-			processConfig, processCallable);
-
-		return fabricWorker.getFuture();
+		return fabricAgent.execute(processConfig, processCallable);
 	}
 
 	protected FabricAgent getFabricAgent(ProcessCallable<?> processCallable) {

@@ -19,7 +19,6 @@ import com.liferay.portal.fabric.netty.worker.NettyFabricWorkerResult;
 import com.liferay.portal.fabric.netty.worker.NettyStubFabricWorker;
 import com.liferay.portal.fabric.worker.FabricWorker;
 import com.liferay.portal.kernel.concurrent.FutureListener;
-import com.liferay.portal.kernel.concurrent.NoticeableFuture;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
@@ -58,14 +57,11 @@ public class NettyStubFabricWorkerExecutionChannelHandler
 
 		final long id = nettyStubFabricWorker.getId();
 
-		NoticeableFuture<Serializable> noticeableFuture =
-			fabricWorker.getFuture();
-
 		final Channel channel = channelHandlerContext.channel();
 
 		// TODO need to handle the case that future has been cancelled
 
-		noticeableFuture.addFutureListener(new FutureListener<Serializable>() {
+		fabricWorker.addFutureListener(new FutureListener<Serializable>() {
 
 			@Override
 			public void complete(Future<Serializable> future) {
