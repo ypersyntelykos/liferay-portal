@@ -15,9 +15,9 @@
 package com.liferay.portal.fabric.netty.handlers;
 
 import com.liferay.portal.fabric.netty.agent.NettyFabricAgent;
-import com.liferay.portal.fabric.netty.worker.NettyFabricWorker;
 import com.liferay.portal.fabric.netty.worker.NettyFabricWorkerResult;
 import com.liferay.portal.fabric.netty.worker.NettyStubFabricWorker;
+import com.liferay.portal.fabric.worker.FabricWorker;
 import com.liferay.portal.kernel.concurrent.FutureListener;
 import com.liferay.portal.kernel.concurrent.NoticeableFuture;
 
@@ -51,7 +51,7 @@ public class NettyStubFabricWorkerExecutionChannelHandler
 		// TODO create the classloading processcallable, and assign the worker
 		// id into it.
 
-		NettyFabricWorker<Serializable> nettyFabricWorker =
+		FabricWorker<Serializable> fabricWorker =
 			_nettyFabricAgent.execute(
 				nettyStubFabricWorker.getProcessConfig(),
 				nettyStubFabricWorker.getProcessCallable());
@@ -59,7 +59,7 @@ public class NettyStubFabricWorkerExecutionChannelHandler
 		final long id = nettyStubFabricWorker.getId();
 
 		NoticeableFuture<Serializable> noticeableFuture =
-			nettyFabricWorker.getFuture();
+			fabricWorker.getFuture();
 
 		final Channel channel = channelHandlerContext.channel();
 
