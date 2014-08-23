@@ -166,6 +166,10 @@ public class ProcessLauncher {
 			return _processOutputStream;
 		}
 
+		public static long getSyntheticId() {
+			return _syntheticId;
+		}
+
 		public static boolean isAttached() {
 			HeartbeatThread attachThread = _heartbeatThreadReference.get();
 
@@ -186,11 +190,14 @@ public class ProcessLauncher {
 		private ProcessContext() {
 		}
 
-		private static ConcurrentMap<String, Object> _attributes =
-			new ConcurrentHashMap<String, Object>();
-		private static AtomicReference<HeartbeatThread>
-			_heartbeatThreadReference = new AtomicReference<HeartbeatThread>();
 		private static ProcessOutputStream _processOutputStream;
+
+		private final static ConcurrentMap<String, Object> _attributes =
+			new ConcurrentHashMap<String, Object>();
+		private final static AtomicReference<HeartbeatThread>
+			_heartbeatThreadReference = new AtomicReference<HeartbeatThread>();
+		private final static long _syntheticId = Long.getLong(
+			LocalProcessExecutor.SYNTHETIC_ID, 0);
 
 	}
 
@@ -274,9 +281,9 @@ public class ProcessLauncher {
 		}
 
 		private volatile boolean _detach;
-		private long _interval;
-		private ProcessCallable<String> _pringBackProcessCallable;
-		private ShutdownHook _shutdownHook;
+		private final long _interval;
+		private final ProcessCallable<String> _pringBackProcessCallable;
+		private final ShutdownHook _shutdownHook;
 
 	}
 
@@ -294,7 +301,7 @@ public class ProcessLauncher {
 
 		private static final long serialVersionUID = 1L;
 
-		private String _message;
+		private final String _message;
 
 	}
 

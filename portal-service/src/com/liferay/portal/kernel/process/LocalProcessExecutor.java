@@ -15,7 +15,6 @@
 package com.liferay.portal.kernel.process;
 
 import com.liferay.portal.kernel.concurrent.AbortPolicy;
-import com.liferay.portal.kernel.concurrent.ConcurrentHashSet;
 import com.liferay.portal.kernel.concurrent.FutureListener;
 import com.liferay.portal.kernel.concurrent.NoticeableFuture;
 import com.liferay.portal.kernel.concurrent.NoticeableFutureConverter;
@@ -40,13 +39,16 @@ import java.io.Serializable;
 import java.io.StreamCorruptedException;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * @author Shuyang Zhou
@@ -69,8 +71,10 @@ public class LocalProcessExecutor implements ProcessExecutor {
 				// destroy the same process, but this is JDK's job to ensure
 				// that processes are destroyed in a thread safe manner.
 
-				Iterator<NoticeableFuture<?>> iterator =
-					_managedNoticeableFutures.iterator();
+				Collection<NoticeableFuture<?>> values =
+					_managedNoticeableFutures.values();
+
+				Iterator<NoticeableFuture<?>> iterator = values.iterator();
 
 				while (iterator.hasNext()) {
 					NoticeableFuture<?> noticeableFuture = iterator.next();
@@ -100,9 +104,13 @@ public class LocalProcessExecutor implements ProcessExecutor {
 		try {
 			List<String> arguments = processConfig.getArguments();
 
-			List<String> commands = new ArrayList<String>(arguments.size() + 4);
+			List<String> commands = new ArrayList<String>(arguments.size() + 5);
 
 			commands.add(processConfig.getJavaExecutable());
+
+			long syntheticId = _syntheticIdGenerator.getAndIncrement();
+
+			commands.add("-D" + SYNTHETIC_ID + "=" + syntheticId);
 			commands.add("-cp");
 			commands.add(processConfig.getBootstrapClassPath());
 			commands.addAll(arguments);
@@ -158,7 +166,8 @@ public class LocalProcessExecutor implements ProcessExecutor {
 				// Consider the newly created process as a managed process only
 				// after the subprocess reactor is taken by the thread pool
 
-				_managedNoticeableFutures.add(processCallableNoticeableFuture);
+				_managedNoticeableFutures.put(
+					syntheticId, processCallableNoticeableFuture);
 
 				return new NoticeableFutureConverter
 					<T, ProcessCallable<? extends Serializable>>(
@@ -196,6 +205,8 @@ public class LocalProcessExecutor implements ProcessExecutor {
 		}
 	}
 
+	protected static final String SYNTHETIC_ID = "synthetic.id";
+
 	private ThreadPoolExecutor _getThreadPoolExecutor() {
 		if (_threadPoolExecutor != null) {
 			return _threadPoolExecutor;
@@ -219,8 +230,9 @@ public class LocalProcessExecutor implements ProcessExecutor {
 
 	private static Log _log = LogFactoryUtil.getLog(LocalProcessExecutor.class);
 
-	private final Set<NoticeableFuture<?>> _managedNoticeableFutures =
-		new ConcurrentHashSet<NoticeableFuture<?>>();
+	private final Map<Long, NoticeableFuture<?>> _managedNoticeableFutures =
+		new ConcurrentHashMap<Long, NoticeableFuture<?>>();
+	private final AtomicLong _syntheticIdGenerator = new AtomicLong();
 	private volatile ThreadPoolExecutor _threadPoolExecutor;
 
 	private class SubprocessReactor

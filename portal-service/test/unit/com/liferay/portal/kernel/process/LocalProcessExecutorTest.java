@@ -632,14 +632,25 @@ public class LocalProcessExecutorTest {
 
 	@Test
 	public void testCreateProcessContext() throws Exception {
-		Constructor<ProcessContext> constructor =
-			ProcessContext.class.getDeclaredConstructor();
+		long syntheticId = System.currentTimeMillis();
 
-		constructor.setAccessible(true);
+		System.setProperty(
+			LocalProcessExecutor.SYNTHETIC_ID, String.valueOf(syntheticId));
 
-		constructor.newInstance();
+		try {
+			Constructor<ProcessContext> constructor =
+				ProcessContext.class.getDeclaredConstructor();
 
-		Assert.assertNotNull(ProcessContext.getAttributes());
+			constructor.setAccessible(true);
+
+			constructor.newInstance();
+
+			Assert.assertNotNull(ProcessContext.getAttributes());
+			Assert.assertEquals(syntheticId, ProcessContext.getSyntheticId());
+		}
+		finally {
+			System.clearProperty(LocalProcessExecutor.SYNTHETIC_ID);
+		}
 	}
 
 	@Test
