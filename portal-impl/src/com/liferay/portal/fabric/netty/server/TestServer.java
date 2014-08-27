@@ -20,11 +20,12 @@ import com.liferay.portal.fabric.agent.FabricAgentRegistry;
 import com.liferay.portal.fabric.agent.FabricAgentSelector;
 import com.liferay.portal.fabric.local.agent.LocalFabricAgent;
 import com.liferay.portal.fabric.server.FabricServerUtil;
-import com.liferay.portal.kernel.process.LocalProcessExecutor;
+import com.liferay.portal.fabric.worker.FabricWorker;
 import com.liferay.portal.kernel.process.ProcessCallable;
 import com.liferay.portal.kernel.process.ProcessConfig;
 import com.liferay.portal.kernel.process.ProcessException;
 import com.liferay.portal.kernel.process.ProcessExecutorUtil;
+import com.liferay.portal.kernel.process.local.LocalProcessExecutor;
 import com.liferay.portal.kernel.util.ClassLoaderPool;
 import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
 
@@ -99,14 +100,19 @@ public class TestServer {
 		ProcessCallable<String> processCallable =
 			new HelloWorldProcessCallable();
 
-		Future<String> future = fabricProcessExecutor.execute(
+		FabricWorker<String> fabricWorker = fabricProcessExecutor.execute(
 			processConfig, processCallable);
+
+		Future<String> future = fabricWorker.getProcessNoticeableFuture();
 
 		System.out.println("Location 1 : " + future.get());
 
 		Thread.sleep(10 * 1000);
 
-		future = fabricProcessExecutor.execute(processConfig, processCallable);
+		fabricWorker = fabricProcessExecutor.execute(
+			processConfig, processCallable);
+
+		future = fabricWorker.getProcessNoticeableFuture();
 
 		System.out.println("Location 2 : " + future.get());
 

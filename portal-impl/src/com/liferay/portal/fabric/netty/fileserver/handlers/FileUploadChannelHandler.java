@@ -133,7 +133,7 @@ public class FileUploadChannelHandler extends ChannelInboundHandlerAdapter {
 			channelPipeline.remove(this);
 		}
 
-		asyncBroker.take(fileResponse.getPath(), null);
+		asyncBroker.takeWithException(fileResponse.getPath(), throwable);
 
 		fileChannel.close();
 
@@ -153,7 +153,7 @@ public class FileUploadChannelHandler extends ChannelInboundHandlerAdapter {
 			fileResponse.getLocalFile(),
 			FileTime.fromMillis(fileResponse.getLastModified()));
 
-		asyncBroker.take(key, fileResponse);
+		asyncBroker.takeWithResult(key, fileResponse);
 	}
 
 	protected boolean receive(ByteBuf byteBuf) throws IOException {

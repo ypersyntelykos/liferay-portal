@@ -14,15 +14,15 @@
 
 package com.liferay.portal.fabric.worker;
 
-import com.liferay.portal.kernel.concurrent.NoticeableFuture;
 
+import com.liferay.portal.kernel.process.ProcessChannel;
 import java.io.Serializable;
 
 /**
  * @author Shuyang Zhou
  */
 public interface FabricWorker<T extends Serializable>
-	extends NoticeableFuture<T> {
+	extends ProcessChannel<T> {
 
 	// TODO, all sorts of process status query support
 

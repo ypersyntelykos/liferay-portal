@@ -17,8 +17,10 @@ package com.liferay.portal.fabric.netty.worker;
 import com.liferay.portal.fabric.worker.FabricWorker;
 import com.liferay.portal.kernel.concurrent.DefaultNoticeableFuture;
 import com.liferay.portal.kernel.concurrent.FutureListener;
+import com.liferay.portal.kernel.concurrent.NoticeableFuture;
 import com.liferay.portal.kernel.process.ProcessCallable;
 import com.liferay.portal.kernel.process.ProcessConfig;
+import com.liferay.portal.kernel.process.ProcessException;
 import com.liferay.portal.kernel.util.AggregateClassLoader;
 import com.liferay.portal.util.ClassLoaderUtil;
 
@@ -30,10 +32,7 @@ import java.io.Serializable;
 
 import java.net.URL;
 
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 /**
  * @author Shuyang Zhou
@@ -72,28 +71,6 @@ public class NettyStubFabricWorker<T extends Serializable>
 		});
 	}
 
-	@Override
-	public boolean addFutureListener(FutureListener<T> futureListener) {
-		return _defaultNoticeableFuture.addFutureListener(futureListener);
-	}
-
-	@Override
-	public boolean cancel(boolean mayInterruptIfRunning) {
-		return _defaultNoticeableFuture.cancel(mayInterruptIfRunning);
-	}
-
-	@Override
-	public T get() throws ExecutionException, InterruptedException {
-		return _defaultNoticeableFuture.get();
-	}
-
-	@Override
-	public T get(long timeout, TimeUnit unit)
-		throws ExecutionException, InterruptedException, TimeoutException {
-
-		return _defaultNoticeableFuture.get(timeout, unit);
-	}
-
 	public long getId() {
 		return _id;
 	}
@@ -108,21 +85,6 @@ public class NettyStubFabricWorker<T extends Serializable>
 
 	public URL getResource(String resourceName) {
 		return _resolvingClassLoader.getResource(resourceName);
-	}
-
-	@Override
-	public boolean isCancelled() {
-		return _defaultNoticeableFuture.isCancelled();
-	}
-
-	@Override
-	public boolean isDone() {
-		return _defaultNoticeableFuture.isDone();
-	}
-
-	@Override
-	public boolean removeFutureListener(FutureListener<T> futureListener) {
-		return _defaultNoticeableFuture.removeFutureListener(futureListener);
 	}
 
 	public void setException(Throwable t) {
@@ -153,5 +115,15 @@ public class NettyStubFabricWorker<T extends Serializable>
 	private final ProcessCallable<T> _processCallable;
 	private final ProcessConfig _processConfig;
 	private final transient ClassLoader _resolvingClassLoader;
+
+	@Override
+	public NoticeableFuture<T> getProcessNoticeableFuture() {
+		return _defaultNoticeableFuture;
+	}
+
+	@Override
+	public <V extends Serializable> NoticeableFuture<V> write(ProcessCallable<V> processCallable) throws ProcessException {
+		throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+	}
 
 }

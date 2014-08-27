@@ -16,23 +16,35 @@ package com.liferay.portal.fabric.local.worker;
 
 import com.liferay.portal.fabric.worker.FabricWorker;
 import com.liferay.portal.kernel.concurrent.NoticeableFuture;
-import com.liferay.portal.kernel.concurrent.NoticeableFutureConverter;
 
+import com.liferay.portal.kernel.process.ProcessCallable;
+import com.liferay.portal.kernel.process.ProcessChannel;
+import com.liferay.portal.kernel.process.ProcessException;
 import java.io.Serializable;
 
 /**
  * @author Shuyang Zhou
  */
 public class LocalFabricWorker<T extends Serializable>
-	extends NoticeableFutureConverter<T, T> implements FabricWorker<T> {
+	implements FabricWorker<T> {
 
-	public LocalFabricWorker(NoticeableFuture<T> noticeableFuture) {
-		super(noticeableFuture);
+	public LocalFabricWorker(ProcessChannel<T> processChannel) {
+		_processChannel = processChannel;
 	}
 
 	@Override
-	protected T convert(T t) throws Throwable {
-		return t;
+	public NoticeableFuture<T> getProcessNoticeableFuture() {
+		return _processChannel.getProcessNoticeableFuture();
 	}
+
+	@Override
+	public <V extends Serializable> NoticeableFuture<V> write(
+			ProcessCallable<V> processCallable)
+		throws ProcessException {
+
+		return _processChannel.write(processCallable);
+	}
+
+	private ProcessChannel<T> _processChannel;
 
 }

@@ -29,6 +29,7 @@ import java.io.Serializable;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -57,7 +58,10 @@ public class NettyStubFabricAgent implements FabricAgent, Serializable {
 			@Override
 			public void operationComplete(ChannelFuture channelFuture) {
 				if (channelFuture.isCancelled()) {
-					nettyStubFabricWorker.cancel(true);
+					Future<T> future =
+						nettyStubFabricWorker.getProcessNoticeableFuture();
+
+					future.cancel(true);
 				}
 				else if (!channelFuture.isSuccess()) {
 					nettyStubFabricWorker.setException(channelFuture.cause());

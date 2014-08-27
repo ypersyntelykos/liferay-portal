@@ -17,8 +17,9 @@ package com.liferay.portal.fabric;
 import com.liferay.portal.fabric.agent.FabricAgent;
 import com.liferay.portal.fabric.agent.FabricAgentRegistry;
 import com.liferay.portal.fabric.agent.FabricAgentSelector;
-import com.liferay.portal.kernel.concurrent.NoticeableFuture;
+import com.liferay.portal.fabric.worker.FabricWorker;
 import com.liferay.portal.kernel.process.ProcessCallable;
+import com.liferay.portal.kernel.process.ProcessChannel;
 import com.liferay.portal.kernel.process.ProcessConfig;
 import com.liferay.portal.kernel.process.ProcessException;
 import com.liferay.portal.kernel.process.ProcessExecutor;
@@ -50,7 +51,7 @@ public class FabricProcessExecutor implements ProcessExecutor {
 	}
 
 	@Override
-	public <T extends Serializable> NoticeableFuture<T> execute(
+	public <T extends Serializable> FabricWorker<T> execute(
 			ProcessConfig processConfig, ProcessCallable<T> processCallable)
 		throws ProcessException {
 

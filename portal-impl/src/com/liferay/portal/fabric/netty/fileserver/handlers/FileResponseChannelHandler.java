@@ -45,7 +45,7 @@ public class FileResponseChannelHandler
 		throws Exception {
 
 		if (fileResponse.isFileNotFound() || fileResponse.isFileNotModified()) {
-			_asyncBroker.take(fileResponse.getPath(), fileResponse);
+			_asyncBroker.takeWithResult(fileResponse.getPath(), fileResponse);
 
 			return null;
 		}
