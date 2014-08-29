@@ -19,8 +19,8 @@ import com.liferay.portal.fabric.netty.worker.NettyFabricWorkerResult;
 import com.liferay.portal.fabric.netty.worker.NettyStubFabricWorker;
 import com.liferay.portal.fabric.worker.FabricWorker;
 import com.liferay.portal.kernel.concurrent.FutureListener;
-
 import com.liferay.portal.kernel.concurrent.NoticeableFuture;
+
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;

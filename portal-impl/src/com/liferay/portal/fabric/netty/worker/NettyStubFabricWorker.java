@@ -83,6 +83,11 @@ public class NettyStubFabricWorker<T extends Serializable>
 		return _processConfig;
 	}
 
+	@Override
+	public NoticeableFuture<T> getProcessNoticeableFuture() {
+		return _defaultNoticeableFuture;
+	}
+
 	public URL getResource(String resourceName) {
 		return _resolvingClassLoader.getResource(resourceName);
 	}
@@ -93,6 +98,14 @@ public class NettyStubFabricWorker<T extends Serializable>
 
 	public void setResult(T t) {
 		_defaultNoticeableFuture.set(t);
+	}
+
+	@Override
+	public <V extends Serializable> NoticeableFuture<V> write(
+			ProcessCallable<V> processCallable)
+		throws ProcessException {
+
+		throw new UnsupportedOperationException("Not supported yet.");
 	}
 
 	// TODO, all sorts of process status query support
@@ -107,6 +120,7 @@ public class NettyStubFabricWorker<T extends Serializable>
 				_defaultNoticeableFuture.cancel(true);
 			}
 		}
+
 	};
 
 	private final transient DefaultNoticeableFuture<T>
@@ -115,15 +129,5 @@ public class NettyStubFabricWorker<T extends Serializable>
 	private final ProcessCallable<T> _processCallable;
 	private final ProcessConfig _processConfig;
 	private final transient ClassLoader _resolvingClassLoader;
-
-	@Override
-	public NoticeableFuture<T> getProcessNoticeableFuture() {
-		return _defaultNoticeableFuture;
-	}
-
-	@Override
-	public <V extends Serializable> NoticeableFuture<V> write(ProcessCallable<V> processCallable) throws ProcessException {
-		throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-	}
 
 }

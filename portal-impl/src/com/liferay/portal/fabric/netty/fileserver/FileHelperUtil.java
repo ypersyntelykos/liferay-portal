@@ -15,6 +15,7 @@
 package com.liferay.portal.fabric.netty.fileserver;
 
 import com.liferay.portal.kernel.io.BigEndianCodec;
+import com.liferay.portal.kernel.util.ReflectionUtil;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -90,7 +91,7 @@ public class FileHelperUtil {
 		}
 		catch (IOException ioe) {
 			if (!quite) {
-				throwException(ioe);
+				ReflectionUtil.throwException(ioe);
 			}
 		}
 	}
@@ -198,10 +199,6 @@ public class FileHelperUtil {
 		move(fromPath, toPath, true);
 	}
 
-	public static void throwException(Throwable throwable) {
-		FileHelperUtil.<RuntimeException>doThrowException(throwable);
-	}
-
 	public static void unzip(InputStream inputStream, Path destPath)
 		throws IOException {
 
@@ -307,14 +304,6 @@ public class FileHelperUtil {
 		}
 
 		return zipPath;
-	}
-
-	@SuppressWarnings("unchecked")
-	private static <E extends Throwable> void doThrowException(
-			Throwable throwable)
-		throws E {
-
-		throw (E)throwable;
 	}
 
 }

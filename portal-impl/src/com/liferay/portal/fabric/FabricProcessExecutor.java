@@ -19,7 +19,6 @@ import com.liferay.portal.fabric.agent.FabricAgentRegistry;
 import com.liferay.portal.fabric.agent.FabricAgentSelector;
 import com.liferay.portal.fabric.worker.FabricWorker;
 import com.liferay.portal.kernel.process.ProcessCallable;
-import com.liferay.portal.kernel.process.ProcessChannel;
 import com.liferay.portal.kernel.process.ProcessConfig;
 import com.liferay.portal.kernel.process.ProcessException;
 import com.liferay.portal.kernel.process.ProcessExecutor;

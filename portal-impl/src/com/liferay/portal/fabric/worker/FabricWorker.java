@@ -14,8 +14,8 @@
 
 package com.liferay.portal.fabric.worker;
 
-
 import com.liferay.portal.kernel.process.ProcessChannel;
+
 import java.io.Serializable;
 
 /**
