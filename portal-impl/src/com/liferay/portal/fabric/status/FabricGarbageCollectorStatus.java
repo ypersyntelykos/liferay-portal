@@ -12,26 +12,29 @@
  * details.
  */
 
-package com.liferay.portal.fabric.agent;
+package com.liferay.portal.fabric.status;
 
-import com.liferay.portal.fabric.FabricException;
-import com.liferay.portal.fabric.status.FabricStatus;
-import com.liferay.portal.fabric.worker.FabricWorker;
-import com.liferay.portal.kernel.process.ProcessCallable;
-import com.liferay.portal.kernel.process.ProcessConfig;
-
-import java.io.Serializable;
+import com.liferay.portal.fabric.status.model.GarbageCollectorMXBeanModel;
+import java.lang.management.GarbageCollectorMXBean;
 
 /**
  * @author Shuyang Zhou
  */
-public interface FabricAgent {
+public class FabricGarbageCollectorStatus
+	extends BasePluralFabricStatus
+		<GarbageCollectorMXBean, GarbageCollectorMXBeanModel> {
 
-	public <T extends Serializable> FabricWorker<T> execute(
-			ProcessConfig processConfig, ProcessCallable<T> processCallable)
-		throws FabricException;
+	public FabricGarbageCollectorStatus() {
+		super(GarbageCollectorMXBean.class);
+	}
 
-	public <T extends FabricStatus> T getFabricStatus(
-		Class<T> fabricStatusClass);
+	@Override
+	protected GarbageCollectorMXBeanModel convert(
+		GarbageCollectorMXBean garbageCollectorMXBean) {
+
+		return new GarbageCollectorMXBeanModel(garbageCollectorMXBean);
+	}
+
+	private static final long serialVersionUID = 1L;
 
 }

@@ -12,26 +12,37 @@
  * details.
  */
 
-package com.liferay.portal.fabric.agent;
-
-import com.liferay.portal.fabric.FabricException;
-import com.liferay.portal.fabric.status.FabricStatus;
-import com.liferay.portal.fabric.worker.FabricWorker;
-import com.liferay.portal.kernel.process.ProcessCallable;
-import com.liferay.portal.kernel.process.ProcessConfig;
+package com.liferay.portal.fabric.status.model;
 
 import java.io.Serializable;
 
 /**
  * @author Shuyang Zhou
  */
-public interface FabricAgent {
+public class LockInfo implements Serializable {
 
-	public <T extends Serializable> FabricWorker<T> execute(
-			ProcessConfig processConfig, ProcessCallable<T> processCallable)
-		throws FabricException;
+	public LockInfo(java.lang.management.LockInfo lockInfo) {
+		_className = lockInfo.getClassName();
+		_identityHashCode = lockInfo.getIdentityHashCode();
+		_toString = lockInfo.toString();
+	}
 
-	public <T extends FabricStatus> T getFabricStatus(
-		Class<T> fabricStatusClass);
+	public String getClassName() {
+		return _className;
+	}
 
+	public int getIdentityHashCode() {
+		return _identityHashCode;
+	}
+
+	@Override
+	public String toString() {
+		return _toString;
+	}
+
+	private static final long serialVersionUID = 1L;
+
+	private final String _className;
+	private final int _identityHashCode;
+	private final String _toString;
 }

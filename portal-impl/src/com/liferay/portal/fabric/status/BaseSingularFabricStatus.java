@@ -17,7 +17,6 @@ package com.liferay.portal.fabric.status;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 
-import java.io.Serializable;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.PlatformManagedObject;
@@ -34,10 +33,13 @@ import javax.management.ObjectName;
 /**
  * @author Shuyang Zhou
  */
-public abstract class BaseFabricStatus implements Serializable {
+public abstract class BaseSingularFabricStatus<T extends PlatformManagedObject>
+	implements FabricStatus {
 
-	public BaseFabricStatus(PlatformManagedObject platformManagedObject) {
-		ObjectName objectName = platformManagedObject.getObjectName();
+	public BaseSingularFabricStatus(T platformManagedObject) {
+		this.platformManagedObject = platformManagedObject;
+
+		objectName = platformManagedObject.getObjectName();
 
 		MBeanServer mBeanServer = ManagementFactory.getPlatformMBeanServer();
 
@@ -86,9 +88,14 @@ public abstract class BaseFabricStatus implements Serializable {
 		return Collections.unmodifiableMap(attributes);
 	}
 
+	private static final long serialVersionUID = 1L;
+
+	private static Log _log = LogFactoryUtil.getLog(BaseSingularFabricStatus.class);
+
 	protected final Map<String, Object> attributes =
 		new HashMap<String, Object>();
 
-	private static Log _log = LogFactoryUtil.getLog(BaseFabricStatus.class);
+	protected final T platformManagedObject;
+	protected final ObjectName objectName;
 
 }

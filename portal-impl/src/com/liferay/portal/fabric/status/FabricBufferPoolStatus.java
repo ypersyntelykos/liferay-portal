@@ -12,26 +12,26 @@
  * details.
  */
 
-package com.liferay.portal.fabric.agent;
+package com.liferay.portal.fabric.status;
 
-import com.liferay.portal.fabric.FabricException;
-import com.liferay.portal.fabric.status.FabricStatus;
-import com.liferay.portal.fabric.worker.FabricWorker;
-import com.liferay.portal.kernel.process.ProcessCallable;
-import com.liferay.portal.kernel.process.ProcessConfig;
-
-import java.io.Serializable;
+import com.liferay.portal.fabric.status.model.BufferPoolMXBeanModel;
+import java.lang.management.BufferPoolMXBean;
 
 /**
  * @author Shuyang Zhou
  */
-public interface FabricAgent {
+public class FabricBufferPoolStatus
+	extends BasePluralFabricStatus<BufferPoolMXBean, BufferPoolMXBeanModel> {
 
-	public <T extends Serializable> FabricWorker<T> execute(
-			ProcessConfig processConfig, ProcessCallable<T> processCallable)
-		throws FabricException;
+	public FabricBufferPoolStatus() {
+		super(BufferPoolMXBean.class);
+	}
 
-	public <T extends FabricStatus> T getFabricStatus(
-		Class<T> fabricStatusClass);
+	@Override
+	protected BufferPoolMXBeanModel convert(BufferPoolMXBean bufferPoolMXBean) {
+		return new BufferPoolMXBeanModel(bufferPoolMXBean);
+	}
+
+	private static final long serialVersionUID = 1L;
 
 }

@@ -14,23 +14,26 @@
 
 package com.liferay.portal.fabric.status;
 
+import com.liferay.portal.kernel.process.ProcessChannel;
+import com.liferay.portal.kernel.util.MethodHandler;
+import com.liferay.portal.kernel.util.MethodKey;
 import java.lang.management.ClassLoadingMXBean;
 import java.lang.management.ManagementFactory;
 
 /**
  * @author Shuyang Zhou
  */
-public class FabricClassLoadingStatus extends BaseFabricStatus {
+public class FabricClassLoadingStatus
+	extends BaseSingularFabricStatus<ClassLoadingMXBean> {
 
 	public FabricClassLoadingStatus() {
 		super(ManagementFactory.getClassLoadingMXBean());
 
-		ClassLoadingMXBean classLoadingMXBean =
-			ManagementFactory.getClassLoadingMXBean();
-
-		_loadedClassCount = classLoadingMXBean.getLoadedClassCount();
-		_totalLoadedClassCount = classLoadingMXBean.getTotalLoadedClassCount();
-		_unloadedClassCount = classLoadingMXBean.getUnloadedClassCount();
+		_loadedClassCount = platformManagedObject.getLoadedClassCount();
+		_totalLoadedClassCount =
+			platformManagedObject.getTotalLoadedClassCount();
+		_unloadedClassCount = platformManagedObject.getUnloadedClassCount();
+		_verbose = platformManagedObject.isVerbose();
 	}
 
 	public int getLoadedClassCount() {
@@ -45,8 +48,24 @@ public class FabricClassLoadingStatus extends BaseFabricStatus {
 		return _unloadedClassCount;
 	}
 
+	public boolean isVerbose() {
+		return _verbose;
+	}
+
+	public void setVerbose(ProcessChannel<?> processChannel, boolean verbose) {
+		FabricStatusOperationUtil.syncInvoke(
+			processChannel, objectName,
+			new MethodHandler(_SET_VERBOSE_METHOD_KEY, verbose));
+	}
+
+	private static final MethodKey _SET_VERBOSE_METHOD_KEY =
+		new MethodKey(ClassLoadingMXBean.class, "setVerbose", boolean.class);
+
+	private static final long serialVersionUID = 1L;
+
 	private final int _loadedClassCount;
 	private final long _totalLoadedClassCount;
 	private final long _unloadedClassCount;
+	private final boolean _verbose;
 
 }

@@ -12,26 +12,31 @@
  * details.
  */
 
-package com.liferay.portal.fabric.agent;
-
-import com.liferay.portal.fabric.FabricException;
-import com.liferay.portal.fabric.status.FabricStatus;
-import com.liferay.portal.fabric.worker.FabricWorker;
-import com.liferay.portal.kernel.process.ProcessCallable;
-import com.liferay.portal.kernel.process.ProcessConfig;
-
-import java.io.Serializable;
+package com.liferay.portal.fabric.status.model;
 
 /**
  * @author Shuyang Zhou
  */
-public interface FabricAgent {
+public class MonitorInfo extends LockInfo {
 
-	public <T extends Serializable> FabricWorker<T> execute(
-			ProcessConfig processConfig, ProcessCallable<T> processCallable)
-		throws FabricException;
+	public MonitorInfo(java.lang.management.MonitorInfo monitorInfo) {
+		super(monitorInfo);
 
-	public <T extends FabricStatus> T getFabricStatus(
-		Class<T> fabricStatusClass);
+		_lockedStackDepth = monitorInfo.getLockedStackDepth();
+		_lockedStackFrame = monitorInfo.getLockedStackFrame();
+	}
+
+	public int getLockedStackDepth() {
+		return _lockedStackDepth;
+	}
+
+	public StackTraceElement getLockedStackFrame() {
+		return _lockedStackFrame;
+	}
+
+	private static final long serialVersionUID = 1L;
+
+	private final int _lockedStackDepth;
+	private final StackTraceElement _lockedStackFrame;
 
 }

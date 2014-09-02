@@ -12,26 +12,12 @@
  * details.
  */
 
-package com.liferay.portal.fabric.agent;
-
-import com.liferay.portal.fabric.FabricException;
-import com.liferay.portal.fabric.status.FabricStatus;
-import com.liferay.portal.fabric.worker.FabricWorker;
-import com.liferay.portal.kernel.process.ProcessCallable;
-import com.liferay.portal.kernel.process.ProcessConfig;
+package com.liferay.portal.fabric.status;
 
 import java.io.Serializable;
 
 /**
  * @author Shuyang Zhou
  */
-public interface FabricAgent {
-
-	public <T extends Serializable> FabricWorker<T> execute(
-			ProcessConfig processConfig, ProcessCallable<T> processCallable)
-		throws FabricException;
-
-	public <T extends FabricStatus> T getFabricStatus(
-		Class<T> fabricStatusClass);
-
+public interface FabricStatus extends Serializable {
 }

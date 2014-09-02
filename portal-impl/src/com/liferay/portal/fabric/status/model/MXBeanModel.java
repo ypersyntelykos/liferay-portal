@@ -12,26 +12,22 @@
  * details.
  */
 
-package com.liferay.portal.fabric.agent;
-
-import com.liferay.portal.fabric.FabricException;
-import com.liferay.portal.fabric.status.FabricStatus;
-import com.liferay.portal.fabric.worker.FabricWorker;
-import com.liferay.portal.kernel.process.ProcessCallable;
-import com.liferay.portal.kernel.process.ProcessConfig;
+package com.liferay.portal.fabric.status.model;
 
 import java.io.Serializable;
+import javax.management.ObjectName;
 
 /**
  * @author Shuyang Zhou
  */
-public interface FabricAgent {
+public abstract class MXBeanModel implements Serializable {
 
-	public <T extends Serializable> FabricWorker<T> execute(
-			ProcessConfig processConfig, ProcessCallable<T> processCallable)
-		throws FabricException;
+	public MXBeanModel(ObjectName objectName) {
+		this.objectName = objectName;
+	}
 
-	public <T extends FabricStatus> T getFabricStatus(
-		Class<T> fabricStatusClass);
+	protected final ObjectName objectName;
+
+	private static final long serialVersionUID = 1L;
 
 }

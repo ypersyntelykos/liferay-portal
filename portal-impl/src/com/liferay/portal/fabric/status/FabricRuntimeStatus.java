@@ -24,29 +24,30 @@ import java.util.Map;
 /**
  * @author Shuyang Zhou
  */
-public class FabricRuntimeStatus extends BaseFabricStatus {
+public class FabricRuntimeStatus
+	extends BaseSingularFabricStatus<RuntimeMXBean> {
 
 	public FabricRuntimeStatus() {
 		super(ManagementFactory.getRuntimeMXBean());
 
-		RuntimeMXBean runtimeMXBean = ManagementFactory.getRuntimeMXBean();
-
-		_bootClassPath = runtimeMXBean.getBootClassPath();
-		_bootClassPathSupported = runtimeMXBean.isBootClassPathSupported();
-		_classPath = runtimeMXBean.getClassPath();
-		_inputArguments = runtimeMXBean.getInputArguments();
-		_libraryPath = runtimeMXBean.getLibraryPath();
-		_managementSpecVersion = runtimeMXBean.getManagementSpecVersion();
-		_name = runtimeMXBean.getName();
-		_specName = runtimeMXBean.getSpecName();
-		_specVendor = runtimeMXBean.getSpecVendor();
-		_specVersion = runtimeMXBean.getSpecVersion();
-		_startTime = runtimeMXBean.getStartTime();
-		_systemProperties = runtimeMXBean.getSystemProperties();
-		_uptime = runtimeMXBean.getUptime();
-		_vmName = runtimeMXBean.getVmName();
-		_vmVendor = runtimeMXBean.getVmVendor();
-		_vmVersion = runtimeMXBean.getVmVersion();
+		_bootClassPath = platformManagedObject.getBootClassPath();
+		_bootClassPathSupported =
+			platformManagedObject.isBootClassPathSupported();
+		_classPath = platformManagedObject.getClassPath();
+		_inputArguments = platformManagedObject.getInputArguments();
+		_libraryPath = platformManagedObject.getLibraryPath();
+		_managementSpecVersion =
+			platformManagedObject.getManagementSpecVersion();
+		_name = platformManagedObject.getName();
+		_specName = platformManagedObject.getSpecName();
+		_specVendor = platformManagedObject.getSpecVendor();
+		_specVersion = platformManagedObject.getSpecVersion();
+		_startTime = platformManagedObject.getStartTime();
+		_systemProperties = platformManagedObject.getSystemProperties();
+		_uptime = platformManagedObject.getUptime();
+		_vmName = platformManagedObject.getVmName();
+		_vmVendor = platformManagedObject.getVmVendor();
+		_vmVersion = platformManagedObject.getVmVersion();
 	}
 
 	public String getBootClassPath() {

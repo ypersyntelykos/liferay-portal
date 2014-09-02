@@ -20,19 +20,17 @@ import java.lang.management.OperatingSystemMXBean;
 /**
  * @author Shuyang Zhou
  */
-public class FabricOSStatus extends BaseFabricStatus {
+public class FabricOperatingSystemStatus
+	extends BaseSingularFabricStatus<OperatingSystemMXBean> {
 
-	public FabricOSStatus() {
+	public FabricOperatingSystemStatus() {
 		super(ManagementFactory.getOperatingSystemMXBean());
 
-		OperatingSystemMXBean operatingSystemMXBean =
-			ManagementFactory.getOperatingSystemMXBean();
-
-		_osArchitecture = operatingSystemMXBean.getArch();
-		_osName = operatingSystemMXBean.getName();
-		_osVersion = operatingSystemMXBean.getVersion();
-		_availableProcessors = operatingSystemMXBean.getAvailableProcessors();
-		_systemLoadAverage = operatingSystemMXBean.getSystemLoadAverage();
+		_osArchitecture = platformManagedObject.getArch();
+		_osName = platformManagedObject.getName();
+		_osVersion = platformManagedObject.getVersion();
+		_availableProcessors = platformManagedObject.getAvailableProcessors();
+		_systemLoadAverage = platformManagedObject.getSystemLoadAverage();
 	}
 
 	public int getAvailableProcessors() {
