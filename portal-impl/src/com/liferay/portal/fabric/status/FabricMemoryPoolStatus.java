@@ -15,14 +15,14 @@
 package com.liferay.portal.fabric.status;
 
 import com.liferay.portal.fabric.status.model.MemoryPoolMXBeanModel;
+
 import java.lang.management.MemoryPoolMXBean;
 
 /**
  * @author Shuyang Zhou
  */
 public class FabricMemoryPoolStatus
-	extends BasePluralFabricStatus<MemoryPoolMXBean, MemoryPoolMXBeanModel>{
-
+	extends BasePluralFabricStatus<MemoryPoolMXBean, MemoryPoolMXBeanModel> {
 
 	public FabricMemoryPoolStatus() {
 		super(MemoryPoolMXBean.class);

@@ -45,4 +45,5 @@ public class LockInfo implements Serializable {
 	private final String _className;
 	private final int _identityHashCode;
 	private final String _toString;
+
 }

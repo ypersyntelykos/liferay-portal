@@ -15,6 +15,7 @@
 package com.liferay.portal.fabric.status;
 
 import com.liferay.portal.fabric.status.model.BufferPoolMXBeanModel;
+
 import java.lang.management.BufferPoolMXBean;
 
 /**

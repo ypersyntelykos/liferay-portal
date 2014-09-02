@@ -17,8 +17,10 @@ package com.liferay.portal.fabric.status;
 import com.liferay.portal.kernel.process.ProcessChannel;
 import com.liferay.portal.kernel.util.MethodHandler;
 import com.liferay.portal.kernel.util.MethodKey;
+
 import java.lang.management.ManagementFactory;
 import java.lang.management.PlatformLoggingMXBean;
+
 import java.util.Collections;
 import java.util.List;
 
@@ -34,16 +36,16 @@ public class FabricPlatformLoggingStatus
 		_loggerNames = platformManagedObject.getLoggerNames();
 	}
 
-	public List<String> getLoggerNames() {
-		return Collections.unmodifiableList(_loggerNames);
-	}
-
 	public String getLoggerLevel(
 		ProcessChannel<?> processChannel, String loggerName) {
 
 		return FabricStatusOperationUtil.syncInvoke(
 			processChannel, objectName,
 			new MethodHandler(_GET_LOGGER_LEVEL_METHOD_KEY, loggerName));
+	}
+
+	public List<String> getLoggerNames() {
+		return Collections.unmodifiableList(_loggerNames);
 	}
 
 	public String getParentLoggerName(
@@ -57,13 +59,11 @@ public class FabricPlatformLoggingStatus
 	public void setLoggerLevel(
 		ProcessChannel<?> processChannel, String loggerName, String levelName) {
 
-		FabricStatusOperationUtil.syncInvoke(
+		FabricStatusOperationUtil.invoke(
 			processChannel, objectName,
 			new MethodHandler(
 				_SET_LOGGER_LEVEL_METHOD_KEY, loggerName, levelName));
 	}
-
-	private static final long serialVersionUID = 1L;
 
 	private static final MethodKey _GET_LOGGER_LEVEL_METHOD_KEY =
 		new MethodKey(
@@ -75,7 +75,10 @@ public class FabricPlatformLoggingStatus
 
 	private static final MethodKey _SET_LOGGER_LEVEL_METHOD_KEY =
 		new MethodKey(
-			PlatformLoggingMXBean.class, "setLoggerLevel", String.class, String.class);
+			PlatformLoggingMXBean.class, "setLoggerLevel", String.class,
+			String.class);
+
+	private static final long serialVersionUID = 1L;
 
 	private final List<String> _loggerNames;
 

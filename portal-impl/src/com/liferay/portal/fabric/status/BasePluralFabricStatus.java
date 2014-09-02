@@ -16,6 +16,7 @@ package com.liferay.portal.fabric.status;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.PlatformManagedObject;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -43,8 +44,8 @@ public abstract class BasePluralFabricStatus<T extends PlatformManagedObject, V>
 
 	protected abstract V convert(T platformManagedObject);
 
-	private static final long serialVersionUID = 1L;
-
 	protected final List<V> _statusInfos;
+
+	private static final long serialVersionUID = 1L;
 
 }

@@ -1,4 +1,3 @@
-
 /**
  * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
@@ -12,9 +11,12 @@
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
  * details.
  */
+
 package com.liferay.portal.fabric.status.model;
 
 import java.io.Serializable;
+
+import java.util.Arrays;
 
 /**
  * @author Shuyang Zhou
@@ -24,20 +26,19 @@ public class ThreadInfo implements Serializable {
 	public ThreadInfo(java.lang.management.ThreadInfo threadInfo) {
 		_blockedCount = threadInfo.getBlockedCount();
 		_blockedTime = threadInfo.getBlockedTime();
+		_inNative = threadInfo.isInNative();
 		_lockInfo = new LockInfo(threadInfo.getLockInfo());
 		_lockName = threadInfo.getLockName();
 		_lockOwnerId = threadInfo.getLockOwnerId();
 		_lockOwnerName = threadInfo.getLockOwnerName();
 		_stackTrace = threadInfo.getStackTrace();
+		_suspended = threadInfo.isSuspended();
 		_threadId = threadInfo.getThreadId();
 		_threadName = threadInfo.getThreadName();
 		_threadState = threadInfo.getThreadState();
+		_toString = threadInfo.toString();
 		_waitedCount = threadInfo.getWaitedCount();
 		_waitedTime = threadInfo.getWaitedTime();
-		_inNative = threadInfo.isInNative();
-		_suspended = threadInfo.isSuspended();
-		_toString = threadInfo.toString();
-		
 
 		java.lang.management.MonitorInfo[] monitorInfos =
 			threadInfo.getLockedMonitors();
@@ -58,28 +59,20 @@ public class ThreadInfo implements Serializable {
 		}
 	}
 
-	public String getThreadName() {
-		return _threadName;
-	}
-
-	public long getThreadId() {
-		return _threadId;
+	public long getBlockedCount() {
+		return _blockedCount;
 	}
 
 	public long getBlockedTime() {
 		return _blockedTime;
 	}
 
-	public long getBlockedCount() {
-		return _blockedCount;
+	public MonitorInfo[] getLockedMonitors() {
+		return Arrays.copyOf(_lockedMonitors, _lockedMonitors.length);
 	}
 
-	public long getWaitedTime() {
-		return _waitedTime;
-	}
-
-	public long getWaitedCount() {
-		return _waitedCount;
+	public LockInfo[] getLockedSynchronizers() {
+		return Arrays.copyOf(_lockedSynchronizers, _lockedSynchronizers.length);
 	}
 
 	public LockInfo getLockInfo() {
@@ -98,28 +91,36 @@ public class ThreadInfo implements Serializable {
 		return _lockOwnerName;
 	}
 
-	public boolean isInNative() {
-		return _inNative;
+	public StackTraceElement[] getStackTrace() {
+		return _stackTrace;
 	}
 
-	public boolean isSuspended() {
-		return _suspended;
+	public long getThreadId() {
+		return _threadId;
+	}
+
+	public String getThreadName() {
+		return _threadName;
 	}
 
 	public Thread.State getThreadState() {
 		return _threadState;
 	}
 
-	public StackTraceElement[] getStackTrace() {
-		return _stackTrace;
+	public long getWaitedCount() {
+		return _waitedCount;
 	}
 
-	public MonitorInfo[] getLockedMonitors() {
-		return _lockedMonitors;
+	public long getWaitedTime() {
+		return _waitedTime;
 	}
 
-	public LockInfo[] getLockedSynchronizers() {
-		return _lockedSynchronizers;
+	public boolean isInNative() {
+		return _inNative;
+	}
+
+	public boolean isSuspended() {
+		return _suspended;
 	}
 
 	@Override
@@ -129,21 +130,22 @@ public class ThreadInfo implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	private final String _threadName;
-	private final long _threadId;
-	private final long _blockedTime;
 	private final long _blockedCount;
-	private final long _waitedTime;
-	private final long _waitedCount;
+	private final long _blockedTime;
+	private final boolean _inNative;
+	private final MonitorInfo[] _lockedMonitors;
+	private final LockInfo[] _lockedSynchronizers;
 	private final LockInfo _lockInfo;
 	private final String _lockName;
 	private final long _lockOwnerId;
 	private final String _lockOwnerName;
-	private final boolean _inNative;
-	private final boolean _suspended;
-	private final Thread.State _threadState;
 	private final StackTraceElement[] _stackTrace;
-	private final MonitorInfo[] _lockedMonitors;
-	private final LockInfo[] _lockedSynchronizers;
+	private final boolean _suspended;
+	private final long _threadId;
+	private final String _threadName;
+	private final Thread.State _threadState;
 	private final String _toString;
+	private final long _waitedCount;
+	private final long _waitedTime;
+
 }

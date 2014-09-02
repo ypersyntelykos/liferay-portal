@@ -15,6 +15,7 @@
 package com.liferay.portal.fabric.status.model;
 
 import java.lang.management.MemoryManagerMXBean;
+
 import java.util.Arrays;
 
 /**
@@ -22,9 +23,7 @@ import java.util.Arrays;
  */
 public class MemoryManagerMXBeanModel extends MXBeanModel {
 
-	public MemoryManagerMXBeanModel(
-		MemoryManagerMXBean memoryManagerMXBean) {
-
+	public MemoryManagerMXBeanModel(MemoryManagerMXBean memoryManagerMXBean) {
 		super(memoryManagerMXBean.getObjectName());
 
 		_memoryPoolNames = memoryManagerMXBean.getMemoryPoolNames();

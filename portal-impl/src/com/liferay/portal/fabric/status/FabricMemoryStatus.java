@@ -18,6 +18,7 @@ import com.liferay.portal.fabric.status.model.MemoryUsage;
 import com.liferay.portal.kernel.process.ProcessChannel;
 import com.liferay.portal.kernel.util.MethodHandler;
 import com.liferay.portal.kernel.util.MethodKey;
+
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryMXBean;
 
@@ -38,6 +39,11 @@ public class FabricMemoryStatus extends BaseSingularFabricStatus<MemoryMXBean> {
 		_verbose = platformManagedObject.isVerbose();
 	}
 
+	public void gc(ProcessChannel<?> processChannel) {
+		FabricStatusOperationUtil.invoke(
+			processChannel, objectName, new MethodHandler(_GC_METHOD_KEY));
+	}
+
 	public MemoryUsage getHeapMemoryUsage() {
 		return _heapMemoryUsage;
 	}
@@ -55,23 +61,18 @@ public class FabricMemoryStatus extends BaseSingularFabricStatus<MemoryMXBean> {
 	}
 
 	public void setVerbose(ProcessChannel<?> processChannel, boolean verbose) {
-		FabricStatusOperationUtil.syncInvoke(
+		FabricStatusOperationUtil.invoke(
 			processChannel, objectName,
 			new MethodHandler(_SET_VERBOSE_METHOD_KEY, verbose));
 	}
 
-	public void gc(ProcessChannel<?> processChannel) {
-		FabricStatusOperationUtil.syncInvoke(
-			processChannel, objectName, new MethodHandler(_GC_METHOD_KEY));
-	}
+	private static final MethodKey _GC_METHOD_KEY = new MethodKey(
+		MemoryMXBean.class, "gc");
+
+	private static final MethodKey _SET_VERBOSE_METHOD_KEY = new MethodKey(
+		MemoryMXBean.class, "setVerbose", boolean.class);
 
 	private static final long serialVersionUID = 1L;
-
-	private static final MethodKey _SET_VERBOSE_METHOD_KEY =
-		new MethodKey(MemoryMXBean.class, "setVerbose", boolean.class);
-
-	private static final MethodKey _GC_METHOD_KEY =
-		new MethodKey(MemoryMXBean.class, "gc");
 
 	private final MemoryUsage _heapMemoryUsage;
 	private final MemoryUsage _nonHeapMemoryUsage;

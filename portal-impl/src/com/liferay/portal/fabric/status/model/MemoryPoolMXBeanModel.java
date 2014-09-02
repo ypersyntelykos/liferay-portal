@@ -18,8 +18,10 @@ import com.liferay.portal.fabric.status.FabricStatusOperationUtil;
 import com.liferay.portal.kernel.process.ProcessChannel;
 import com.liferay.portal.kernel.util.MethodHandler;
 import com.liferay.portal.kernel.util.MethodKey;
+
 import java.lang.management.MemoryPoolMXBean;
 import java.lang.management.MemoryType;
+
 import java.util.Arrays;
 
 /**
@@ -27,9 +29,7 @@ import java.util.Arrays;
  */
 public class MemoryPoolMXBeanModel extends MXBeanModel {
 
-	public MemoryPoolMXBeanModel(
-		MemoryPoolMXBean memoryPoolMXBean) {
-
+	public MemoryPoolMXBeanModel(MemoryPoolMXBean memoryPoolMXBean) {
 		super(memoryPoolMXBean.getObjectName());
 
 		_collectionUsage = new MemoryUsage(
@@ -38,17 +38,17 @@ public class MemoryPoolMXBeanModel extends MXBeanModel {
 			memoryPoolMXBean.getCollectionUsageThreshold();
 		_collectionUsageThresholdCount =
 			memoryPoolMXBean.getCollectionUsageThresholdCount();
-		_memoryManagerNames = memoryPoolMXBean.getMemoryManagerNames();
-		_name = memoryPoolMXBean.getName();
-		_peakUsage = new MemoryUsage(memoryPoolMXBean.getPeakUsage());
-		_memoryType = memoryPoolMXBean.getType();
-		_usage = new MemoryUsage(memoryPoolMXBean.getUsage());
-		_usageThreshold = memoryPoolMXBean.getUsageThreshold();
-		_usageThresholdCount = memoryPoolMXBean.getUsageThresholdCount();
 		_collectionUsageThresholdExceeded =
 			memoryPoolMXBean.isCollectionUsageThresholdExceeded();
 		_collectionUsageThresholdSupported =
 			memoryPoolMXBean.isCollectionUsageThresholdSupported();
+		_memoryManagerNames = memoryPoolMXBean.getMemoryManagerNames();
+		_memoryType = memoryPoolMXBean.getType();
+		_name = memoryPoolMXBean.getName();
+		_peakUsage = new MemoryUsage(memoryPoolMXBean.getPeakUsage());
+		_usage = new MemoryUsage(memoryPoolMXBean.getUsage());
+		_usageThreshold = memoryPoolMXBean.getUsageThreshold();
+		_usageThresholdCount = memoryPoolMXBean.getUsageThresholdCount();
 		_usageThresholdExceeded = memoryPoolMXBean.isUsageThresholdExceeded();
 		_usageThresholdSupported = memoryPoolMXBean.isUsageThresholdSupported();
 		_valid = memoryPoolMXBean.isValid();
@@ -70,16 +70,16 @@ public class MemoryPoolMXBeanModel extends MXBeanModel {
 		return Arrays.copyOf(_memoryManagerNames, _memoryManagerNames.length);
 	}
 
+	public MemoryType getMemoryType() {
+		return _memoryType;
+	}
+
 	public String getName() {
 		return _name;
 	}
 
 	public MemoryUsage getPeakUsage() {
 		return _peakUsage;
-	}
-
-	public MemoryType getMemoryType() {
-		return _memoryType;
 	}
 
 	public MemoryUsage getUsage() {
@@ -115,7 +115,7 @@ public class MemoryPoolMXBeanModel extends MXBeanModel {
 	}
 
 	public void resetPeakUsage(ProcessChannel<?> processChannel) {
-		FabricStatusOperationUtil.syncInvoke(
+		FabricStatusOperationUtil.invoke(
 			processChannel, objectName,
 			new MethodHandler(_RESET_PEAK_USAGE_METHOD_KEY));
 	}
@@ -123,7 +123,7 @@ public class MemoryPoolMXBeanModel extends MXBeanModel {
 	public void setCollectionUsageThreshold(
 		ProcessChannel<?> processChannel, long threshold) {
 
-		FabricStatusOperationUtil.syncInvoke(
+		FabricStatusOperationUtil.invoke(
 			processChannel, objectName,
 			new MethodHandler(
 				_SET_COLLECTION_USAGE_THRESHOLD_METHOD_KEY, threshold));
@@ -132,15 +132,13 @@ public class MemoryPoolMXBeanModel extends MXBeanModel {
 	public void setUsageThreshold(
 		ProcessChannel<?> processChannel, long threshold) {
 
-		FabricStatusOperationUtil.syncInvoke(
+		FabricStatusOperationUtil.invoke(
 			processChannel, objectName,
 			new MethodHandler(_SET_USAGE_THRESHOLD_METHOD_KEY, threshold));
 	}
 
-	private static final long serialVersionUID = 1L;
-
-	private static final MethodKey _RESET_PEAK_USAGE_METHOD_KEY =
-		new MethodKey(MemoryPoolMXBean.class, "resetPeakUsage");
+	private static final MethodKey _RESET_PEAK_USAGE_METHOD_KEY = new MethodKey(
+		MemoryPoolMXBean.class, "resetPeakUsage");
 
 	private static final MethodKey _SET_COLLECTION_USAGE_THRESHOLD_METHOD_KEY =
 		new MethodKey(
@@ -149,19 +147,22 @@ public class MemoryPoolMXBeanModel extends MXBeanModel {
 	private static final MethodKey _SET_USAGE_THRESHOLD_METHOD_KEY =
 		new MethodKey(MemoryPoolMXBean.class, "setUsageThreshold", long.class);
 
+	private static final long serialVersionUID = 1L;
+
 	private final MemoryUsage _collectionUsage;
 	private final long _collectionUsageThreshold;
 	private final long _collectionUsageThresholdCount;
+	private final boolean _collectionUsageThresholdExceeded;
+	private final boolean _collectionUsageThresholdSupported;
 	private final String[] _memoryManagerNames;
+	private final MemoryType _memoryType;
 	private final String _name;
 	private final MemoryUsage _peakUsage;
-	private final MemoryType _memoryType;
 	private final MemoryUsage _usage;
 	private final long _usageThreshold;
 	private final long _usageThresholdCount;
-	private final boolean _collectionUsageThresholdExceeded;
-	private final boolean _collectionUsageThresholdSupported;
 	private final boolean _usageThresholdExceeded;
 	private final boolean _usageThresholdSupported;
 	private final boolean _valid;
+
 }

@@ -14,10 +14,6 @@
 
 package com.liferay.portal.fabric.status;
 
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
-
-
 import java.lang.management.ManagementFactory;
 import java.lang.management.PlatformManagedObject;
 
@@ -43,40 +39,24 @@ public abstract class BaseSingularFabricStatus<T extends PlatformManagedObject>
 
 		MBeanServer mBeanServer = ManagementFactory.getPlatformMBeanServer();
 
-		MBeanInfo mBeanInfo = null;
-
 		try {
-			mBeanInfo = mBeanServer.getMBeanInfo(objectName);
-		}
-		catch (Exception e) {
-			if (_log.isWarnEnabled()) {
-				_log.warn("Unable to get MBeanInfo for " + objectName);
-			}
+			MBeanInfo mBeanInfo = mBeanServer.getMBeanInfo(objectName);
 
-			return;
-		}
+			for (MBeanAttributeInfo mBeanAttributeInfo :
+					mBeanInfo.getAttributes()) {
 
-		for (MBeanAttributeInfo mBeanAttributeInfo :
-				mBeanInfo.getAttributes()) {
+				if (!mBeanAttributeInfo.isReadable()) {
+					continue;
+				}
 
-			if (!mBeanAttributeInfo.isReadable()) {
-				continue;
-			}
-
-			try {
 				attributes.put(
 					mBeanAttributeInfo.getName(),
 					mBeanServer.getAttribute(
 						objectName, mBeanAttributeInfo.getName()));
 			}
-			catch (Exception e) {
-				if (_log.isWarnEnabled()) {
-					_log.warn(
-						"Unable to get attribute " +
-							mBeanAttributeInfo.getName() + " from " +
-								objectName, e);
-				}
-			}
+		}
+		catch (Exception e) {
+			throw new IllegalArgumentException(e);
 		}
 	}
 
@@ -88,14 +68,11 @@ public abstract class BaseSingularFabricStatus<T extends PlatformManagedObject>
 		return Collections.unmodifiableMap(attributes);
 	}
 
-	private static final long serialVersionUID = 1L;
-
-	private static Log _log = LogFactoryUtil.getLog(BaseSingularFabricStatus.class);
-
 	protected final Map<String, Object> attributes =
 		new HashMap<String, Object>();
-
-	protected final T platformManagedObject;
 	protected final ObjectName objectName;
+	protected final T platformManagedObject;
+
+	private static final long serialVersionUID = 1L;
 
 }

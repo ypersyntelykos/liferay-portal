@@ -15,6 +15,7 @@
 package com.liferay.portal.fabric.status.model;
 
 import java.io.Serializable;
+
 import javax.management.ObjectName;
 
 /**

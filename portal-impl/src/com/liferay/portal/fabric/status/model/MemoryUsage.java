@@ -22,27 +22,27 @@ import java.io.Serializable;
 public class MemoryUsage implements Serializable {
 
 	public MemoryUsage(java.lang.management.MemoryUsage memoryUsage) {
-		_init = memoryUsage.getInit();
-		_used = memoryUsage.getUsed();
 		_committed = memoryUsage.getCommitted();
+		_init = memoryUsage.getInit();
 		_max = memoryUsage.getMax();
+		_used = memoryUsage.getUsed();
 		_toString = memoryUsage.toString();
-	}
-
-	public long getInit() {
-		return _init;
-	}
-
-	public long getUsed() {
-		return _used;
 	}
 
 	public long getCommitted() {
 		return _committed;
 	}
 
+	public long getInit() {
+		return _init;
+	}
+
 	public long getMax() {
 		return _max;
+	}
+
+	public long getUsed() {
+		return _used;
 	}
 
 	@Override
@@ -52,10 +52,10 @@ public class MemoryUsage implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
+	private final long _committed;
 	private final long _init;
-    private final long _used;
-    private final long _committed;
-    private final long _max;
+	private final long _max;
 	private final String _toString;
+	private final long _used;
 
 }

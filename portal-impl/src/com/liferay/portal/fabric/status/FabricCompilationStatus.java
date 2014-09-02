@@ -23,7 +23,6 @@ import java.lang.management.ManagementFactory;
 public class FabricCompilationStatus
 	extends BaseSingularFabricStatus<CompilationMXBean> {
 
-
 	public FabricCompilationStatus() {
 		super(ManagementFactory.getCompilationMXBean());
 
@@ -31,10 +30,6 @@ public class FabricCompilationStatus
 			platformManagedObject.isCompilationTimeMonitoringSupported();
 		_name = platformManagedObject.getName();
 		_totalCompilationTime = platformManagedObject.getTotalCompilationTime();
-	}
-
-	public boolean isCompilationTimeMonitoringSupported() {
-		return _compilationTimeMonitoringSupported;
 	}
 
 	public String getName() {
@@ -45,10 +40,14 @@ public class FabricCompilationStatus
 		return _totalCompilationTime;
 	}
 
+	public boolean isCompilationTimeMonitoringSupported() {
+		return _compilationTimeMonitoringSupported;
+	}
+
 	private static final long serialVersionUID = 1L;
 
 	private final boolean _compilationTimeMonitoringSupported;
 	private final String _name;
 	private final long _totalCompilationTime;
-	
+
 }

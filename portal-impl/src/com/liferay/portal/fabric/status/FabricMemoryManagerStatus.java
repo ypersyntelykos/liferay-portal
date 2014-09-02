@@ -15,6 +15,7 @@
 package com.liferay.portal.fabric.status;
 
 import com.liferay.portal.fabric.status.model.MemoryManagerMXBeanModel;
+
 import java.lang.management.MemoryManagerMXBean;
 
 /**
@@ -23,7 +24,6 @@ import java.lang.management.MemoryManagerMXBean;
 public class FabricMemoryManagerStatus
 	extends BasePluralFabricStatus
 		<MemoryManagerMXBean, MemoryManagerMXBeanModel> {
-	
 
 	public FabricMemoryManagerStatus() {
 		super(MemoryManagerMXBean.class);

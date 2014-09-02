@@ -21,9 +21,7 @@ import java.lang.management.BufferPoolMXBean;
  */
 public class BufferPoolMXBeanModel extends MXBeanModel {
 
-	public BufferPoolMXBeanModel(
-		BufferPoolMXBean bufferPoolMXBean) {
-
+	public BufferPoolMXBeanModel(BufferPoolMXBean bufferPoolMXBean) {
 		super(bufferPoolMXBean.getObjectName());
 
 		_count = bufferPoolMXBean.getCount();

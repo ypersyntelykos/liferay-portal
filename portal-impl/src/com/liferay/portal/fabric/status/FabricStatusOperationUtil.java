@@ -20,9 +20,13 @@ import com.liferay.portal.kernel.process.ProcessChannel;
 import com.liferay.portal.kernel.process.ProcessException;
 import com.liferay.portal.kernel.util.MethodHandler;
 import com.liferay.portal.kernel.util.ReflectionUtil;
+
 import java.io.Serializable;
+
 import java.lang.management.ManagementFactory;
+
 import java.util.concurrent.Future;
+
 import javax.management.MBeanServer;
 import javax.management.ObjectInstance;
 import javax.management.ObjectName;
@@ -92,8 +96,8 @@ public class FabricStatusOperationUtil {
 
 		private static final long serialVersionUID = 1L;
 
-		private final ObjectName _objectName;
 		private final MethodHandler _methodHandler;
+		private final ObjectName _objectName;
 
 	}
 

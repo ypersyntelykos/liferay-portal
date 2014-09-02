@@ -17,6 +17,7 @@ package com.liferay.portal.fabric.status;
 import com.liferay.portal.kernel.process.ProcessChannel;
 import com.liferay.portal.kernel.util.MethodHandler;
 import com.liferay.portal.kernel.util.MethodKey;
+
 import java.lang.management.ClassLoadingMXBean;
 import java.lang.management.ManagementFactory;
 
@@ -53,13 +54,13 @@ public class FabricClassLoadingStatus
 	}
 
 	public void setVerbose(ProcessChannel<?> processChannel, boolean verbose) {
-		FabricStatusOperationUtil.syncInvoke(
+		FabricStatusOperationUtil.invoke(
 			processChannel, objectName,
 			new MethodHandler(_SET_VERBOSE_METHOD_KEY, verbose));
 	}
 
-	private static final MethodKey _SET_VERBOSE_METHOD_KEY =
-		new MethodKey(ClassLoadingMXBean.class, "setVerbose", boolean.class);
+	private static final MethodKey _SET_VERBOSE_METHOD_KEY = new MethodKey(
+		ClassLoadingMXBean.class, "setVerbose", boolean.class);
 
 	private static final long serialVersionUID = 1L;
 
