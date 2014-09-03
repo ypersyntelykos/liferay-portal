@@ -17,6 +17,7 @@ package com.liferay.portal.fabric.local.agent;
 import com.liferay.portal.fabric.FabricException;
 import com.liferay.portal.fabric.agent.FabricAgent;
 import com.liferay.portal.fabric.local.worker.LocalFabricWorker;
+import com.liferay.portal.fabric.status.FabricStatus;
 import com.liferay.portal.fabric.worker.FabricWorker;
 import com.liferay.portal.kernel.process.ProcessCallable;
 import com.liferay.portal.kernel.process.ProcessConfig;
@@ -48,6 +49,18 @@ public class LocalFabricAgent implements FabricAgent {
 		}
 		catch (ProcessException pe) {
 			throw new FabricException(pe);
+		}
+	}
+
+	@Override
+	public <T extends FabricStatus> T getFabricStatus(
+		Class<T> fabricStatusClass) {
+
+		try {
+			return fabricStatusClass.newInstance();
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
 		}
 	}
 

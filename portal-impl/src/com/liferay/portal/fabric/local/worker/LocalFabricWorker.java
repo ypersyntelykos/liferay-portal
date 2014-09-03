@@ -14,6 +14,7 @@
 
 package com.liferay.portal.fabric.local.worker;
 
+import com.liferay.portal.fabric.status.FabricStatus;
 import com.liferay.portal.fabric.worker.FabricWorker;
 import com.liferay.portal.kernel.concurrent.NoticeableFuture;
 import com.liferay.portal.kernel.process.ProcessCallable;
@@ -21,6 +22,8 @@ import com.liferay.portal.kernel.process.ProcessChannel;
 import com.liferay.portal.kernel.process.ProcessException;
 
 import java.io.Serializable;
+
+import java.util.concurrent.Future;
 
 /**
  * @author Shuyang Zhou
@@ -30,6 +33,21 @@ public class LocalFabricWorker<T extends Serializable>
 
 	public LocalFabricWorker(ProcessChannel<T> processChannel) {
 		_processChannel = processChannel;
+	}
+
+	@Override
+	public <T extends FabricStatus> T getFabricStatus(
+		Class<T> fabricStatusClass) {
+
+		try {
+			Future<T> future = write(
+				new FabricStatusProcessCallable<T>(fabricStatusClass));
+
+			return future.get();
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
@@ -46,5 +64,28 @@ public class LocalFabricWorker<T extends Serializable>
 	}
 
 	private ProcessChannel<T> _processChannel;
+
+	private static class FabricStatusProcessCallable<T extends FabricStatus>
+		implements ProcessCallable<T> {
+
+		public FabricStatusProcessCallable(Class<T> fabricStatusClass) {
+			_fabricStatusClass = fabricStatusClass;
+		}
+
+		@Override
+		public T call() throws ProcessException {
+			try {
+				return _fabricStatusClass.newInstance();
+			}
+			catch (Exception e) {
+				throw new ProcessException(e);
+			}
+		}
+
+		private static final long serialVersionUID = 1L;
+
+		private final Class<T> _fabricStatusClass;
+
+	}
 
 }

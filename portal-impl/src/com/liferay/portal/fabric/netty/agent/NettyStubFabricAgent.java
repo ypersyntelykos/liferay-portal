@@ -17,6 +17,7 @@ package com.liferay.portal.fabric.netty.agent;
 import com.liferay.portal.fabric.FabricException;
 import com.liferay.portal.fabric.agent.FabricAgent;
 import com.liferay.portal.fabric.netty.worker.NettyStubFabricWorker;
+import com.liferay.portal.fabric.status.FabricStatus;
 import com.liferay.portal.fabric.worker.FabricWorker;
 import com.liferay.portal.kernel.process.ProcessCallable;
 import com.liferay.portal.kernel.process.ProcessConfig;
@@ -71,6 +72,15 @@ public class NettyStubFabricAgent implements FabricAgent, Serializable {
 		});
 
 		return nettyStubFabricWorker;
+	}
+
+	@Override
+	public <T extends FabricStatus> T getFabricStatus(
+		Class<T> fabricStatusClass) {
+
+		// TODO ask for FabricStatus
+
+		throw new UnsupportedOperationException("Not supported yet.");
 	}
 
 	public NettyStubFabricWorker<?> getNettyStubFabricWorker(long id) {

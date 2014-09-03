@@ -14,6 +14,7 @@
 
 package com.liferay.portal.fabric.worker;
 
+import com.liferay.portal.fabric.status.FabricStatus;
 import com.liferay.portal.kernel.process.ProcessChannel;
 
 import java.io.Serializable;
@@ -24,6 +25,7 @@ import java.io.Serializable;
 public interface FabricWorker<T extends Serializable>
 	extends ProcessChannel<T> {
 
-	// TODO, all sorts of process status query support
+	public <T extends FabricStatus> T getFabricStatus(
+		Class<T> fabricStatusClass);
 
 }

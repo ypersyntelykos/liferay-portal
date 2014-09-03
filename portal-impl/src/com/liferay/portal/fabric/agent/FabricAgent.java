@@ -19,14 +19,16 @@ import com.liferay.portal.fabric.status.FabricStatus;
 import com.liferay.portal.fabric.worker.FabricWorker;
 import com.liferay.portal.kernel.process.ProcessCallable;
 import com.liferay.portal.kernel.process.ProcessConfig;
+import com.liferay.portal.kernel.process.ProcessExecutor;
 
 import java.io.Serializable;
 
 /**
  * @author Shuyang Zhou
  */
-public interface FabricAgent {
+public interface FabricAgent extends ProcessExecutor {
 
+	@Override
 	public <T extends Serializable> FabricWorker<T> execute(
 			ProcessConfig processConfig, ProcessCallable<T> processCallable)
 		throws FabricException;

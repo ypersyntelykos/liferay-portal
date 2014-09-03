@@ -14,6 +14,7 @@
 
 package com.liferay.portal.fabric.netty.worker;
 
+import com.liferay.portal.fabric.status.FabricStatus;
 import com.liferay.portal.fabric.worker.FabricWorker;
 import com.liferay.portal.kernel.concurrent.DefaultNoticeableFuture;
 import com.liferay.portal.kernel.concurrent.FutureListener;
@@ -69,6 +70,15 @@ public class NettyStubFabricWorker<T extends Serializable>
 			}
 
 		});
+	}
+
+	@Override
+	public <T extends FabricStatus> T getFabricStatus(
+		Class<T> fabricStatusClass) {
+
+		// TODO ask for FabricStatus
+
+		throw new UnsupportedOperationException("Not supported yet.");
 	}
 
 	public long getId() {

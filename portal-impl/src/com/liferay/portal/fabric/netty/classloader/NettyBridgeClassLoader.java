@@ -57,7 +57,7 @@ public class NettyBridgeClassLoader extends URLClassLoader {
 	}
 
 	public Class<?> defineClass(String name, byte[] data) throws Exception {
-		return (Class<?>)_defineClass.invoke(this, name, data, 0, data.length);
+		return (Class<?>)_DEFINE_CLASS.invoke(this, name, data, 0, data.length);
 	}
 
 	@Override
@@ -93,11 +93,11 @@ public class NettyBridgeClassLoader extends URLClassLoader {
 		}
 	}
 
-	private static final Method _defineClass;
+	private static final Method _DEFINE_CLASS;
 
 	static {
 		try {
-			_defineClass = ReflectionUtil.getDeclaredMethod(
+			_DEFINE_CLASS = ReflectionUtil.getDeclaredMethod(
 				ClassLoader.class, "defineClass", String.class, byte[].class,
 				int.class, int.class);
 		}

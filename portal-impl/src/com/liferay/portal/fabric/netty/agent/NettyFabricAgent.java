@@ -20,6 +20,7 @@ import com.liferay.portal.fabric.agent.FabricAgent;
 import com.liferay.portal.fabric.local.agent.LocalFabricAgent;
 import com.liferay.portal.fabric.netty.fileserver.FileResponse;
 import com.liferay.portal.fabric.netty.repository.Repository;
+import com.liferay.portal.fabric.status.FabricStatus;
 import com.liferay.portal.fabric.worker.FabricWorker;
 import com.liferay.portal.kernel.concurrent.AsyncBroker;
 import com.liferay.portal.kernel.log.Log;
@@ -71,6 +72,13 @@ public class NettyFabricAgent
 			convertClassPath(processConfig.getRuntimeClassPath()));
 
 		return _localFabricAgent.execute(builder.build(), processCallable);
+	}
+
+	@Override
+	public <T extends FabricStatus> T getFabricStatus(
+		Class<T> fabricStatusClass) {
+
+		return _localFabricAgent.getFabricStatus(fabricStatusClass);
 	}
 
 	public void initialize(
