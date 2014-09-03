@@ -22,6 +22,7 @@ import com.liferay.portal.fabric.netty.codec.serialization.FabricRemoteEncoder;
 import com.liferay.portal.fabric.netty.fileserver.FileResponse;
 import com.liferay.portal.fabric.netty.fileserver.handlers.FileResponseChannelHandler;
 import com.liferay.portal.fabric.netty.handlers.NettyStubFabricWorkerExecutionChannelHandler;
+import com.liferay.portal.fabric.netty.rpc.handlers.NettyRPCChannelHandler;
 import com.liferay.portal.kernel.concurrent.AsyncBroker;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -112,6 +113,12 @@ public class NettyFabricClient implements FabricClient {
 					new NioEventLoopGroup(1),
 					new NettyStubFabricWorkerExecutionChannelHandler(
 						_nettyFabricAgent));
+
+				// TODO threadpool for RPC
+
+				channelPipeline.addLast(
+					NettyRPCChannelHandler.NAME,
+					NettyRPCChannelHandler.INSTANCE);
 			}
 		});
 

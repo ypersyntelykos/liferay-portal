@@ -20,6 +20,7 @@ import com.liferay.portal.fabric.netty.codec.serialization.AnnotatedObjectEncode
 import com.liferay.portal.fabric.netty.fileserver.handlers.FileRequestChannelHandler;
 import com.liferay.portal.fabric.netty.handlers.NettyFabricWorkerResultReceptionChannelHandler;
 import com.liferay.portal.fabric.netty.handlers.NettyStubFabricAgentRegisterationChannelHandler;
+import com.liferay.portal.fabric.netty.rpc.handlers.NettyRPCChannelHandler;
 import com.liferay.portal.fabric.server.FabricServer;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -119,9 +120,12 @@ public class NettyFabricServer implements FabricServer {
 						_fabricAgentRegistry));
 				channelPipeline.addLast(
 					new NettyFabricWorkerResultReceptionChannelHandler());
-//				channelPipeline.addLast(
-//					_classLoadingGroup,
-//					new ClassLoadingRequestChannelHandler());
+
+				// TODO threadpool for RPC
+
+				channelPipeline.addLast(
+					NettyRPCChannelHandler.NAME,
+					NettyRPCChannelHandler.INSTANCE);
 			}
 
 		});

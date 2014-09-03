@@ -1,0 +1,52 @@
+/**
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
+ *
+ * This library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License as published by the Free
+ * Software Foundation; either version 2.1 of the License, or (at your option)
+ * any later version.
+ *
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+ * details.
+ */
+
+package com.liferay.portal.fabric.netty.rpc;
+
+import com.liferay.portal.fabric.netty.handlers.NettyChannelAttributes;
+import com.liferay.portal.kernel.concurrent.AsyncBroker;
+import com.liferay.portal.kernel.concurrent.NoticeableFuture;
+import com.liferay.portal.kernel.process.ProcessCallable;
+
+import io.netty.channel.Channel;
+
+import java.io.Serializable;
+
+import java.util.concurrent.atomic.AtomicLong;
+
+/**
+ * @author Shuyang Zhou
+ */
+public class RPCUtil {
+
+	public static <T extends Serializable> NoticeableFuture<T> execute(
+		Channel channel, ProcessCallable<T> processCallable) {
+
+		AtomicLong idGenerator = NettyChannelAttributes.getRPCIdGenerator(
+			channel);
+
+		AsyncBroker<Long, T> asyncBroker =
+			(AsyncBroker<Long, T>)NettyChannelAttributes.getRPCAsyncBroker(
+				channel);
+
+		long id = idGenerator.getAndIncrement();
+
+		NoticeableFuture<T> noticeableFuture = asyncBroker.post(id);
+
+		channel.writeAndFlush(new RPCRequest<T>(id, processCallable));
+
+		return noticeableFuture;
+	}
+
+}
