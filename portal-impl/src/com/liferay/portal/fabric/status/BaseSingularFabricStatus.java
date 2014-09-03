@@ -71,7 +71,7 @@ public abstract class BaseSingularFabricStatus<T extends PlatformManagedObject>
 	protected final Map<String, Object> attributes =
 		new HashMap<String, Object>();
 	protected final ObjectName objectName;
-	protected final T platformManagedObject;
+	protected final transient T platformManagedObject;
 
 	private static final long serialVersionUID = 1L;
 

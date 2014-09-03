@@ -14,7 +14,9 @@
 
 package com.liferay.portal.fabric.netty.worker;
 
+import com.liferay.portal.fabric.netty.rpc.RPCUtil;
 import com.liferay.portal.fabric.status.FabricStatus;
+import com.liferay.portal.fabric.status.FabricStatusProcessCallable;
 import com.liferay.portal.fabric.worker.FabricWorker;
 import com.liferay.portal.kernel.concurrent.DefaultNoticeableFuture;
 import com.liferay.portal.kernel.concurrent.FutureListener;
@@ -76,9 +78,16 @@ public class NettyStubFabricWorker<T extends Serializable>
 	public <T extends FabricStatus> T getFabricStatus(
 		Class<T> fabricStatusClass) {
 
-		// TODO ask for FabricStatus
+		try {
+			Future<T> future = RPCUtil.execute(
+				_channel,
+				new FabricStatusProcessCallable<T>(fabricStatusClass));
 
-		throw new UnsupportedOperationException("Not supported yet.");
+			return future.get();
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	public long getId() {

@@ -16,8 +16,10 @@ package com.liferay.portal.fabric.netty.agent;
 
 import com.liferay.portal.fabric.FabricException;
 import com.liferay.portal.fabric.agent.FabricAgent;
+import com.liferay.portal.fabric.netty.rpc.RPCUtil;
 import com.liferay.portal.fabric.netty.worker.NettyStubFabricWorker;
 import com.liferay.portal.fabric.status.FabricStatus;
+import com.liferay.portal.fabric.status.FabricStatusProcessCallable;
 import com.liferay.portal.fabric.worker.FabricWorker;
 import com.liferay.portal.kernel.process.ProcessCallable;
 import com.liferay.portal.kernel.process.ProcessConfig;
@@ -78,9 +80,16 @@ public class NettyStubFabricAgent implements FabricAgent, Serializable {
 	public <T extends FabricStatus> T getFabricStatus(
 		Class<T> fabricStatusClass) {
 
-		// TODO ask for FabricStatus
+		try {
+			Future<T> future = RPCUtil.execute(
+				_channel,
+				new FabricStatusProcessCallable<T>(fabricStatusClass));
 
-		throw new UnsupportedOperationException("Not supported yet.");
+			return future.get();
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	public NettyStubFabricWorker<?> getNettyStubFabricWorker(long id) {

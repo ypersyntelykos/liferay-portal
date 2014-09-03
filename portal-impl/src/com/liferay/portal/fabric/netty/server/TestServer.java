@@ -20,6 +20,7 @@ import com.liferay.portal.fabric.agent.FabricAgentRegistry;
 import com.liferay.portal.fabric.agent.FabricAgentSelector;
 import com.liferay.portal.fabric.local.agent.LocalFabricAgent;
 import com.liferay.portal.fabric.server.FabricServerUtil;
+import com.liferay.portal.fabric.status.FabricOperatingSystemStatus;
 import com.liferay.portal.fabric.worker.FabricWorker;
 import com.liferay.portal.kernel.process.ProcessCallable;
 import com.liferay.portal.kernel.process.ProcessConfig;
@@ -32,6 +33,7 @@ import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
 import io.netty.util.ResourceLeakDetector;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.Future;
@@ -96,12 +98,19 @@ public class TestServer {
 
 		FabricServerUtil.start();
 
-		ProcessConfig processConfig = new ProcessConfig.Builder().build();
+		ProcessConfig processConfig = new ProcessConfig.Builder().setArguments(
+			Arrays.asList(
+				"-agentlib:jdwp=transport=dt_socket,address=8001,server=y," +
+					"suspend=n")).build();
 		ProcessCallable<String> processCallable =
 			new HelloWorldProcessCallable();
 
 		FabricWorker<String> fabricWorker = fabricProcessExecutor.execute(
 			processConfig, processCallable);
+
+		System.out.println(
+			fabricWorker.getFabricStatus(
+				FabricOperatingSystemStatus.class).getAttributes());
 
 		Future<String> future = fabricWorker.getProcessNoticeableFuture();
 
@@ -111,6 +120,10 @@ public class TestServer {
 
 		fabricWorker = fabricProcessExecutor.execute(
 			processConfig, processCallable);
+
+		System.out.println(
+			fabricWorker.getFabricStatus(
+				FabricOperatingSystemStatus.class).getAttributes());
 
 		future = fabricWorker.getProcessNoticeableFuture();
 
@@ -125,6 +138,13 @@ public class TestServer {
 		@Override
 		public String call() throws ProcessException {
 			System.out.println("Hello World!!!!!!");
+
+			try {
+				Thread.sleep(5000);
+			}
+			catch (InterruptedException ie) {
+				throw new ProcessException(ie);
+			}
 
 			return "I said Hello world!!!!!!";
 		}
