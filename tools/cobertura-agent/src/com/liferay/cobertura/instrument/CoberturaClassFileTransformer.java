@@ -14,6 +14,8 @@
 
 package com.liferay.cobertura.instrument;
 
+import com.liferay.cobertura.instrument.pass3.LiteralClassCodeProviderUtil;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
@@ -27,6 +29,7 @@ import java.lang.management.RuntimeMXBean;
 import java.security.ProtectionDomain;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.regex.Matcher;
@@ -34,6 +37,10 @@ import java.util.regex.Pattern;
 
 import net.sourceforge.cobertura.coveragedata.CoverageDataFileHandler;
 import net.sourceforge.cobertura.coveragedata.ProjectData;
+import net.sourceforge.cobertura.instrument.pass1.DetectDuplicatedCodeClassVisitor;
+import net.sourceforge.cobertura.instrument.pass2.BuildClassMapClassVisitor;
+import net.sourceforge.cobertura.instrument.pass3.InjectCodeClassInstrumenter;
+import net.sourceforge.cobertura.instrument.tp.ClassMap;
 
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassVisitor;
@@ -122,6 +129,12 @@ public class CoberturaClassFileTransformer implements ClassFileTransformer {
 		ClassLoader classLoader, String className, Class<?> refinedClass,
 		ProtectionDomain protectionDomain, byte[] classfileBuffer) {
 
+		Thread currentThread = Thread.currentThread();
+
+		ClassLoader contextClassLoader = currentThread.getContextClassLoader();
+
+		currentThread.setContextClassLoader(classLoader);
+
 		try {
 			if (matches(className)) {
 				InstrumentationAgent.recordInstrumentation(
@@ -140,25 +153,65 @@ public class CoberturaClassFileTransformer implements ClassFileTransformer {
 					}
 				}
 
-				ClassWriter classWriter = new ContextAwareClassWriter(
-					ClassWriter.COMPUTE_FRAMES);
-
 				String name = className.replace('/', '.');
 
-				ClassVisitor classVisitor = new CoberturaClassVisitor(
-					projectData.getOrCreateClassData(name), classWriter);
-
 				ClassReader classReader = new ClassReader(classfileBuffer);
+				ClassWriter classWriter = new ClassWriter(0);
 
-				synchronized (projectData) {
-					classReader.accept(classVisitor, 0);
+				DetectDuplicatedCodeClassVisitor
+					detectDuplicatedCodeClassVisitor =
+						new DetectDuplicatedCodeClassVisitor(classWriter);
+
+				classReader.accept(detectDuplicatedCodeClassVisitor, 0);
+
+				byte[] classData = classWriter.toByteArray();
+
+				classReader = new ClassReader(classData);
+
+				classWriter = new ClassWriter(0);
+
+				BuildClassMapClassVisitor buildClassMapClassVisitor =
+					new BuildClassMapClassVisitor(
+						classWriter, Collections.<Pattern>emptyList(),
+						detectDuplicatedCodeClassVisitor.getDuplicatesLinesCollector(),
+						Collections.<String>emptySet());
+
+				classReader.accept(
+					buildClassMapClassVisitor, ClassReader.EXPAND_FRAMES);
+
+				ClassMap classMap = buildClassMapClassVisitor.getClassMap();
+
+				classMap.applyOnProjectData(
+					projectData,
+					buildClassMapClassVisitor.shouldBeInstrumented());
+
+				if (buildClassMapClassVisitor.shouldBeInstrumented()) {
+					classReader = new ClassReader(classData);
+
+					classWriter = new ContextAwareClassWriter(
+						ClassWriter.COMPUTE_FRAMES);
+
+					classMap.assignCounterIds();
+
+					InjectCodeClassInstrumenter injectCodeClassInstrumenter =
+						new InjectCodeClassInstrumenter(
+							classWriter, Collections.<Pattern>emptyList(), true,
+							classMap,
+							detectDuplicatedCodeClassVisitor.getDuplicatesLinesCollector(),
+							Collections.<String>emptySet());
+
+					LiteralClassCodeProviderUtil.install(
+						injectCodeClassInstrumenter);
+
+					classReader.accept(
+						injectCodeClassInstrumenter, ClassReader.SKIP_FRAMES);
+
+					classData = classWriter.toByteArray();
 				}
 
-				byte[] data = classWriter.toByteArray();
+				dumpIntrumentedClass(classLoader, className, classData);
 
-				dumpIntrumentedClass(classLoader, className, data);
-
-				return data;
+				return classData;
 			}
 
 			// Modify TouchCollector's static initialization block by
@@ -190,6 +243,9 @@ public class CoberturaClassFileTransformer implements ClassFileTransformer {
 			t.printStackTrace();
 
 			throw new RuntimeException(t);
+		}
+		finally {
+			currentThread.setContextClassLoader(contextClassLoader);
 		}
 
 		return null;

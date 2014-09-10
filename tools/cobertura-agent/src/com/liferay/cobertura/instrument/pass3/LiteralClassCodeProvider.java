@@ -12,36 +12,28 @@
  * details.
  */
 
-package com.liferay.cobertura.instrument;
+package com.liferay.cobertura.instrument.pass3;
 
-import org.objectweb.asm.Label;
+import net.sourceforge.cobertura.coveragedata.TouchCollector;
+import net.sourceforge.cobertura.instrument.pass3.FastArrayCodeProvider;
+
+import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.tree.LabelNode;
-import org.objectweb.asm.tree.MethodNode;
+import org.objectweb.asm.Type;
 
 /**
- * <p>
- * See https://issues.liferay.com/browse/LPS-44718.
- * </p>
- *
  * @author Shuyang Zhou
  */
-public class BackwardCompatibleMethodNode extends MethodNode {
-
-	public BackwardCompatibleMethodNode(
-		int access, String name, String desc, String signature,
-		String[] exceptions) {
-
-		super(Opcodes.ASM5, access, name, desc, signature, exceptions);
-	}
+public class LiteralClassCodeProvider extends FastArrayCodeProvider {
 
 	@Override
-	protected LabelNode getLabelNode(Label label) {
-		if (label.info instanceof LabelNode) {
-			return (LabelNode)label.info;
-		}
+	protected void generateRegisterClass(
+		MethodVisitor methodVisitor, String className) {
 
-		return new LabelNode(label);
+		methodVisitor.visitLdcInsn(Type.getObjectType(className));
+		methodVisitor.visitMethodInsn(
+			Opcodes.INVOKESTATIC, Type.getInternalName(TouchCollector.class),
+			"registerClass", "(Ljava/lang/Class;)V", false);
 	}
 
 }
