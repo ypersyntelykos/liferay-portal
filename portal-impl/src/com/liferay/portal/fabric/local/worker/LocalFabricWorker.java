@@ -33,12 +33,14 @@ public class LocalFabricWorker<T extends Serializable>
 
 	public LocalFabricWorker(ProcessChannel<T> processChannel) {
 		_processChannel = processChannel;
+
+		_fabricStatus = new RemoteFabricStatus(
+			JMXProxyUtil.toProcessCallableExecutor(_processChannel));
 	}
 
 	@Override
 	public FabricStatus getFabricStatus() {
-		return new RemoteFabricStatus(
-			JMXProxyUtil.toProcessCallableExecutor(_processChannel));
+		return _fabricStatus;
 	}
 
 	@Override
@@ -54,6 +56,7 @@ public class LocalFabricWorker<T extends Serializable>
 		return _processChannel.write(processCallable);
 	}
 
-	private ProcessChannel<T> _processChannel;
+	private final FabricStatus _fabricStatus;
+	private final ProcessChannel<T> _processChannel;
 
 }

@@ -42,6 +42,8 @@ import java.util.List;
  */
 public class LocalFabricStatus implements FabricStatus {
 
+	public static final FabricStatus INSTANCE = new LocalFabricStatus();
+
 	@Override
 	public AdvancedOperatingSystemMXBean getAdvancedOperatingSystemMXBean() {
 		OperatingSystemMXBean operatingSystemMXBean =
@@ -124,5 +126,8 @@ public class LocalFabricStatus implements FabricStatus {
 			}
 
 		};
+
+	private LocalFabricStatus() {
+	}
 
 }

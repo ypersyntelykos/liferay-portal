@@ -35,7 +35,7 @@ public class FabricClientUtil {
 		return _fabricClient;
 	}
 
-	public void setFabricServer(FabricClient fabricClient) {
+	public void setFabricClient(FabricClient fabricClient) {
 		PortalRuntimePermission.checkSetBeanProperty(getClass());
 
 		_fabricClient = fabricClient;

@@ -40,7 +40,7 @@ public class LocalFabricStatusTest extends BaseFabricStatusTestCase {
 
 	@Test
 	public void testObjectNames() {
-		doTestObjectNames(new LocalFabricStatus());
+		doTestObjectNames(LocalFabricStatus.INSTANCE);
 	}
 
 	@Test

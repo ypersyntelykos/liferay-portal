@@ -52,21 +52,22 @@ public class LocalFabricAgent implements FabricAgent {
 		NoticeableFuture<T> noticeableFuture =
 			fabricWorker.getProcessNoticeableFuture();
 
-		noticeableFuture.addFutureListener(new FutureListener<T>() {
+		noticeableFuture.addFutureListener(
+			new FutureListener<T>() {
 
-			@Override
-			public void complete(Future<T> future) {
-				_fabricWorkerQueue.remove(fabricWorker);
-			}
+				@Override
+				public void complete(Future<T> future) {
+					_fabricWorkerQueue.remove(fabricWorker);
+				}
 
-		});
+			});
 
 		return fabricWorker;
 	}
 
 	@Override
 	public FabricStatus getFabricStatus() {
-		return new LocalFabricStatus();
+		return LocalFabricStatus.INSTANCE;
 	}
 
 	@Override

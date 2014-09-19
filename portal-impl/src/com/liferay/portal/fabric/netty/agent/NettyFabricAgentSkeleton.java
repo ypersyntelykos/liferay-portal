@@ -25,16 +25,15 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.process.ProcessCallable;
 import com.liferay.portal.kernel.process.ProcessConfig;
+import com.liferay.portal.kernel.process.ProcessConfig.Builder;
 import com.liferay.portal.kernel.process.ProcessException;
 import com.liferay.portal.kernel.util.StringUtil;
 
 import io.netty.channel.Channel;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.Serializable;
 
-import java.nio.file.Files;
 import java.nio.file.Path;
 
 import java.util.ArrayList;
@@ -48,13 +47,10 @@ public class NettyFabricAgentSkeleton
 	implements FabricAgent, FabricRemote<NettyFabricAgentStub> {
 
 	public NettyFabricAgentSkeleton(
-			FabricAgent fabricAgent, Path repositoryFolder)
-		throws IOException {
-
-		Files.createDirectories(repositoryFolder);
+		FabricAgent fabricAgent, Path repositoryFolderPath) {
 
 		_fabricAgent = fabricAgent;
-		_repositoryFolder = repositoryFolder;
+		_repositoryFolder = repositoryFolderPath;
 	}
 
 	@Override
@@ -62,7 +58,7 @@ public class NettyFabricAgentSkeleton
 			ProcessConfig processConfig, ProcessCallable<T> processCallable)
 		throws ProcessException {
 
-		ProcessConfig.Builder builder = new ProcessConfig.Builder();
+		Builder builder = new Builder();
 
 		builder.setArguments(processConfig.getArguments());
 		builder.setBootstrapClassPath(
@@ -96,7 +92,7 @@ public class NettyFabricAgentSkeleton
 		return new NettyFabricAgentStub();
 	}
 
-	private String convertClassPath(String classPath) {
+	protected String convertClassPath(String classPath) {
 		List<String> localPaths = new ArrayList<String>();
 
 		for (String path :

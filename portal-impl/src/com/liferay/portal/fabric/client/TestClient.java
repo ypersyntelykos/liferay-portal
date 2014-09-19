@@ -64,7 +64,7 @@ public class TestClient {
 
 		FabricClientUtil fabricClientUtil = new FabricClientUtil();
 
-		fabricClientUtil.setFabricServer(nettyFabricClient);
+		fabricClientUtil.setFabricClient(nettyFabricClient);
 
 		//--------------------------------------------------------------------//
 
