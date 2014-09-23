@@ -14,6 +14,7 @@
 
 package com.liferay.portal.fabric.netty.handlers;
 
+import com.liferay.portal.fabric.netty.agent.NettyFabricAgentStub;
 import com.liferay.portal.fabric.netty.rpc.RPCUtil;
 import com.liferay.portal.kernel.concurrent.AsyncBroker;
 
@@ -52,6 +53,15 @@ public class NettyChannelAttributes {
 		return (AsyncBroker<Long, T>)asyncBroker;
 	}
 
+	public static NettyFabricAgentStub getNettyFabricAgentStub(
+		Channel channel) {
+
+		Attribute<NettyFabricAgentStub> attribute = channel.attr(
+			_nettyFabricAgentStubKey);
+
+		return attribute.get();
+	}
+
 	public static long nextId(Channel channel) {
 		Attribute<AtomicLong> attribute = channel.attr(_idGeneratorKey);
 
@@ -71,10 +81,22 @@ public class NettyChannelAttributes {
 		return attachmentIdGenerator.getAndIncrement();
 	}
 
+	public static void setNettyFabricAgentStub(
+		Channel channel, NettyFabricAgentStub nettyFabricAgentStub) {
+
+		Attribute<NettyFabricAgentStub> attribute = channel.attr(
+			_nettyFabricAgentStubKey);
+
+		attribute.set(nettyFabricAgentStub);
+	}
+
 	private static final AttributeKey<AsyncBroker<Long, Serializable>>
 		_asyncBrokerKey = AttributeKey.valueOf(
 			RPCUtil.class.getName() + "-AsyncBroker");
 	private static final AttributeKey<AtomicLong> _idGeneratorKey =
 		AttributeKey.valueOf(RPCUtil.class.getName() + "-IdGenerator");
+	private static final AttributeKey<NettyFabricAgentStub>
+		_nettyFabricAgentStubKey = AttributeKey.valueOf(
+			NettyFabricAgentStub.class.getName());
 
 }
