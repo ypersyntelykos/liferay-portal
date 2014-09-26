@@ -14,9 +14,7 @@
 
 package com.liferay.portal.fabric.netty.agent;
 
-import com.liferay.portal.fabric.FabricOutputResourceMappingVisitor;
 import com.liferay.portal.fabric.agent.FabricAgent;
-import com.liferay.portal.fabric.netty.fileserver.FileHelperUtil;
 import com.liferay.portal.fabric.netty.repository.Repository;
 import com.liferay.portal.fabric.netty.worker.NettyFabricWorkerConfig;
 import com.liferay.portal.fabric.netty.worker.NettyFabricWorkerStub;
@@ -25,12 +23,9 @@ import com.liferay.portal.fabric.status.JMXProxyUtil;
 import com.liferay.portal.fabric.status.RemoteFabricStatus;
 import com.liferay.portal.fabric.worker.FabricWorker;
 import com.liferay.portal.kernel.cluster.ClusterNode;
-import com.liferay.portal.kernel.concurrent.FutureListener;
-import com.liferay.portal.kernel.concurrent.NoticeableFuture;
 import com.liferay.portal.kernel.process.ProcessCallable;
 import com.liferay.portal.kernel.process.ProcessConfig;
 import com.liferay.portal.kernel.process.ProcessException;
-import com.liferay.portal.kernel.util.ObjectGraphUtil;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -38,8 +33,6 @@ import io.netty.channel.ChannelFutureListener;
 
 import java.io.File;
 import java.io.Serializable;
-
-import java.nio.file.Path;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -89,53 +82,8 @@ public class NettyFabricAgentStub implements FabricAgent {
 
 		final NettyFabricWorkerStub<T> nettyFabricWorkerStub =
 			new NettyFabricWorkerStub<T>(
-				_channel, id, processConfig, processCallable);
-
-		FabricOutputResourceMappingVisitor fabricOutputResourceMappingVisitor =
-			new FabricOutputResourceMappingVisitor(_remoteRepositoryFolder);
-
-		ObjectGraphUtil.walkObjectGraph(
-			processCallable, fabricOutputResourceMappingVisitor);
-
-		final Map<File, File> outputResourceMap =
-			fabricOutputResourceMappingVisitor.getResourceMap();
-
-		if (!outputResourceMap.isEmpty()) {
-			NoticeableFuture<T> noticeableFuture =
-				nettyFabricWorkerStub.getProcessNoticeableFuture();
-
-			noticeableFuture.addFutureListener(
-				new FutureListener<T>() {
-
-					@Override
-					public void complete(Future<T> future) {
-						try {
-							future.get();
-
-							for (Map.Entry<File, File> entry :
-									outputResourceMap.entrySet()) {
-
-								File localFile = entry.getKey();
-								File remoteFile = entry.getValue();
-
-								Path repositoryFilePath = _repository.getFile(
-									remoteFile.getAbsolutePath(), true);
-
-								if (repositoryFilePath != null) {
-									FileHelperUtil.move(
-										repositoryFilePath, localFile.toPath());
-								}
-							}
-						}
-						catch (Exception e) {
-
-							// TODO have to do exception handling here
-
-						}
-					}
-
-				});
-		}
+				_channel, id, processConfig, processCallable, _repository,
+				_remoteRepositoryFolder);
 
 		_nettyFabricWorkerStubs.put(id, nettyFabricWorkerStub);
 
@@ -176,13 +124,13 @@ public class NettyFabricAgentStub implements FabricAgent {
 			_nettyFabricWorkerStubs.values());
 	}
 
-	public NettyFabricWorkerStub<?> getNettyStubFabricWorker(long id) {
-		return _nettyFabricWorkerStubs.get(id);
-	}
-
 	@Override
 	public int hashCode() {
 		return _channel.hashCode();
+	}
+
+	public NettyFabricWorkerStub<?> takeNettyStubFabricWorker(long id) {
+		return _nettyFabricWorkerStubs.remove(id);
 	}
 
 	private final Channel _channel;

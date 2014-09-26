@@ -35,6 +35,7 @@ import com.liferay.portal.kernel.process.ProcessConfig.Builder;
 import com.liferay.portal.kernel.process.ProcessException;
 import com.liferay.portal.kernel.process.ProcessExecutor;
 import com.liferay.portal.kernel.util.ObjectGraphUtil;
+import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 
 import io.netty.channel.Channel;
@@ -101,31 +102,50 @@ public class NettyFabricWorkerExecutionChannelHandler
 						FileHelperUtil.delete(true, file.toPath());
 					}
 
-					long id = nettyFabricWorkerConfig.getId();
+					Serializable result = null;
 
-					FabricWorkerResultProcessCallable
-						fabricWorkerResultProcessCallable = null;
+					Throwable throwable = null;
 
 					try {
-						fabricWorkerResultProcessCallable =
-							new FabricWorkerResultProcessCallable(
-								id, future.get(), null);
+						result = future.get();
 					}
 					catch (ExecutionException ee) {
-						fabricWorkerResultProcessCallable =
-							new FabricWorkerResultProcessCallable(
-								id, null, ee.getCause());
+						throwable = ee.getCause();
 					}
 					catch (InterruptedException ie) {
-						fabricWorkerResultProcessCallable =
-							new FabricWorkerResultProcessCallable(id, null, ie);
+						throwable = ie;
 					}
 
-					// TODO check result?
+					final ResultProcessCallable resultProcessCallable =
+						new ResultProcessCallable(
+							nettyFabricWorkerConfig.getId(), result, throwable);
 
-					RPCUtil.execute(
-						channelHandlerContext.channel(),
-						fabricWorkerResultProcessCallable);
+					NoticeableFuture<Serializable> noticeableFuture =
+						RPCUtil.execute(
+							channelHandlerContext.channel(),
+							resultProcessCallable);
+
+					noticeableFuture.addFutureListener(
+						new FutureListener<Serializable>() {
+
+							@Override
+							public void complete(Future<Serializable> future) {
+								try {
+									future.get();
+								}
+								catch (Throwable t) {
+									if (t instanceof ExecutionException) {
+										t = t.getCause();
+									}
+
+									_log.error(
+										"Unable to send back fabric worker " +
+											"result " + resultProcessCallable,
+										t);
+								}
+							}
+
+						});
 				}
 
 			});
@@ -191,7 +211,7 @@ public class NettyFabricWorkerExecutionChannelHandler
 	private final FabricAgent _fabricAgent;
 	private final Repository _repository;
 
-	private static class FabricWorkerResultProcessCallable
+	private static class ResultProcessCallable
 		implements ProcessCallable<Serializable> {
 
 		@Override
@@ -208,7 +228,7 @@ public class NettyFabricWorkerExecutionChannelHandler
 
 			NettyFabricWorkerStub<Serializable> nettyStubFabricWorker =
 				(NettyFabricWorkerStub<Serializable>)
-					nettyStubFabricAgent.getNettyStubFabricWorker(_id);
+					nettyStubFabricAgent.takeNettyStubFabricWorker(_id);
 
 			if (nettyStubFabricWorker == null) {
 				throw new ProcessException(
@@ -226,7 +246,22 @@ public class NettyFabricWorkerExecutionChannelHandler
 			return null;
 		}
 
-		private FabricWorkerResultProcessCallable(
+		@Override
+		public String toString() {
+			StringBundler sb = new StringBundler(7);
+
+			sb.append("Fabric Worker Result : {id = ");
+			sb.append(_id);
+			sb.append(", result = ");
+			sb.append(_result);
+			sb.append(", throwable = ");
+			sb.append(_throwable);
+			sb.append("}");
+
+			return sb.toString();
+		}
+
+		private ResultProcessCallable(
 			long id, Serializable result, Throwable throwable) {
 
 			_id = id;

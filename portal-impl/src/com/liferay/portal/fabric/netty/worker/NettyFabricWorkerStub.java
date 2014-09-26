@@ -14,6 +14,9 @@
 
 package com.liferay.portal.fabric.netty.worker;
 
+import com.liferay.portal.fabric.FabricOutputResourceMappingVisitor;
+import com.liferay.portal.fabric.netty.fileserver.FileHelperUtil;
+import com.liferay.portal.fabric.netty.repository.Repository;
 import com.liferay.portal.fabric.netty.rpc.RPCUtil;
 import com.liferay.portal.fabric.status.FabricStatus;
 import com.liferay.portal.fabric.status.JMXProxyUtil;
@@ -24,13 +27,19 @@ import com.liferay.portal.kernel.concurrent.FutureListener;
 import com.liferay.portal.kernel.concurrent.NoticeableFuture;
 import com.liferay.portal.kernel.process.ProcessCallable;
 import com.liferay.portal.kernel.process.ProcessConfig;
+import com.liferay.portal.kernel.util.ObjectGraphUtil;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
 
+import java.nio.file.Path;
+
+import java.util.Map;
 import java.util.concurrent.Future;
 
 /**
@@ -41,12 +50,23 @@ public class NettyFabricWorkerStub<T extends Serializable>
 
 	public NettyFabricWorkerStub(
 		Channel channel, long id, ProcessConfig processConfig,
-		ProcessCallable<T> processCallable) {
+		ProcessCallable<T> processCallable, Repository repository,
+		File remoteRepositoryFolder) {
 
 		_channel = channel;
 		_id = id;
 		_processConfig = processConfig;
 		_processCallable = processCallable;
+		_repository = repository;
+
+		FabricOutputResourceMappingVisitor fabricOutputResourceMappingVisitor =
+			new FabricOutputResourceMappingVisitor(remoteRepositoryFolder);
+
+		ObjectGraphUtil.walkObjectGraph(
+			processCallable, fabricOutputResourceMappingVisitor);
+
+		_outputResourceMap =
+			fabricOutputResourceMappingVisitor.getResourceMap();
 
 		ChannelFuture channelFuture = _channel.closeFuture();
 
@@ -93,7 +113,24 @@ public class NettyFabricWorkerStub<T extends Serializable>
 	}
 
 	public void setResult(T t) {
-		_defaultNoticeableFuture.set(t);
+		try {
+			for (Map.Entry<File, File> entry : _outputResourceMap.entrySet()) {
+				File localFile = entry.getKey();
+				File remoteFile = entry.getValue();
+
+				Path repositoryFilePath = _repository.getFile(
+					remoteFile.getAbsolutePath(), true);
+
+				if (repositoryFilePath != null) {
+					FileHelperUtil.move(repositoryFilePath, localFile.toPath());
+				}
+			}
+
+			_defaultNoticeableFuture.set(t);
+		}
+		catch (IOException ioe) {
+			_defaultNoticeableFuture.setException(ioe);
+		}
 	}
 
 	@Override
@@ -122,7 +159,9 @@ public class NettyFabricWorkerStub<T extends Serializable>
 	private final DefaultNoticeableFuture<T> _defaultNoticeableFuture =
 		new DefaultNoticeableFuture<T>();
 	private final long _id;
+	private final Map<File, File> _outputResourceMap;
 	private final ProcessCallable<T> _processCallable;
 	private final ProcessConfig _processConfig;
+	private final Repository _repository;
 
 }
