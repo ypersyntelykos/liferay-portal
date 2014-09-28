@@ -28,6 +28,7 @@ import com.liferay.portal.fabric.netty.worker.NettyFabricWorkerStub;
 import com.liferay.portal.fabric.worker.FabricWorker;
 import com.liferay.portal.kernel.concurrent.FutureListener;
 import com.liferay.portal.kernel.concurrent.NoticeableFuture;
+import com.liferay.portal.kernel.concurrent.NoticeableFutureConverter;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.process.ProcessCallable;
@@ -42,6 +43,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.util.concurrent.EventExecutor;
 
 import java.io.File;
 import java.io.Serializable;
@@ -49,7 +51,10 @@ import java.io.Serializable;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -68,139 +73,298 @@ public class NettyFabricWorkerExecutionChannelHandler
 		_fabricAgent = new LocalFabricAgent(processExecutor);
 	}
 
+	protected static ProcessConfig convertProcessConfig(
+		ProcessConfig processConfig, LoadedResources loadedResources) {
+
+		Builder builder = new Builder();
+
+		builder.setArguments(processConfig.getArguments());
+		builder.setBootstrapClassPath(loadedResources.getBootstrapClassPath());
+		builder.setJavaExecutable(processConfig.getJavaExecutable());
+		builder.setRuntimeClassPath(loadedResources.getRuntimeClassPath());
+
+		return builder.build();
+	}
+
+	protected static void sendResult(
+		Channel channel, long fabricWorkerId, Serializable result,
+		Throwable t) {
+
+		if (t instanceof ExecutionException) {
+			t = t.getCause();
+		}
+
+		final ResultProcessCallable resultProcessCallable =
+			new ResultProcessCallable(fabricWorkerId, result, t);
+
+		NoticeableFuture<Serializable> noticeableFuture = RPCUtil.execute(
+			channel, resultProcessCallable);
+
+		NettyChannelAttributes.attach(channel, noticeableFuture);
+
+		noticeableFuture.addFutureListener(
+			new FutureListener<Serializable>() {
+
+				@Override
+				public void complete(Future<Serializable> future) {
+					try {
+						future.get();
+					}
+					catch (Throwable t) {
+						if (t instanceof ExecutionException) {
+							t = t.getCause();
+						}
+
+						_log.error(
+							"Unable to send back fabric worker result " +
+								resultProcessCallable,
+							t);
+					}
+				}
+
+			});
+	}
+
 	@Override
 	protected void channelRead0(
 			final ChannelHandlerContext channelHandlerContext,
 			final NettyFabricWorkerConfig<Serializable> nettyFabricWorkerConfig)
 		throws Exception {
 
-		ProcessCallable<Serializable> processCallable =
-			nettyFabricWorkerConfig.getProcessCallable();
+		NoticeableFuture<LoadedResources> noticeableFuture = loadResources(
+			nettyFabricWorkerConfig);
 
-		Path repositoryPath = _repository.getRepositoryPath();
-
-		FabricResourceMappingVisitor fabricResourceMappingVisitor =
-			new FabricResourceMappingVisitor(
-				InputResource.class, repositoryPath);
-
-		ObjectGraphUtil.walkObjectGraph(
-			processCallable, fabricResourceMappingVisitor);
-
-		NoticeableFuture<Map<Path, Path>> noticeableFuture =
-			_repository.getFiles(
-				fabricResourceMappingVisitor.getResourceMap(), false);
-
-		// TODO async....
-
-		final Map<Path, Path> inputResourceMap = noticeableFuture.get();
-
-		FabricWorker<Serializable> fabricWorker = _fabricAgent.execute(
-			convertProcessConfig(nettyFabricWorkerConfig.getProcessConfig()),
-			processCallable);
-
-		NoticeableFuture<Serializable> processNoticeableFuture =
-			fabricWorker.getProcessNoticeableFuture();
-
-		processNoticeableFuture.addFutureListener(
-			new FutureListener<Serializable>() {
+		noticeableFuture.addFutureListener(
+			new SendResultFutureListener<LoadedResources>(
+				channelHandlerContext.channel(),
+				nettyFabricWorkerConfig.getId()) {
 
 				@Override
-				public void complete(Future<Serializable> future) {
-					for (Path path : inputResourceMap.values()) {
-						FileHelperUtil.delete(true, path);
-					}
+				protected Serializable doComplete(
+					LoadedResources loadedResources) {
 
-					Serializable result = null;
+					EventExecutor eventExecutor =
+						channelHandlerContext.executor();
 
-					Throwable throwable = null;
-
-					try {
-						result = future.get();
-					}
-					catch (ExecutionException ee) {
-						throwable = ee.getCause();
-					}
-					catch (InterruptedException ie) {
-						throwable = ie;
-					}
-
-					final ResultProcessCallable resultProcessCallable =
-						new ResultProcessCallable(
-							nettyFabricWorkerConfig.getId(), result, throwable);
-
-					NoticeableFuture<Serializable> noticeableFuture =
-						RPCUtil.execute(
+					eventExecutor.submit(
+						new ExecutionRunnable(
 							channelHandlerContext.channel(),
-							resultProcessCallable);
+							nettyFabricWorkerConfig, loadedResources));
 
-					noticeableFuture.addFutureListener(
-						new FutureListener<Serializable>() {
-
-							@Override
-							public void complete(Future<Serializable> future) {
-								try {
-									future.get();
-								}
-								catch (Throwable t) {
-									if (t instanceof ExecutionException) {
-										t = t.getCause();
-									}
-
-									_log.error(
-										"Unable to send back fabric worker " +
-											"result " + resultProcessCallable,
-										t);
-								}
-							}
-
-						});
+					return _NO_RESULT;
 				}
 
 			});
 	}
 
-	protected String convertClassPath(String classPath) throws Exception {
-		Map<Path, Path> pathMap = new HashMap<Path, Path>();
+	protected NoticeableFuture<LoadedResources> loadResources(
+		NettyFabricWorkerConfig<Serializable> nettyFabricWorkerConfig) {
+
+		Map<Path, Path> mergedResources = new HashMap<Path, Path>();
+
+		ProcessConfig processConfig =
+			nettyFabricWorkerConfig.getProcessConfig();
+
+		final Map<Path, Path> bootstrapResources =
+			new LinkedHashMap<Path, Path>();
 
 		for (String pathString :
-				StringUtil.split(classPath, File.pathSeparatorChar)) {
+				StringUtil.split(
+					processConfig.getBootstrapClassPath(),
+					File.pathSeparatorChar)) {
 
-			pathMap.put(Paths.get(pathString), null);
+			bootstrapResources.put(Paths.get(pathString), null);
 		}
 
-		NoticeableFuture<Map<Path, Path>> noticeableFuture =
-			_repository.getFiles(pathMap, false);
+		mergedResources.putAll(bootstrapResources);
 
-		// TODO Async....
+		final Map<Path, Path> runtimeResources =
+			new LinkedHashMap<Path, Path>();
 
-		pathMap = noticeableFuture.get();
+		for (String pathString :
+				StringUtil.split(
+					processConfig.getRuntimeClassPath(),
+					File.pathSeparatorChar)) {
 
-		String localClassPath = StringUtil.merge(
-			pathMap.values(), File.pathSeparator);
-
-		if (_log.isInfoEnabled()) {
-			_log.info(
-				"Class path mapped, remote path : " + classPath +
-					", local path : " + localClassPath);
+			runtimeResources.put(Paths.get(pathString), null);
 		}
 
-		return localClassPath;
+		mergedResources.putAll(runtimeResources);
+
+		FabricResourceMappingVisitor fabricResourceMappingVisitor =
+			new FabricResourceMappingVisitor(
+				InputResource.class, _repository.getRepositoryPath());
+
+		ObjectGraphUtil.walkObjectGraph(
+			nettyFabricWorkerConfig.getProcessCallable(),
+			fabricResourceMappingVisitor);
+
+		final Map<Path, Path> inputResources =
+			fabricResourceMappingVisitor.getResourceMap();
+
+		mergedResources.putAll(inputResources);
+
+		return new NoticeableFutureConverter<LoadedResources, Map<Path, Path>>(
+			_repository.getFiles(mergedResources, false)) {
+
+				@Override
+				protected LoadedResources convert(
+					Map<Path, Path> mergedResources) {
+
+					Map<Path, Path> loadedInputResources =
+						new HashMap<Path, Path>();
+
+					for (Path path : inputResources.keySet()) {
+						loadedInputResources.put(
+							path, mergedResources.get(path));
+					}
+
+					List<Path> loadedBootstrapResources = new ArrayList<Path>();
+
+					for (Path path : bootstrapResources.keySet()) {
+						loadedBootstrapResources.add(mergedResources.get(path));
+					}
+
+					List<Path> loadedRuntimeResources = new ArrayList<Path>();
+
+					for (Path path : runtimeResources.keySet()) {
+						loadedRuntimeResources.add(mergedResources.get(path));
+					}
+
+					return new LoadedResources(
+						inputResources,
+						StringUtil.merge(
+							loadedBootstrapResources, File.pathSeparator),
+						StringUtil.merge(
+							loadedRuntimeResources, File.pathSeparator));
+				}
+
+			};
 	}
 
-	protected ProcessConfig convertProcessConfig(ProcessConfig processConfig)
-		throws Exception {
+	protected static class LoadedResources {
 
-		Builder builder = new Builder();
+		public LoadedResources(
+			Map<Path, Path> inputResources, String bootstrapClassPath,
+			String runtimeClassPath) {
 
-		builder.setArguments(processConfig.getArguments());
-		builder.setBootstrapClassPath(
-			convertClassPath(processConfig.getBootstrapClassPath()));
-		builder.setJavaExecutable(processConfig.getJavaExecutable());
-		builder.setRuntimeClassPath(
-			convertClassPath(processConfig.getRuntimeClassPath()));
+			_inputResources = inputResources;
+			_bootstrapClassPath = bootstrapClassPath;
+			_runtimeClassPath = runtimeClassPath;
+		}
 
-		return builder.build();
+		public String getBootstrapClassPath() {
+			return _bootstrapClassPath;
+		}
+
+		public Map<Path, Path> getInputResources() {
+			return _inputResources;
+		}
+
+		public String getRuntimeClassPath() {
+			return _runtimeClassPath;
+		}
+
+		private final String _bootstrapClassPath;
+		private final Map<Path, Path> _inputResources;
+		private final String _runtimeClassPath;
 	}
+
+	protected static abstract class SendResultFutureListener<T>
+		implements FutureListener<T> {
+
+		public SendResultFutureListener(Channel channel, long fabricWorkerId) {
+			_channel = channel;
+			_fabricWorkerId = fabricWorkerId;
+		}
+
+		@Override
+		public void complete(Future<T> future) {
+			try {
+				Serializable result = doComplete(future.get());
+
+				if (result == _NO_RESULT) {
+					return;
+				}
+
+				sendResult(_channel, _fabricWorkerId, result, null);
+			}
+			catch (Throwable t) {
+				sendResult(_channel, _fabricWorkerId, null, t);
+			}
+		}
+
+		protected abstract Serializable doComplete(T result) throws Throwable;
+
+		private final Channel _channel;
+		private final long _fabricWorkerId;
+
+	}
+
+	protected class ExecutionRunnable implements Runnable {
+
+		public ExecutionRunnable(
+			Channel channel,
+			NettyFabricWorkerConfig<Serializable> nettyFabricWorkerConfig,
+			LoadedResources loadedResources) {
+
+			_channel = channel;
+			_nettyFabricWorkerConfig = nettyFabricWorkerConfig;
+			_loadedResources = loadedResources;
+		}
+
+		@Override
+		public void run() {
+			try {
+				doRun(_loadedResources);
+			}
+			catch (Throwable t) {
+				sendResult(_channel, _nettyFabricWorkerConfig.getId(), null, t);
+			}
+		}
+
+		protected void doRun(final LoadedResources loadedResources)
+			throws Throwable {
+
+			FabricWorker<Serializable> fabricWorker = _fabricAgent.execute(
+				convertProcessConfig(
+					_nettyFabricWorkerConfig.getProcessConfig(),
+					loadedResources),
+				_nettyFabricWorkerConfig.getProcessCallable());
+
+			NoticeableFuture<Serializable> processNoticeableFuture =
+				fabricWorker.getProcessNoticeableFuture();
+
+			processNoticeableFuture.addFutureListener(
+				new SendResultFutureListener<Serializable>(
+					_channel, _nettyFabricWorkerConfig.getId()) {
+
+					@Override
+					protected Serializable doComplete(Serializable result) {
+						Map<Path, Path> inputResources =
+							loadedResources.getInputResources();
+
+						for (Path path : inputResources.values()) {
+							FileHelperUtil.delete(true, path);
+						}
+
+						return result;
+					}
+
+				});
+		}
+
+		private final Channel _channel;
+		private final LoadedResources _loadedResources;
+		private NettyFabricWorkerConfig<Serializable> _nettyFabricWorkerConfig;
+
+	}
+
+	private static final Serializable _NO_RESULT = new Serializable() {
+
+		private static final long serialVersionUID = 1L;
+
+	};
 
 	private static Log _log = LogFactoryUtil.getLog(
 		NettyFabricWorkerExecutionChannelHandler.class);

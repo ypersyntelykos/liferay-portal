@@ -18,6 +18,7 @@ import com.liferay.portal.fabric.netty.fileserver.FileHelperUtil;
 import com.liferay.portal.fabric.netty.fileserver.FileRequest;
 import com.liferay.portal.fabric.netty.fileserver.FileResponse;
 import com.liferay.portal.fabric.netty.fileserver.handlers.FileResponseChannelHandler;
+import com.liferay.portal.fabric.netty.handlers.NettyChannelAttributes;
 import com.liferay.portal.kernel.concurrent.AsyncBroker;
 import com.liferay.portal.kernel.concurrent.DefaultNoticeableFuture;
 import com.liferay.portal.kernel.concurrent.FutureListener;
@@ -41,8 +42,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.FileTime;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
@@ -123,19 +122,8 @@ public class Repository {
 	public NoticeableFuture<Map<Path, Path>> getFiles(
 		final Map<Path, Path> pathMap, boolean deleteAfterFetch) {
 
-		final List<NoticeableFuture<Path>> noticeableFutures =
-			new ArrayList<NoticeableFuture<Path>>();
-
 		final DefaultNoticeableFuture<Map<Path, Path>> defaultNoticeableFuture =
-			new DefaultNoticeableFuture<Map<Path, Path>>() {
-
-				// Hold strong references to all NoticeableFuture,
-				// otherwise they will be GCed.
-
-				private final List<NoticeableFuture<Path>> _noticeableFutures =
-					noticeableFutures;
-
-			};
+			new DefaultNoticeableFuture<Map<Path, Path>>();
 
 		if (pathMap.isEmpty()) {
 			defaultNoticeableFuture.set(pathMap);
@@ -153,8 +141,6 @@ public class Repository {
 
 			NoticeableFuture<Path> noticeableFuture = getFile(
 				remoteFilePath, entry.getValue(), deleteAfterFetch);
-
-			noticeableFutures.add(noticeableFuture);
 
 			noticeableFuture.addFutureListener(
 				new FutureListener<Path>() {
@@ -210,6 +196,8 @@ public class Repository {
 
 		NoticeableFuture<FileResponse> noticeableFuture = _asyncBroker.post(
 			remoteFilePath);
+
+		NettyChannelAttributes.attach(_channel, noticeableFuture);
 
 		ChannelFuture channelFuture = _channel.writeAndFlush(
 			new FileRequest(

@@ -15,15 +15,42 @@
 package com.liferay.portal.fabric.netty.handlers;
 
 import com.liferay.portal.fabric.netty.agent.NettyFabricAgentStub;
+import com.liferay.portal.kernel.concurrent.FutureListener;
+import com.liferay.portal.kernel.concurrent.NoticeableFuture;
 
 import io.netty.channel.Channel;
 import io.netty.util.Attribute;
 import io.netty.util.AttributeKey;
 
+import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicLong;
+
 /**
  * @author Shuyang Zhou
  */
 public class NettyChannelAttributes {
+
+	public static <T> void attach(
+		Channel channel, NoticeableFuture<T> noticeableFuture) {
+
+		AttributeKey<NoticeableFuture<T>> attributeKey = AttributeKey.valueOf(
+			"Attachment-" + nextAttachmentId(channel));
+
+		final Attribute<NoticeableFuture<T>> attribute = channel.attr(
+			attributeKey);
+
+		attribute.set(noticeableFuture);
+
+		noticeableFuture.addFutureListener(
+			new FutureListener<T>() {
+
+				@Override
+				public void complete(Future<T> future) {
+					attribute.remove();
+				}
+
+			});
+	}
 
 	public static NettyFabricAgentStub getNettyFabricAgentStub(
 		Channel channel) {
@@ -32,6 +59,26 @@ public class NettyChannelAttributes {
 			_nettyFabricAgentStubKey);
 
 		return attribute.get();
+	}
+
+	public static long nextAttachmentId(Channel channel) {
+		Attribute<AtomicLong> attribute = channel.attr(
+			_attachmentIdGeneratorKey);
+
+		AtomicLong attachmentIdGenerator = attribute.get();
+
+		if (attachmentIdGenerator == null) {
+			attachmentIdGenerator = new AtomicLong();
+
+			AtomicLong previousAttachmentIdGenerator = attribute.setIfAbsent(
+				attachmentIdGenerator);
+
+			if (previousAttachmentIdGenerator != null) {
+				attachmentIdGenerator = previousAttachmentIdGenerator;
+			}
+		}
+
+		return attachmentIdGenerator.getAndIncrement();
 	}
 
 	public static void setNettyFabricAgentStub(
@@ -43,6 +90,8 @@ public class NettyChannelAttributes {
 		attribute.set(nettyFabricAgentStub);
 	}
 
+	private static final AttributeKey<AtomicLong> _attachmentIdGeneratorKey =
+		AttributeKey.valueOf("AttachIdGenerator");
 	private static final AttributeKey<NettyFabricAgentStub>
 		_nettyFabricAgentStubKey = AttributeKey.valueOf(
 			NettyFabricAgentStub.class.getName());

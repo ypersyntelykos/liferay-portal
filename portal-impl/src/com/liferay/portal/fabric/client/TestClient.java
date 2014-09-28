@@ -16,7 +16,6 @@ package com.liferay.portal.fabric.client;
 
 import com.liferay.portal.fabric.netty.client.NettyFabricClient;
 import com.liferay.portal.fabric.netty.fileserver.FileHelperUtil;
-import com.liferay.portal.fabric.netty.repository.Repository;
 import com.liferay.portal.fabric.netty.server.TestServer;
 import com.liferay.portal.kernel.process.ProcessExecutor;
 import com.liferay.portal.kernel.process.ProcessExecutorUtil;
@@ -29,10 +28,6 @@ import io.netty.util.ResourceLeakDetector;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-
-import java.util.logging.Handler;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * @author Shuyang Zhou
@@ -52,13 +47,13 @@ public class TestClient {
 
 		processExecutorUtil.setProcessExecutor(processExecutor);
 
-		Logger logger = Logger.getLogger(Repository.class.getName());
-
-		logger.setLevel(Level.FINEST);
-
-		for (Handler handler : Logger.getLogger("").getHandlers()) {
-			handler.setLevel(Level.FINEST);
-		}
+//		Logger logger = Logger.getLogger(Repository.class.getName());
+//
+//		logger.setLevel(Level.FINEST);
+//
+//		for (Handler handler : Logger.getLogger("").getHandlers()) {
+//			handler.setLevel(Level.FINEST);
+//		}
 
 		//--------------------------------------------------------------------//
 
