@@ -15,6 +15,9 @@
 package com.liferay.portal.fabric.netty.rpc;
 
 import com.liferay.portal.kernel.concurrent.AsyncBroker;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.util.StringBundler;
 
 import io.netty.channel.Channel;
 
@@ -38,12 +41,36 @@ public class RPCResponse<T extends Serializable> extends RPCSerializable {
 			channel);
 
 		if (_throwable != null) {
-			asyncBroker.takeWithException(id, _throwable);
+			if (!asyncBroker.takeWithException(id, _throwable)) {
+				_log.error(
+					"No match key : " + id + " for rpc response exception",
+					_throwable);
+			}
 		}
 		else {
-			asyncBroker.takeWithResult(id, _result);
+			if (!asyncBroker.takeWithResult(id, _result)) {
+				_log.error(
+					"No match key : " + id + " for rpc response result : " +
+						_result);
+			}
 		}
 	}
+
+	@Override
+	public String toString() {
+		StringBundler sb = new StringBundler(6);
+
+		sb.append("{id=");
+		sb.append(id);
+		sb.append(", result=");
+		sb.append(_result);
+		sb.append(", throwable=");
+		sb.append(_throwable);
+
+		return sb.toString();
+	}
+
+	private static Log _log = LogFactoryUtil.getLog(RPCResponse.class);
 
 	private static final long serialVersionUID = 1L;
 

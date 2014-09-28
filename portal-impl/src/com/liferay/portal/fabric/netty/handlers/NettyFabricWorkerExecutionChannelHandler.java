@@ -411,11 +411,11 @@ public class NettyFabricWorkerExecutionChannelHandler
 		public String toString() {
 			StringBundler sb = new StringBundler(7);
 
-			sb.append("Fabric Worker Result : {id = ");
+			sb.append("{id=");
 			sb.append(_id);
-			sb.append(", result = ");
+			sb.append(", result=");
 			sb.append(_result);
-			sb.append(", throwable = ");
+			sb.append(", throwable=");
 			sb.append(_throwable);
 			sb.append("}");
 

@@ -17,6 +17,8 @@ package com.liferay.portal.fabric.netty.fileserver.handlers;
 import com.liferay.portal.fabric.netty.codec.serialization.ObjectDecodeChannelInboundHandler;
 import com.liferay.portal.fabric.netty.fileserver.FileResponse;
 import com.liferay.portal.kernel.concurrent.AsyncBroker;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
@@ -46,7 +48,13 @@ public class FileResponseChannelHandler
 		throws Exception {
 
 		if (fileResponse.isFileNotFound() || fileResponse.isFileNotModified()) {
-			_asyncBroker.takeWithResult(fileResponse.getPath(), fileResponse);
+			if (!_asyncBroker.takeWithResult(
+					fileResponse.getPath(), fileResponse)) {
+
+				_log.error(
+					"No match key : " + fileResponse.getPath() +
+						" for file response result : " + fileResponse);
+			}
 
 			return null;
 		}
@@ -61,6 +69,9 @@ public class FileResponseChannelHandler
 
 		return null;
 	}
+
+	private static Log _log = LogFactoryUtil.getLog(
+		FileResponseChannelHandler.class);
 
 	private final AsyncBroker<Path, FileResponse> _asyncBroker;
 	private final EventExecutorGroup _eventExecutorGroup;

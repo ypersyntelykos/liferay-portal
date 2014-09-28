@@ -34,7 +34,7 @@ public class NettyChannelAttributes {
 		Channel channel, NoticeableFuture<T> noticeableFuture) {
 
 		AttributeKey<NoticeableFuture<T>> attributeKey = AttributeKey.valueOf(
-			"Attachment-" + nextAttachmentId(channel));
+			"Attachment-" + nextId(channel));
 
 		final Attribute<NoticeableFuture<T>> attribute = channel.attr(
 			attributeKey);
@@ -61,9 +61,8 @@ public class NettyChannelAttributes {
 		return attribute.get();
 	}
 
-	public static long nextAttachmentId(Channel channel) {
-		Attribute<AtomicLong> attribute = channel.attr(
-			_attachmentIdGeneratorKey);
+	public static long nextId(Channel channel) {
+		Attribute<AtomicLong> attribute = channel.attr(_idGeneratorKey);
 
 		AtomicLong attachmentIdGenerator = attribute.get();
 
@@ -90,8 +89,9 @@ public class NettyChannelAttributes {
 		attribute.set(nettyFabricAgentStub);
 	}
 
-	private static final AttributeKey<AtomicLong> _attachmentIdGeneratorKey =
-		AttributeKey.valueOf("AttachIdGenerator");
+	private static final AttributeKey<AtomicLong> _idGeneratorKey =
+		AttributeKey.valueOf(
+			NettyChannelAttributes.class.getName() + "-IdGenerator");
 	private static final AttributeKey<NettyFabricAgentStub>
 		_nettyFabricAgentStubKey = AttributeKey.valueOf(
 			NettyFabricAgentStub.class.getName());

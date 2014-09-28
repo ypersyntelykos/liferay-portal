@@ -94,21 +94,22 @@ public class FileUploadChannelHandler extends ChannelInboundHandlerAdapter {
 			finish(fileResponse.getPath(), fileResponse);
 		}
 		else {
-			eventExecutor.submit(new Callable<Void>() {
+			eventExecutor.submit(
+				new Callable<Void>() {
 
-				@Override
-				public Void call() throws Exception {
-					try {
-						finish(fileResponse.getPath(), fileResponse);
+					@Override
+					public Void call() throws Exception {
+						try {
+							finish(fileResponse.getPath(), fileResponse);
+						}
+						catch (IOException ioe) {
+							exceptionCaught(null, ioe);
+						}
+
+						return null;
 					}
-					catch (IOException ioe) {
-						exceptionCaught(null, ioe);
-					}
 
-					return null;
-				}
-
-			});
+				});
 		}
 
 		ChannelPipeline channelPipeline = channelHandlerContext.pipeline();
@@ -133,7 +134,12 @@ public class FileUploadChannelHandler extends ChannelInboundHandlerAdapter {
 			channelPipeline.remove(this);
 		}
 
-		asyncBroker.takeWithException(fileResponse.getPath(), throwable);
+		if (!asyncBroker.takeWithException(fileResponse.getPath(), throwable)) {
+			_log.error(
+				"No match key : " + fileResponse.getPath() +
+					" for file upload exception",
+				throwable);
+		}
 
 		fileChannel.close();
 
@@ -153,7 +159,11 @@ public class FileUploadChannelHandler extends ChannelInboundHandlerAdapter {
 			fileResponse.getLocalFile(),
 			FileTime.fromMillis(fileResponse.getLastModified()));
 
-		asyncBroker.takeWithResult(path, fileResponse);
+		if (!asyncBroker.takeWithResult(path, fileResponse)) {
+			_log.error(
+				"No match key : " + path + " for file upload result : " +
+					fileResponse);
+		}
 	}
 
 	protected boolean receive(ByteBuf byteBuf) throws IOException {

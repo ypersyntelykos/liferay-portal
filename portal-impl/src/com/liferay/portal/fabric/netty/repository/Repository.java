@@ -213,12 +213,18 @@ public class Repository {
 						return;
 					}
 
-					_asyncBroker.takeWithException(
-						remoteFilePath,
-						new IOException(
-							"Unable to fetch remote file " +
-								remoteFilePath,
-							channelFuture.cause()));
+					Throwable throwable = new IOException(
+						"Unable to fetch remote file " + remoteFilePath,
+						channelFuture.cause());
+
+					if (!_asyncBroker.takeWithException(
+							remoteFilePath, throwable)) {
+
+						_log.error(
+							"No match key : " + remoteFilePath +
+								" for repository file fetch exception",
+							throwable);
+					}
 				}
 
 			});

@@ -14,17 +14,20 @@
 
 package com.liferay.portal.fabric.netty.rpc;
 
+import com.liferay.portal.fabric.netty.handlers.NettyChannelAttributes;
 import com.liferay.portal.kernel.concurrent.AsyncBroker;
 import com.liferay.portal.kernel.concurrent.NoticeableFuture;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.process.ProcessCallable;
 
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
 import io.netty.util.Attribute;
 import io.netty.util.AttributeKey;
 
 import java.io.Serializable;
-
-import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * @author Shuyang Zhou
@@ -34,16 +37,38 @@ public class RPCUtil {
 	public static <T extends Serializable> NoticeableFuture<T> execute(
 		Channel channel, ProcessCallable<T> processCallable) {
 
-		AsyncBroker<Long, T> asyncBroker =
+		final AsyncBroker<Long, T> asyncBroker =
 			(AsyncBroker<Long, T>)getRPCAsyncBroker(channel);
 
-		AtomicLong idGenerator = getRPCIdGenerator(channel);
-
-		long id = idGenerator.getAndIncrement();
+		final long id = NettyChannelAttributes.nextId(channel);
 
 		NoticeableFuture<T> noticeableFuture = asyncBroker.post(id);
 
-		channel.writeAndFlush(new RPCRequest<T>(id, processCallable));
+		ChannelFuture channelFuture = channel.writeAndFlush(
+			new RPCRequest<T>(id, processCallable));
+
+		channelFuture.addListener(
+			new ChannelFutureListener() {
+
+				@Override
+				public void operationComplete(ChannelFuture channelFuture)
+					throws Exception {
+
+					if (channelFuture.isSuccess()) {
+						return;
+					}
+
+					if (!asyncBroker.takeWithException(
+							id, channelFuture.cause())) {
+
+						_log.error(
+							"No match key : " + id +
+								" for rpc response exception ",
+							channelFuture.cause());
+					}
+				}
+
+			});
 
 		return noticeableFuture;
 	}
@@ -70,29 +95,10 @@ public class RPCUtil {
 		return asyncBroker;
 	}
 
-	protected static AtomicLong getRPCIdGenerator(Channel channel) {
-		Attribute<AtomicLong> attribute = channel.attr(_idGeneratorKey);
-
-		AtomicLong idGenerator = attribute.get();
-
-		if (idGenerator == null) {
-			AtomicLong newIdGenerator = new AtomicLong();
-
-			idGenerator = attribute.setIfAbsent(newIdGenerator);
-
-			if (idGenerator == null) {
-				idGenerator = newIdGenerator;
-			}
-		}
-
-		return idGenerator;
-	}
+	private static Log _log = LogFactoryUtil.getLog(RPCUtil.class);
 
 	private static final AttributeKey<AsyncBroker<Long, Serializable>>
 		_asyncBrokerKey = AttributeKey.valueOf(
 			RPCUtil.class.getName() + "-AsyncBroker");
-	private static final AttributeKey<AtomicLong>
-		_idGeneratorKey = AttributeKey.valueOf(
-			RPCUtil.class.getName() + "-IdGenerator");
 
 }
