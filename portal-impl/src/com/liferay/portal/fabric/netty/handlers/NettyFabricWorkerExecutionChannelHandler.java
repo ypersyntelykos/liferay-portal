@@ -66,6 +66,10 @@ public class NettyFabricWorkerExecutionChannelHandler
 	extends SimpleChannelInboundHandler
 		<NettyFabricWorkerConfig<Serializable>> {
 
+	// TODO move to properties
+
+	public static final long FABRIC_WORKER_EXECUTION_TIME_OUT = 10000;
+
 	public NettyFabricWorkerExecutionChannelHandler(
 		Repository repository, ProcessExecutor processExecutor) {
 
@@ -100,7 +104,8 @@ public class NettyFabricWorkerExecutionChannelHandler
 		NoticeableFuture<Serializable> noticeableFuture = RPCUtil.execute(
 			channel, resultProcessCallable);
 
-		NettyChannelAttributes.attach(channel, noticeableFuture);
+		NettyChannelAttributes.attach(
+			channel, noticeableFuture, FABRIC_WORKER_EXECUTION_TIME_OUT);
 
 		noticeableFuture.addFutureListener(
 			new FutureListener<Serializable>() {

@@ -54,6 +54,10 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class Repository {
 
+	// TODO move to properties
+
+	public static final long FILE_FETCH_TIMEOUT = 10 * 60 * 1000;
+
 	public static Path getRepositoryFilePath(
 		Path repository, Path remoteFilePath) {
 
@@ -197,7 +201,8 @@ public class Repository {
 		NoticeableFuture<FileResponse> noticeableFuture = _asyncBroker.post(
 			remoteFilePath);
 
-		NettyChannelAttributes.attach(_channel, noticeableFuture);
+		NettyChannelAttributes.attach(
+			_channel, noticeableFuture, FILE_FETCH_TIMEOUT);
 
 		ChannelFuture channelFuture = _channel.writeAndFlush(
 			new FileRequest(

@@ -17,12 +17,17 @@ package com.liferay.portal.fabric.netty.handlers;
 import com.liferay.portal.fabric.netty.agent.NettyFabricAgentStub;
 import com.liferay.portal.kernel.concurrent.FutureListener;
 import com.liferay.portal.kernel.concurrent.NoticeableFuture;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 
 import io.netty.channel.Channel;
+import io.netty.channel.EventLoop;
 import io.netty.util.Attribute;
 import io.netty.util.AttributeKey;
 
 import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -31,7 +36,7 @@ import java.util.concurrent.atomic.AtomicLong;
 public class NettyChannelAttributes {
 
 	public static <T> void attach(
-		Channel channel, NoticeableFuture<T> noticeableFuture) {
+		Channel channel, NoticeableFuture<T> noticeableFuture, long timeout) {
 
 		AttributeKey<NoticeableFuture<T>> attributeKey = AttributeKey.valueOf(
 			"Attachment-" + nextId(channel));
@@ -41,12 +46,40 @@ public class NettyChannelAttributes {
 
 		attribute.set(noticeableFuture);
 
+		EventLoop eventLoop = channel.eventLoop();
+
+		final ScheduledFuture<?> scheduledFuture = eventLoop.schedule(
+			new Runnable() {
+
+				@Override
+				public void run() {
+					NoticeableFuture<T> timeoutNoticeableFuture =
+						attribute.getAndRemove();
+
+					if ((timeoutNoticeableFuture != null) &&
+						timeoutNoticeableFuture.cancel(true) &&
+						_log.isWarnEnabled()) {
+
+						_log.warn(
+							"Cancelled timeout attachment NoticeableFuture " +
+								timeoutNoticeableFuture);
+					}
+				}
+
+			},
+			timeout, TimeUnit.MILLISECONDS);
+
 		noticeableFuture.addFutureListener(
 			new FutureListener<T>() {
 
 				@Override
 				public void complete(Future<T> future) {
-					attribute.remove();
+					NoticeableFuture<T> orphanNoticeableFuture =
+						attribute.getAndRemove();
+
+					if (orphanNoticeableFuture != null) {
+						scheduledFuture.cancel(true);
+					}
 				}
 
 			});
@@ -88,6 +121,9 @@ public class NettyChannelAttributes {
 
 		attribute.set(nettyFabricAgentStub);
 	}
+
+	private static Log _log = LogFactoryUtil.getLog(
+		NettyChannelAttributes.class);
 
 	private static final AttributeKey<AtomicLong> _idGeneratorKey =
 		AttributeKey.valueOf(
