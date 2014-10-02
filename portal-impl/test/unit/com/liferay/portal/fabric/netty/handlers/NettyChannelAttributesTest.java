@@ -14,6 +14,7 @@
 
 package com.liferay.portal.fabric.netty.handlers;
 
+import com.liferay.portal.fabric.netty.agent.NettyFabricAgentStub;
 import com.liferay.portal.fabric.netty.rpc.handlers.NettyRPCChannelHandler;
 import com.liferay.portal.kernel.concurrent.AsyncBroker;
 import com.liferay.portal.kernel.test.CodeCoverageAssertor;
@@ -86,6 +87,22 @@ public class NettyChannelAttributesTest {
 		Assert.assertSame(
 			asyncBroker,
 			NettyChannelAttributes.getAsyncBroker(_embeddedChannel));
+	}
+
+	@Test
+	public void testGetSetNettyFabricAgentStub() {
+		Assert.assertNull(
+			NettyChannelAttributes.getNettyFabricAgentStub(_embeddedChannel));
+
+		NettyFabricAgentStub nettyFabricAgentStub = new NettyFabricAgentStub(
+			_embeddedChannel, null, null);
+
+		NettyChannelAttributes.setNettyFabricAgentStub(
+			_embeddedChannel, nettyFabricAgentStub);
+
+		Assert.assertSame(
+			nettyFabricAgentStub,
+			NettyChannelAttributes.getNettyFabricAgentStub(_embeddedChannel));
 	}
 
 	@Test
