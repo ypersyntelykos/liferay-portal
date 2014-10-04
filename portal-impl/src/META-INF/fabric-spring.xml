@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+
+<beans
+	default-destroy-method="destroy"
+	default-init-method="afterPropertiesSet"
+	xmlns="http://www.springframework.org/schema/beans"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd"
+>
+	<bean id="com.liferay.portal.fabric.agent.FabricAgentRegistry" class="com.liferay.portal.fabric.agent.FabricAgentRegistry">
+		<constructor-arg>
+			<bean class="com.liferay.portal.fabric.local.agent.LocalFabricAgent">
+				<constructor-arg ref="com.liferay.portal.kernel.process.local.LocalProcessExecutor" />
+			</bean>
+		</constructor-arg>
+	</bean>
+	<bean id="com.liferay.portal.kernel.process.ProcessExecutorUtil" class="com.liferay.portal.kernel.process.ProcessExecutorUtil">
+		<property name="processExecutor">
+			<bean class="com.liferay.portal.fabric.FabricProcessExecutorFactory" factory-method="createFabricProcessExecutor">
+				<constructor-arg ref="com.liferay.portal.fabric.agent.FabricAgentRegistry" />
+				<constructor-arg>
+					<bean class="com.liferay.portal.kernel.spring.util.ClassNameUtil" factory-method="getClassName">
+						<constructor-arg value="com.liferay.portal.fabric.agent.selectors.MinSystemCPULoadFabricAgentSelector" />
+					</bean>
+				</constructor-arg>
+			</bean>
+		</property>
+	</bean>
+	<bean class="com.liferay.portal.fabric.server.FabricServerUtil">
+		<property name="fabricServer">
+			<bean class="com.liferay.portal.fabric.netty.server.NettyFabricServerFactory" factory-method="createNettyFabricServer">
+				<constructor-arg ref="com.liferay.portal.fabric.agent.FabricAgentRegistry" />
+			</bean>
+		</property>
+	</bean>
+</beans>
