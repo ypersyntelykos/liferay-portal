@@ -15,13 +15,13 @@
 package com.liferay.portal.fabric.netty.agent;
 
 import com.liferay.portal.fabric.OutputResource;
+import com.liferay.portal.fabric.netty.NettyTestUtil;
 import com.liferay.portal.fabric.netty.worker.NettyFabricWorkerConfig;
 import com.liferay.portal.fabric.netty.worker.NettyFabricWorkerStub;
-import com.liferay.portal.fabric.repository.Repository;
+import com.liferay.portal.fabric.repository.MockRepository;
 import com.liferay.portal.fabric.status.FabricStatus;
 import com.liferay.portal.fabric.status.RemoteFabricStatus;
 import com.liferay.portal.fabric.worker.FabricWorker;
-import com.liferay.portal.kernel.concurrent.DefaultNoticeableFuture;
 import com.liferay.portal.kernel.concurrent.NoticeableFuture;
 import com.liferay.portal.kernel.process.ProcessCallable;
 import com.liferay.portal.kernel.process.ProcessConfig;
@@ -31,9 +31,7 @@ import com.liferay.portal.kernel.process.local.ReturnProcessCallable;
 import com.liferay.portal.kernel.test.CodeCoverageAssertor;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
 
-import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOutboundHandlerAdapter;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.ChannelPromise;
@@ -110,13 +108,7 @@ public class NettyFabricAgentStubTest {
 
 		NettyFabricAgentStub anotherNettyFabricAgentStub =
 			new NettyFabricAgentStub(
-				new EmbeddedChannel(new ChannelInitializer<Channel>() {
-
-					@Override
-					protected void initChannel(Channel channel) {
-					}
-
-				}),
+				NettyTestUtil.createEmptyEmbeddedChannel(),
 				new MockRepository(), Paths.get("AnotherRepositoryPath"));
 
 		Assert.assertFalse(
@@ -354,45 +346,7 @@ public class NettyFabricAgentStubTest {
 			_embeddedChannel.hashCode(), nettyFabricAgentStub.hashCode());
 	}
 
-	private EmbeddedChannel _embeddedChannel = new EmbeddedChannel(
-		new ChannelInitializer<Channel>() {
-
-			@Override
-			protected void initChannel(Channel channel) {
-			}
-
-		});
-
-	private static class MockRepository implements Repository {
-
-		@Override
-		public void dispose(boolean delete) {
-		}
-
-		@Override
-		public NoticeableFuture<Path> getFile(
-			Path remoteFilePath, Path localFilePath, boolean deleteAfterFetch) {
-
-			return null;
-		}
-
-		@Override
-		public NoticeableFuture<Map<Path, Path>> getFiles(
-			Map<Path, Path> pathMap, boolean deleteAfterFetch) {
-
-			DefaultNoticeableFuture<Map<Path, Path>> defaultNoticeableFuture =
-				new DefaultNoticeableFuture<Map<Path, Path>>();
-
-			defaultNoticeableFuture.set(pathMap);
-
-			return defaultNoticeableFuture;
-		}
-
-		@Override
-		public Path getRepositoryPath() {
-			return null;
-		}
-
-	}
+	private EmbeddedChannel _embeddedChannel =
+		NettyTestUtil.createEmptyEmbeddedChannel();
 
 }

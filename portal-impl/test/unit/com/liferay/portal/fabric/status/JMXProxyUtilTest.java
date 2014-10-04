@@ -14,6 +14,7 @@
 
 package com.liferay.portal.fabric.status;
 
+import com.liferay.portal.fabric.netty.NettyTestUtil;
 import com.liferay.portal.fabric.status.JMXProxyUtil.GetAttributeProcessCallable;
 import com.liferay.portal.fabric.status.JMXProxyUtil.JMXProxyInvocationHandler;
 import com.liferay.portal.fabric.status.JMXProxyUtil.OperationProcessCallable;
@@ -33,7 +34,6 @@ import com.liferay.portal.test.runners.AspectJMockingNewClassLoaderJUnitTestRunn
 import com.liferay.portal.util.test.RandomTestUtil;
 
 import io.netty.channel.Channel;
-import io.netty.channel.ChannelInitializer;
 import io.netty.channel.embedded.EmbeddedChannel;
 
 import java.io.Serializable;
@@ -592,14 +592,8 @@ public class JMXProxyUtilTest {
 	@AdviseWith(adviceClasses = RPCUtilAdvice.class)
 	@Test
 	public void testToProcessCallableExecutorChannel() throws ProcessException {
-		EmbeddedChannel embeddedChannel = new EmbeddedChannel(
-			new ChannelInitializer<Channel>() {
-
-				@Override
-				protected void initChannel(Channel channel) {
-				}
-
-			});
+		EmbeddedChannel embeddedChannel =
+			NettyTestUtil.createEmptyEmbeddedChannel();
 
 		ProcessCallableExecutor processCallableExecutor =
 			JMXProxyUtil.toProcessCallableExecutor(embeddedChannel);

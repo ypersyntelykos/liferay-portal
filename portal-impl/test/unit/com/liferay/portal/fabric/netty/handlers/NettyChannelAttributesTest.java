@@ -14,8 +14,9 @@
 
 package com.liferay.portal.fabric.netty.handlers;
 
+import com.liferay.portal.fabric.netty.NettyTestUtil;
 import com.liferay.portal.fabric.netty.agent.NettyFabricAgentStub;
-import com.liferay.portal.fabric.netty.rpc.handlers.NettyRPCChannelHandler;
+import com.liferay.portal.fabric.repository.MockRepository;
 import com.liferay.portal.kernel.concurrent.AsyncBroker;
 import com.liferay.portal.kernel.test.CodeCoverageAssertor;
 import com.liferay.portal.test.AdviseWith;
@@ -25,6 +26,8 @@ import io.netty.channel.embedded.EmbeddedChannel;
 import io.netty.util.Attribute;
 
 import java.io.Serializable;
+
+import java.nio.file.Paths;
 
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -95,7 +98,8 @@ public class NettyChannelAttributesTest {
 			NettyChannelAttributes.getNettyFabricAgentStub(_embeddedChannel));
 
 		NettyFabricAgentStub nettyFabricAgentStub = new NettyFabricAgentStub(
-			_embeddedChannel, null, null);
+			_embeddedChannel, new MockRepository(),
+			Paths.get("remoteRepositoryPath"));
 
 		NettyChannelAttributes.setNettyFabricAgentStub(
 			_embeddedChannel, nettyFabricAgentStub);
@@ -136,7 +140,7 @@ public class NettyChannelAttributesTest {
 
 	}
 
-	private final EmbeddedChannel _embeddedChannel = new EmbeddedChannel(
-		NettyRPCChannelHandler.INSTANCE);
+	private final EmbeddedChannel _embeddedChannel =
+		NettyTestUtil.createEmptyEmbeddedChannel();
 
 }

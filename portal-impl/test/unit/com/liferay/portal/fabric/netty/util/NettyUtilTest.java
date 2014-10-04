@@ -15,6 +15,7 @@
 
 package com.liferay.portal.fabric.netty.util;
 
+import com.liferay.portal.fabric.netty.NettyTestUtil;
 import com.liferay.portal.kernel.concurrent.DefaultNoticeableFuture;
 import com.liferay.portal.kernel.test.CaptureHandler;
 import com.liferay.portal.kernel.test.CodeCoverageAssertor;
@@ -24,7 +25,6 @@ import com.liferay.portal.kernel.util.Time;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
-import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.SingleThreadEventLoop;
 import io.netty.channel.embedded.EmbeddedChannel;
@@ -216,14 +216,8 @@ public class NettyUtilTest {
 		mockEventLoopGroup.shutdownGracefully();
 	}
 
-	private final EmbeddedChannel _embeddedChannel = new EmbeddedChannel(
-		new ChannelInitializer<Channel>() {
-
-			@Override
-			protected void initChannel(Channel channel) {
-			}
-
-		});
+	private final EmbeddedChannel _embeddedChannel =
+		NettyTestUtil.createEmptyEmbeddedChannel();
 
 	private static class MockEventLoopGroup extends LocalEventLoopGroup {
 

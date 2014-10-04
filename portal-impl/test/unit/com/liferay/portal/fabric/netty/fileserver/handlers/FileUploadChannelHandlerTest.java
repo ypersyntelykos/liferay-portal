@@ -14,6 +14,7 @@
 
 package com.liferay.portal.fabric.netty.fileserver.handlers;
 
+import com.liferay.portal.fabric.netty.NettyTestUtil;
 import com.liferay.portal.fabric.netty.fileserver.CompressionLevel;
 import com.liferay.portal.fabric.netty.fileserver.FileHelperUtil;
 import com.liferay.portal.fabric.netty.fileserver.FileResponse;
@@ -30,10 +31,8 @@ import com.liferay.portal.test.runners.AspectJMockingNewClassLoaderJUnitTestRunn
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
-import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.EventLoop;
 import io.netty.channel.embedded.EmbeddedChannel;
@@ -506,14 +505,7 @@ public class FileUploadChannelHandlerTest {
 
 	private final AsyncBroker<Path, FileResponse> _asyncBroker =
 		new AsyncBroker<Path, FileResponse>();
-
-	private final EmbeddedChannel _embeddedChannel = new EmbeddedChannel(
-		new ChannelInitializer<Channel>() {
-
-			@Override
-			protected void initChannel(Channel channel) {
-			}
-
-		});
+	private final EmbeddedChannel _embeddedChannel =
+		NettyTestUtil.createEmptyEmbeddedChannel();
 
 }
