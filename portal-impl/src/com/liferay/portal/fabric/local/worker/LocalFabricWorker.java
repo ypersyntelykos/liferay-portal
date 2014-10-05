@@ -20,7 +20,6 @@ import com.liferay.portal.fabric.worker.FabricWorker;
 import com.liferay.portal.kernel.concurrent.NoticeableFuture;
 import com.liferay.portal.kernel.process.ProcessCallable;
 import com.liferay.portal.kernel.process.ProcessChannel;
-import com.liferay.portal.kernel.process.ProcessException;
 
 import java.io.Serializable;
 
@@ -49,8 +48,7 @@ public class LocalFabricWorker<T extends Serializable>
 
 	@Override
 	public <V extends Serializable> NoticeableFuture<V> write(
-			ProcessCallable<V> processCallable)
-		throws ProcessException {
+		ProcessCallable<V> processCallable) {
 
 		return _processChannel.write(processCallable);
 	}
