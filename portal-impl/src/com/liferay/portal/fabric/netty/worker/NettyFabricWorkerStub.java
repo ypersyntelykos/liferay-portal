@@ -44,7 +44,7 @@ public class NettyFabricWorkerStub<T extends Serializable>
 	implements FabricWorker<T> {
 
 	public NettyFabricWorkerStub(
-		Channel channel, Repository repository,
+		long id, Channel channel, Repository repository,
 		Map<Path, Path> outputResourceMap) {
 
 		if (channel == null) {
@@ -59,6 +59,7 @@ public class NettyFabricWorkerStub<T extends Serializable>
 			throw new NullPointerException("Output resource map is null");
 		}
 
+		_id = id;
 		_channel = channel;
 		_repository = repository;
 		_outputResourceMap = outputResourceMap;
@@ -145,6 +146,7 @@ public class NettyFabricWorkerStub<T extends Serializable>
 	private final Channel _channel;
 	private final DefaultNoticeableFuture<T> _defaultNoticeableFuture =
 		new DefaultNoticeableFuture<T>();
+	private final long _id;
 	private final Map<Path, Path> _outputResourceMap;
 	private final Repository _repository;
 

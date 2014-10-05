@@ -104,7 +104,7 @@ public class NettyFabricAgentStub implements FabricAgent {
 
 		NettyFabricWorkerStub<T> nettyFabricWorkerStub =
 			new NettyFabricWorkerStub<T>(
-				_channel, _repository,
+				id, _channel, _repository,
 				fabricResourceMappingVisitor.getResourceMap());
 
 		_nettyFabricWorkerStubs.put(id, nettyFabricWorkerStub);

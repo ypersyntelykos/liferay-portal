@@ -52,7 +52,7 @@ public class NettyFabricWorkerStubTest {
 	@Test
 	public void testConstructor() {
 		try {
-			new NettyFabricWorkerStub<String>(null, null, null);
+			new NettyFabricWorkerStub<String>(0, null, null, null);
 
 			Assert.fail();
 		}
@@ -62,7 +62,7 @@ public class NettyFabricWorkerStubTest {
 
 		try {
 			new NettyFabricWorkerStub<String>(
-				NettyTestUtil.createEmptyEmbeddedChannel(), null, null);
+				0, NettyTestUtil.createEmptyEmbeddedChannel(), null, null);
 
 			Assert.fail();
 		}
@@ -72,7 +72,7 @@ public class NettyFabricWorkerStubTest {
 
 		try {
 			new NettyFabricWorkerStub<String>(
-				NettyTestUtil.createEmptyEmbeddedChannel(),
+				0, NettyTestUtil.createEmptyEmbeddedChannel(),
 				new MockRepository(), null);
 
 			Assert.fail();
@@ -90,7 +90,7 @@ public class NettyFabricWorkerStubTest {
 
 		NettyFabricWorkerStub<String> nettyFabricWorkerStub =
 			new NettyFabricWorkerStub<String>(
-				channel, new MockRepository(),
+				0, channel, new MockRepository(),
 				Collections.<Path, Path>emptyMap());
 
 		Assert.assertNotNull(
@@ -112,7 +112,8 @@ public class NettyFabricWorkerStubTest {
 		Assert.assertFalse(channelFuture.isDone());
 
 		nettyFabricWorkerStub = new NettyFabricWorkerStub<String>(
-			channel, new MockRepository(), Collections.<Path, Path>emptyMap());
+			0, channel, new MockRepository(),
+			Collections.<Path, Path>emptyMap());
 
 		Assert.assertNotNull(
 			ReflectionTestUtil.getFieldValue(channelFuture, "listeners"));
@@ -130,7 +131,7 @@ public class NettyFabricWorkerStubTest {
 	public void testGetFabricStatus() {
 		NettyFabricWorkerStub<String> nettyFabricWorkerStub =
 			new NettyFabricWorkerStub<String>(
-				NettyTestUtil.createEmptyEmbeddedChannel(),
+				0, NettyTestUtil.createEmptyEmbeddedChannel(),
 				new MockRepository(), Collections.<Path, Path>emptyMap());
 
 		FabricStatus fabricStatus = nettyFabricWorkerStub.getFabricStatus();
@@ -142,7 +143,7 @@ public class NettyFabricWorkerStubTest {
 	public void testSetException() throws InterruptedException {
 		NettyFabricWorkerStub<String> nettyFabricWorkerStub =
 			new NettyFabricWorkerStub<String>(
-				NettyTestUtil.createEmptyEmbeddedChannel(),
+				0, NettyTestUtil.createEmptyEmbeddedChannel(),
 				new MockRepository(), Collections.<Path, Path>emptyMap());
 
 		Throwable throwable = new Throwable();
@@ -167,7 +168,7 @@ public class NettyFabricWorkerStubTest {
 
 		NettyFabricWorkerStub<String> nettyFabricWorkerStub =
 			new NettyFabricWorkerStub<String>(
-				NettyTestUtil.createEmptyEmbeddedChannel(),
+				0, NettyTestUtil.createEmptyEmbeddedChannel(),
 				new MockRepository() {
 
 					@Override
@@ -201,7 +202,7 @@ public class NettyFabricWorkerStubTest {
 
 		NettyFabricWorkerStub<String> nettyFabricWorkerStub =
 			new NettyFabricWorkerStub<String>(
-				NettyTestUtil.createEmptyEmbeddedChannel(),
+				0, NettyTestUtil.createEmptyEmbeddedChannel(),
 				new MockRepository() {
 
 					@Override
@@ -231,7 +232,7 @@ public class NettyFabricWorkerStubTest {
 
 		NettyFabricWorkerStub<String> nettyFabricWorkerStub =
 			new NettyFabricWorkerStub<String>(
-				NettyTestUtil.createEmptyEmbeddedChannel(),
+				0, NettyTestUtil.createEmptyEmbeddedChannel(),
 				new MockRepository() {
 
 					@Override
@@ -270,7 +271,7 @@ public class NettyFabricWorkerStubTest {
 
 		NettyFabricWorkerStub<String> nettyFabricWorkerStub =
 			new NettyFabricWorkerStub<String>(
-				embeddedChannel, new MockRepository(),
+				0, embeddedChannel, new MockRepository(),
 				Collections.<Path, Path>emptyMap());
 
 		String result = "Test result";
