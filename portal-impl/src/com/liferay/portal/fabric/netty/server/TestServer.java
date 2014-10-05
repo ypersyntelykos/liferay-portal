@@ -145,6 +145,11 @@ public class TestServer {
 			fabricWorker.getFabricStatus().getAdvancedOperatingSystemMXBean().
 				getSystemCpuLoad());
 
+		Future<String> pingFuture = fabricWorker.write(
+			new PingProcessCallable());
+
+		System.out.println("Ping result : " + pingFuture.get());
+
 		Future<String> future = fabricWorker.getProcessNoticeableFuture();
 
 		System.out.println("Location 1 : " + future.get());
@@ -157,6 +162,10 @@ public class TestServer {
 		System.out.println(
 			fabricWorker.getFabricStatus().getAdvancedOperatingSystemMXBean().
 				getSystemCpuLoad());
+
+		pingFuture = fabricWorker.write(new PingProcessCallable());
+
+		System.out.println("Ping result : " + pingFuture.get());
 
 		future = fabricWorker.getProcessNoticeableFuture();
 
@@ -222,6 +231,20 @@ public class TestServer {
 		private final File[] _testOutputArray = new File[] {
 			new File(System.getProperty("user.home") + "/test-output-array1"),
 			new File(System.getProperty("user.home") + "/test-output-array2")};
+
+	}
+
+	private static class PingProcessCallable
+		implements ProcessCallable<String> {
+
+		@Override
+		public String call() throws ProcessException {
+			String pingMessage = "This is a ping message!";
+
+			System.out.println(pingMessage);
+
+			return pingMessage;
+		}
 
 	}
 

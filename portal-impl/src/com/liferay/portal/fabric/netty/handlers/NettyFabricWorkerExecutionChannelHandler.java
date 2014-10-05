@@ -392,6 +392,9 @@ public class NettyFabricWorkerExecutionChannelHandler
 					_nettyFabricWorkerConfig.getProcessConfig()),
 				_nettyFabricWorkerConfig.getProcessCallable());
 
+			NettyChannelAttributes.putFabricWorker(
+				_channel, _nettyFabricWorkerConfig.getId(), fabricWorker);
+
 			NoticeableFuture<Serializable> processNoticeableFuture =
 				fabricWorker.getProcessNoticeableFuture();
 
