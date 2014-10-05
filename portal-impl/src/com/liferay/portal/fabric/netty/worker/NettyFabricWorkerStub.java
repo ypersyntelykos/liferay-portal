@@ -96,7 +96,7 @@ public class NettyFabricWorkerStub<T extends Serializable>
 	@Override
 	public FabricStatus getFabricStatus() {
 		return new RemoteFabricStatus(
-			JMXProxyUtil.toProcessCallableExecutor(_channel));
+			JMXProxyUtil.toProcessCallableExecutor(_channel, _id));
 	}
 
 	@Override

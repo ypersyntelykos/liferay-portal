@@ -14,7 +14,11 @@
 
 package com.liferay.portal.fabric.status;
 
+import com.liferay.portal.fabric.netty.handlers.NettyChannelAttributes;
+import com.liferay.portal.fabric.netty.rpc.ChannelThreadLocal;
+import com.liferay.portal.fabric.netty.rpc.NoticeableFutureHolder;
 import com.liferay.portal.fabric.netty.rpc.RPCUtil;
+import com.liferay.portal.fabric.worker.FabricWorker;
 import com.liferay.portal.kernel.concurrent.NoticeableFuture;
 import com.liferay.portal.kernel.process.ProcessCallable;
 import com.liferay.portal.kernel.process.ProcessChannel;
@@ -65,6 +69,52 @@ public class JMXProxyUtil {
 		return (T)ProxyUtil.newProxyInstance(
 			classLoader, new Class<?>[] {interfaceClass},
 			new JMXProxyInvocationHandler(objectName, processCallableExecutor));
+	}
+
+	public static ProcessCallableExecutor toProcessCallableExecutor(
+		final Channel channel, final long fabricWorkerId) {
+
+		return new ProcessCallableExecutor() {
+
+			@Override
+			public <V extends Serializable> NoticeableFuture<V> execute(
+				ProcessCallable<V> processCallable) {
+
+				return (NoticeableFuture<V>)RPCUtil.execute(
+					channel,
+					new BridgeProcessCallable<V>(
+						fabricWorkerId, processCallable));
+			}
+
+		};
+	}
+
+	protected static class BridgeProcessCallable<V extends Serializable>
+		implements ProcessCallable<NoticeableFutureHolder<V>> {
+
+		public BridgeProcessCallable(
+			long id, ProcessCallable<V> processCallable) {
+
+			_id = id;
+			_processCallable = processCallable;
+		}
+
+		@Override
+		public NoticeableFutureHolder<V> call() throws ProcessException {
+			Channel channel = ChannelThreadLocal.getChannel();
+
+			FabricWorker<V> fabricWorker =
+				NettyChannelAttributes.getFabricWorker(channel, _id);
+
+			return new NoticeableFutureHolder<V>(
+				fabricWorker.write(_processCallable));
+		}
+
+		private static final long serialVersionUID = 1L;
+
+		private final long _id;
+		private final ProcessCallable<V> _processCallable;
+
 	}
 
 	public static ProcessCallableExecutor toProcessCallableExecutor(
