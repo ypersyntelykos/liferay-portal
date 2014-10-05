@@ -14,18 +14,10 @@
 
 package com.liferay.portal.fabric.status;
 
-import com.liferay.portal.fabric.netty.handlers.NettyChannelAttributes;
-import com.liferay.portal.fabric.netty.rpc.ChannelThreadLocal;
-import com.liferay.portal.fabric.netty.rpc.NoticeableFutureHolder;
-import com.liferay.portal.fabric.netty.rpc.RPCUtil;
-import com.liferay.portal.fabric.worker.FabricWorker;
 import com.liferay.portal.kernel.concurrent.NoticeableFuture;
 import com.liferay.portal.kernel.process.ProcessCallable;
-import com.liferay.portal.kernel.process.ProcessChannel;
 import com.liferay.portal.kernel.process.ProcessException;
 import com.liferay.portal.kernel.util.ProxyUtil;
-
-import io.netty.channel.Channel;
 
 import java.io.Serializable;
 
@@ -69,96 +61,6 @@ public class JMXProxyUtil {
 		return (T)ProxyUtil.newProxyInstance(
 			classLoader, new Class<?>[] {interfaceClass},
 			new JMXProxyInvocationHandler(objectName, processCallableExecutor));
-	}
-
-	public static ProcessCallableExecutor toProcessCallableExecutor(
-		final Channel channel, final long fabricWorkerId) {
-
-		return new ProcessCallableExecutor() {
-
-			@Override
-			public <V extends Serializable> NoticeableFuture<V> execute(
-				ProcessCallable<V> processCallable) {
-
-				return (NoticeableFuture<V>)RPCUtil.execute(
-					channel,
-					new BridgeProcessCallable<V>(
-						fabricWorkerId, processCallable));
-			}
-
-		};
-	}
-
-	protected static class BridgeProcessCallable<V extends Serializable>
-		implements ProcessCallable<NoticeableFutureHolder<V>> {
-
-		public BridgeProcessCallable(
-			long id, ProcessCallable<V> processCallable) {
-
-			_id = id;
-			_processCallable = processCallable;
-		}
-
-		@Override
-		public NoticeableFutureHolder<V> call() throws ProcessException {
-			Channel channel = ChannelThreadLocal.getChannel();
-
-			FabricWorker<V> fabricWorker =
-				NettyChannelAttributes.getFabricWorker(channel, _id);
-
-			return new NoticeableFutureHolder<V>(
-				fabricWorker.write(_processCallable));
-		}
-
-		private static final long serialVersionUID = 1L;
-
-		private final long _id;
-		private final ProcessCallable<V> _processCallable;
-
-	}
-
-	public static ProcessCallableExecutor toProcessCallableExecutor(
-		final Channel channel) {
-
-		return new ProcessCallableExecutor() {
-
-			@Override
-			public <V extends Serializable> NoticeableFuture<V> execute(
-				ProcessCallable<V> processCallable) {
-
-				return RPCUtil.execute(channel, processCallable);
-			}
-
-		};
-	}
-
-	public static ProcessCallableExecutor toProcessCallableExecutor(
-		final ProcessChannel<?> processChannel) {
-
-		return new ProcessCallableExecutor() {
-
-			@Override
-			public <V extends Serializable> NoticeableFuture<V> execute(
-					ProcessCallable<V> processCallable)
-				throws ProcessException {
-
-				return processChannel.write(processCallable);
-			}
-
-		};
-	}
-
-	@Retention(RetentionPolicy.RUNTIME)
-	@Target(ElementType.METHOD)
-	public @interface Optional {
-	}
-
-	public interface ProcessCallableExecutor {
-
-		public <V extends Serializable> NoticeableFuture<V> execute(
-			ProcessCallable<V> processCallable)
-		throws ProcessException;
-
 	}
 
 	protected static Object decode(
@@ -322,6 +224,19 @@ public class JMXProxyUtil {
 		}
 
 		return false;
+	}
+
+	@Retention(RetentionPolicy.RUNTIME)
+	@Target(ElementType.METHOD)
+	public @interface Optional {
+	}
+
+	public interface ProcessCallableExecutor {
+
+		public <V extends Serializable> NoticeableFuture<V> execute(
+			ProcessCallable<V> processCallable)
+		throws ProcessException;
+
 	}
 
 	protected static class GetAttributeProcessCallable

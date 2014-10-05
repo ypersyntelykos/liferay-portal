@@ -14,20 +14,15 @@
 
 package com.liferay.portal.fabric.netty.worker;
 
-import com.liferay.portal.fabric.netty.handlers.NettyChannelAttributes;
-import com.liferay.portal.fabric.netty.rpc.ChannelThreadLocal;
-import com.liferay.portal.fabric.netty.rpc.NoticeableFutureHolder;
 import com.liferay.portal.fabric.netty.rpc.RPCUtil;
 import com.liferay.portal.fabric.repository.Repository;
 import com.liferay.portal.fabric.status.FabricStatus;
-import com.liferay.portal.fabric.status.JMXProxyUtil;
 import com.liferay.portal.fabric.status.RemoteFabricStatus;
 import com.liferay.portal.fabric.worker.FabricWorker;
 import com.liferay.portal.kernel.concurrent.DefaultNoticeableFuture;
 import com.liferay.portal.kernel.concurrent.FutureListener;
 import com.liferay.portal.kernel.concurrent.NoticeableFuture;
 import com.liferay.portal.kernel.process.ProcessCallable;
-import com.liferay.portal.kernel.process.ProcessException;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -96,7 +91,7 @@ public class NettyFabricWorkerStub<T extends Serializable>
 	@Override
 	public FabricStatus getFabricStatus() {
 		return new RemoteFabricStatus(
-			JMXProxyUtil.toProcessCallableExecutor(_channel, _id));
+			new NettyFabricWorkerProcessCallableExecutor(_channel, _id));
 	}
 
 	@Override
@@ -144,36 +139,9 @@ public class NettyFabricWorkerStub<T extends Serializable>
 	public <V extends Serializable> NoticeableFuture<V> write(
 		ProcessCallable<V> processCallable) {
 
-		return (NoticeableFuture<V>)RPCUtil.execute(
-			_channel, new BridgeProcessCallable<V>(_id, processCallable));
-	}
-
-	protected static class BridgeProcessCallable<V extends Serializable>
-		implements ProcessCallable<NoticeableFutureHolder<V>> {
-
-		public BridgeProcessCallable(
-			long id, ProcessCallable<V> processCallable) {
-
-			_id = id;
-			_processCallable = processCallable;
-		}
-
-		@Override
-		public NoticeableFutureHolder<V> call() throws ProcessException {
-			Channel channel = ChannelThreadLocal.getChannel();
-
-			FabricWorker<V> fabricWorker =
-				NettyChannelAttributes.getFabricWorker(channel, _id);
-
-			return new NoticeableFutureHolder<V>(
-				fabricWorker.write(_processCallable));
-		}
-
-		private static final long serialVersionUID = 1L;
-
-		private final long _id;
-		private final ProcessCallable<V> _processCallable;
-
+		return RPCUtil.execute(
+			_channel,
+			new NettyFabricWorkerBridgeRPCCallable<V>(_id, processCallable));
 	}
 
 	private final Channel _channel;

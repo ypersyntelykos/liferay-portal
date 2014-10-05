@@ -14,31 +14,37 @@
 
 package com.liferay.portal.fabric.netty.rpc;
 
+import com.liferay.portal.kernel.concurrent.DefaultNoticeableFuture;
 import com.liferay.portal.kernel.concurrent.NoticeableFuture;
+import com.liferay.portal.kernel.process.ProcessCallable;
 
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
 /**
  * @author Shuyang Zhou
  */
-public class NoticeableFutureHolder<T extends Serializable>
-	implements Serializable {
+public class SyncProcessRPCCallable<T extends Serializable>
+	implements RPCCallable<T> {
 
-	public NoticeableFutureHolder(NoticeableFuture<T> noticeableFuture) {
-		_noticeableFuture = noticeableFuture;
+	public SyncProcessRPCCallable(ProcessCallable<T> processCallable) {
+		_processCallable = processCallable;
 	}
 
-	public NoticeableFuture<T> getNoticeableFuture() {
-		return _noticeableFuture;
+	@Override
+	public NoticeableFuture<T> call() {
+		DefaultNoticeableFuture<T> defaultNoticeableFuture =
+			new DefaultNoticeableFuture<T>();
+
+		try {
+			defaultNoticeableFuture.set(_processCallable.call());
+		}
+		catch (Throwable t) {
+			defaultNoticeableFuture.setException(t);
+		}
+
+		return defaultNoticeableFuture;
 	}
 
-	private void writeObject(ObjectOutputStream objectOutputStream) {
-		throw new UnsupportedOperationException(
-			NoticeableFutureHolder.class.getName() +
-				" is a transient place holder, should never be serilaized");
-	}
-
-	private final transient NoticeableFuture<T> _noticeableFuture;
+	private final ProcessCallable<T> _processCallable;
 
 }

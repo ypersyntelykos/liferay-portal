@@ -14,9 +14,7 @@
 
 package com.liferay.portal.fabric.local.worker;
 
-import com.liferay.portal.fabric.status.FabricStatus;
-import com.liferay.portal.fabric.status.RemoteFabricStatus;
-import com.liferay.portal.fabric.worker.FabricWorker;
+import com.liferay.portal.fabric.status.JMXProxyUtil.ProcessCallableExecutor;
 import com.liferay.portal.kernel.concurrent.NoticeableFuture;
 import com.liferay.portal.kernel.process.ProcessCallable;
 import com.liferay.portal.kernel.process.ProcessChannel;
@@ -27,35 +25,23 @@ import java.io.Serializable;
 /**
  * @author Shuyang Zhou
  */
-public class LocalFabricWorker<T extends Serializable>
-	implements FabricWorker<T> {
+public class LocalFabricWorkerProcessCallableExecutor
+	implements ProcessCallableExecutor {
 
-	public LocalFabricWorker(ProcessChannel<T> processChannel) {
+	public LocalFabricWorkerProcessCallableExecutor(
+		ProcessChannel<? extends Serializable> processChannel) {
+
 		_processChannel = processChannel;
-
-		_fabricStatus = new RemoteFabricStatus(
-			new LocalFabricWorkerProcessCallableExecutor(_processChannel));
 	}
 
 	@Override
-	public FabricStatus getFabricStatus() {
-		return _fabricStatus;
-	}
-
-	@Override
-	public NoticeableFuture<T> getProcessNoticeableFuture() {
-		return _processChannel.getProcessNoticeableFuture();
-	}
-
-	@Override
-	public <V extends Serializable> NoticeableFuture<V> write(
+	public <V extends Serializable> NoticeableFuture<V> execute(
 			ProcessCallable<V> processCallable)
 		throws ProcessException {
 
 		return _processChannel.write(processCallable);
 	}
 
-	private final FabricStatus _fabricStatus;
-	private final ProcessChannel<T> _processChannel;
+	private final ProcessChannel<? extends Serializable> _processChannel;
 
 }

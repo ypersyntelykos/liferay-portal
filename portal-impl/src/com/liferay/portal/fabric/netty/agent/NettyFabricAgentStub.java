@@ -21,7 +21,6 @@ import com.liferay.portal.fabric.netty.worker.NettyFabricWorkerConfig;
 import com.liferay.portal.fabric.netty.worker.NettyFabricWorkerStub;
 import com.liferay.portal.fabric.repository.Repository;
 import com.liferay.portal.fabric.status.FabricStatus;
-import com.liferay.portal.fabric.status.JMXProxyUtil;
 import com.liferay.portal.fabric.status.RemoteFabricStatus;
 import com.liferay.portal.fabric.worker.FabricWorker;
 import com.liferay.portal.kernel.process.ProcessCallable;
@@ -144,7 +143,7 @@ public class NettyFabricAgentStub implements FabricAgent {
 	@Override
 	public FabricStatus getFabricStatus() {
 		return new RemoteFabricStatus(
-			JMXProxyUtil.toProcessCallableExecutor(_channel));
+			new NettyFabricAgentProcessCallableExecutor(_channel));
 	}
 
 	@Override

@@ -22,6 +22,7 @@ import com.liferay.portal.fabric.netty.agent.NettyFabricAgentStub;
 import com.liferay.portal.fabric.netty.fileserver.FileHelperUtil;
 import com.liferay.portal.fabric.netty.rpc.ChannelThreadLocal;
 import com.liferay.portal.fabric.netty.rpc.RPCUtil;
+import com.liferay.portal.fabric.netty.rpc.SyncProcessRPCCallable;
 import com.liferay.portal.fabric.netty.util.NettyUtil;
 import com.liferay.portal.fabric.netty.worker.NettyFabricWorkerConfig;
 import com.liferay.portal.fabric.netty.worker.NettyFabricWorkerStub;
@@ -89,7 +90,8 @@ public class NettyFabricWorkerExecutionChannelHandler
 			new ResultProcessCallable(fabricWorkerId, result, t);
 
 		NoticeableFuture<Serializable> noticeableFuture = RPCUtil.execute(
-			channel, resultProcessCallable);
+			channel,
+			new SyncProcessRPCCallable<Serializable>(resultProcessCallable));
 
 		NettyUtil.scheduleCancellation(
 			channel, noticeableFuture, FABRIC_WORKER_EXECUTION_TIME_OUT);
