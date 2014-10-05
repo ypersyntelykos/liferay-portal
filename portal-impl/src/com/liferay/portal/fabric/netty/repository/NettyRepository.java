@@ -170,6 +170,8 @@ public class NettyRepository implements Repository {
 				});
 		}
 
+		// TODO user triggered cancel, cancel back to all getFile futures
+
 		return defaultNoticeableFuture;
 	}
 
