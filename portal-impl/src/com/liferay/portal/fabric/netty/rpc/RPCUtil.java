@@ -75,6 +75,43 @@ public class RPCUtil {
 		return noticeableFuture;
 	}
 
+	protected static <T extends Serializable> void sendRPCResponse(
+		Channel channel, RPCResponse<T> rpcResponse) {
+
+		ChannelFuture channelFuture = channel.writeAndFlush(rpcResponse);
+
+		channelFuture.addListener(new LogErrorFutureListener(rpcResponse));
+	}
+
+	protected static class LogErrorFutureListener
+		implements ChannelFutureListener {
+
+		@Override
+		public void operationComplete(ChannelFuture channelFuture) {
+			if (channelFuture.isSuccess()) {
+				return;
+			}
+
+			if (channelFuture.isCancelled()) {
+				_log.error(
+					"Cancelled on sending RPC response: " + _rpcResponse);
+
+				return;
+			}
+
+			_log.error(
+				"Unable to send RPC response: " + _rpcResponse,
+				channelFuture.cause());
+		}
+
+		protected LogErrorFutureListener(RPCResponse<?> rpcResponse) {
+			_rpcResponse = rpcResponse;
+		}
+
+		private final RPCResponse<?> _rpcResponse;
+
+	}
+
 	private static Log _log = LogFactoryUtil.getLog(RPCUtil.class);
 
 }

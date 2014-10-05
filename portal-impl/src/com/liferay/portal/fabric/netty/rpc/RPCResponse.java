@@ -16,6 +16,7 @@ package com.liferay.portal.fabric.netty.rpc;
 
 import com.liferay.portal.fabric.netty.handlers.NettyChannelAttributes;
 import com.liferay.portal.kernel.concurrent.AsyncBroker;
+import com.liferay.portal.kernel.concurrent.NoticeableFuture;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.StringBundler;
@@ -29,9 +30,12 @@ import java.io.Serializable;
  */
 public class RPCResponse<T extends Serializable> extends RPCSerializable {
 
-	public RPCResponse(long id, T result, Throwable throwable) {
+	public RPCResponse(
+		long id, boolean cancelled, T result, Throwable throwable) {
+
 		super(id);
 
+		_cancelled = cancelled;
 		_result = result;
 		_throwable = throwable;
 	}
@@ -40,6 +44,27 @@ public class RPCResponse<T extends Serializable> extends RPCSerializable {
 	public void execute(Channel channel) {
 		AsyncBroker<Long, Serializable> asyncBroker =
 			NettyChannelAttributes.getAsyncBroker(channel);
+
+		if (_cancelled) {
+			NoticeableFuture<?> noticeableFuture = asyncBroker.take(id);
+
+			if (noticeableFuture == null) {
+				_log.error(
+					"Unable to place cancellation because no future exists " +
+						"with ID " + id);
+			}
+
+			if (noticeableFuture.cancel(true)) {
+				if (_log.isDebugEnabled()) {
+					_log.debug("Cancelled future with ID " + id);
+				}
+			}
+			else if (_log.isDebugEnabled()) {
+				_log.debug(
+					"Unable to cancel future with ID " + id +
+						", because it is already completed");
+			}
+		}
 
 		if (_throwable != null) {
 			if (!asyncBroker.takeWithException(id, _throwable)) {
@@ -77,6 +102,7 @@ public class RPCResponse<T extends Serializable> extends RPCSerializable {
 
 	private static final long serialVersionUID = 1L;
 
+	private final boolean _cancelled;
 	private final T _result;
 	private final Throwable _throwable;
 

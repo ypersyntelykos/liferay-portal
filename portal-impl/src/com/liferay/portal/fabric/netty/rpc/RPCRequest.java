@@ -14,16 +14,19 @@
 
 package com.liferay.portal.fabric.netty.rpc;
 
+import com.liferay.portal.kernel.concurrent.FutureListener;
+import com.liferay.portal.kernel.concurrent.NoticeableFuture;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.process.ProcessCallable;
 import com.liferay.portal.kernel.util.StringBundler;
 
 import io.netty.channel.Channel;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelFutureListener;
 
 import java.io.Serializable;
+
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 /**
  * @author Shuyang Zhou
@@ -37,15 +40,58 @@ public class RPCRequest<T extends Serializable> extends RPCSerializable {
 	}
 
 	@Override
-	public void execute(Channel channel) {
+	public void execute(final Channel channel) {
 		ChannelThreadLocal.setChannel(channel);
 
 		try {
-			sendRPCResponse(
-				channel, new RPCResponse<T>(id, _processCallable.call(), null));
+			T result = _processCallable.call();
+
+			if (result instanceof NoticeableFutureHolder) {
+				NoticeableFutureHolder<T> noticeableFutureHolder =
+					(NoticeableFutureHolder<T>)result;
+
+				NoticeableFuture<T> noticeableFuture =
+					noticeableFutureHolder.getNoticeableFuture();
+
+				noticeableFuture.addFutureListener(
+					new FutureListener<T>() {
+
+						@Override
+						public void complete(Future<T> future) {
+							if (future.isCancelled()) {
+								RPCUtil.sendRPCResponse(
+									channel, new RPCResponse<T>(
+										id, false, null, null));
+							}
+
+							try {
+								RPCUtil.sendRPCResponse(
+									channel,
+									new RPCResponse<T>(
+										id, false, future.get(), null));
+							}
+							catch (Throwable throwable) {
+								if (throwable instanceof ExecutionException) {
+									throwable = throwable.getCause();
+								}
+
+								RPCUtil.sendRPCResponse(
+									channel, new RPCResponse<T>(
+										id, false, null, throwable));
+							}
+						}
+
+					});
+
+				return;
+			}
+
+			RPCUtil.sendRPCResponse(
+				channel, new RPCResponse<T>(id, false, result, null));
 		}
 		catch (Throwable t) {
-			sendRPCResponse(channel, new RPCResponse<T>(id, null, t));
+			RPCUtil.sendRPCResponse(
+				channel, new RPCResponse<T>(id, false, null, t));
 		}
 		finally {
 			ChannelThreadLocal.removeChannel();
@@ -63,43 +109,6 @@ public class RPCRequest<T extends Serializable> extends RPCSerializable {
 		sb.append("}");
 
 		return sb.toString();
-	}
-
-	protected void sendRPCResponse(
-		Channel channel, RPCResponse<T> rpcResponse) {
-
-		ChannelFuture channelFuture = channel.writeAndFlush(rpcResponse);
-
-		channelFuture.addListener(new LogErrorFutureListener(rpcResponse));
-	}
-
-	protected static class LogErrorFutureListener
-		implements ChannelFutureListener {
-
-		@Override
-		public void operationComplete(ChannelFuture channelFuture) {
-			if (channelFuture.isSuccess()) {
-				return;
-			}
-
-			if (channelFuture.isCancelled()) {
-				_log.error(
-					"Cancelled on sending RPC response: " + _rpcResponse);
-
-				return;
-			}
-
-			_log.error(
-				"Unable to send RPC response: " + _rpcResponse,
-				channelFuture.cause());
-		}
-
-		protected LogErrorFutureListener(RPCResponse<?> rpcResponse) {
-			_rpcResponse = rpcResponse;
-		}
-
-		private final RPCResponse<?> _rpcResponse;
-
 	}
 
 	private static Log _log = LogFactoryUtil.getLog(RPCRequest.class);
