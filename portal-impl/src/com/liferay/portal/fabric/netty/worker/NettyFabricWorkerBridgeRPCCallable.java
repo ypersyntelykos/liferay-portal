@@ -46,6 +46,11 @@ public class NettyFabricWorkerBridgeRPCCallable<T extends Serializable>
 		FabricWorker<T> fabricWorker = NettyChannelAttributes.getFabricWorker(
 			channel, _id);
 
+		if (fabricWorker == null) {
+			throw new ProcessException(
+				"Unable to locate fabric worker with id " + _id);
+		}
+
 		return fabricWorker.write(_processCallable);
 	}
 

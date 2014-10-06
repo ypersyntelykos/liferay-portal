@@ -69,7 +69,7 @@ public class NettyFabricWorkerExecutionChannelHandler
 
 	// TODO move to properties
 
-	public static final long FABRIC_WORKER_EXECUTION_TIME_OUT = 10000;
+	public static final long FABRIC_WORKER_EXECUTION_TIME_OUT = Long.MAX_VALUE;
 
 	public NettyFabricWorkerExecutionChannelHandler(
 		Repository repository, ProcessExecutor processExecutor) {
@@ -236,6 +236,34 @@ public class NettyFabricWorkerExecutionChannelHandler
 			};
 	}
 
+	protected static class FinishStartupProcessCallable
+		implements ProcessCallable<Serializable> {
+
+		public FinishStartupProcessCallable(long id) {
+			_id = id;
+		}
+
+		@Override
+		public Serializable call() throws ProcessException {
+			Channel channel = ChannelThreadLocal.getChannel();
+
+			NettyFabricAgentStub nettyStubFabricAgent =
+				NettyChannelAttributes.getNettyFabricAgentStub(channel);
+
+			if (nettyStubFabricAgent == null) {
+				throw new ProcessException(
+					"Unable to locate fabric agent on channel " + channel);
+			}
+
+			nettyStubFabricAgent.finsihStartup(_id);
+
+			return null;
+		}
+
+		private final long _id;
+
+	}
+
 	protected static class LoadedResources {
 
 		public LoadedResources(
@@ -381,13 +409,14 @@ public class NettyFabricWorkerExecutionChannelHandler
 			try {
 				doRun(_loadedResources);
 			}
-			catch (Throwable t) {
-				sendResult(_channel, _nettyFabricWorkerConfig.getId(), null, t);
+			catch (ProcessException pe) {
+				sendResult(
+					_channel, _nettyFabricWorkerConfig.getId(), null, pe);
 			}
 		}
 
 		protected void doRun(final LoadedResources loadedResources)
-			throws Throwable {
+			throws ProcessException {
 
 			FabricWorker<Serializable> fabricWorker = _fabricAgent.execute(
 				loadedResources.toProcessConfig(
@@ -396,6 +425,35 @@ public class NettyFabricWorkerExecutionChannelHandler
 
 			NettyChannelAttributes.putFabricWorker(
 				_channel, _nettyFabricWorkerConfig.getId(), fabricWorker);
+
+			NoticeableFuture<Serializable> noticeableFuture = RPCUtil.execute(
+				_channel,
+				new SyncProcessRPCCallable<Serializable>(
+					new FinishStartupProcessCallable(
+						_nettyFabricWorkerConfig.getId())));
+
+			NettyUtil.scheduleCancellation(
+				_channel, noticeableFuture, FABRIC_WORKER_EXECUTION_TIME_OUT);
+
+			noticeableFuture.addFutureListener(
+				new FutureListener<Serializable>() {
+
+					@Override
+					public void complete(Future<Serializable> future) {
+						try {
+							future.get();
+						}
+						catch (Throwable t) {
+							if (t instanceof ExecutionException) {
+								t = t.getCause();
+							}
+
+							_log.error(
+								"Unable to finish fabric worker startup", t);
+						}
+					}
+
+				});
 
 			NoticeableFuture<Serializable> processNoticeableFuture =
 				fabricWorker.getProcessNoticeableFuture();

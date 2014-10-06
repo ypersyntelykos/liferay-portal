@@ -99,6 +99,10 @@ public class NettyFabricWorkerStub<T extends Serializable>
 		return _defaultNoticeableFuture;
 	}
 
+	public void setCancel() {
+		_defaultNoticeableFuture.cancel(true);
+	}
+
 	public void setException(Throwable t) {
 		_defaultNoticeableFuture.setException(t);
 	}

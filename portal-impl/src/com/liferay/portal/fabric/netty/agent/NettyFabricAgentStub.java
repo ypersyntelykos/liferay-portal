@@ -23,6 +23,8 @@ import com.liferay.portal.fabric.repository.Repository;
 import com.liferay.portal.fabric.status.FabricStatus;
 import com.liferay.portal.fabric.status.RemoteFabricStatus;
 import com.liferay.portal.fabric.worker.FabricWorker;
+import com.liferay.portal.kernel.concurrent.DefaultNoticeableFuture;
+import com.liferay.portal.kernel.concurrent.FutureListener;
 import com.liferay.portal.kernel.process.ProcessCallable;
 import com.liferay.portal.kernel.process.ProcessConfig;
 import com.liferay.portal.kernel.process.ProcessException;
@@ -39,7 +41,9 @@ import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -106,7 +110,20 @@ public class NettyFabricAgentStub implements FabricAgent {
 				id, _channel, _repository,
 				fabricResourceMappingVisitor.getResourceMap());
 
-		_nettyFabricWorkerStubs.put(id, nettyFabricWorkerStub);
+		final DefaultNoticeableFuture<Object> startupNoticeableFuture =
+			new DefaultNoticeableFuture<Object>();
+
+		_startupNoticeableFutures.put(id, startupNoticeableFuture);
+
+		startupNoticeableFuture.addFutureListener(
+			new FutureListener<Object>() {
+
+				@Override
+				public void complete(Future<Object> future) {
+					_startupNoticeableFutures.remove(id);
+				}
+
+			});
 
 		ChannelFuture channelFuture = _channel.writeAndFlush(
 			new NettyFabricWorkerConfig<T>(id, processConfig, processCallable));
@@ -120,24 +137,43 @@ public class NettyFabricAgentStub implements FabricAgent {
 						return;
 					}
 
-					NettyFabricWorkerStub<?> nettyFabricWorkerStub =
-						takeNettyStubFabricWorker(id);
-
 					if (channelFuture.isCancelled()) {
-						Future<?> future =
-							nettyFabricWorkerStub.getProcessNoticeableFuture();
-
-						future.cancel(true);
+						startupNoticeableFuture.cancel(true);
 
 						return;
 					}
 
-					nettyFabricWorkerStub.setException(channelFuture.cause());
+					startupNoticeableFuture.setException(channelFuture.cause());
 				}
 
 			});
 
+		try {
+			startupNoticeableFuture.get();
+
+			_nettyFabricWorkerStubs.put(id, nettyFabricWorkerStub);
+		}
+		catch (CancellationException ce) {
+			nettyFabricWorkerStub.setCancel();
+		}
+		catch (Throwable t) {
+			if (t instanceof ExecutionException) {
+				t = t.getCause();
+			}
+
+			nettyFabricWorkerStub.setException(t);
+		}
+
 		return nettyFabricWorkerStub;
+	}
+
+	public void finsihStartup(long id) {
+		DefaultNoticeableFuture<?> startupNoticeabeFuture =
+			_startupNoticeableFutures.remove(id);
+
+		if (startupNoticeabeFuture != null) {
+			startupNoticeabeFuture.run();
+		}
 	}
 
 	@Override
@@ -168,5 +204,8 @@ public class NettyFabricAgentStub implements FabricAgent {
 			new ConcurrentHashMap<Long, NettyFabricWorkerStub<?>>();
 	private final Path _remoteRepositoryPath;
 	private final Repository _repository;
+	private final Map<Long, DefaultNoticeableFuture<?>>
+		_startupNoticeableFutures =
+			new ConcurrentHashMap<Long, DefaultNoticeableFuture<?>>();
 
 }
