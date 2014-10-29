@@ -25,6 +25,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import java.nio.file.AtomicMoveNotSupportedException;
+import java.nio.file.DirectoryStream;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
@@ -35,7 +36,9 @@ import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
@@ -107,6 +110,22 @@ public class FileHelperUtil {
 
 	public static void delete(Path... paths) {
 		delete(false, paths);
+	}
+
+	public static List<Path> list(Path folderPath) {
+		List<Path> paths = new ArrayList<Path>();
+
+		try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(
+				folderPath)) {
+
+			for (Path path : directoryStream) {
+				paths.add(path);
+			}
+		}
+		catch (IOException ioe) {
+		}
+
+		return paths;
 	}
 
 	public static void move(Path fromPath, final Path toPath)

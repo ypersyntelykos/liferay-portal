@@ -49,6 +49,7 @@ import io.netty.util.concurrent.GenericFutureListener;
 import java.io.File;
 import java.io.Serializable;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -171,6 +172,11 @@ public class NettyFabricWorkerExecutionChannelHandler
 						loadedRuntimeResources.add(loadedRuntimeResource);
 					}
 				}
+
+				Path repositoryPath = _repository.getRepositoryPath();
+
+				loadedRuntimeResources.addAll(
+					FileHelperUtil.list(repositoryPath.resolve("dynamic-lib")));
 
 				return new LoadedResources(
 					loadedInputResources,
