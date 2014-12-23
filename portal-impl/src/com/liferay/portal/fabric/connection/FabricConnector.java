@@ -12,25 +12,15 @@
  * details.
  */
 
-package com.liferay.portal.fabric.client;
+package com.liferay.portal.fabric.connection;
 
-import com.liferay.portal.fabric.connection.FabricConnection;
 import com.liferay.portal.kernel.concurrent.NoticeableFuture;
-
-import java.net.InetSocketAddress;
-
-import java.util.Map;
 
 /**
  * @author Shuyang Zhou
  */
-public interface FabricClient {
+public interface FabricConnector {
 
-	public NoticeableFuture<FabricConnection> connect(
-		InetSocketAddress inetSocketAddress);
-
-	public Map<InetSocketAddress, FabricConnection> getFabricConnections();
-
-	public void shutdown();
+	public NoticeableFuture<FabricConnection> connect();
 
 }

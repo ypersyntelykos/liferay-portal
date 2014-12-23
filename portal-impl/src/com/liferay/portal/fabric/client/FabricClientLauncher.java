@@ -20,10 +20,13 @@ import com.liferay.portal.fabric.netty.client.NettyFabricClientShutdownCallback;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.process.local.LocalProcessExecutor;
+import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.PropsKeys;
 
 import java.io.IOException;
 import java.io.InputStream;
 
+import java.net.InetSocketAddress;
 import java.net.URL;
 
 import java.util.Enumeration;
@@ -45,8 +48,10 @@ public class FabricClientLauncher {
 	public static void main(String[] args) throws Exception {
 		UUID uuid = UUID.randomUUID();
 
+		Properties properties = loadProperties();
+
 		NettyFabricClientConfig nettyFabricClientConfig =
-			new NettyFabricClientConfig(uuid.toString(), loadProperties());
+			new NettyFabricClientConfig(uuid.toString(), properties);
 
 		final CountDownLatch countDownLatch = new CountDownLatch(1);
 
@@ -65,7 +70,16 @@ public class FabricClientLauncher {
 
 		fabricClientUtil.setFabricClient(nettyFabricClient);
 
-		FabricClientUtil.connect();
+		String portalFabricServerHost = GetterUtil.getString(
+			properties.getProperty(PropsKeys.PORTAL_FABRIC_SERVER_HOST),
+			"localhost");
+
+		int portalFabricServerPort = GetterUtil.getInteger(
+			properties.getProperty(PropsKeys.PORTAL_FABRIC_SERVER_PORT), 8923);
+
+		FabricClientUtil.connect(
+			new InetSocketAddress(
+				portalFabricServerHost, portalFabricServerPort));
 
 		countDownLatch.await();
 	}

@@ -77,17 +77,6 @@ public class NettyFabricClientConfig implements Serializable {
 			1);
 	}
 
-	public String getNettyFabricServerHost() {
-		return GetterUtil.getString(
-			_properties.getProperty(PropsKeys.PORTAL_FABRIC_SERVER_HOST),
-			"localhost");
-	}
-
-	public int getNettyFabricServerPort() {
-		return GetterUtil.getInteger(
-			_properties.getProperty(PropsKeys.PORTAL_FABRIC_SERVER_PORT), 8923);
-	}
-
 	public int getReconnectCount() {
 		return GetterUtil.getInteger(
 			_properties.getProperty(
@@ -122,7 +111,7 @@ public class NettyFabricClientConfig implements Serializable {
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(27);
+		StringBundler sb = new StringBundler(23);
 
 		sb.append("{eventLoopGroupThreadCount=");
 		sb.append(getEventLoopGroupThreadCount());
@@ -136,10 +125,6 @@ public class NettyFabricClientConfig implements Serializable {
 		sb.append(getFileServerGroupThreadCount());
 		sb.append(", id=");
 		sb.append(_id);
-		sb.append(", nettyFabricServetHost=");
-		sb.append(getNettyFabricServerHost());
-		sb.append(", nettyFabricServerPort=");
-		sb.append(getNettyFabricServerPort());
 		sb.append(", reconnectCount=");
 		sb.append(getReconnectCount());
 		sb.append(", reconnectInterval=");
