@@ -17,9 +17,7 @@ package com.liferay.portal.fabric.netty.connection;
 import com.liferay.portal.fabric.agent.FabricAgent;
 import com.liferay.portal.fabric.connection.FabricConnection;
 import com.liferay.portal.fabric.worker.FabricWorker;
-import com.liferay.portal.kernel.concurrent.DefaultNoticeableFuture;
 import com.liferay.portal.kernel.concurrent.NoticeableFuture;
-import com.liferay.portal.kernel.concurrent.ReadOnlyNoticeableFutureWrapper;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.process.ProcessCallable;
@@ -49,25 +47,9 @@ public class NettyFabricConnection implements FabricConnection {
 		_fabricAgent = fabricAgent;
 		_executionTimeout = executionTimeout;
 
-		_defaultNoticeableFuture = new DefaultNoticeableFuture<Void>();
-		_disconnectNoticeableFuture = new ReadOnlyNoticeableFutureWrapper<Void>(
-			_defaultNoticeableFuture);
-
 		ChannelFuture channelFuture = _channel.closeFuture();
 
 		channelFuture.addListener(new PostCloseChannelFutureListener());
-	}
-
-	@Override
-	public NoticeableFuture<Void> disconnect() {
-		_channel.close();
-
-		return _disconnectNoticeableFuture;
-	}
-
-	@Override
-	public NoticeableFuture<Void> disconnectNoticeableFuture() {
-		return _disconnectNoticeableFuture;
 	}
 
 	@Override
@@ -132,28 +114,10 @@ public class NettyFabricConnection implements FabricConnection {
 
 		@Override
 		public void operationComplete(ChannelFuture channelFuture) {
-			try {
-				terminateFabricWorkers();
+			terminateFabricWorkers();
 
-				if (_log.isInfoEnabled()) {
-					_log.info(
-						"Disconnect Netty fabric connection on " + _channel);
-				}
-			}
-			finally {
-				if (channelFuture.isCancelled()) {
-					_defaultNoticeableFuture.cancel(true);
-				}
-				else {
-					Throwable throwable = channelFuture.cause();
-
-					if (throwable != null) {
-						_defaultNoticeableFuture.setException(throwable);
-					}
-					else {
-						_defaultNoticeableFuture.set(channelFuture.getNow());
-					}
-				}
+			if (_log.isInfoEnabled()) {
+				_log.info("Disconnect Netty fabric connection on " + _channel);
 			}
 		}
 
@@ -197,8 +161,6 @@ public class NettyFabricConnection implements FabricConnection {
 		};
 
 	private final Channel _channel;
-	private final DefaultNoticeableFuture<Void> _defaultNoticeableFuture;
-	private final NoticeableFuture<Void> _disconnectNoticeableFuture;
 	private final long _executionTimeout;
 	private final FabricAgent _fabricAgent;
 

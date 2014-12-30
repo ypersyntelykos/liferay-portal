@@ -21,11 +21,9 @@ import java.util.concurrent.TimeoutException;
 /**
  * @author Shuyang Zhou
  */
-public class ReadOnlyNoticeableFutureWrapper<T> implements NoticeableFuture<T> {
+public class NoticeableFutureWrapper<T> implements NoticeableFuture<T> {
 
-	public ReadOnlyNoticeableFutureWrapper(
-		NoticeableFuture<T> noticeableFuture) {
-
+	public NoticeableFutureWrapper(NoticeableFuture<T> noticeableFuture) {
 		_noticeableFuture = noticeableFuture;
 	}
 
@@ -36,8 +34,7 @@ public class ReadOnlyNoticeableFutureWrapper<T> implements NoticeableFuture<T> {
 
 	@Override
 	public boolean cancel(boolean mayInterruptIfRunning) {
-		throw new IllegalStateException(
-			"Can not cancel read only noticeable future");
+		return _noticeableFuture.cancel(mayInterruptIfRunning);
 	}
 
 	@Override

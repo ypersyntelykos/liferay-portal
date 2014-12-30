@@ -12,13 +12,21 @@
  * details.
  */
 
-package com.liferay.portal.fabric.netty.client;
+package com.liferay.portal.fabric.connection;
+
+import java.net.InetSocketAddress;
+
+import java.util.concurrent.Future;
 
 /**
  * @author Shuyang Zhou
  */
-public interface NettyFabricClientShutdownCallback {
+public interface FabricConnectionWatchDog {
 
-	public void shutdown();
+	public FabricConnection getFabricConnection();
+
+	public InetSocketAddress getInetSocketAddress();
+
+	public Future<Void> stop();
 
 }

@@ -16,7 +16,6 @@ package com.liferay.portal.fabric.client;
 
 import com.liferay.portal.fabric.netty.client.NettyFabricClient;
 import com.liferay.portal.fabric.netty.client.NettyFabricClientConfig;
-import com.liferay.portal.fabric.netty.client.NettyFabricClientShutdownCallback;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.process.local.LocalProcessExecutor;
@@ -57,10 +56,10 @@ public class FabricClientLauncher {
 
 		NettyFabricClient nettyFabricClient = new NettyFabricClient(
 			new LocalProcessExecutor(), nettyFabricClientConfig,
-			new NettyFabricClientShutdownCallback() {
+			new Runnable() {
 
 				@Override
-				public void shutdown() {
+				public void run() {
 					countDownLatch.countDown();
 				}
 

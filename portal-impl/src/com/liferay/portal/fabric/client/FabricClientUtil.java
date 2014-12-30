@@ -14,8 +14,7 @@
 
 package com.liferay.portal.fabric.client;
 
-import com.liferay.portal.fabric.connection.FabricConnection;
-import com.liferay.portal.kernel.concurrent.NoticeableFuture;
+import com.liferay.portal.fabric.connection.FabricConnectionWatchDog;
 import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
 
 import java.net.InetSocketAddress;
@@ -27,7 +26,7 @@ import java.util.Map;
  */
 public class FabricClientUtil {
 
-	public static NoticeableFuture<FabricConnection> connect(
+	public static FabricConnectionWatchDog connect(
 		InetSocketAddress inetSocketAddress) {
 
 		return getFabricClient().connect(inetSocketAddress);
@@ -39,10 +38,10 @@ public class FabricClientUtil {
 		return _fabricClient;
 	}
 
-	public static Map<InetSocketAddress, FabricConnection>
-		getFabricConnections() {
+	public static Map<InetSocketAddress, FabricConnectionWatchDog>
+		getFabricConnectionWatchDogs() {
 
-		return getFabricClient().getFabricConnections();
+		return getFabricClient().getFabricConnectionWatchDogs();
 	}
 
 	public static void shutdown() {

@@ -14,18 +14,12 @@
 
 package com.liferay.portal.fabric.connection;
 
-import com.liferay.portal.kernel.concurrent.NoticeableFuture;
-
 import java.net.InetSocketAddress;
 
 /**
  * @author Shuyang Zhou
  */
 public interface FabricConnection {
-
-	public NoticeableFuture<Void> disconnect();
-
-	public NoticeableFuture<Void> disconnectNoticeableFuture();
 
 	public InetSocketAddress getLocalInetSocketAddress();
 

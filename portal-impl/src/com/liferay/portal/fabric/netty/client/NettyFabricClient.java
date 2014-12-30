@@ -15,18 +15,14 @@
 package com.liferay.portal.fabric.netty.client;
 
 import com.liferay.portal.fabric.client.FabricClient;
-import com.liferay.portal.fabric.connection.FabricConnection;
-import com.liferay.portal.fabric.connection.FabricConnector;
+import com.liferay.portal.fabric.connection.FabricConnectionWatchDog;
 import com.liferay.portal.fabric.netty.codec.serialization.AnnotatedObjectDecoder;
 import com.liferay.portal.fabric.netty.codec.serialization.AnnotatedObjectEncoder;
-import com.liferay.portal.fabric.netty.connection.NettyFabricConnector;
+import com.liferay.portal.fabric.netty.connection.NettyFabricConnectionWatchDog;
 import com.liferay.portal.fabric.netty.fileserver.handlers.FileRequestChannelHandler;
 import com.liferay.portal.fabric.netty.repository.NettyRepository;
 import com.liferay.portal.fabric.netty.rpc.handlers.NettyRPCChannelHandler;
 import com.liferay.portal.fabric.repository.Repository;
-import com.liferay.portal.kernel.concurrent.BaseFutureListener;
-import com.liferay.portal.kernel.concurrent.FutureListener;
-import com.liferay.portal.kernel.concurrent.NoticeableFuture;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.process.ProcessExecutor;
@@ -34,6 +30,7 @@ import com.liferay.portal.kernel.util.NamedThreadFactory;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.EventLoopGroup;
@@ -54,7 +51,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author Shuyang Zhou
@@ -64,184 +61,140 @@ public class NettyFabricClient implements FabricClient {
 	public NettyFabricClient(
 			ProcessExecutor processExecutor,
 			NettyFabricClientConfig nettyFabricClientConfig,
-			NettyFabricClientShutdownCallback nettyFabricClientShutdownCallback)
+			Runnable shutdownCallback)
 		throws IOException {
 
-		_processExecutor = processExecutor;
-		_nettyFabricClientConfig = nettyFabricClientConfig;
-		_nettyFabricClientShutdownCallback = nettyFabricClientShutdownCallback;
+		this.processExecutor = processExecutor;
+		this.nettyFabricClientConfig = nettyFabricClientConfig;
+		this.shutdownCallback = shutdownCallback;
 
 		EventLoopGroup eventLoopGroup = new NioEventLoopGroup(
-			_nettyFabricClientConfig.getEventLoopGroupThreadCount(),
+			nettyFabricClientConfig.getEventLoopGroupThreadCount(),
 			new NamedThreadFactory(
 				"Netty Fabric Client/NIO Event Loop Group",
 				Thread.NORM_PRIORITY, null));
 
-		_executionEventExecutorGroup = new DefaultEventExecutorGroup(
-			_nettyFabricClientConfig.getExecutionGroupThreadCount(),
+		executionEventExecutorGroup = new DefaultEventExecutorGroup(
+			nettyFabricClientConfig.getExecutionGroupThreadCount(),
 			new NamedThreadFactory(
 				"Netty Fabric Client/Execution Event Executor Group",
 				Thread.NORM_PRIORITY, null));
 
-		_fileServerEventExecutorGroup = new DefaultEventExecutorGroup(
-			_nettyFabricClientConfig.getFileServerGroupThreadCount(),
+		fileServerEventExecutorGroup = new DefaultEventExecutorGroup(
+			nettyFabricClientConfig.getFileServerGroupThreadCount(),
 			new NamedThreadFactory(
 				"Netty Fabric Client/File Server Event Executor Group",
 				Thread.NORM_PRIORITY, null));
 
-		_rpcEventExecutorGroup = new DefaultEventExecutorGroup(
-			_nettyFabricClientConfig.getRPCGroupThreadCount(),
+		rpcEventExecutorGroup = new DefaultEventExecutorGroup(
+			nettyFabricClientConfig.getRPCGroupThreadCount(),
 			new NamedThreadFactory(
 				"Netty Fabric Client/RPC Event Executor Group",
 				Thread.NORM_PRIORITY, null));
 
-		_bootstrap = new Bootstrap();
+		bootstrap = new Bootstrap();
 
-		_bootstrap.channel(NioSocketChannel.class);
-		_bootstrap.group(eventLoopGroup);
-		_bootstrap.handler(new NettyFabricClientChannelInitializer());
+		bootstrap.channel(NioSocketChannel.class);
+		bootstrap.group(eventLoopGroup);
+		bootstrap.handler(new NettyFabricClientChannelInitializer());
 
-		Path repositoryPath = _nettyFabricClientConfig.getRepositoryPath();
+		Path repositoryPath = nettyFabricClientConfig.getRepositoryPath();
 
 		Files.createDirectories(repositoryPath);
 
-		_repository = new NettyRepository(
+		repository = new NettyRepository(
 			repositoryPath,
-			_nettyFabricClientConfig.getRepositoryGetFileTimeout());
+			nettyFabricClientConfig.getRepositoryGetFileTimeout());
 	}
 
 	@Override
-	public NoticeableFuture<FabricConnection> connect(
+	public FabricConnectionWatchDog connect(
 		InetSocketAddress inetSocketAddress) {
 
-		FabricConnector fabricConnector = new NettyFabricConnector(
-			_bootstrap, inetSocketAddress, _nettyFabricClientConfig,
-			_repository, _executionEventExecutorGroup,
-			_fileServerEventExecutorGroup, _processExecutor);
+		NettyFabricConnectionWatchDog nettyFabricConnectionWatchDog =
+			new NettyFabricConnectionWatchDog(
+				bootstrap, inetSocketAddress, nettyFabricClientConfig,
+				repository, executionEventExecutorGroup,
+				fileServerEventExecutorGroup, processExecutor,
+				nettyFabricConnectionWatchDogs, activeConnectionCounter);
 
-		NoticeableFuture<FabricConnection> noticeableFuture =
-			fabricConnector.connect();
+		NettyFabricConnectionWatchDog previousNettyFabricConnectionWatchDog =
+			nettyFabricConnectionWatchDogs.putIfAbsent(
+				inetSocketAddress, nettyFabricConnectionWatchDog);
 
-		noticeableFuture.addFutureListener(
-			new FabricConnectionRegisterFutureListener(inetSocketAddress));
+		if (previousNettyFabricConnectionWatchDog != null) {
+			nettyFabricConnectionWatchDog.stop();
 
-		return noticeableFuture;
+			nettyFabricConnectionWatchDog =
+				previousNettyFabricConnectionWatchDog;
+		}
+
+		return nettyFabricConnectionWatchDog;
 	}
 
 	@Override
-	public Map<InetSocketAddress, FabricConnection> getFabricConnections() {
-		return new HashMap<InetSocketAddress, FabricConnection>(
-			_fabricConnections);
+	public Map<InetSocketAddress, FabricConnectionWatchDog>
+		getFabricConnectionWatchDogs() {
+
+		return new HashMap<InetSocketAddress, FabricConnectionWatchDog>(
+			nettyFabricConnectionWatchDogs);
 	}
 
 	@Override
 	public void shutdown() {
 		try {
-			for (FabricConnection fabricConnection :
-					_fabricConnections.values()) {
+			for (Map.Entry<InetSocketAddress, NettyFabricConnectionWatchDog>
+				entry : nettyFabricConnectionWatchDogs.entrySet()) {
+
+				InetSocketAddress inetSocketAddress = entry.getKey();
+
+				NettyFabricConnectionWatchDog nettyFabricConnectionWatchDog =
+					entry.getValue();
+
+				ChannelFuture channelFuture =
+					nettyFabricConnectionWatchDog.stop();
 
 				try {
-					Future<Void> future = fabricConnection.disconnect();
-
-					future.get();
+					channelFuture.sync();
 				}
 				catch (Exception e) {
-					if (_log.isWarnEnabled()) {
-						_log.warn(
-							"Error on disconnecting " + fabricConnection, e);
-					}
+					_log.error(
+						"Unable to stop Netty fabric connection watch dog on " +
+							"address " + inetSocketAddress, e);
 				}
 			}
 
-			_repository.dispose(true);
+			repository.dispose(true);
 		}
 		finally {
-			EventLoopGroup eventLoopGroup = _bootstrap.group();
+			EventLoopGroup eventLoopGroup = bootstrap.group();
 
 			eventLoopGroup.shutdownGracefully();
 
-			_executionEventExecutorGroup.shutdownGracefully();
+			executionEventExecutorGroup.shutdownGracefully();
 
-			_fileServerEventExecutorGroup.shutdownGracefully();
+			fileServerEventExecutorGroup.shutdownGracefully();
 
-			_rpcEventExecutorGroup.shutdownGracefully();
+			rpcEventExecutorGroup.shutdownGracefully();
 
-			_nettyFabricClientShutdownCallback.shutdown();
+			shutdownCallback.run();
 		}
 	}
 
-	protected class FabricConnectionRegisterFutureListener
-		extends BaseFutureListener<FabricConnection> {
-
-		@Override
-		public void completeWithResult(
-			Future<FabricConnection> future,
-			final FabricConnection fabricConnection) {
-
-			FabricConnection previousFabricConnection =
-				_fabricConnections.putIfAbsent(
-					_inetSocketAddress, fabricConnection);
-
-			if (previousFabricConnection != null) {
-				if (_log.isWarnEnabled()) {
-					_log.warn(
-						"Disconnecting duplicated connection " +
-							fabricConnection);
-				}
-
-				fabricConnection.disconnect();
-
-				return;
-			}
-
-			NoticeableFuture<Void> noticeableFuture =
-				fabricConnection.disconnectNoticeableFuture();
-
-			noticeableFuture.addFutureListener(
-				new FabricConnectionUnregisterFutureListener(
-					_inetSocketAddress, fabricConnection));
-		}
-
-		protected FabricConnectionRegisterFutureListener(
-			InetSocketAddress inetSocketAddress) {
-
-			_inetSocketAddress = inetSocketAddress;
-		}
-
-		private final InetSocketAddress _inetSocketAddress;
-
-	}
-
-	protected class FabricConnectionUnregisterFutureListener
-		implements FutureListener<Void> {
-
-		@Override
-		public void complete(Future<Void> future) {
-			_fabricConnections.remove(_inetSocketAddress, _fabricConnection);
-
-			if (_fabricConnections.isEmpty()) {
-				if (_log.isInfoEnabled()) {
-					_log.info(
-						"All connections have " +
-							"disconnected, auto-purging " + "repository.");
-				}
-
-				_repository.dispose(false);
-			}
-		}
-
-		protected FabricConnectionUnregisterFutureListener(
-			InetSocketAddress inetSocketAddress,
-			FabricConnection fabricConnection) {
-
-			_inetSocketAddress = inetSocketAddress;
-			_fabricConnection = fabricConnection;
-		}
-
-		private final FabricConnection _fabricConnection;
-		private final InetSocketAddress _inetSocketAddress;
-
-	}
+	protected final AtomicInteger activeConnectionCounter = new AtomicInteger();
+	protected final Bootstrap bootstrap;
+	protected final EventExecutorGroup executionEventExecutorGroup;
+	protected final EventExecutorGroup fileServerEventExecutorGroup;
+	protected final NettyFabricClientConfig nettyFabricClientConfig;
+	protected final ConcurrentMap
+		<InetSocketAddress, NettyFabricConnectionWatchDog>
+			nettyFabricConnectionWatchDogs =
+				new ConcurrentHashMap
+					<InetSocketAddress, NettyFabricConnectionWatchDog>();
+	protected final ProcessExecutor processExecutor;
+	protected final Repository<Channel> repository;
+	protected final EventExecutorGroup rpcEventExecutorGroup;
+	protected final Runnable shutdownCallback;
 
 	protected class NettyFabricClientChannelInitializer
 		extends ChannelInitializer<SocketChannel> {
@@ -255,12 +208,12 @@ public class NettyFabricClient implements FabricClient {
 			channelPipeline.addLast(
 				AnnotatedObjectDecoder.NAME, new AnnotatedObjectDecoder());
 			channelPipeline.addLast(
-				_fileServerEventExecutorGroup, FileRequestChannelHandler.NAME,
+				fileServerEventExecutorGroup, FileRequestChannelHandler.NAME,
 				new FileRequestChannelHandler(
-					_nettyFabricClientConfig.
+					nettyFabricClientConfig.
 						getFileServerFolderCompressionLevel()));
 			channelPipeline.addLast(
-				_rpcEventExecutorGroup, NettyRPCChannelHandler.NAME,
+				rpcEventExecutorGroup, NettyRPCChannelHandler.NAME,
 				NettyRPCChannelHandler.INSTANCE);
 		}
 
@@ -268,18 +221,5 @@ public class NettyFabricClient implements FabricClient {
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		NettyFabricClient.class);
-
-	private final Bootstrap _bootstrap;
-	private final EventExecutorGroup _executionEventExecutorGroup;
-	private final ConcurrentMap<InetSocketAddress, FabricConnection>
-		_fabricConnections =
-			new ConcurrentHashMap<InetSocketAddress, FabricConnection>();
-	private final EventExecutorGroup _fileServerEventExecutorGroup;
-	private final NettyFabricClientConfig _nettyFabricClientConfig;
-	private final NettyFabricClientShutdownCallback
-		_nettyFabricClientShutdownCallback;
-	private final ProcessExecutor _processExecutor;
-	private final Repository<Channel> _repository;
-	private final EventExecutorGroup _rpcEventExecutorGroup;
 
 }

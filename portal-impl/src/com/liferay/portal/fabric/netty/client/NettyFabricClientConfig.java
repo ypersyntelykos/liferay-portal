@@ -78,10 +78,16 @@ public class NettyFabricClientConfig implements Serializable {
 	}
 
 	public int getReconnectCount() {
-		return GetterUtil.getInteger(
+		int reconnectCount = GetterUtil.getInteger(
 			_properties.getProperty(
 				PropsKeys.PORTAL_FABRIC_CLIENT_RECONNECT_COUNT),
 			3);
+
+		if (reconnectCount < 0) {
+			reconnectCount = Integer.MAX_VALUE;
+		}
+
+		return reconnectCount;
 	}
 
 	public long getReconnectInterval() {
