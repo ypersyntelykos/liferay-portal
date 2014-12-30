@@ -79,6 +79,8 @@ public class NettyRepository implements Repository<Channel> {
 			FileHelperUtil.delete(true, entry.getValue());
 		}
 
+		// TODO don't acutally remove the repositoryPath, otherwise the repository is no longer usable.
+
 		if (delete) {
 			FileHelperUtil.delete(true, repositoryPath);
 		}
