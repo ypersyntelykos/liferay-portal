@@ -20,12 +20,15 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.EventLoop;
 import io.netty.channel.embedded.EmbeddedChannel;
 import io.netty.util.concurrent.EventExecutorGroup;
 
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
@@ -113,6 +116,26 @@ public class NettyUtil {
 				}
 
 			});
+	}
+
+	public static void syncFully(ChannelFuture channelFuture)
+		throws InterruptedException {
+
+		channelFuture.sync();
+
+		final CountDownLatch countDownLatch = new CountDownLatch(1);
+
+		channelFuture.addListener(
+			new ChannelFutureListener() {
+
+				@Override
+				public void operationComplete(ChannelFuture channelFuture) {
+					countDownLatch.countDown();
+				}
+
+			});
+
+		countDownLatch.await();
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(NettyUtil.class);

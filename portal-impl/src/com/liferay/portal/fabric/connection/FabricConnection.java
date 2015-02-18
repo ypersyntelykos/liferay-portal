@@ -12,25 +12,21 @@
  * details.
  */
 
-package com.liferay.portal.fabric.client;
-
-import com.liferay.portal.fabric.connection.FabricConnectionWatchDog;
-import com.liferay.portal.kernel.concurrent.NoticeableFuture;
+package com.liferay.portal.fabric.connection;
 
 import java.net.SocketAddress;
 
-import java.util.Map;
+import java.util.concurrent.Future;
 
 /**
  * @author Shuyang Zhou
  */
-public interface FabricClient {
+public interface FabricConnection {
 
-	public FabricConnectionWatchDog connect(SocketAddress socketAddress);
+	public Future<Void> disconnect();
 
-	public Map<SocketAddress, FabricConnectionWatchDog>
-		getFabricConnectionWatchDogs();
+	public SocketAddress getLocalSocketAddress();
 
-	public NoticeableFuture<?> shutdown();
+	public SocketAddress getRemoteSocketAddress();
 
 }

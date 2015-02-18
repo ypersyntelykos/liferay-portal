@@ -14,27 +14,39 @@
 
 package com.liferay.portal.fabric.client;
 
+import com.liferay.portal.fabric.connection.FabricConnectionWatchDog;
+import com.liferay.portal.kernel.concurrent.NoticeableFuture;
 import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
 
-import java.util.concurrent.Future;
+import java.net.SocketAddress;
+
+import java.util.Map;
 
 /**
  * @author Shuyang Zhou
  */
 public class FabricClientUtil {
 
-	public static void connect() throws Exception {
-		getFabricClient().connect();
-	}
+	public static FabricConnectionWatchDog connect(
+		SocketAddress socketAddress) {
 
-	public static Future<?> disconnect() throws Exception {
-		return getFabricClient().disconnect();
+		return getFabricClient().connect(socketAddress);
 	}
 
 	public static FabricClient getFabricClient() {
 		PortalRuntimePermission.checkGetBeanProperty(FabricClientUtil.class);
 
 		return _fabricClient;
+	}
+
+	public static Map<SocketAddress, FabricConnectionWatchDog>
+		getFabricConnectionWatchDogs() {
+
+		return getFabricClient().getFabricConnectionWatchDogs();
+	}
+
+	public static NoticeableFuture<?> shutdown() {
+		return getFabricClient().shutdown();
 	}
 
 	public void setFabricClient(FabricClient fabricClient) {
