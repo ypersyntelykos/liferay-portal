@@ -45,6 +45,10 @@ public abstract class BaseVerifyProcessTestCase {
 
 	@Before
 	public void setUp() throws Exception {
+		Class.forName(
+			DataAccess.class.getName(), true,
+			DataAccess.class.getClassLoader());
+
 		Field paclField = ReflectionUtil.getDeclaredField(
 			DataAccess.class, "_pacl");
 
