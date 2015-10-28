@@ -29,7 +29,7 @@ import org.junit.Test;
 /**
  * @author Shuyang Zhou
  */
-public class ModulesBuildScriptsTest {
+public class ModulesStructureTest {
 
 	@Test
 	public void testScanBuildScripts() throws IOException {
