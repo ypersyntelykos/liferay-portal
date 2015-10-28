@@ -33,6 +33,7 @@ import com.liferay.registry.collections.StringServiceRegistrationMapImpl;
 
 import java.io.Closeable;
 
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -103,16 +104,7 @@ public class ResourceBundleTracker implements Closeable {
 			_resourceBundleWrappers.get(languageId);
 
 		if (resourceBundleWrapper == null) {
-			ResourceBundle defaultResourceBundle = ResourceBundleUtil.getBundle(
-				_portlet.getResourceBundle(),
-				LocaleUtil.fromLanguageId(languageId), _classLoader);
-
-			if (defaultResourceBundle == null) {
-				return null;
-			}
-
-			resourceBundleWrapper = new ResourceBundleWrapper(
-				languageId, defaultResourceBundle);
+			resourceBundleWrapper = new ResourceBundleWrapper(languageId, null);
 
 			ResourceBundleWrapper previousResourceBundleWrapper =
 				_resourceBundleWrappers.putIfAbsent(
@@ -155,12 +147,7 @@ public class ResourceBundleTracker implements Closeable {
 
 			if (resourceBundleWrapper == null) {
 				resourceBundleWrapper = new ResourceBundleWrapper(
-					languageId,
-					ResourceBundleUtil.getBundle(
-						_portlet.getResourceBundle(),
-						LocaleUtil.fromLanguageId(languageId),
-						_classLoader),
-					resourceBundle);
+					languageId, resourceBundle);
 
 				ResourceBundleWrapper previousResourceBundleWrapper =
 					_resourceBundleWrappers.putIfAbsent(
@@ -215,14 +202,20 @@ public class ResourceBundleTracker implements Closeable {
 
 		@Override
 		public Enumeration<String> getKeys() {
-			return _resourceBundle.getKeys();
+			ResourceBundle resourceBundle = _resourceBundle;
+
+			if (resourceBundle == null) {
+				return Collections.emptyEnumeration();
+			}
+
+			return resourceBundle.getKeys();
 		}
 
 		@Override
 		protected Object handleGetObject(String key) {
 			ResourceBundle resourceBundle = _resourceBundle;
 
-			if (resourceBundle.containsKey(key)) {
+			if ((resourceBundle != null) && resourceBundle.containsKey(key)) {
 				return resourceBundle.getObject(key);
 			}
 
@@ -236,15 +229,20 @@ public class ResourceBundleTracker implements Closeable {
 			if (keySet == null) {
 				ResourceBundle resourceBundle = _resourceBundle;
 
-				keySet = new HashSet<>();
+				if (resourceBundle == null) {
+					keySet = Collections.emptySet();
+				}
+				else {
+					keySet = new HashSet<>();
 
-				Enumeration<String> enumeration = resourceBundle.getKeys();
+					Enumeration<String> enumeration = resourceBundle.getKeys();
 
-				while (enumeration.hasMoreElements()) {
-					String key = enumeration.nextElement();
+					while (enumeration.hasMoreElements()) {
+						String key = enumeration.nextElement();
 
-					if (resourceBundle.containsKey(key)) {
-						keySet.add(key);
+						if (resourceBundle.containsKey(key)) {
+							keySet.add(key);
+						}
 					}
 				}
 
@@ -255,47 +253,37 @@ public class ResourceBundleTracker implements Closeable {
 		}
 
 		private ResourceBundleWrapper(
-			String languageId, ResourceBundle defaultResourceBundle) {
+			String languageId, ResourceBundle resourceBundle) {
 
-			_defaultResourceBundle = defaultResourceBundle;
-			_resourceBundle = defaultResourceBundle;
-			_resourceBundles = new CopyOnWriteArrayList<>();
-
-			_configureParent(languageId);
-		}
-
-		private ResourceBundleWrapper(
-			String languageId, ResourceBundle defaultResourceBundle,
-			ResourceBundle resourceBundle) {
-
-			_defaultResourceBundle = defaultResourceBundle;
 			_resourceBundle = resourceBundle;
-			_resourceBundles = new CopyOnWriteArrayList<>(
-				new ResourceBundle[] {resourceBundle});
 
-			_configureParent(languageId);
+			if (resourceBundle != null) {
+				_resourceBundles.add(resourceBundle);
+			}
+
+			if (languageId.isEmpty()) {
+				setParent(
+					ResourceBundleUtil.getBundle(
+						_portlet.getResourceBundle(),
+						LocaleUtil.fromLanguageId(languageId), _classLoader));
+			}
+			else {
+				String parentLanguageId = StringPool.BLANK;
+
+				int index = languageId.lastIndexOf(CharPool.UNDERLINE);
+
+				if (index > 0) {
+					parentLanguageId = languageId.substring(0, index);
+				}
+
+				setParent(getResourceBundle(parentLanguageId));
+			}
 		}
 
 		private void _addResourceBundle(ResourceBundle resourceBundle) {
 			_resourceBundles.add(resourceBundle);
 
 			_update();
-		}
-
-		private void _configureParent(String languageId) {
-			if (languageId.isEmpty()) {
-				return;
-			}
-
-			String parentLanguageId = StringPool.BLANK;
-
-			int index = languageId.lastIndexOf(CharPool.UNDERLINE);
-
-			if (index > 0) {
-				parentLanguageId = languageId.substring(0, index);
-			}
-
-			setParent(getResourceBundle(parentLanguageId));
 		}
 
 		private void _removeResourceBundle(ResourceBundle resourceBundle) {
@@ -309,7 +297,7 @@ public class ResourceBundleTracker implements Closeable {
 				new ResourceBundle[_resourceBundles.size()]);
 
 			if (resourceBundles.length == 0) {
-				_resourceBundle = _defaultResourceBundle;
+				_resourceBundle = null;
 			}
 			else if (resourceBundles.length == 1) {
 				_resourceBundle = resourceBundles[0];
@@ -323,10 +311,10 @@ public class ResourceBundleTracker implements Closeable {
 			_keySet = null;
 		}
 
-		private final ResourceBundle _defaultResourceBundle;
 		private volatile Set<String> _keySet;
 		private volatile ResourceBundle _resourceBundle;
-		private final List<ResourceBundle> _resourceBundles;
+		private final List<ResourceBundle> _resourceBundles =
+			new CopyOnWriteArrayList<>();
 
 	}
 
