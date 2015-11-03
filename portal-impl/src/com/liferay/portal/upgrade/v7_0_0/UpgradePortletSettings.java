@@ -50,13 +50,12 @@ public abstract class UpgradePortletSettings extends UpgradeProcess {
 			Connection con, PortletPreferencesRow portletPreferencesRow)
 		throws Exception {
 
-		StringBundler sb = new StringBundler(3);
+		String sql =
+			"insert into PortletPreferences (mvccVersion, " +
+				"portletPreferencesId, ownerId, ownerType, plid, portletId, " +
+					"preferences) values (?, ?, ?, ?, ?, ?, ?)";
 
-		sb.append("insert into PortletPreferences (mvccVersion, ");
-		sb.append("portletPreferencesId, ownerId, ownerType, plid, ");
-		sb.append("portletId, preferences) values (?, ?, ?, ?, ?, ?, ?)");
-
-		try (PreparedStatement ps = con.prepareStatement(sb.toString())) {
+		try (PreparedStatement ps = con.prepareStatement(sql)) {
 			ps.setLong(1, portletPreferencesRow.getMvccVersion());
 			ps.setLong(2, portletPreferencesRow.getPortletPreferencesId());
 			ps.setLong(3, portletPreferencesRow.getOwnerId());
@@ -193,13 +192,12 @@ public abstract class UpgradePortletSettings extends UpgradeProcess {
 			Connection con, PortletPreferencesRow portletPreferencesRow)
 		throws Exception {
 
-		StringBundler sb = new StringBundler(3);
+		String sql =
+			"update PortletPreferences set mvccVersion = ?, ownerId = ?, " +
+				"ownerType = ?, plid = ?, portletId = ?, preferences = ? " +
+					"where portletPreferencesId = ?";
 
-		sb.append("update PortletPreferences set mvccVersion = ?, ownerId = ?");
-		sb.append(", ownerType = ?, plid = ?, portletId = ?, preferences = ? ");
-		sb.append("where portletPreferencesId = ?");
-
-		try (PreparedStatement ps = con.prepareStatement(sb.toString())) {
+		try (PreparedStatement ps = con.prepareStatement(sql)) {
 			ps.setLong(1, portletPreferencesRow.getMvccVersion());
 			ps.setLong(2, portletPreferencesRow.getOwnerId());
 			ps.setInt(3, portletPreferencesRow.getOwnerType());

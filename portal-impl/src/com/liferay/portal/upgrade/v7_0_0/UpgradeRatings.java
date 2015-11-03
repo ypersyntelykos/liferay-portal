@@ -20,7 +20,6 @@ import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PropsUtil;
 import com.liferay.portal.util.PropsValues;
@@ -115,14 +114,13 @@ public class UpgradeRatings extends UpgradeProcess {
 	}
 
 	protected void upgradeRatingsStats(Connection con) throws Exception {
-		StringBundler sb = new StringBundler(4);
+		String sql =
+			"select classNameId, classPK, count(1) as totalEntries, " +
+				"sum(RatingsEntry.score) as totalScore, " +
+					"sum(RatingsEntry.score) / count(1) as averageScore " +
+						"from RatingsEntry group by classNameId, classPK";
 
-		sb.append("select classNameId, classPK, count(1) as ");
-		sb.append("totalEntries, sum(RatingsEntry.score) as totalScore, ");
-		sb.append("sum(RatingsEntry.score) / count(1) as averageScore ");
-		sb.append("from RatingsEntry group by classNameId, classPK");
-
-		try (PreparedStatement ps = con.prepareStatement(sb.toString());
+		try (PreparedStatement ps = con.prepareStatement(sql);
 			ResultSet rs = ps.executeQuery()) {
 
 			upgradeRatingsStats(con, rs);

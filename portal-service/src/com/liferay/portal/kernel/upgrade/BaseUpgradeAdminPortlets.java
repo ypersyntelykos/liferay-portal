@@ -15,8 +15,6 @@
 package com.liferay.portal.kernel.upgrade;
 
 import com.liferay.portal.kernel.dao.jdbc.DataAccess;
-import com.liferay.portal.kernel.util.StringBundler;
-import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.GroupConstants;
 import com.liferay.portal.model.ResourcePermission;
 import com.liferay.portal.security.permission.ActionKeys;
@@ -36,13 +34,12 @@ public class BaseUpgradeAdminPortlets extends UpgradeProcess {
 			String name, int scope, String primKey, long roleId, long actionIds)
 		throws Exception {
 
-		StringBundler sb = new StringBundler(3);
+		String sql =
+			"insert into ResourcePermission (resourcePermissionId, " +
+				"companyId, name, scope, primKey, roleId, actionIds) values " +
+					"(?, ?, ?, ?, ?, ?, ?)";
 
-		sb.append("insert into ResourcePermission (resourcePermissionId, ");
-		sb.append("companyId, name, scope, primKey, roleId, actionIds) ");
-		sb.append("values (?, ?, ?, ?, ?, ?, ?)");
-
-		try (PreparedStatement ps = con.prepareStatement(sb.toString())) {
+		try (PreparedStatement ps = con.prepareStatement(sql)) {
 			ps.setLong(1, resourcePermissionId);
 			ps.setLong(2, companyId);
 			ps.setString(3, name);
@@ -77,14 +74,12 @@ public class BaseUpgradeAdminPortlets extends UpgradeProcess {
 	}
 
 	protected long getControlPanelGroupId() throws Exception {
-		StringBundler sb = new StringBundler(3);
-
-		sb.append("select groupId from Group_ where name = '");
-		sb.append(GroupConstants.CONTROL_PANEL);
-		sb.append(StringPool.APOSTROPHE);
+		String sql =
+			"select groupId from Group_ where name = '" +
+				GroupConstants.CONTROL_PANEL + "'";
 
 		try (Connection con = DataAccess.getUpgradeOptimizedConnection();
-			PreparedStatement ps = con.prepareStatement(sb.toString());
+			PreparedStatement ps = con.prepareStatement(sql);
 			ResultSet rs = ps.executeQuery()) {
 
 			if (rs.next()) {
