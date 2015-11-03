@@ -86,7 +86,9 @@ public class UpgradeMVCCVersion extends UpgradeProcess {
 					continue;
 				}
 
-				upgradeMVCCVersion(con, databaseMetaData, classElement);
+				upgradeMVCCVersion(
+					con, databaseMetaData,
+					classElement.attributeValue("table"));
 			}
 
 			String[] moduleTableNames = getModuleTableNames();
@@ -129,16 +131,6 @@ public class UpgradeMVCCVersion extends UpgradeProcess {
 		}
 
 		return name;
-	}
-
-	protected void upgradeMVCCVersion(
-			Connection con, DatabaseMetaData databaseMetaData,
-			Element classElement)
-		throws Exception {
-
-		String tableName = classElement.attributeValue("table");
-
-		upgradeMVCCVersion(con, databaseMetaData, tableName);
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
