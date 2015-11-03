@@ -93,7 +93,7 @@ public class BaseUpgradeAdminPortlets extends UpgradeProcess {
 					long actionIds = rs.getLong("actionIds");
 
 					if ((actionIds & bitwiseValue) != 0) {
-						actionIds = actionIds & (~bitwiseValue);
+						actionIds &= (~bitwiseValue);
 
 						runSQL(
 							con,
