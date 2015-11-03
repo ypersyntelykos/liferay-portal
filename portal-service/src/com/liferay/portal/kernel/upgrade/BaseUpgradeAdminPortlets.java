@@ -15,7 +15,6 @@
 package com.liferay.portal.kernel.upgrade;
 
 import com.liferay.portal.kernel.dao.jdbc.DataAccess;
-import com.liferay.portal.model.GroupConstants;
 import com.liferay.portal.model.ResourcePermission;
 import com.liferay.portal.security.permission.ActionKeys;
 
@@ -67,23 +66,6 @@ public class BaseUpgradeAdminPortlets extends UpgradeProcess {
 				if (rs.next()) {
 					return rs.getLong("bitwiseValue");
 				}
-			}
-
-			return 0;
-		}
-	}
-
-	protected long getControlPanelGroupId() throws Exception {
-		String sql =
-			"select groupId from Group_ where name = '" +
-				GroupConstants.CONTROL_PANEL + "'";
-
-		try (Connection con = DataAccess.getUpgradeOptimizedConnection();
-			PreparedStatement ps = con.prepareStatement(sql);
-			ResultSet rs = ps.executeQuery()) {
-
-			if (rs.next()) {
-				return rs.getLong("groupId");
 			}
 
 			return 0;
