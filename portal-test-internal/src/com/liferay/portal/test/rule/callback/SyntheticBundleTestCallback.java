@@ -111,7 +111,7 @@ public class SyntheticBundleTestCallback extends BaseTestCallback<Long, Long> {
 				jar.write(outputStream);
 
 				return new UnsyncByteArrayInputStream(
-					outputStream.toByteArray());
+					outputStream.unsafeGetByteArray(), 0, outputStream.size());
 			}
 		}
 	}
