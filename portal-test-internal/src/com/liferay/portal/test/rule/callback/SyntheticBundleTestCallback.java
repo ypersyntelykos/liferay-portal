@@ -17,6 +17,7 @@ package com.liferay.portal.test.rule.callback;
 import aQute.bnd.osgi.Builder;
 import aQute.bnd.osgi.Jar;
 
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayInputStream;
 import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayOutputStream;
 import com.liferay.portal.kernel.test.rule.callback.BaseTestCallback;
@@ -41,7 +42,9 @@ public class SyntheticBundleTestCallback extends BaseTestCallback<Long, Long> {
 	}
 
 	@Override
-	public void afterClass(Class<?> clazz, Long bundleId) throws Throwable {
+	public void doAfterClass(Description description, Long bundleId)
+		throws PortalException {
+
 		if (bundleId == null) {
 			return;
 		}
@@ -52,27 +55,17 @@ public class SyntheticBundleTestCallback extends BaseTestCallback<Long, Long> {
 	}
 
 	@Override
-	public Long beforeClass(Class<?> clazz) throws Throwable {
-		InputStream inputStream = createBundle(clazz);
+	public Long doBeforeClass(Description description) throws Exception {
+		Class<?> testClass = description.getTestClass();
+
+		InputStream inputStream = createBundle(testClass);
 
 		Long bundleId = ModuleFrameworkUtilAdapter.addBundle(
-			clazz.getName(), inputStream);
+			testClass.getName(), inputStream);
 
 		ModuleFrameworkUtilAdapter.startBundle(bundleId);
 
 		return bundleId;
-	}
-
-	@Override
-	public void doAfterClass(Description description, Long bundleId)
-		throws Throwable {
-
-		afterClass(description.getTestClass(), bundleId);
-	}
-
-	@Override
-	public Long doBeforeClass(Description description) throws Throwable {
-		return beforeClass(description.getTestClass());
 	}
 
 	protected InputStream createBundle(Class<?> clazz) throws Exception {
