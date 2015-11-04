@@ -69,11 +69,9 @@ public class SyntheticBundleTestCallback extends BaseTestCallback<Long, Long> {
 	}
 
 	protected InputStream createBundle(Class<?> clazz) throws Exception {
-		Builder builder = new Builder();
+		try (Builder builder = new Builder()) {
+			builder.setBundleSymbolicName(clazz.getName());
 
-		builder.setBundleSymbolicName(clazz.getName());
-
-		try {
 			URL url = clazz.getResource("");
 
 			String protocol = url.getProtocol();
@@ -117,9 +115,6 @@ public class SyntheticBundleTestCallback extends BaseTestCallback<Long, Long> {
 						outputStream.toByteArray());
 				}
 			}
-		}
-		finally {
-			builder.close();
 		}
 	}
 
