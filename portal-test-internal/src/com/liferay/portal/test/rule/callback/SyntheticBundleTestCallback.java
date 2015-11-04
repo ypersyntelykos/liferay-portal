@@ -69,30 +69,29 @@ public class SyntheticBundleTestCallback extends BaseTestCallback<Long, Long> {
 	}
 
 	protected InputStream createBundle(Class<?> clazz) throws Exception {
+		URL url = clazz.getResource("");
+
+		String protocol = url.getProtocol();
+
+		if (!protocol.equals("file")) {
+			throw new IllegalStateException(
+				"Test classes are not on the file system");
+		}
+
+		String basePath = url.getPath();
+
+		Package pkg = clazz.getPackage();
+
+		String packageName = pkg.getName();
+
+		int index = basePath.indexOf(packageName.replace('.', '/') + '/');
+
+		basePath = basePath.substring(0, index);
+
+		File baseDir = new File(basePath);
+
 		try (Builder builder = new Builder()) {
 			builder.setBundleSymbolicName(clazz.getName());
-
-			URL url = clazz.getResource("");
-
-			String protocol = url.getProtocol();
-
-			if (!protocol.equals("file")) {
-				throw new IllegalStateException(
-					"Test classes are not on the file system");
-			}
-
-			String basePath = url.getPath();
-
-			Package pkg = clazz.getPackage();
-
-			String packageName = pkg.getName();
-
-			int index = basePath.indexOf(packageName.replace('.', '/') + '/');
-
-			basePath = basePath.substring(0, index);
-
-			File baseDir = new File(basePath);
-
 			builder.setBase(baseDir);
 			builder.setClasspath(new File[] {baseDir});
 			builder.setProperty(
