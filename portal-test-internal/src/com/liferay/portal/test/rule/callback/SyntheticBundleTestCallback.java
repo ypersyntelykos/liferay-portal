@@ -107,15 +107,15 @@ public class SyntheticBundleTestCallback extends BaseTestCallback<Long, Long> {
 
 				properties.load(inputStream);
 
-				Jar jar = builder.build();
+				try (Jar jar = builder.build()) {
+					UnsyncByteArrayOutputStream outputStream =
+						new UnsyncByteArrayOutputStream();
 
-				UnsyncByteArrayOutputStream outputStream =
-					new UnsyncByteArrayOutputStream();
+					jar.write(outputStream);
 
-				jar.write(outputStream);
-
-				return new UnsyncByteArrayInputStream(
-					outputStream.toByteArray());
+					return new UnsyncByteArrayInputStream(
+						outputStream.toByteArray());
+				}
 			}
 		}
 		finally {
