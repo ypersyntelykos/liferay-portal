@@ -90,7 +90,10 @@ public class SyntheticBundleTestCallback extends BaseTestCallback<Long, Long> {
 
 		File baseDir = new File(basePath);
 
-		try (Builder builder = new Builder()) {
+		try (Builder builder = new Builder();
+			InputStream inputStream = clazz.getResourceAsStream(
+				_bundlePackageName.replace('.', '/') + "/bnd.bnd")) {
+
 			builder.setBundleSymbolicName(clazz.getName());
 			builder.setBase(baseDir);
 			builder.setClasspath(new File[] {baseDir});
@@ -99,20 +102,16 @@ public class SyntheticBundleTestCallback extends BaseTestCallback<Long, Long> {
 
 			Properties properties = builder.getProperties();
 
-			try (InputStream inputStream = clazz.getResourceAsStream(
-					_bundlePackageName.replace('.', '/') + "/bnd.bnd")) {
+			properties.load(inputStream);
 
-				properties.load(inputStream);
+			try (Jar jar = builder.build()) {
+				UnsyncByteArrayOutputStream outputStream =
+					new UnsyncByteArrayOutputStream();
 
-				try (Jar jar = builder.build()) {
-					UnsyncByteArrayOutputStream outputStream =
-						new UnsyncByteArrayOutputStream();
+				jar.write(outputStream);
 
-					jar.write(outputStream);
-
-					return new UnsyncByteArrayInputStream(
-						outputStream.toByteArray());
-				}
+				return new UnsyncByteArrayInputStream(
+					outputStream.toByteArray());
 			}
 		}
 	}
