@@ -192,8 +192,7 @@ public class SecureXMLFactoryProviderImplTest {
 							_contentLenght += length;
 
 							if (_contentLenght > (1024 * 1024 * 10)) {
-								throw new RuntimeException(
-									new OutOfMemoryError());
+								throw new OutOfMemoryError();
 							}
 						}
 
