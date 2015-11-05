@@ -15,6 +15,9 @@
 package com.liferay.portal.security.xml;
 
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
+import com.liferay.portal.kernel.test.rule.NewEnv;
+import com.liferay.portal.kernel.test.rule.NewEnv.JVMArgsLine;
+import com.liferay.portal.kernel.test.rule.NewEnvTestRule;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.util.PropsValues;
 
@@ -30,7 +33,7 @@ import javax.xml.stream.XMLEventReader;
 
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
 
 import org.xml.sax.InputSource;
@@ -41,10 +44,14 @@ import org.xml.sax.helpers.DefaultHandler;
 /**
  * @author Tomas Polesovsky
  */
+@JVMArgsLine("-Xmx2m -Dattached=true")
+@NewEnv(type = NewEnv.Type.JVM)
 public class SecureXMLFactoryProviderImplTest {
 
-	@BeforeClass
-	public static void setUpClass() throws Exception {
+	@Before
+	public void setUp() throws Exception {
+		_secureXMLFactoryProvider = new SecureXMLFactoryProviderImpl();
+
 		_xmlBombBillionLaughsXML = readDependency(
 			"xml-bomb-billion-laughs.xml");
 		_xmlBombQuadraticBlowupXML = readDependency(
@@ -55,11 +62,6 @@ public class SecureXMLFactoryProviderImplTest {
 			"xxe-parameter-entities-1.xml");
 		_xxeParameterEntitiesXML2 = readDependency(
 			"xxe-parameter-entities-2.xml");
-	}
-
-	@Before
-	public void setUp() throws Exception {
-		_secureXMLFactoryProvider = new SecureXMLFactoryProviderImpl();
 	}
 
 	@Test
@@ -234,6 +236,9 @@ public class SecureXMLFactoryProviderImplTest {
 			SAXParseException.class,
 			"Vulnerable to Parameter Entities XXE attack using PUBLIC entity.");
 	}
+
+	@Rule
+	public final NewEnvTestRule newEnvTestRule = NewEnvTestRule.INSTANCE;
 
 	protected static String readDependency(String name) throws IOException {
 		return StringUtil.read(
