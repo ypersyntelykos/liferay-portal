@@ -66,7 +66,7 @@ public class SecureXMLFactoryProviderImplTest {
 
 	@Test
 	public void testNewDocumentBuilderFactory() throws Throwable {
-		XMLSecurityTest documentBuilderTestCase = new XMLSecurityTest() {
+		XMLSecurityTest documentBuilderTest = new XMLSecurityTest() {
 
 			@Override
 			public void run(String xml) throws Exception {
@@ -82,36 +82,36 @@ public class SecureXMLFactoryProviderImplTest {
 		};
 
 		runXMLSecurityTest(
-			documentBuilderTestCase, _xmlBombBillionLaughsXML,
+			documentBuilderTest, _xmlBombBillionLaughsXML,
 			OutOfMemoryError.class, "Billion Laughs XML attack does not work.",
 			SAXParseException.class,
 			"Vulnerable to Billion Laughs XML attack.");
 		runXMLSecurityTest(
-			documentBuilderTestCase, _xmlBombQuadraticBlowupXML,
+			documentBuilderTest, _xmlBombQuadraticBlowupXML,
 			OutOfMemoryError.class,
 			"Quadratic Blowup XML attack does not work.",
 			SAXParseException.class,
 			"Vulnerable to Quadratic Blowup XML attack.");
 		runXMLSecurityTest(
-			documentBuilderTestCase, _xxeGeneralEntitiesXML1,
+			documentBuilderTest, _xxeGeneralEntitiesXML1,
 			ConnectException.class,
 			"General Entities XXE attack using SYSTEM entity does not work.",
 			SAXParseException.class,
 			"Vulnerable to General Entities XXE attack using SYSTEM entity.");
 		runXMLSecurityTest(
-			documentBuilderTestCase, _xxeGeneralEntitiesXML2,
+			documentBuilderTest, _xxeGeneralEntitiesXML2,
 			ConnectException.class,
 			"General Entities XXE attack using PUBLIC entity does not work.",
 			SAXParseException.class,
 			"Vulnerable to General Entities XXE attack using PUBLIC entity.");
 		runXMLSecurityTest(
-			documentBuilderTestCase, _xxeParameterEntitiesXML1,
+			documentBuilderTest, _xxeParameterEntitiesXML1,
 			ConnectException.class,
 			"Parameter Entities XXE using SYSTEM entity does not work.",
 			SAXParseException.class,
 			"Vulnerable to Parameter Entities XXE using SYSTEM entity.");
 		runXMLSecurityTest(
-			documentBuilderTestCase, _xxeParameterEntitiesXML2,
+			documentBuilderTest, _xxeParameterEntitiesXML2,
 			ConnectException.class,
 			"Parameter Entities XXE attack using PUBLIC entity does not work.",
 			SAXParseException.class,
@@ -285,25 +285,28 @@ public class SecureXMLFactoryProviderImplTest {
 			String enableXMLSecurityFailMessage)
 		throws Throwable {
 
-		boolean initial = ReflectionTestUtil.getFieldValue(
+		boolean xmlSecurityEnabled = ReflectionTestUtil.getFieldValue(
 			PropsValues.class, _XML_SECURITY_ENABLED);
 
-		ReflectionTestUtil.setFieldValue(
-			PropsValues.class, _XML_SECURITY_ENABLED, false);
+		try {
+			ReflectionTestUtil.setFieldValue(
+				PropsValues.class, _XML_SECURITY_ENABLED, false);
 
-		runXMLSecurityTest(
-			xmlSecurityTest, xml, disableXMLSecurityExpectedException,
-			disableXMLSecurityFailMessage);
+			runXMLSecurityTest(
+				xmlSecurityTest, xml, disableXMLSecurityExpectedException,
+				disableXMLSecurityFailMessage);
 
-		ReflectionTestUtil.setFieldValue(
-			PropsValues.class, _XML_SECURITY_ENABLED, true);
+			ReflectionTestUtil.setFieldValue(
+				PropsValues.class, _XML_SECURITY_ENABLED, true);
 
-		runXMLSecurityTest(
-			xmlSecurityTest, xml, enableXMLSecurityExpectedException,
-			enableXMLSecurityFailMessage);
-
-		ReflectionTestUtil.setFieldValue(
-			PropsValues.class, _XML_SECURITY_ENABLED, initial);
+			runXMLSecurityTest(
+				xmlSecurityTest, xml, enableXMLSecurityExpectedException,
+				enableXMLSecurityFailMessage);
+		}
+		finally {
+			ReflectionTestUtil.setFieldValue(
+				PropsValues.class, _XML_SECURITY_ENABLED, xmlSecurityEnabled);
+		}
 	}
 
 	private static final String _XML_SECURITY_ENABLED = "XML_SECURITY_ENABLED";
