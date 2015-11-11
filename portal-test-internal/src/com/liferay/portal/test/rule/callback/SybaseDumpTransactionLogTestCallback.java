@@ -47,10 +47,7 @@ public class SybaseDumpTransactionLogTestCallback
 		try (Connection connection = DataAccess.getConnection();
 			Statement statement = connection.createStatement()) {
 
-			statement.addBatch("use master");
-			statement.addBatch("dump transaction master with no_log");
-
-			statement.executeBatch();
+			statement.execute("dump transaction lportal with no_log");
 		}
 
 		return null;
