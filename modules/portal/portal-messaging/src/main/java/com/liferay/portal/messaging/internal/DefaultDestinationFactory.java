@@ -25,6 +25,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
@@ -84,31 +85,23 @@ public class DefaultDestinationFactory implements DestinationFactory {
 		DestinationPrototype destinationPrototype,
 		Map<String, Object> properties) {
 
-		synchronized (_destinationPrototypes) {
-			String destinationType = MapUtil.getString(
-				properties, "destination.type");
-
-			_destinationPrototypes.put(destinationType, destinationPrototype);
-		}
+		_destinationPrototypes.put(
+			MapUtil.getString(properties, "destination.type"),
+			destinationPrototype);
 	}
 
 	@Deactivate
 	protected void deactivate() {
-		synchronized (_destinationPrototypes) {
-			_destinationPrototypes.clear();
-		}
+		_destinationPrototypes.clear();
 	}
 
 	protected void removeDestinationPrototype(
 		DestinationPrototype destinationPrototype,
 		Map<String, Object> properties) {
 
-		synchronized (_destinationPrototypes) {
-			String destinationType = MapUtil.getString(
-				properties, "destination.type");
-
-			_destinationPrototypes.remove(destinationType);
-		}
+		_destinationPrototypes.remove(
+			MapUtil.getString(properties, "destination.type"),
+			destinationPrototype);
 	}
 
 	@Reference(unbind = "-")
@@ -116,7 +109,7 @@ public class DefaultDestinationFactory implements DestinationFactory {
 		PortalExecutorManager portalExecutorManager) {
 	}
 
-	private final Map<String, DestinationPrototype> _destinationPrototypes =
-		new ConcurrentHashMap<>();
+	private final ConcurrentMap<String, DestinationPrototype>
+		_destinationPrototypes = new ConcurrentHashMap<>();
 
 }
