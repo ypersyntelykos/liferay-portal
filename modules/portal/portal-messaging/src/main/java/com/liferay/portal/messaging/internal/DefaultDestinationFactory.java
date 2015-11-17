@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
@@ -39,18 +40,6 @@ import org.osgi.service.component.annotations.ReferencePolicyOption;
  */
 @Component(immediate = true, service = DestinationFactory.class)
 public class DefaultDestinationFactory implements DestinationFactory {
-
-	public DefaultDestinationFactory() {
-		_destinationPrototypes.put(
-			DestinationConfiguration.DESTINATION_TYPE_PARALLEL,
-			new ParallelDestinationPrototype());
-		_destinationPrototypes.put(
-			DestinationConfiguration.DESTINATION_TYPE_SERIAL,
-			new SerialDestinationPrototype());
-		_destinationPrototypes.put(
-			DestinationConfiguration.DESTINATION_TYPE_SYNCHRONOUS,
-			new SynchronousDestinationPrototype());
-	}
 
 	@Override
 	public Destination createDestination(
@@ -73,6 +62,19 @@ public class DefaultDestinationFactory implements DestinationFactory {
 	public Collection<String> getDestinationTypes() {
 		return Collections.unmodifiableCollection(
 			_destinationPrototypes.keySet());
+	}
+
+	@Activate
+	protected void activate() {
+		_destinationPrototypes.put(
+			DestinationConfiguration.DESTINATION_TYPE_PARALLEL,
+			new ParallelDestinationPrototype());
+		_destinationPrototypes.put(
+			DestinationConfiguration.DESTINATION_TYPE_SERIAL,
+			new SerialDestinationPrototype());
+		_destinationPrototypes.put(
+			DestinationConfiguration.DESTINATION_TYPE_SYNCHRONOUS,
+			new SynchronousDestinationPrototype());
 	}
 
 	@Reference(
