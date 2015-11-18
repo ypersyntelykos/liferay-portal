@@ -345,23 +345,22 @@ public class UpgradeImageGallery extends UpgradeProcess {
 
 			ps1.setString(1, igResourceName);
 
-			try (ResultSet rs = ps1.executeQuery()) {
-				try (PreparedStatement ps2 =
-						AutoBatchPreparedStatementUtil.autoBatch(
-							con.prepareStatement(deleteSQL))) {
+			try (ResultSet rs = ps1.executeQuery();
+				PreparedStatement ps2 =
+					AutoBatchPreparedStatementUtil.autoBatch(
+						con.prepareStatement(deleteSQL))) {
 
-					while (rs.next()) {
-						ps2.setString(1, dlResourceName);
-						ps2.setLong(2, rs.getLong("companyId"));
-						ps2.setInt(3, rs.getInt("scope"));
-						ps2.setString(4, rs.getString("primKey"));
-						ps2.setLong(5, rs.getLong("roleId"));
+				while (rs.next()) {
+					ps2.setString(1, dlResourceName);
+					ps2.setLong(2, rs.getLong("companyId"));
+					ps2.setInt(3, rs.getInt("scope"));
+					ps2.setString(4, rs.getString("primKey"));
+					ps2.setLong(5, rs.getLong("roleId"));
 
-						ps2.addBatch();
-					}
-
-					ps2.executeBatch();
+					ps2.addBatch();
 				}
+
+				ps2.executeBatch();
 			}
 		}
 	}
