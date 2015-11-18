@@ -36,9 +36,7 @@ import org.osgi.service.component.annotations.Reference;
 public class MessagingConfigurator {
 
 	@Activate
-	protected void activate(ComponentContext componentContext)
-		throws Exception {
-
+	protected void activate(ComponentContext componentContext) {
 		BundleContext bundleContext = componentContext.getBundleContext();
 
 		DestinationConfiguration destinationConfiguration =

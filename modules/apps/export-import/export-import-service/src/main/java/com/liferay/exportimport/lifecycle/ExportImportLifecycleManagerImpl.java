@@ -45,6 +45,7 @@ import org.osgi.service.component.annotations.Reference;
 public class ExportImportLifecycleManagerImpl
 	implements ExportImportLifecycleManager {
 
+	@Override
 	public void fireExportImportLifecycleEvent(
 		int code, int processFlag, Serializable... arguments) {
 

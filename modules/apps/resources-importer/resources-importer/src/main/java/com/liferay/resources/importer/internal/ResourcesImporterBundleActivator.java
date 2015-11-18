@@ -33,7 +33,7 @@ import org.osgi.framework.ServiceRegistration;
 public class ResourcesImporterBundleActivator implements BundleActivator {
 
 	@Override
-	public void start(BundleContext bundleContext) throws Exception {
+	public void start(BundleContext bundleContext) {
 		ServiceReference<DestinationFactory> serviceReference =
 			bundleContext.getServiceReference(DestinationFactory.class);
 
@@ -62,7 +62,7 @@ public class ResourcesImporterBundleActivator implements BundleActivator {
 	}
 
 	@Override
-	public void stop(BundleContext bundleContext) throws Exception {
+	public void stop(BundleContext bundleContext) {
 		_serviceRegistration.unregister();
 	}
 
