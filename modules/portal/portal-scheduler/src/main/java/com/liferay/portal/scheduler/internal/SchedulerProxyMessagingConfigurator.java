@@ -47,7 +47,8 @@ public class SchedulerProxyMessagingConfigurator {
 
 	@Reference(
 		service = Destination.class,
-		target = "(destination.name=" + DestinationNames.SCHEDULER_DISPATCH + ")"
+		target = "(destination.name=" + DestinationNames.SCHEDULER_DISPATCH + ")",
+		unbind = "-"
 	)
 	protected void setSchedulerDispatchDestination(Destination destination) {
 	}
