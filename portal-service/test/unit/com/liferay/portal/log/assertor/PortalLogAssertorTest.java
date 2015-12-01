@@ -22,7 +22,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 import java.io.IOException;
 
 import java.nio.charset.Charset;
-import java.nio.file.FileVisitOption;
+import java.nio.file.DirectoryStream;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -30,7 +30,6 @@ import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 
-import java.util.Collections;
 import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -60,42 +59,32 @@ public class PortalLogAssertorTest {
 
 	@Test
 	public void testScanOsgiLog() throws IOException {
-		Files.walkFileTree(
-			Paths.get(System.getProperty("osgi.state.dir")),
-			Collections.<FileVisitOption>emptySet(), 1,
-			new SimpleFileVisitor<Path>() {
+		try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(
+			Paths.get(System.getProperty("osgi.state.dir")), "*.log")) {
 
-				@Override
-				public FileVisitResult visitFile(
-						Path path, BasicFileAttributes basicFileAttributes)
-					throws IOException {
-
-					String pathString = StringUtil.toLowerCase(path.toString());
-
-					if (pathString.endsWith(".log")) {
-						StringBundler sb = new StringBundler();
-
-						sb.append(
-							"\nPortal log assert failure, OSGi log found: ");
-						sb.append(path);
-						sb.append(StringPool.COLON);
-						sb.append(StringPool.NEW_LINE);
-
-						List<String> lines = Files.readAllLines(
-							path, Charset.defaultCharset());
-
-						for (String line : lines) {
-							sb.append(line);
-							sb.append(StringPool.NEW_LINE);
-						}
-
-						Assert.fail(sb.toString());
-					}
-
-					return FileVisitResult.CONTINUE;
+			for (Path path : directoryStream) {
+				if (!Files.isRegularFile(path)) {
+					continue;
 				}
 
-			});
+				StringBundler sb = new StringBundler();
+
+				sb.append("\nPortal log assert failure, OSGi log found: ");
+				sb.append(path);
+				sb.append(StringPool.COLON);
+				sb.append(StringPool.NEW_LINE);
+
+				List<String> lines = Files.readAllLines(
+					path, Charset.defaultCharset());
+
+				for (String line : lines) {
+					sb.append(line);
+					sb.append(StringPool.NEW_LINE);
+				}
+
+				Assert.fail(sb.toString());
+			}
+		}
 	}
 
 	@Test
