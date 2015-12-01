@@ -235,14 +235,14 @@ public class JspCompiler extends Jsr199JavaCompiler {
 	protected String getTldUri(URL url) {
 		try (InputStream is = url.openStream();
 			InputStreamReader inputStreamReader = new InputStreamReader(is);
-			BufferedReader bufferedReader =
-				new BufferedReader(inputStreamReader)) {
+			BufferedReader bufferedReader = new BufferedReader(
+				inputStreamReader)) {
 
 			StringBuilder sb = null;
 
-			for (String line = bufferedReader.readLine(); line != null;
-				line = bufferedReader.readLine()) {
+			String line = null;
 
+			while ((line = bufferedReader.readLine()) != null) {
 				if (sb == null) {
 					int x = line.indexOf("<uri>");
 
