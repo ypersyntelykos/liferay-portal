@@ -37,6 +37,8 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.junit.Assert;
+import org.junit.Assume;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import org.w3c.dom.Document;
@@ -51,14 +53,13 @@ import org.xml.sax.InputSource;
  */
 public class PortalLogAssertorTest {
 
+	@BeforeClass
+	public static void setUpClass() {
+		Assume.assumeNotNull(System.getenv("JENKINS_HOME"));
+	}
+
 	@Test
 	public void testScanOsgiLog() throws IOException {
-		String jenkinsHome = System.getenv("JENKINS_HOME");
-
-		if (jenkinsHome == null) {
-			return;
-		}
-
 		Files.walkFileTree(
 			Paths.get(System.getProperty("osgi.state.dir")),
 			Collections.<FileVisitOption>emptySet(), 1,
@@ -99,12 +100,6 @@ public class PortalLogAssertorTest {
 
 	@Test
 	public void testScanXmlLog() throws IOException {
-		String jenkinsHome = System.getenv("JENKINS_HOME");
-
-		if (jenkinsHome == null) {
-			return;
-		}
-
 		Files.walkFileTree(
 			Paths.get(System.getProperty("liferay.log.dir")),
 			new SimpleFileVisitor<Path>() {
