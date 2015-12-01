@@ -57,6 +57,8 @@ public class PortalLogAssertorTest {
 
 	@Test
 	public void testScanOsgiLog() throws IOException {
+		StringBundler sb = new StringBundler();
+
 		try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(
 			Paths.get(System.getProperty("osgi.state.dir")), "*.log")) {
 
@@ -65,8 +67,6 @@ public class PortalLogAssertorTest {
 					continue;
 				}
 
-				StringBundler sb = new StringBundler(5);
-
 				sb.append("\nPortal log assert failure, OSGi log found: ");
 				sb.append(path);
 				sb.append(StringPool.COLON);
@@ -74,9 +74,12 @@ public class PortalLogAssertorTest {
 				sb.append(
 					new String(
 						Files.readAllBytes(path), Charset.defaultCharset()));
-
-				Assert.fail(sb.toString());
+				sb.append(StringPool.NEW_LINE);
 			}
+		}
+
+		if (sb.index() != 0) {
+			Assert.fail(sb.toString());
 		}
 	}
 
