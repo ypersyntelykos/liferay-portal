@@ -250,13 +250,15 @@ public class JspCompiler extends Jsr199JavaCompiler {
 						continue;
 					}
 
+					x += 5;
+
 					int y = line.indexOf("</uri>", x);
 
 					if (y >= 0) {
-						return line.substring(x + 5, y);
+						return line.substring(x, y);
 					}
 
-					sb = new StringBuilder(line.substring(x + 5));
+					sb = new StringBuilder(line.substring(x));
 				}
 				else {
 					int y = line.indexOf("</uri>");
