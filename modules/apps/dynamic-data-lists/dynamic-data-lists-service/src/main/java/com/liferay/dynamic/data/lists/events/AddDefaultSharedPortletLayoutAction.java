@@ -19,7 +19,6 @@ import com.liferay.portal.kernel.events.SimpleAction;
 import com.liferay.portal.kernel.module.framework.ModuleServiceLifecycle;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.Company;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.GroupConstants;
@@ -79,7 +78,7 @@ public class AddDefaultSharedPortletLayoutAction extends SimpleAction {
 		Layout layout = _layoutLocalService.fetchLayoutByFriendlyURL(
 			group.getGroupId(), false, "/shared");
 
-		if (!Validator.isNull(layout)) {
+		if (layout != null) {
 			return;
 		}
 
