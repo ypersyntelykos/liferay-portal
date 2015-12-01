@@ -349,7 +349,7 @@ public class EditServerMVCActionCommand extends BaseMVCActionCommand {
 		XugglerUtil.installNativeLibraries(jarName);
 	}
 
-	protected void reindex(ActionRequest actionRequest) throws Exception {
+	protected void reindex(final ActionRequest actionRequest) throws Exception {
 		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
@@ -376,11 +376,6 @@ public class EditServerMVCActionCommand extends BaseMVCActionCommand {
 
 			return;
 		}
-
-		final PortletSession portletSession = actionRequest.getPortletSession();
-
-		final long lastAccessedTime = portletSession.getLastAccessedTime();
-		final int maxInactiveInterval = portletSession.getMaxInactiveInterval();
 
 		final String uuid = PortalUUIDUtil.generate();
 
@@ -417,11 +412,20 @@ public class EditServerMVCActionCommand extends BaseMVCActionCommand {
 					(status == BackgroundTaskConstants.STATUS_FAILED) ||
 					(status == BackgroundTaskConstants.STATUS_SUCCESSFUL)) {
 
-					int reindexSessionDuration =
-						(int)(System.currentTimeMillis() - lastAccessedTime);
+					PortletSession portletSession =
+						actionRequest.getPortletSession();
+
+					long lastAccessedTime =
+						portletSession.getLastAccessedTime();
+					int maxInactiveInterval =
+						portletSession.getMaxInactiveInterval();
+
+					int extendedMaxInactiveIntervalTime =
+						(int)(System.currentTimeMillis() - lastAccessedTime +
+							maxInactiveInterval);
 
 					portletSession.setMaxInactiveInterval(
-						reindexSessionDuration + maxInactiveInterval);
+						extendedMaxInactiveIntervalTime);
 
 					countDownLatch.countDown();
 				}
