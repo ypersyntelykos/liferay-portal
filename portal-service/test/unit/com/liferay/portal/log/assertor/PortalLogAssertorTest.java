@@ -30,8 +30,6 @@ import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 
-import java.util.List;
-
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
@@ -67,20 +65,15 @@ public class PortalLogAssertorTest {
 					continue;
 				}
 
-				StringBundler sb = new StringBundler();
+				StringBundler sb = new StringBundler(5);
 
 				sb.append("\nPortal log assert failure, OSGi log found: ");
 				sb.append(path);
 				sb.append(StringPool.COLON);
 				sb.append(StringPool.NEW_LINE);
-
-				List<String> lines = Files.readAllLines(
-					path, Charset.defaultCharset());
-
-				for (String line : lines) {
-					sb.append(line);
-					sb.append(StringPool.NEW_LINE);
-				}
+				sb.append(
+					new String(
+						Files.readAllBytes(path), Charset.defaultCharset()));
 
 				Assert.fail(sb.toString());
 			}
