@@ -4706,6 +4706,9 @@ public class StringUtil {
 
 		while (sIndex < s.length()) {
 			if (wildcardIndex == wildcard.length()) {
+
+				// Wildcard exhausted before s
+
 				return false;
 			}
 
