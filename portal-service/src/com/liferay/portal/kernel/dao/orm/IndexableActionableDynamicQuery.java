@@ -22,6 +22,7 @@ import com.liferay.portal.kernel.search.background.task.ReindexStatusMessageSend
 import com.liferay.portal.kernel.util.Validator;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
@@ -31,7 +32,7 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 public class IndexableActionableDynamicQuery
 	extends DefaultActionableDynamicQuery {
 
-	public void addDocument(Document document) throws PortalException {
+	public void addDocuments(Document... documents) throws PortalException {
 		if (_documents == null) {
 			if (isParallel()) {
 				_documents = new ConcurrentLinkedDeque<>();
@@ -41,26 +42,7 @@ public class IndexableActionableDynamicQuery
 			}
 		}
 
-		_documents.add(document);
-
-		if (_documents.size() >= getInterval()) {
-			indexInterval();
-		}
-	}
-
-	public void addDocuments(Collection<Document> documents)
-		throws PortalException {
-
-		if (_documents == null) {
-			if (isParallel()) {
-				_documents = new ConcurrentLinkedDeque<>();
-			}
-			else {
-				_documents = new ArrayList<>();
-			}
-		}
-
-		_documents.addAll(documents);
+		_documents.addAll(Arrays.asList(documents));
 
 		if (_documents.size() >= getInterval()) {
 			indexInterval();
