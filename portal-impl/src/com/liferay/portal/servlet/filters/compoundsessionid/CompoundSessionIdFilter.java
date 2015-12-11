@@ -15,7 +15,6 @@
 package com.liferay.portal.servlet.filters.compoundsessionid;
 
 import com.liferay.portal.kernel.servlet.WrapHttpServletRequestFilter;
-import com.liferay.portal.kernel.servlet.filters.compoundsessionid.CompoundSessionIdServletRequest;
 import com.liferay.portal.kernel.servlet.filters.compoundsessionid.CompoundSessionIdSplitterUtil;
 import com.liferay.portal.servlet.filters.BasePortalFilter;
 
