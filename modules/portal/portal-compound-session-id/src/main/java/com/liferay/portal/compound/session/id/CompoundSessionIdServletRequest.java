@@ -12,11 +12,11 @@
  * details.
  */
 
-package com.liferay.portal.servlet.filters.compoundsessionid;
+package com.liferay.portal.compound.session.id;
 
 import com.liferay.portal.kernel.servlet.PersistentHttpServletRequestWrapper;
-
 import com.liferay.portal.kernel.servlet.filters.compoundsessionid.CompoundSessionIdHttpSession;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
