@@ -120,15 +120,8 @@ public class HypersonicServerTestCallback
 				PropsValues.JDBC_DEFAULT_URL, "sa", "");
 			Statement statement = connection.createStatement()) {
 
-			StringBundler sb = new StringBundler(3);
-
-			sb.append("BACKUP DATABASE TO ");
-			sb.append(StringPool.APOSTROPHE);
-			sb.append(_HSQL_TEMP);
-			sb.append(StringPool.APOSTROPHE);
-			sb.append(" BLOCKING AS FILES");
-
-			statement.execute(sb.toString());
+			statement.execute(
+				"BACKUP DATABASE TO '" + _HSQL_TEMP + "' BLOCKING AS FILES");
 		}
 
 		server.setErrWriter(
