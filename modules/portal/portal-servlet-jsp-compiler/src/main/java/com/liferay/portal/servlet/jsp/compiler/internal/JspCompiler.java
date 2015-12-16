@@ -100,9 +100,7 @@ public class JspCompiler extends Jsr199JavaCompiler {
 
 		JavaFileObject[] javaFileObjects = {
 			new SimpleJavaFileObject(
-				URI.create(
-					"string:///" + simpleName.replace('.', '/') +
-						Kind.SOURCE.extension),
+				URI.create("string:///" + simpleName + Kind.SOURCE.extension),
 				Kind.SOURCE) {
 
 				@Override
