@@ -120,6 +120,7 @@ public class JspCompiler extends Jsr199JavaCompiler {
 				StandardLocation.CLASS_PATH, cpath);
 		}
 		catch (IOException ioe) {
+			throw new JasperException(ioe);
 		}
 
 		JavaFileManager javaFileManager = getJavaFileManager(
@@ -133,6 +134,7 @@ public class JspCompiler extends Jsr199JavaCompiler {
 			javaFileManager.close();
 		}
 		catch (IOException ioe) {
+			throw new JasperException(ioe);
 		}
 
 		if (compilationTask.call()) {
