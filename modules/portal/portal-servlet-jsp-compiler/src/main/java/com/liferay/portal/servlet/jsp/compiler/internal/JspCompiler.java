@@ -79,8 +79,6 @@ public class JspCompiler extends Jsr199JavaCompiler {
 	public JavacErrorDetail[] compile(String className, Nodes pageNodes)
 		throws JasperException {
 
-		final String source = charArrayWriter.toString();
-
 		classFiles = new ArrayList<>();
 
 		JavaCompiler javaCompiler = ToolProvider.getSystemJavaCompiler();
@@ -109,7 +107,7 @@ public class JspCompiler extends Jsr199JavaCompiler {
 
 				@Override
 				public CharSequence getCharContent(boolean ignore) {
-					return source;
+					return charArrayWriter.toString();
 				}
 
 			}
