@@ -123,27 +123,25 @@ public class JspCompiler extends Jsr199JavaCompiler {
 			throw new JasperException(ioe);
 		}
 
-		JavaFileManager javaFileManager = getJavaFileManager(
-			standardJavaFileManager);
+		try (JavaFileManager javaFileManager = getJavaFileManager(
+			standardJavaFileManager)) {
 
-		CompilationTask compilationTask = javaCompiler.getTask(
-			null, javaFileManager, diagnosticCollector, options, null,
-			Arrays.asList(javaFileObjects));
+			CompilationTask compilationTask = javaCompiler.getTask(
+				null, javaFileManager, diagnosticCollector, options, null,
+				Arrays.asList(javaFileObjects));
 
-		try {
-			javaFileManager.close();
+			if (compilationTask.call()) {
+				for (BytecodeFile bytecodeFile : classFiles) {
+					rtctxt.setBytecode(
+						bytecodeFile.getClassName(),
+						bytecodeFile.getBytecode());
+				}
+
+				return null;
+			}
 		}
 		catch (IOException ioe) {
 			throw new JasperException(ioe);
-		}
-
-		if (compilationTask.call()) {
-			for (BytecodeFile bytecodeFile : classFiles) {
-				rtctxt.setBytecode(
-					bytecodeFile.getClassName(), bytecodeFile.getBytecode());
-			}
-
-			return null;
 		}
 
 		List<JavacErrorDetail> javacErrorDetails = new ArrayList<>();
