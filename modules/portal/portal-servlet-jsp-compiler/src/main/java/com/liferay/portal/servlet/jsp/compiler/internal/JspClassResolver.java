@@ -225,7 +225,7 @@ public class JspClassResolver implements ClassResolver {
 			return resources;
 		}
 
-		String matcherRegex = replace("*.class", '*', "[^/]*");
+		String matcherRegex = "[^/]*.class";
 
 		matcherRegex = replace(matcherRegex, '.', "\\.");
 
