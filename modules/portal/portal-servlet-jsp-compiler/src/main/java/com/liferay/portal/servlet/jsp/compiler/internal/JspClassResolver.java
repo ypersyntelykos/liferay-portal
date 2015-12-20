@@ -191,8 +191,6 @@ public class JspClassResolver implements ClassResolver {
 			return resources;
 		}
 
-		resources = new ArrayList<>();
-
 		String packageName = path.replace('/', '.');
 
 		List<URL> urls = null;
@@ -219,9 +217,9 @@ public class JspClassResolver implements ClassResolver {
 		}
 
 		if ((urls == null) || urls.isEmpty()) {
-			_jspResourceCache.put(path, resources);
+			_jspResourceCache.put(path, Collections.<String>emptyList());
 
-			return resources;
+			return null;
 		}
 
 		int length = path.length();
@@ -264,6 +262,10 @@ public class JspClassResolver implements ClassResolver {
 						continue;
 					}
 
+					if (resources == null) {
+						resources = new ArrayList<>();
+					}
+
 					resources.add(name);
 				}
 			}
@@ -272,7 +274,12 @@ public class JspClassResolver implements ClassResolver {
 			}
 		}
 
-		_jspResourceCache.put(path, resources);
+		if (resources == null) {
+			_jspResourceCache.put(path, Collections.<String>emptyList());
+		}
+		else {
+			_jspResourceCache.put(path, resources);
+		}
 
 		return resources;
 	}
