@@ -186,9 +186,7 @@ public class JspClassResolver implements ClassResolver {
 	protected Collection<String> handleSystemBundle(
 		BundleWiring bundleWiring, String path, int options) {
 
-		String key = path + "/*.class";
-
-		Collection<String> resources = _jspResourceCache.get(key);
+		Collection<String> resources = _jspResourceCache.get(path);
 
 		if (resources != null) {
 			return resources;
@@ -222,7 +220,7 @@ public class JspClassResolver implements ClassResolver {
 		}
 
 		if ((urls == null) || urls.isEmpty()) {
-			_jspResourceCache.put(key, resources);
+			_jspResourceCache.put(path, resources);
 
 			return resources;
 		}
@@ -258,7 +256,7 @@ public class JspClassResolver implements ClassResolver {
 			}
 		}
 
-		_jspResourceCache.put(key, resources);
+		_jspResourceCache.put(path, resources);
 
 		return resources;
 	}
