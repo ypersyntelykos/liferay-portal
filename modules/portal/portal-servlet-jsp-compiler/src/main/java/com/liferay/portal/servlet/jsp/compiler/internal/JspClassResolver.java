@@ -191,14 +191,12 @@ public class JspClassResolver implements ClassResolver {
 			return resources;
 		}
 
-		String packageName = path.replace('/', '.');
-
 		List<URL> urls = null;
 
 		Map<String, List<URL>> extraPackageMap = _serviceTracker.getService();
 
 		if (extraPackageMap != null) {
-			urls = extraPackageMap.get(packageName);
+			urls = extraPackageMap.get(path.replace('/', '.'));
 		}
 
 		if ((urls == null) || urls.isEmpty()) {
