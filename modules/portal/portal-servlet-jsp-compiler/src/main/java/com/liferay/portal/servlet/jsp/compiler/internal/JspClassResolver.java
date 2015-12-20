@@ -225,11 +225,7 @@ public class JspClassResolver implements ClassResolver {
 			return resources;
 		}
 
-		String matcherRegex = "[^/]*\\.class";
-
-		matcherRegex = path + "/" + matcherRegex;
-
-		Pattern pattern = Pattern.compile(matcherRegex);
+		Pattern pattern = Pattern.compile(path + "/[^/]*\\.class");
 
 		for (URL url : urls) {
 			try {
