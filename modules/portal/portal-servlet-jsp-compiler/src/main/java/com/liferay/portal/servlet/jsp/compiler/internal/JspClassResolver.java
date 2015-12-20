@@ -98,8 +98,7 @@ public class JspClassResolver implements ClassResolver {
 		}
 		else if (isExportsPackage(bundleWiring, path.replace('/', '.'))) {
 			if (bundle.getBundleId() == 0) {
-				resources = handleSystemBundle(
-					bundleWiring, path, "*.class", options);
+				resources = handleSystemBundle(bundleWiring, path, options);
 			}
 			else {
 				resources = bundleWiring.listResources(
@@ -185,9 +184,9 @@ public class JspClassResolver implements ClassResolver {
 	}
 
 	protected Collection<String> handleSystemBundle(
-		BundleWiring bundleWiring, String path, String fileRegex, int options) {
+		BundleWiring bundleWiring, String path, int options) {
 
-		String key = path + '/' + fileRegex;
+		String key = path + "/*.class";
 
 		Collection<String> resources = _jspResourceCache.get(key);
 
@@ -228,7 +227,7 @@ public class JspClassResolver implements ClassResolver {
 			return resources;
 		}
 
-		String matcherRegex = replace(fileRegex, '*', "[^/]*");
+		String matcherRegex = replace("*.class", '*', "[^/]*");
 
 		matcherRegex = replace(matcherRegex, '.', "\\.");
 
