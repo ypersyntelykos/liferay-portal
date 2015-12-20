@@ -15,6 +15,7 @@
 package com.liferay.portal.servlet.jsp.compiler.internal;
 
 import com.liferay.osgi.util.ServiceTrackerFactory;
+import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.URLCodec;
@@ -34,8 +35,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.jar.JarFile;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 
 import org.apache.felix.utils.log.Logger;
@@ -225,7 +224,7 @@ public class JspClassResolver implements ClassResolver {
 			return resources;
 		}
 
-		Pattern pattern = Pattern.compile(path + "/[^/]*\\.class");
+		int length = path.length();
 
 		for (URL url : urls) {
 			try {
@@ -238,11 +237,34 @@ public class JspClassResolver implements ClassResolver {
 
 					String name = zipEntry.getName();
 
-					Matcher matcher = pattern.matcher(name);
+					// Long enough, otherwise don't bother to look into it.
 
-					if (matcher.matches()) {
-						resources.add(name);
+					if (name.length() <= (length + 7)) {
+						continue;
 					}
+
+					// Start with path + "/", check separately to avoid creating
+					// temp string
+
+					if (!name.startsWith(path) ||
+						(name.charAt(length) != CharPool.SLASH)) {
+
+						continue;
+					}
+
+					// End with ".class"
+
+					if (!name.endsWith(".class")) {
+						continue;
+					}
+
+					// Middle part does not contain '/'
+
+					if (name.indexOf(CharPool.SLASH, length + 1) >= 0) {
+						continue;
+					}
+
+					resources.add(name);
 				}
 			}
 			catch (Exception e) {
