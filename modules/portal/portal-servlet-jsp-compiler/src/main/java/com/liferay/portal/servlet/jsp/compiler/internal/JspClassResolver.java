@@ -97,7 +97,7 @@ public class JspClassResolver implements ClassResolver {
 		}
 		else if (isExportsPackage(bundleWiring, path.replace('/', '.'))) {
 			if (bundle.getBundleId() == 0) {
-				resources = handleSystemBundle(bundleWiring, path, options);
+				resources = handleSystemBundle(bundleWiring, path);
 			}
 			else {
 				resources = bundleWiring.listResources(
@@ -183,7 +183,7 @@ public class JspClassResolver implements ClassResolver {
 	}
 
 	protected Collection<String> handleSystemBundle(
-		BundleWiring bundleWiring, String path, int options) {
+		BundleWiring bundleWiring, String path) {
 
 		Collection<String> resources = _jspResourceCache.get(path);
 
