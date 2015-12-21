@@ -12,12 +12,10 @@
  * details.
  */
 
-package com.liferay.portal.cache.ehcache.single.internal.distribution;
+package com.liferay.portal.cache.single.internal.bootstrap;
 
-import com.liferay.portal.cache.PortalCacheReplicator;
-import com.liferay.portal.cache.PortalCacheReplicatorFactory;
-
-import java.io.Serializable;
+import com.liferay.portal.cache.PortalCacheBootstrapLoader;
+import com.liferay.portal.cache.PortalCacheBootstrapLoaderFactory;
 
 import java.util.Properties;
 
@@ -26,14 +24,12 @@ import org.osgi.service.component.annotations.Component;
 /**
  * @author Tina Tian
  */
-@Component(immediate = true, service = PortalCacheReplicatorFactory.class)
-public class SinglePortalCacheReplicatorFactory
-	implements PortalCacheReplicatorFactory {
+@Component(immediate = true, service = PortalCacheBootstrapLoaderFactory.class)
+public class SinglePortalCacheBootstrapLoaderFactory
+	implements PortalCacheBootstrapLoaderFactory {
 
 	@Override
-	public <K extends Serializable, V extends Serializable>
-		PortalCacheReplicator<K, V> create(Properties properties) {
-
+	public PortalCacheBootstrapLoader create(Properties properties) {
 		return null;
 	}
 
