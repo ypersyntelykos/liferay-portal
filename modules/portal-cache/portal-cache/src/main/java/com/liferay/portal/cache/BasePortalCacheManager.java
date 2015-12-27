@@ -318,6 +318,13 @@ public abstract class BasePortalCacheManager<K extends Serializable, V>
 				portalCacheConfiguration.
 					getPortalCacheListenerPropertiesSet()) {
 
+			PortalCacheListener<K, V> portalCacheListener =
+				portalCacheListenerFactory.create(properties);
+
+			if (portalCacheListener == null) {
+				continue;
+			}
+
 			PortalCacheListenerScope portalCacheListenerScope =
 				(PortalCacheListenerScope)properties.remove(
 					PortalCacheConfiguration.PORTAL_CACHE_LISTENER_SCOPE);
@@ -326,13 +333,8 @@ public abstract class BasePortalCacheManager<K extends Serializable, V>
 				portalCacheListenerScope = PortalCacheListenerScope.ALL;
 			}
 
-			PortalCacheListener<K, V> portalCacheListener =
-				portalCacheListenerFactory.create(properties);
-
-			if (portalCacheListener != null) {
-				portalCache.registerPortalCacheListener(
-					portalCacheListener, portalCacheListenerScope);
-			}
+			portalCache.registerPortalCacheListener(
+				portalCacheListener, portalCacheListenerScope);
 		}
 	}
 
