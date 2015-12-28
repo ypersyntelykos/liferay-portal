@@ -48,19 +48,13 @@ public class ModuleFrameworkClassLoader extends URLClassLoader {
 	public Enumeration<URL> getResources(String name) throws IOException {
 		final List<URL> urls = new ArrayList<>();
 
-		Enumeration<URL> localURLs = findResources(name);
-
-		urls.addAll(_buildURLs(localURLs));
-
-		Enumeration<URL> parentURLs = null;
+		_appendURLs(urls, findResources(name));
 
 		ClassLoader parentClassLoader = getParent();
 
 		if (parentClassLoader != null) {
-			parentURLs = parentClassLoader.getResources(name);
+			_appendURLs(urls, parentClassLoader.getResources(name));
 		}
-
-		urls.addAll(_buildURLs(parentURLs));
 
 		return new Enumeration<URL>() {
 
@@ -105,18 +99,10 @@ public class ModuleFrameworkClassLoader extends URLClassLoader {
 		}
 	}
 
-	private List<URL> _buildURLs(Enumeration<URL> url) {
-		if (url == null) {
-			return new ArrayList<>();
+	private void _appendURLs(List<URL> urls, Enumeration<URL> enumeration) {
+		while (enumeration.hasMoreElements()) {
+			urls.add(enumeration.nextElement());
 		}
-
-		List<URL> urls = new ArrayList<>();
-
-		while (url.hasMoreElements()) {
-			urls.add(url.nextElement());
-		}
-
-		return urls;
 	}
 
 	static {
