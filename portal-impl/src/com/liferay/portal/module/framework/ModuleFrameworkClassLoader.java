@@ -20,8 +20,8 @@ import java.net.URL;
 import java.net.URLClassLoader;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Enumeration;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -46,7 +46,7 @@ public class ModuleFrameworkClassLoader extends URLClassLoader {
 
 	@Override
 	public Enumeration<URL> getResources(String name) throws IOException {
-		final List<URL> urls = new ArrayList<>();
+		List<URL> urls = new ArrayList<>();
 
 		_appendURLs(urls, findResources(name));
 
@@ -56,21 +56,7 @@ public class ModuleFrameworkClassLoader extends URLClassLoader {
 			_appendURLs(urls, parentClassLoader.getResources(name));
 		}
 
-		return new Enumeration<URL>() {
-
-			final Iterator<URL> iterator = urls.iterator();
-
-			@Override
-			public boolean hasMoreElements() {
-				return iterator.hasNext();
-			}
-
-			@Override
-			public URL nextElement() {
-				return iterator.next();
-			}
-
-		};
+		return Collections.enumeration(urls);
 	}
 
 	@Override
