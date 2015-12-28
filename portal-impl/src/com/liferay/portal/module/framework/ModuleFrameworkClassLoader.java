@@ -48,8 +48,6 @@ public class ModuleFrameworkClassLoader extends URLClassLoader {
 	public Enumeration<URL> getResources(String name) throws IOException {
 		final List<URL> urls = new ArrayList<>();
 
-		urls.addAll(_buildURLs(null));
-
 		Enumeration<URL> localURLs = findResources(name);
 
 		urls.addAll(_buildURLs(localURLs));
