@@ -454,7 +454,9 @@ public class StringUtil {
 				return false;
 			}
 
-			if (Character.toLowerCase(c1) != Character.toLowerCase(c2)) {
+			int delta = c1 - c2;
+
+			if ((delta != 32) && (delta != -32)) {
 				return false;
 			}
 		}
