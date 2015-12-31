@@ -15,9 +15,11 @@
 package com.liferay.portal.servlet.jsp.compiler.internal;
 
 import com.liferay.portal.kernel.util.CharPool;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.JavaDetector;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.SystemProperties;
 
 import java.io.IOException;
 
@@ -149,7 +151,12 @@ public class BundleJavaFileManager
 		Field nameField = null;
 		Class<?> zipFileIndexFileObjectClass = null;
 
-		if (JavaDetector.isOpenJDK() || JavaDetector.isOracle()) {
+		if ((JavaDetector.isOpenJDK() || JavaDetector.isOracle()) &&
+			GetterUtil.getBoolean(
+				SystemProperties.get(
+					"portal.servlet.jsp.compiler.sun.javac.hack.enabled"),
+				true)) {
+
 			try {
 				ClassLoader systemToolClassLoader =
 					ToolProvider.getSystemToolClassLoader();
