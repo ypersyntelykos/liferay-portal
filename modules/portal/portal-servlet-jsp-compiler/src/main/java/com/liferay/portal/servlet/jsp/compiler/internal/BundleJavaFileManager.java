@@ -15,6 +15,7 @@
 package com.liferay.portal.servlet.jsp.compiler.internal;
 
 import com.liferay.portal.kernel.util.CharPool;
+import com.liferay.portal.kernel.util.JavaDetector;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 
@@ -148,21 +149,24 @@ public class BundleJavaFileManager
 		Field nameField = null;
 		Class<?> zipFileIndexFileObjectClass = null;
 
-		try {
-			ClassLoader systemToolClassLoader =
-				ToolProvider.getSystemToolClassLoader();
+		if (JavaDetector.isOpenJDK() || JavaDetector.isOracle()) {
+			try {
+				ClassLoader systemToolClassLoader =
+					ToolProvider.getSystemToolClassLoader();
 
-			zipFileIndexFileObjectClass = systemToolClassLoader.loadClass(
-				"com.sun.tools.javac.file.ZipFileIndexArchive$" +
-					"ZipFileIndexFileObject");
+				zipFileIndexFileObjectClass = systemToolClassLoader.loadClass(
+					"com.sun.tools.javac.file.ZipFileIndexArchive$" +
+						"ZipFileIndexFileObject");
 
-			nameField = zipFileIndexFileObjectClass.getDeclaredField("name");
+				nameField = zipFileIndexFileObjectClass.getDeclaredField(
+					"name");
 
-			nameField.setAccessible(true);
-		}
-		catch (ReflectiveOperationException roe) {
-			nameField = null;
-			zipFileIndexFileObjectClass = null;
+				nameField.setAccessible(true);
+			}
+			catch (ReflectiveOperationException roe) {
+				nameField = null;
+				zipFileIndexFileObjectClass = null;
+			}
 		}
 
 		_zipFileIndexFileObjectClass = zipFileIndexFileObjectClass;
