@@ -335,17 +335,37 @@
 			<arg value="--parallel" />
 		</gradle-execute>
 
-		<gradle-execute dir="${project.dir}/modules" task="deploy">
-			<arg value="--parallel" />
-			<arg value="-Dportal.build=true" />
-			<env key="WAS_HOME" value="${app.server.websphere.dir}" />
-		</gradle-execute>
-
 		<if>
 			<equals arg1="${jsp.precompile}" arg2="on" />
 			<then>
-				<gradle-execute dir="${project.dir}/modules" task="compileJSP" />
+				<if>
+					<equals arg1="${jsp.precompile.parallel}" arg2="on" />
+					<then>
+						<gradle-execute dir="${project.dir}/modules" task="compileJSP">
+							<arg value="deploy" />
+							<arg value="--parallel" />
+							<arg value="-Dportal.build=true" />
+							<env key="WAS_HOME" value="${app.server.websphere.dir}" />
+						</gradle-execute>
+					</then>
+					<else>
+						<gradle-execute dir="${project.dir}/modules" task="deploy">
+							<arg value="--parallel" />
+							<arg value="-Dportal.build=true" />
+							<env key="WAS_HOME" value="${app.server.websphere.dir}" />
+						</gradle-execute>
+
+						<gradle-execute dir="${project.dir}/modules" task="compileJSP" />
+					</else>
+				</if>
 			</then>
+			<else>
+				<gradle-execute dir="${project.dir}/modules" task="deploy">
+					<arg value="--parallel" />
+					<arg value="-Dportal.build=true" />
+					<env key="WAS_HOME" value="${app.server.websphere.dir}" />
+				</gradle-execute>
+			</else>
 		</if>
 
 		<stopwatch action="elapsed" name="modules.stopwatch" />
