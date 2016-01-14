@@ -237,7 +237,12 @@ public class HtmlImpl implements Html {
 		for (int i = 0; i < text.length(); i++) {
 			char c = text.charAt(i);
 
-			if ((c > 255) || Character.isLetterOrDigit(c) ||
+			if ((c > 255) ||
+				((c >= CharPool.LOWER_CASE_A) &&
+				 (c <= CharPool.LOWER_CASE_Z)) ||
+				((c >= CharPool.UPPER_CASE_A) &&
+				 (c <= CharPool.UPPER_CASE_Z)) ||
+				((c >= CharPool.NUMBER_0) && (c <= CharPool.NUMBER_9)) ||
 				(c == CharPool.DASH) || (c == CharPool.UNDERLINE)) {
 
 				sb.append(c);
