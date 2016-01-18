@@ -90,15 +90,15 @@ public class BundleJavaFileManager
 
 		Field nameField = _getZipFileIndexFileObjectNameField();
 
-		if (nameField != null) {
-			if (file.getClass() == nameField.getDeclaringClass()) {
-				try {
-					String name = (String)nameField.get(file);
+		if ((nameField != null) &&
+			(file.getClass() == nameField.getDeclaringClass())) {
 
-					return name.substring(0, name.lastIndexOf(CharPool.PERIOD));
-				}
-				catch (ReflectiveOperationException roe) {
-				}
+			try {
+				String name = (String)nameField.get(file);
+
+				return name.substring(0, name.lastIndexOf(CharPool.PERIOD));
+			}
+			catch (ReflectiveOperationException roe) {
 			}
 		}
 
