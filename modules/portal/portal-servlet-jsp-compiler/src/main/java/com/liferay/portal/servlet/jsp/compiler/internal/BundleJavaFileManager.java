@@ -180,7 +180,7 @@ public class BundleJavaFileManager
 		return null;
 	}
 
-	private Field _getZipFileIndexFileObjectNameField() {
+	private static Field _getZipFileIndexFileObjectNameField() {
 		if (_nameFieldReference == null) {
 			return null;
 		}
