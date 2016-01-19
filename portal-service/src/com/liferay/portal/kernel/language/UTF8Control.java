@@ -39,18 +39,8 @@ public class UTF8Control extends Control {
 
 	public static final UTF8Control INSTANCE = new UTF8Control();
 
-	@Override
-	public ResourceBundle newBundle(
-			String baseName, Locale locale, String format,
-			ClassLoader classLoader, boolean reload)
+	public static ResourceBundle newBundle(URL url, boolean reload)
 		throws IOException {
-
-		URL url = classLoader.getResource(
-			toResourceName(toBundleName(baseName, locale), "properties"));
-
-		if (url == null) {
-			return null;
-		}
 
 		if (!reload) {
 			ResourceBundle resourceBundle = _resourceBundles.get(url);
@@ -72,6 +62,22 @@ public class UTF8Control extends Control {
 
 			return resourceBundle;
 		}
+	}
+
+	@Override
+	public ResourceBundle newBundle(
+			String baseName, Locale locale, String format,
+			ClassLoader classLoader, boolean reload)
+		throws IOException {
+
+		URL url = classLoader.getResource(
+			toResourceName(toBundleName(baseName, locale), "properties"));
+
+		if (url == null) {
+			return null;
+		}
+
+		return newBundle(url, reload);
 	}
 
 	private static final Map<URL, ResourceBundle> _resourceBundles =
