@@ -109,8 +109,13 @@ public class ModuleApplicationContextRegistrator {
 	private void _cleanInstropectionCaches(Bundle bundle) {
 		BundleWiring bundleWiring = bundle.adapt(BundleWiring.class);
 
-		CachedIntrospectionResults.clearClassLoader(
-			bundleWiring.getClassLoader());
+		ClassLoader classLoader = bundleWiring.getClassLoader();
+
+		while (classLoader != null) {
+			CachedIntrospectionResults.clearClassLoader(classLoader);
+
+			classLoader = classLoader.getParent();
+		}
 
 		Introspector.flushCaches();
 	}
