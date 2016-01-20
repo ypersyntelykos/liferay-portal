@@ -25,6 +25,7 @@ import java.util.Set;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.PageContext;
 
 /**
@@ -123,6 +124,14 @@ public class ParamAndPropertyAncestorTagImpl
 		if (_properties != null) {
 			_properties.clear();
 		}
+	}
+
+	@Override
+	public int doEndTag() throws JspException {
+		request = null;
+		servletContext = null;
+
+		return super.doEndTag();
 	}
 
 	public Map<String, String[]> getParams() {
