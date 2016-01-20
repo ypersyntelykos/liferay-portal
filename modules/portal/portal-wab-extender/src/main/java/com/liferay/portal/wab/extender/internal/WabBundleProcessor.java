@@ -335,9 +335,7 @@ public class WabBundleProcessor implements ServletContextListener {
 		return classNamesList.toArray(new String[classNamesList.size()]);
 	}
 
-	protected void initContext(Map<String, String> contextParameters)
-		throws Exception {
-
+	protected void initContext(Map<String, String> contextParameters) {
 		Dictionary<String, Object> properties = new HashMapDictionary<>();
 
 		properties.put(
