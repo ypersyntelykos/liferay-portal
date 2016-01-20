@@ -77,6 +77,8 @@ public class ModuleApplicationContextRegistrator {
 					_extendeeBundle.getBundleContext());
 
 			_applicationContextServicePublisher.register();
+
+			_cleanInstropectionCaches(_extendeeBundle);
 		}
 		catch (Exception e) {
 			_logger.log(
@@ -88,8 +90,6 @@ public class ModuleApplicationContextRegistrator {
 	}
 
 	protected void stop() throws Exception {
-		_cleanInstropectionCaches(_extendeeBundle);
-
 		_applicationContextServicePublisher.unregister();
 
 		PortletBeanLocatorUtil.setBeanLocator(
