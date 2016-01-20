@@ -165,13 +165,15 @@ public class WabBundleProcessor implements ServletContextListener {
 			WebXMLDefinition webXMLDefinition =
 				webXMLDefinitionLoader.loadWebXML();
 
-			initContext(webXMLDefinition);
+			_jspTaglibMappings = webXMLDefinition.getJspTaglibMappings();
 
-			registerThisAsEventListener(webXMLDefinition);
+			initContext(webXMLDefinition.getContextParameters());
 
-			initListeners(webXMLDefinition);
+			registerThisAsEventListener();
 
-			initFilters(webXMLDefinition);
+			initListeners(webXMLDefinition.getListenerDefinitions());
+
+			initFilters(webXMLDefinition.getFilterDefinitions());
 
 			try {
 				currentThread.setContextClassLoader(contextClassLoader);
@@ -333,11 +335,8 @@ public class WabBundleProcessor implements ServletContextListener {
 		return classNamesList.toArray(new String[classNamesList.size()]);
 	}
 
-	protected void initContext(WebXMLDefinition webXMLDefinition)
+	protected void initContext(Map<String, String> contextParameters)
 		throws Exception {
-
-		Map<String, String> contextParameters =
-			webXMLDefinition.getContextParameters();
 
 		Dictionary<String, Object> properties = new HashMapDictionary<>();
 
@@ -365,11 +364,8 @@ public class WabBundleProcessor implements ServletContextListener {
 			properties);
 	}
 
-	protected void initFilters(WebXMLDefinition webXMLDefinition)
+	protected void initFilters(Map<String, FilterDefinition> filterDefinitions)
 		throws Exception {
-
-		Map<String, FilterDefinition> filterDefinitions =
-			webXMLDefinition.getFilterDefinitions();
 
 		for (Map.Entry<String, FilterDefinition> entry :
 				filterDefinitions.entrySet()) {
@@ -434,11 +430,8 @@ public class WabBundleProcessor implements ServletContextListener {
 		}
 	}
 
-	protected void initListeners(WebXMLDefinition webXMLDefinition)
+	protected void initListeners(List<ListenerDefinition> listenerDefinitions)
 		throws Exception {
-
-		List<ListenerDefinition> listenerDefinitions =
-			webXMLDefinition.getListenerDefinitions();
 
 		for (ListenerDefinition listenerDefinition : listenerDefinitions) {
 			Dictionary<String, Object> properties = new Hashtable<>();
@@ -552,11 +545,7 @@ public class WabBundleProcessor implements ServletContextListener {
 		}
 	}
 
-	protected void registerThisAsEventListener(
-		WebXMLDefinition webXMLDefinition) {
-
-		_jspTaglibMappings = webXMLDefinition.getJspTaglibMappings();
-
+	protected void registerThisAsEventListener() {
 		Dictionary<String, Object> properties = new HashMapDictionary<>();
 
 		properties.put(
