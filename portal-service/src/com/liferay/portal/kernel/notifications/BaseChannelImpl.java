@@ -94,7 +94,9 @@ public abstract class BaseChannelImpl implements Channel {
 		lock.lock();
 
 		try {
-			_channelListeners.add(channelListener);
+			List<ChannelListener> channelListeners = _getChannelListeners();
+
+			channelListeners.add(channelListener);
 
 			if (hasNotificationEvents()) {
 				notifyChannelListeners();
@@ -114,7 +116,9 @@ public abstract class BaseChannelImpl implements Channel {
 		lock.lock();
 
 		try {
-			_channelListeners.remove(channelListener);
+			List<ChannelListener> channelListeners = _getChannelListeners();
+
+			channelListeners.remove(channelListener);
 		}
 		finally {
 			lock.unlock();
@@ -131,17 +135,25 @@ public abstract class BaseChannelImpl implements Channel {
 	protected abstract void doCleanUp() throws Exception;
 
 	protected void notifyChannelListeners() {
-		for (ChannelListener channelListener : _channelListeners) {
+		for (ChannelListener channelListener : _getChannelListeners()) {
 			channelListener.notificationEventsAvailable(_userId);
 		}
 	}
 
 	protected final Lock lock = new ReentrantLock();
 
+	private List<ChannelListener> _getChannelListeners() {
+		if (_channelListeners == null) {
+			_channelListeners = new ArrayList<>();
+		}
+
+		return _channelListeners;
+	}
+
 	private static final Log _log = LogFactoryUtil.getLog(
 		BaseChannelImpl.class);
 
-	private final List<ChannelListener> _channelListeners = new ArrayList<>();
+	private List<ChannelListener> _channelListeners;
 	private long _cleanUpInterval;
 	private final long _companyId;
 	private final AtomicLong _nextCleanUpTime = new AtomicLong();
