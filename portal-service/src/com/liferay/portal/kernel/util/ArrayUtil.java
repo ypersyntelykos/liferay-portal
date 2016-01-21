@@ -852,7 +852,7 @@ public class ArrayUtil {
 	public static String[] distinct(
 		String[] array, Comparator<String> comparator) {
 
-		if (isEmpty(array)) {
+		if (isEmpty(array) || (array.length == 1)) {
 			return array;
 		}
 
