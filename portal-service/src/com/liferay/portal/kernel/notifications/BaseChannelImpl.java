@@ -20,6 +20,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * @author Edward Han
@@ -119,6 +120,8 @@ public abstract class BaseChannelImpl implements Channel {
 			channelListener.notificationEventsAvailable(_userId);
 		}
 	}
+
+	protected final ReentrantLock reentrantLock = new ReentrantLock();
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		BaseChannelImpl.class);
