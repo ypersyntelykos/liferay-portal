@@ -14,8 +14,6 @@
 
 package com.liferay.portal.bootstrap;
 
-import aQute.bnd.version.Version;
-
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -146,18 +144,12 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 				bundleSymbolicName = bundleSymbolicName.substring(0, index);
 			}
 
-			String bundleVersionAttributeValue = attributes.getValue(
+			String bundleVersion = attributes.getValue(
 				Constants.BUNDLE_VERSION);
 
-			Version bundleVersion = Version.parseVersion(
-				bundleVersionAttributeValue);
-
 			for (Bundle bundle : bundleContext.getBundles()) {
-				Version curBundleVersion = Version.parseVersion(
-					String.valueOf(bundle.getVersion()));
-
 				if (bundleSymbolicName.equals(bundle.getSymbolicName()) &&
-					bundleVersion.equals(curBundleVersion)) {
+					bundleVersion.equals(String.valueOf(bundle.getVersion()))) {
 
 					return bundle;
 				}
