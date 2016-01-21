@@ -21,7 +21,6 @@ import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.notifications.BaseChannelImpl;
-import com.liferay.portal.kernel.notifications.Channel;
 import com.liferay.portal.kernel.notifications.ChannelException;
 import com.liferay.portal.kernel.notifications.NotificationEvent;
 import com.liferay.portal.kernel.notifications.NotificationEventComparator;
@@ -56,11 +55,6 @@ public class ChannelImpl extends BaseChannelImpl {
 
 	public ChannelImpl(long companyId, long usedId) {
 		super(companyId, usedId);
-	}
-
-	@Override
-	public Channel clone(long companyId, long userId) {
-		return new ChannelImpl(companyId, userId);
 	}
 
 	@Override
