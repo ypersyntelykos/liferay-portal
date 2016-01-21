@@ -14,8 +14,6 @@
 
 package com.liferay.portal.bootstrap;
 
-import aQute.bnd.header.OSGiHeader;
-import aQute.bnd.header.Parameters;
 import aQute.bnd.version.Version;
 
 import com.liferay.portal.kernel.exception.PortalException;
@@ -746,13 +744,7 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 			return false;
 		}
 
-		Parameters parameters = OSGiHeader.parseHeader(activationPolicy);
-
-		if (parameters.containsKey(Constants.ACTIVATION_LAZY)) {
-			return true;
-		}
-
-		return false;
+		return activationPolicy.equals(Constants.ACTIVATION_LAZY);
 	}
 
 	private void _installInitialBundle(String location) {
