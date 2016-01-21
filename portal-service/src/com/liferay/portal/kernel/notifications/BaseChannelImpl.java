@@ -19,7 +19,6 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -30,23 +29,27 @@ public abstract class BaseChannelImpl implements Channel {
 
 	@Override
 	public void cleanUp() throws ChannelException {
-		long currentTime = System.currentTimeMillis();
+		lock.lock();
 
-		long nextCleanUpTime = _nextCleanUpTime.get();
+		try {
+			long currentTime = System.currentTimeMillis();
 
-		if ((currentTime > nextCleanUpTime) &&
-			_nextCleanUpTime.compareAndSet(
-				nextCleanUpTime, currentTime + _cleanUpInterval)) {
+			if (currentTime > _nextCleanUpTime) {
+				_nextCleanUpTime = currentTime + _cleanUpInterval;
 
-			try {
-				doCleanUp();
+				try {
+					doCleanUp();
+				}
+				catch (ChannelException ce) {
+					throw ce;
+				}
+				catch (Exception e) {
+					throw new ChannelException(e);
+				}
 			}
-			catch (ChannelException ce) {
-				throw ce;
-			}
-			catch (Exception e) {
-				throw new ChannelException(e);
-			}
+		}
+		finally {
+			lock.unlock();
 		}
 	}
 
@@ -156,7 +159,7 @@ public abstract class BaseChannelImpl implements Channel {
 	private List<ChannelListener> _channelListeners;
 	private long _cleanUpInterval;
 	private final long _companyId;
-	private final AtomicLong _nextCleanUpTime = new AtomicLong();
+	private long _nextCleanUpTime;
 	private final long _userId;
 
 }
