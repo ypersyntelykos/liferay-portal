@@ -22,6 +22,7 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.spring.osgi.OSGiBeanProperties;
+import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapDictionary;
 import com.liferay.portal.kernel.util.Props;
@@ -59,7 +60,6 @@ import java.security.ProtectionDomain;
 import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -139,18 +139,14 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 
 			Attributes attributes = manifest.getMainAttributes();
 
-			String bundleSymbolicNameAttributeValue = attributes.getValue(
+			String bundleSymbolicName = attributes.getValue(
 				Constants.BUNDLE_SYMBOLICNAME);
 
-			Parameters parameters = OSGiHeader.parseHeader(
-				bundleSymbolicNameAttributeValue);
+			int index = bundleSymbolicName.indexOf(CharPool.SEMICOLON);
 
-			Set<String> bundleSymbolicNameSet = parameters.keySet();
-
-			Iterator<String> bundleSymbolicNameIterator =
-				bundleSymbolicNameSet.iterator();
-
-			String bundleSymbolicName = bundleSymbolicNameIterator.next();
+			if (index >= 0) {
+				bundleSymbolicName = bundleSymbolicName.substring(0, index);
+			}
 
 			String bundleVersionAttributeValue = attributes.getValue(
 				Constants.BUNDLE_VERSION);
