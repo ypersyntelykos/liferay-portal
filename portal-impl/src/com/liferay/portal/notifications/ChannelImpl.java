@@ -330,6 +330,8 @@ public class ChannelImpl extends BaseChannelImpl {
 				UserNotificationEventLocalServiceUtil.addUserNotificationEvent(
 					getUserId(), notificationEvent);
 			}
+
+			notifyChannelListeners();
 		}
 		catch (Exception e) {
 			throw new ChannelException("Unable to send event", e);
@@ -337,8 +339,6 @@ public class ChannelImpl extends BaseChannelImpl {
 		finally {
 			lock.unlock();
 		}
-
-		notifyChannelListeners();
 	}
 
 	@Override
@@ -370,6 +370,8 @@ public class ChannelImpl extends BaseChannelImpl {
 				UserNotificationEventLocalServiceUtil.addUserNotificationEvents(
 					getUserId(), persistedNotificationEvents);
 			}
+
+			notifyChannelListeners();
 		}
 		catch (Exception e) {
 			throw new ChannelException("Unable to send event", e);
@@ -377,8 +379,6 @@ public class ChannelImpl extends BaseChannelImpl {
 		finally {
 			lock.unlock();
 		}
-
-		notifyChannelListeners();
 	}
 
 	@Override

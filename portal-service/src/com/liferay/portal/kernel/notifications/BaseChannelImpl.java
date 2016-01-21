@@ -17,8 +17,8 @@ package com.liferay.portal.kernel.notifications;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -91,10 +91,17 @@ public abstract class BaseChannelImpl implements Channel {
 
 	@Override
 	public void registerChannelListener(ChannelListener channelListener) {
-		_channelListeners.add(channelListener);
+		lock.lock();
 
-		if (hasNotificationEvents()) {
-			notifyChannelListeners();
+		try {
+			_channelListeners.add(channelListener);
+
+			if (hasNotificationEvents()) {
+				notifyChannelListeners();
+			}
+		}
+		finally {
+			lock.unlock();
 		}
 	}
 
@@ -104,7 +111,14 @@ public abstract class BaseChannelImpl implements Channel {
 
 	@Override
 	public void unregisterChannelListener(ChannelListener channelListener) {
-		_channelListeners.remove(channelListener);
+		lock.lock();
+
+		try {
+			_channelListeners.remove(channelListener);
+		}
+		finally {
+			lock.unlock();
+		}
 
 		channelListener.channelListenerRemoved(_userId);
 	}
@@ -127,8 +141,7 @@ public abstract class BaseChannelImpl implements Channel {
 	private static final Log _log = LogFactoryUtil.getLog(
 		BaseChannelImpl.class);
 
-	private final List<ChannelListener> _channelListeners =
-		new CopyOnWriteArrayList<>();
+	private final List<ChannelListener> _channelListeners = new ArrayList<>();
 	private long _cleanUpInterval;
 	private final long _companyId;
 	private final AtomicLong _nextCleanUpTime = new AtomicLong();
