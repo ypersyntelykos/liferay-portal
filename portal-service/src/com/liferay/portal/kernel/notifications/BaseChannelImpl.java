@@ -20,6 +20,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
@@ -121,7 +122,7 @@ public abstract class BaseChannelImpl implements Channel {
 		}
 	}
 
-	protected final ReentrantLock reentrantLock = new ReentrantLock();
+	protected final Lock lock = new ReentrantLock();
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		BaseChannelImpl.class);

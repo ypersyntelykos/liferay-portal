@@ -68,7 +68,7 @@ public class ChannelImpl extends BaseChannelImpl {
 			Collection<String> notificationEventUuids, boolean archive)
 		throws ChannelException {
 
-		reentrantLock.lock();
+		lock.lock();
 
 		try {
 			if (PropsValues.USER_NOTIFICATION_EVENT_CONFIRMATION_ENABLED) {
@@ -96,7 +96,7 @@ public class ChannelImpl extends BaseChannelImpl {
 				"Unable to confirm delivery for user " + getUserId(), e);
 		}
 		finally {
-			reentrantLock.unlock();
+			lock.unlock();
 		}
 	}
 
@@ -111,7 +111,7 @@ public class ChannelImpl extends BaseChannelImpl {
 	public void confirmDelivery(String notificationEventUuid, boolean archive)
 		throws ChannelException {
 
-		reentrantLock.lock();
+		lock.lock();
 
 		try {
 			if (PropsValues.USER_NOTIFICATION_EVENT_CONFIRMATION_ENABLED) {
@@ -137,7 +137,7 @@ public class ChannelImpl extends BaseChannelImpl {
 				"Unable to confirm delivery for " + notificationEventUuid, e);
 		}
 		finally {
-			reentrantLock.unlock();
+			lock.unlock();
 		}
 	}
 
@@ -145,7 +145,7 @@ public class ChannelImpl extends BaseChannelImpl {
 	public void deleteUserNotificiationEvent(String notificationEventUuid)
 		throws ChannelException {
 
-		reentrantLock.lock();
+		lock.lock();
 
 		try {
 			UserNotificationEventLocalServiceUtil.deleteUserNotificationEvent(
@@ -161,7 +161,7 @@ public class ChannelImpl extends BaseChannelImpl {
 				"Unable to delete event " + notificationEventUuid, e);
 		}
 		finally {
-			reentrantLock.unlock();
+			lock.unlock();
 		}
 	}
 
@@ -170,7 +170,7 @@ public class ChannelImpl extends BaseChannelImpl {
 			Collection<String> notificationEventUuids)
 		throws ChannelException {
 
-		reentrantLock.lock();
+		lock.lock();
 
 		try {
 			UserNotificationEventLocalServiceUtil.deleteUserNotificationEvents(
@@ -188,13 +188,13 @@ public class ChannelImpl extends BaseChannelImpl {
 				"Unable to delete events for user " + getUserId(), e);
 		}
 		finally {
-			reentrantLock.unlock();
+			lock.unlock();
 		}
 	}
 
 	@Override
 	public void flush() {
-		reentrantLock.lock();
+		lock.lock();
 
 		try {
 			if (_notificationEvents != null) {
@@ -202,13 +202,13 @@ public class ChannelImpl extends BaseChannelImpl {
 			}
 		}
 		finally {
-			reentrantLock.unlock();
+			lock.unlock();
 		}
 	}
 
 	@Override
 	public void flush(long timestamp) {
-		reentrantLock.lock();
+		lock.lock();
 
 		try {
 			if (_notificationEvents == null) {
@@ -226,7 +226,7 @@ public class ChannelImpl extends BaseChannelImpl {
 			}
 		}
 		finally {
-			reentrantLock.unlock();
+			lock.unlock();
 		}
 	}
 
@@ -234,7 +234,7 @@ public class ChannelImpl extends BaseChannelImpl {
 	public List<NotificationEvent> getNotificationEvents(boolean flush)
 		throws ChannelException {
 
-		reentrantLock.lock();
+		lock.lock();
 
 		try {
 			return doGetNotificationEvents(flush);
@@ -246,13 +246,13 @@ public class ChannelImpl extends BaseChannelImpl {
 			throw new ChannelException(e);
 		}
 		finally {
-			reentrantLock.unlock();
+			lock.unlock();
 		}
 	}
 
 	@Override
 	public void init() throws ChannelException {
-		reentrantLock.lock();
+		lock.lock();
 
 		try {
 			doInit();
@@ -262,7 +262,7 @@ public class ChannelImpl extends BaseChannelImpl {
 				"Unable to init channel " + getUserId(), se);
 		}
 		finally {
-			reentrantLock.unlock();
+			lock.unlock();
 		}
 	}
 
@@ -270,7 +270,7 @@ public class ChannelImpl extends BaseChannelImpl {
 	public void removeTransientNotificationEvents(
 		Collection<NotificationEvent> notificationEvents) {
 
-		reentrantLock.lock();
+		lock.lock();
 
 		try {
 			if (_notificationEvents != null) {
@@ -278,7 +278,7 @@ public class ChannelImpl extends BaseChannelImpl {
 			}
 		}
 		finally {
-			reentrantLock.unlock();
+			lock.unlock();
 		}
 	}
 
@@ -289,7 +289,7 @@ public class ChannelImpl extends BaseChannelImpl {
 		Set<String> notificationEventUuidsSet = new HashSet<>(
 			notificationEventUuids);
 
-		reentrantLock.lock();
+		lock.lock();
 
 		try {
 			if (_notificationEvents == null) {
@@ -309,7 +309,7 @@ public class ChannelImpl extends BaseChannelImpl {
 			}
 		}
 		finally {
-			reentrantLock.unlock();
+			lock.unlock();
 		}
 	}
 
@@ -317,7 +317,7 @@ public class ChannelImpl extends BaseChannelImpl {
 	public void sendNotificationEvent(NotificationEvent notificationEvent)
 		throws ChannelException {
 
-		reentrantLock.lock();
+		lock.lock();
 
 		try {
 			long currentTime = System.currentTimeMillis();
@@ -335,7 +335,7 @@ public class ChannelImpl extends BaseChannelImpl {
 			throw new ChannelException("Unable to send event", e);
 		}
 		finally {
-			reentrantLock.unlock();
+			lock.unlock();
 		}
 
 		notifyChannelListeners();
@@ -346,7 +346,7 @@ public class ChannelImpl extends BaseChannelImpl {
 			Collection<NotificationEvent> notificationEvents)
 		throws ChannelException {
 
-		reentrantLock.lock();
+		lock.lock();
 
 		try {
 			long currentTime = System.currentTimeMillis();
@@ -375,7 +375,7 @@ public class ChannelImpl extends BaseChannelImpl {
 			throw new ChannelException("Unable to send event", e);
 		}
 		finally {
-			reentrantLock.unlock();
+			lock.unlock();
 		}
 
 		notifyChannelListeners();
@@ -385,19 +385,19 @@ public class ChannelImpl extends BaseChannelImpl {
 	public void storeNotificationEvent(
 		NotificationEvent notificationEvent, long currentTime) {
 
-		reentrantLock.lock();
+		lock.lock();
 
 		try {
 			doStoreNotificationEvent(notificationEvent, currentTime);
 		}
 		finally {
-			reentrantLock.unlock();
+			lock.unlock();
 		}
 	}
 
 	@Override
 	protected void doCleanUp() throws Exception {
-		reentrantLock.lock();
+		lock.lock();
 
 		try {
 			long currentTime = System.currentTimeMillis();
@@ -453,7 +453,7 @@ public class ChannelImpl extends BaseChannelImpl {
 				"Unable to clean up channel " + getUserId(), e);
 		}
 		finally {
-			reentrantLock.unlock();
+			lock.unlock();
 		}
 	}
 
