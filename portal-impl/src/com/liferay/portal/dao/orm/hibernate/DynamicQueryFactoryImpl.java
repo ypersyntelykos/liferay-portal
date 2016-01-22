@@ -95,7 +95,7 @@ public class DynamicQueryFactoryImpl implements DynamicQueryFactory {
 			ImplementationPath ip = clazz.getAnnotation(
 				ImplementationPath.class);
 
-			implClassName = ip.implementationPath();
+			implClassName = ip.value();
 
 			try {
 				implClass = getImplClass(implClassName, classLoader);
