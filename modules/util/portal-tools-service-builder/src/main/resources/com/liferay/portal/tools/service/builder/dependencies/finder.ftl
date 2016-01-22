@@ -2,8 +2,6 @@ package ${packagePath}.service.persistence;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.portal.kernel.annotation.ImplementationPath;
-
 /**
  * @author ${author}
 <#if classDeprecated>
@@ -17,7 +15,6 @@ import com.liferay.portal.kernel.annotation.ImplementationPath;
 </#if>
 
 @ProviderType
-@ImplementationPath(implementationPath="${packagePath}.service.persistence.impl.${entity.name}FinderImpl")
 public interface ${entity.name}Finder {
 
 	<#list methods as method>

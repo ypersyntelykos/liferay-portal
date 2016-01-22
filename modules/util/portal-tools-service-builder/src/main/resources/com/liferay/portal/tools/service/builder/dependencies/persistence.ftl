@@ -4,7 +4,6 @@ import ${packagePath}.model.${entity.name};
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.portal.kernel.annotation.ImplementationPath;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.Transactional;
@@ -33,7 +32,6 @@ import java.util.Date;
 </#if>
 
 @ProviderType
-@ImplementationPath(implementationPath="${packagePath}.service.persistence.impl.${entity.name}PersistenceImpl")
 public interface ${entity.name}Persistence extends BasePersistence<${entity.name}> {
 
 	/*
