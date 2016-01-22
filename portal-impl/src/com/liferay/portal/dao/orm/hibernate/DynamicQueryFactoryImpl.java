@@ -22,7 +22,6 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.memory.FinalizeManager;
 import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
-import com.liferay.portal.kernel.util.ClassLoaderUtil;
 import com.liferay.portal.security.lang.DoPrivilegedUtil;
 
 import java.security.PrivilegedAction;
@@ -73,46 +72,39 @@ public class DynamicQueryFactoryImpl implements DynamicQueryFactory {
 	}
 
 	protected Class<?> getImplClass(Class<?> clazz, ClassLoader classLoader) {
+		ImplementationClassName implementationClassName = clazz.getAnnotation(
+			ImplementationClassName.class);
+
+		if (implementationClassName == null) {
+			String className = clazz.getName();
+
+			if (!className.endsWith("Impl")) {
+				_log.error("Unable find model for " + clazz);
+			}
+
+			PortalRuntimePermission.checkDynamicQuery(clazz);
+
+			return clazz;
+		}
+
 		Class<?> implClass = clazz;
 
-		String className = clazz.getName();
+		String implClassName = implementationClassName.value();
 
-		if (!className.endsWith("Impl")) {
-			if (classLoader == null) {
-				classLoader = ClassLoaderUtil.getContextClassLoader();
-			}
-
-			String implClassName;
-
-			if (!clazz.isAnnotationPresent(ImplementationClassName.class)) {
-				_log.error(
-					"Unable find model " + className +
-						" no ImplementationPath annotation found");
-
-				return implClass;
-			}
-
-			ImplementationClassName ip = clazz.getAnnotation(
-				ImplementationClassName.class);
-
-			implClassName = ip.value();
-
-			try {
-				implClass = getImplClass(implClassName, classLoader);
-			}
-			catch (Exception e1) {
-				if (classLoader != _portalClassLoader) {
-					try {
-						implClass = getImplClass(
-							implClassName, _portalClassLoader);
-					}
-					catch (Exception e2) {
-						_log.error("Unable find model " + implClassName, e2);
-					}
+		try {
+			implClass = getImplClass(implClassName, classLoader);
+		}
+		catch (Exception e1) {
+			if (classLoader != _portalClassLoader) {
+				try {
+					implClass = getImplClass(implClassName, _portalClassLoader);
 				}
-				else {
-					_log.error("Unable find model " + implClassName, e1);
+				catch (Exception e2) {
+					_log.error("Unable find model " + implClassName, e2);
 				}
+			}
+			else {
+				_log.error("Unable find model " + implClassName, e1);
 			}
 		}
 
