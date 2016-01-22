@@ -14,7 +14,7 @@
 
 package com.liferay.portal.dao.orm.hibernate;
 
-import com.liferay.portal.kernel.annotation.ImplementationPath;
+import com.liferay.portal.kernel.annotation.ImplementationClassName;
 import com.liferay.portal.kernel.concurrent.ConcurrentReferenceKeyHashMap;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactory;
@@ -84,7 +84,7 @@ public class DynamicQueryFactoryImpl implements DynamicQueryFactory {
 
 			String implClassName;
 
-			if (!clazz.isAnnotationPresent(ImplementationPath.class)) {
+			if (!clazz.isAnnotationPresent(ImplementationClassName.class)) {
 				_log.error(
 					"Unable find model " + className +
 						" no ImplementationPath annotation found");
@@ -92,10 +92,10 @@ public class DynamicQueryFactoryImpl implements DynamicQueryFactory {
 				return implClass;
 			}
 
-			ImplementationPath ip = clazz.getAnnotation(
-				ImplementationPath.class);
+			ImplementationClassName ip = clazz.getAnnotation(
+				ImplementationClassName.class);
 
-			implClassName = ip.implementationPath();
+			implClassName = ip.value();
 
 			try {
 				implClass = getImplClass(implClassName, classLoader);
