@@ -2289,6 +2289,13 @@ public class ServiceBuilder {
 			"<import class=\"" + _packagePath + ".model.");
 
 		if (firstImport == -1) {
+			firstImport = newContent.indexOf(
+				"<import class=\"" + _apiPackagePath + ".model.");
+			lastImport = newContent.lastIndexOf(
+				"<import class=\"" + _apiPackagePath + ".model.");
+		}
+
+		if (firstImport == -1) {
 			int x = newContent.indexOf("<class");
 
 			if (x != -1) {
@@ -2463,6 +2470,13 @@ public class ServiceBuilder {
 			"<model name=\"" + _packagePath + ".model.");
 		int lastModel = newContent.lastIndexOf(
 			"<model name=\"" + _packagePath + ".model.");
+
+		if (firstModel == -1) {
+			firstModel = newContent.indexOf(
+				"<model name=\"" + _apiPackagePath + ".model.");
+			lastModel = newContent.lastIndexOf(
+				"<model name=\"" + _apiPackagePath + ".model.");
+		}
 
 		if (firstModel == -1) {
 			int x = newContent.indexOf("</model-hints>");
@@ -3215,6 +3229,14 @@ public class ServiceBuilder {
 
 		int lastSession = newContent.lastIndexOf(
 			"<bean id=\"" + _packagePath + ".service.", y);
+
+		if (firstSession == -1) {
+			firstSession = newContent.indexOf(
+				"<bean id=\"" + _apiPackagePath + ".service.", x);
+
+			lastSession = newContent.lastIndexOf(
+				"<bean id=\"" + _apiPackagePath + ".service.", y);
+		}
 
 		if ((firstSession == -1) || (firstSession > y)) {
 			x = newContent.indexOf("</beans>");
