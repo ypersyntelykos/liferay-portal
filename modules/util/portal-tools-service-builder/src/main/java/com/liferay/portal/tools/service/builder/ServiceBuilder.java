@@ -4162,7 +4162,7 @@ public class ServiceBuilder {
 			}
 			else if (colType.equals("String")) {
 				int maxLength = getMaxLength(
-					_packagePath + ".model." + entity.getName(), colName);
+					_apiPackagePath + ".model." + entity.getName(), colName);
 
 				if (col.isLocalized() && (maxLength < 4000)) {
 					maxLength = 4000;
