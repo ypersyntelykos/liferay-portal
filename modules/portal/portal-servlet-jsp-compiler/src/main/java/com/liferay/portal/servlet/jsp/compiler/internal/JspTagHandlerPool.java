@@ -46,13 +46,7 @@ public class JspTagHandlerPool extends TagHandlerPool {
 
 		if (jspTag == null) {
 			try {
-				if (_resourceInjector == null) {
-					jspTag = jspTagClass.newInstance();
-				}
-				else {
-					jspTag = _resourceInjector.createTagHandlerInstance(
-						jspTagClass);
-				}
+				jspTag = jspTagClass.newInstance();
 			}
 			catch (Exception e) {
 				throw new JspException(e);
@@ -75,10 +69,6 @@ public class JspTagHandlerPool extends TagHandlerPool {
 
 				tag.release();
 			}
-
-			if (_resourceInjector != null) {
-				_resourceInjector.preDestroy(jspTag);
-			}
 		}
 	}
 
@@ -93,10 +83,6 @@ public class JspTagHandlerPool extends TagHandlerPool {
 			Tag tag = (Tag)jspTag;
 
 			tag.release();
-
-			if (_resourceInjector != null) {
-				_resourceInjector.preDestroy(jspTag);
-			}
 		}
 	}
 
@@ -104,16 +90,10 @@ public class JspTagHandlerPool extends TagHandlerPool {
 	protected void init(ServletConfig config) {
 		_maxSize = GetterUtil.getInteger(
 			getOption(config, OPTION_MAXSIZE, null), Constants.MAX_POOL_SIZE);
-
-		ServletContext servletContext = config.getServletContext();
-
-		_resourceInjector = (ResourceInjector)servletContext.getAttribute(
-			Constants.JSP_RESOURCE_INJECTOR_CONTEXT_ATTRIBUTE);
 	}
 
 	private final AtomicInteger _counter = new AtomicInteger();
 	private final Queue<JspTag> _jspTags = new ConcurrentLinkedQueue<>();
 	private int _maxSize;
-	private ResourceInjector _resourceInjector;
 
 }
