@@ -33,7 +33,7 @@ import java.util.Date;
 </#if>
 
 @ProviderType
-@ImplementationPath(implementationPath="${packagePath}.service.persistence.impl.${entity.name}PersistenceImpl")
+@ImplementationPath("${packagePath}.service.persistence.impl.${entity.name}PersistenceImpl")
 public interface ${entity.name}Persistence extends BasePersistence<${entity.name}> {
 
 	/*

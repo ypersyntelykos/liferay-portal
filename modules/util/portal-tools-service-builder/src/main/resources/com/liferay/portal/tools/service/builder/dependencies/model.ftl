@@ -62,7 +62,7 @@ import java.util.Map;
 </#if>
 
 @ProviderType
-@ImplementationPath(implementationPath="${packagePath}.model.impl.${entity.name}ModelImpl")
+@ImplementationPath("${packagePath}.model.impl.${entity.name}ModelImpl")
 public interface ${entity.name}Model extends
 	<#assign overrideColumnNames = []>
 

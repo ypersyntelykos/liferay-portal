@@ -17,7 +17,7 @@ import com.liferay.portal.kernel.annotation.ImplementationPath;
 </#if>
 
 @ProviderType
-@ImplementationPath(implementationPath="${packagePath}.service.persistence.impl.${entity.name}FinderImpl")
+@ImplementationPath("${packagePath}.service.persistence.impl.${entity.name}FinderImpl")
 public interface ${entity.name}Finder {
 
 	<#list methods as method>

@@ -74,9 +74,9 @@ import ${import};
 
 @ProviderType
 <#if sessionTypeName == "Local">
-@ImplementationPath(implementationPath="${packagePath}.service.impl.${entity.name}LocalServiceImpl")
+@ImplementationPath("${packagePath}.service.impl.${entity.name}LocalServiceImpl")
 <#else>
-@ImplementationPath(implementationPath="${packagePath}.service.impl.${entity.name}ServiceImpl")
+@ImplementationPath("${packagePath}.service.impl.${entity.name}ServiceImpl")
 </#if>
 @Transactional(isolation = Isolation.PORTAL, rollbackFor = {PortalException.class, SystemException.class})
 public interface ${entity.name}${sessionTypeName}Service

@@ -28,7 +28,7 @@ import com.liferay.portal.model.TreeModel;
 </#if>
 
 @ProviderType
-@ImplementationPath(implementationPath="${packagePath}.model.impl.${entity.name}Impl")
+@ImplementationPath("${packagePath}.model.impl.${entity.name}Impl")
 public interface ${entity.name} extends
 	${entity.name}Model
 
