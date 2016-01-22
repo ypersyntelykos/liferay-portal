@@ -2,7 +2,7 @@ package ${packagePath}.model;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.portal.kernel.annotation.ImplementationPath;
+import com.liferay.portal.kernel.annotation.ImplementationClassName;
 import com.liferay.portal.kernel.util.Accessor;
 import com.liferay.portal.kernel.util.LocaleThreadLocal;
 import com.liferay.portal.model.NestedSetsTreeNodeModel;
@@ -28,7 +28,7 @@ import com.liferay.portal.model.TreeModel;
 </#if>
 
 @ProviderType
-@ImplementationPath(implementationPath="${packagePath}.model.impl.${entity.name}Impl")
+@ImplementationClassName("${packagePath}.model.impl.${entity.name}Impl")
 public interface ${entity.name} extends
 	${entity.name}Model
 
