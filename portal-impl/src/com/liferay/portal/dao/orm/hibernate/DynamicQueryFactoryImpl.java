@@ -82,20 +82,20 @@ public class DynamicQueryFactoryImpl implements DynamicQueryFactory {
 				classLoader = ClassLoaderUtil.getContextClassLoader();
 			}
 
-			String implClassName;
+			String implClassName = null;
 
-			if (!clazz.isAnnotationPresent(ImplementationPath.class)) {
-				_log.error(
-					"Unable find model " + className +
-						" no ImplementationPath annotation found");
-
-				return implClass;
-			}
-
-			ImplementationPath ip = clazz.getAnnotation(
+			ImplementationPath implementationPath = clazz.getAnnotation(
 				ImplementationPath.class);
 
-			implClassName = ip.value();
+			if (implementationPath == null) {
+				Package pkg = clazz.getPackage();
+
+				implClassName =
+					pkg.getName() + ".impl." + clazz.getSimpleName() + "Impl";
+			}
+			else {
+				implClassName = implementationPath.value();
+			}
 
 			try {
 				implClass = getImplClass(implClassName, classLoader);
