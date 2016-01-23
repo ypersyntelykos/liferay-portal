@@ -16,8 +16,6 @@ package com.liferay.portal.servlet.jsp.compiler.internal;
 
 import com.liferay.portal.kernel.util.GetterUtil;
 
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.servlet.ServletConfig;
@@ -39,28 +37,47 @@ public class JspTagHandlerPool extends TagHandlerPool {
 	public <T extends JspTag> JspTag get(Class<T> jspTagClass)
 		throws JspException {
 
-		JspTag jspTag = _jspTags.poll();
+		int index = _counter.decrementAndGet();
 
-		if (jspTag == null) {
-			try {
-				jspTag = jspTagClass.newInstance();
-			}
-			catch (Exception e) {
-				throw new JspException(e);
-			}
-		}
-		else {
-			_counter.getAndDecrement();
+		if (index >= 0) {
+			return _jspTags[index];
 		}
 
-		return jspTag;
+		_counter.incrementAndGet();
+
+		try {
+			return jspTagClass.newInstance();
+		}
+		catch (Exception e) {
+			throw new JspException(e);
+		}
 	}
 
 	@Override
 	public void release() {
-		JspTag jspTag = null;
+		for (int i = 0; i < _counter.get(); i++) {
+			JspTag jspTag = _jspTags[i];
 
-		while ((jspTag = _jspTags.poll()) != null) {
+			if (jspTag instanceof Tag) {
+				Tag tag = (Tag)jspTag;
+
+				tag.release();
+			}
+		}
+
+		_jspTags = null;
+	}
+
+	@Override
+	public void reuse(JspTag jspTag) {
+		int index = _counter.getAndIncrement();
+
+		if (index < _jspTags.length) {
+			_jspTags[index] = jspTag;
+		}
+		else {
+			_counter.decrementAndGet();
+
 			if (jspTag instanceof Tag) {
 				Tag tag = (Tag)jspTag;
 
@@ -70,27 +87,14 @@ public class JspTagHandlerPool extends TagHandlerPool {
 	}
 
 	@Override
-	public void reuse(JspTag jspTag) {
-		if (_counter.get() < _maxSize) {
-			_counter.getAndIncrement();
-
-			_jspTags.offer(jspTag);
-		}
-		else if (jspTag instanceof Tag) {
-			Tag tag = (Tag)jspTag;
-
-			tag.release();
-		}
-	}
-
-	@Override
 	protected void init(ServletConfig config) {
-		_maxSize = GetterUtil.getInteger(
+		int maxSize = GetterUtil.getInteger(
 			getOption(config, OPTION_MAXSIZE, null), Constants.MAX_POOL_SIZE);
+
+		_jspTags = new JspTag[maxSize];
 	}
 
 	private final AtomicInteger _counter = new AtomicInteger();
-	private final Queue<JspTag> _jspTags = new ConcurrentLinkedQueue<>();
-	private int _maxSize;
+	private JspTag[] _jspTags;
 
 }
