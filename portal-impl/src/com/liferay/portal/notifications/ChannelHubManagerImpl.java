@@ -377,11 +377,8 @@ public class ChannelHubManagerImpl implements ChannelHubManager {
 		if (channelHub != null) {
 			channelHub.storeNotificationEvent(userId, notificationEvent);
 		}
-		else {
-			if (_log.isDebugEnabled()) {
-				_log.debug(
-					"There is no channelHub for companyId: " + companyId);
-			}
+		else if (_log.isDebugEnabled()) {
+			_log.debug("There is no channelHub for companyId: " + companyId);
 		}
 	}
 
