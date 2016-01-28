@@ -22,12 +22,14 @@ import com.liferay.portal.kernel.util.StringUtil;
  */
 public class BeanNameMatcher implements BeanMatcher {
 
-	@Override
-	public boolean match(Class<?> beanClass, String beanName) {
+	public void afterPropertiesSet() {
 		if (_beanNamePattern == null) {
 			throw new IllegalStateException("Bean name pattern must be set");
 		}
+	}
 
+	@Override
+	public boolean match(Class<?> beanClass, String beanName) {
 		return StringUtil.wildcardMatches(
 			beanName, _beanNamePattern, CharPool.QUESTION, CharPool.STAR,
 			CharPool.PERCENT, true);
