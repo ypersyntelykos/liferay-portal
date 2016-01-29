@@ -372,7 +372,6 @@ public class PermissionCacheUtil {
 		public int hashCode() {
 			int hashCode = HashUtil.hash(0, _groupId);
 
-			hashCode = HashUtil.hash(hashCode, _groupId);
 			hashCode = HashUtil.hash(hashCode, _name);
 			hashCode = HashUtil.hash(hashCode, _primKey);
 			hashCode = HashUtil.hash(hashCode, _roleIds.length);
