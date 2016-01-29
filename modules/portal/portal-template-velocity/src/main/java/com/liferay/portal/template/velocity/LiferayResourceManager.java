@@ -205,11 +205,7 @@ public class LiferayResourceManager extends ResourceManagerImpl {
 		public boolean process() throws IOException, ParseErrorException {
 			data = null;
 
-			Reader reader = null;
-
-			try {
-				reader = _templateResource.getReader();
-
+			try (Reader reader = _templateResource.getReader()) {
 				data = rsvc.parse(reader, name);
 
 				initDocument();
@@ -219,11 +215,6 @@ public class LiferayResourceManager extends ResourceManagerImpl {
 			catch (Exception e) {
 				throw new ParseErrorException(
 					"Unable to parse Velocity template");
-			}
-			finally {
-				if (reader != null) {
-					reader.close();
-				}
 			}
 		}
 
