@@ -23,7 +23,6 @@ import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.service.BaseLocalService;
 import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.TransactionConfig;
-import com.liferay.portal.kernel.transaction.TransactionConfig.Builder;
 import com.liferay.portal.kernel.transaction.TransactionInvokerUtil;
 
 import java.lang.reflect.InvocationTargetException;
@@ -43,7 +42,7 @@ public class DefaultActionableDynamicQuery implements ActionableDynamicQuery {
 	public static final TransactionConfig REQUIRES_NEW_TRANSACTION_CONFIG;
 
 	static {
-		Builder builder = new Builder();
+		TransactionConfig.Builder builder = new TransactionConfig.Builder();
 
 		builder.setPropagation(Propagation.REQUIRES_NEW);
 		builder.setRollbackForClasses(

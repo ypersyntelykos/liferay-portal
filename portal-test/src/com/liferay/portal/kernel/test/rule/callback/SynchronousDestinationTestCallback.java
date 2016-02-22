@@ -31,7 +31,6 @@ import com.liferay.portal.kernel.test.rule.SynchronousDestinationTestRule;
 import com.liferay.portal.kernel.test.rule.callback.SynchronousDestinationTestCallback.SyncHandler;
 import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.TransactionConfig;
-import com.liferay.portal.kernel.transaction.TransactionConfig.Builder;
 import com.liferay.portal.kernel.transaction.TransactionInvokerUtil;
 import com.liferay.registry.Filter;
 import com.liferay.registry.Registry;
@@ -283,7 +282,7 @@ public class SynchronousDestinationTestCallback
 	private static final TransactionConfig _transactionConfig;
 
 	static {
-		Builder builder = new Builder();
+		TransactionConfig.Builder builder = new TransactionConfig.Builder();
 
 		builder.setPropagation(Propagation.NOT_SUPPORTED);
 		builder.setRollbackForClasses(

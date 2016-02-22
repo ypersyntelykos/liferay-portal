@@ -17,7 +17,6 @@ package com.liferay.portal.kernel.portlet.bridges.mvc;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.TransactionConfig;
-import com.liferay.portal.kernel.transaction.TransactionConfig.Builder;
 import com.liferay.portal.kernel.transaction.TransactionInvokerUtil;
 
 import java.util.concurrent.Callable;
@@ -68,7 +67,7 @@ public abstract class BaseTransactionalMVCActionCommand
 	private static final TransactionConfig _transactionConfig;
 
 	static {
-		Builder builder = new Builder();
+		TransactionConfig.Builder builder = new TransactionConfig.Builder();
 
 		builder.setPropagation(Propagation.REQUIRES_NEW);
 		builder.setRollbackForClasses(Exception.class);
