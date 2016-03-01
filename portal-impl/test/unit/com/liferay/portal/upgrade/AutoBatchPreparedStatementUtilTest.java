@@ -37,13 +37,13 @@ import java.lang.reflect.Modifier;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
+import java.sql.SQLException;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CancellationException;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -67,7 +67,9 @@ public class AutoBatchPreparedStatementUtilTest {
 	@AdviseWith(adviceClasses = {PortalExecutorManagerUtilAdvice.class})
 	@NewEnv(type = NewEnv.Type.CLASSLOADER)
 	@Test
-	public void testBatchUpdateConcurrentWaitingForFutures() throws Exception {
+	public void testBatchUpdateConcurrentWaitingForFutures()
+		throws SQLException {
+
 		testConcurrentWaitingForFutures(true);
 	}
 
@@ -116,7 +118,7 @@ public class AutoBatchPreparedStatementUtilTest {
 	@NewEnv(type = NewEnv.Type.CLASSLOADER)
 	@Test
 	public void testNoBatchUpdateConcurrentWaitingForFutures()
-		throws Exception {
+		throws SQLException {
 
 		testConcurrentWaitingForFutures(false);
 	}
@@ -127,7 +129,7 @@ public class AutoBatchPreparedStatementUtilTest {
 	@NewEnv(type = NewEnv.Type.CLASSLOADER)
 	@Test
 	public void testNoSupportBatchUpdatesConcurrentCancellationException()
-		throws Exception {
+		throws SQLException {
 
 		testConcurrentCancellationException(false);
 	}
@@ -148,7 +150,7 @@ public class AutoBatchPreparedStatementUtilTest {
 	@NewEnv(type = NewEnv.Type.CLASSLOADER)
 	@Test
 	public void testNotSupportBatchUpdatesConcurrentExecutionException()
-		throws Exception {
+		throws SQLException {
 
 		testConcurrentExecutionExceptions(false);
 	}
@@ -171,7 +173,7 @@ public class AutoBatchPreparedStatementUtilTest {
 	@NewEnv(type = NewEnv.Type.CLASSLOADER)
 	@Test
 	public void testSupportBatchUpdatesConcurrentCancellationException()
-		throws Exception {
+		throws SQLException {
 
 		testConcurrentCancellationException(true);
 	}
@@ -180,14 +182,14 @@ public class AutoBatchPreparedStatementUtilTest {
 	@NewEnv(type = NewEnv.Type.CLASSLOADER)
 	@Test
 	public void testSupportBatchUpdatesConcurrentExecutionException()
-		throws Exception {
+		throws SQLException {
 
 		testConcurrentExecutionExceptions(true);
 	}
 
 	protected void testConcurrentCancellationException(
 			boolean supportBatchUpdates)
-		throws Exception {
+		throws SQLException {
 
 		ConnectionInvocationHandler connectionInvocationHandler =
 			new ConnectionInvocationHandler(supportBatchUpdates);
@@ -226,7 +228,7 @@ public class AutoBatchPreparedStatementUtilTest {
 
 	protected void testConcurrentExecutionExceptions(
 			boolean supportBatchUpdates)
-		throws Exception {
+		throws SQLException {
 
 		ConnectionInvocationHandler connectionInvocationHandler =
 			new ConnectionInvocationHandler(supportBatchUpdates);
@@ -284,7 +286,7 @@ public class AutoBatchPreparedStatementUtilTest {
 	}
 
 	protected void testConcurrentWaitingForFutures(boolean supportBatchUpdates)
-		throws Exception {
+		throws SQLException {
 
 		ConnectionInvocationHandler connectionInvocationHandler =
 			new ConnectionInvocationHandler(supportBatchUpdates);
@@ -701,7 +703,7 @@ public class AutoBatchPreparedStatementUtilTest {
 		extends DefaultNoticeableFuture<T> {
 
 		@Override
-		public T get() throws ExecutionException, InterruptedException {
+		public T get() {
 			_calledGet = true;
 
 			return null;
