@@ -64,15 +64,6 @@ public class AutoBatchPreparedStatementUtilTest {
 		new AggregateTestRule(
 			AspectJNewEnvTestRule.INSTANCE, CodeCoverageAssertor.INSTANCE);
 
-	@AdviseWith(adviceClasses = {PortalExecutorManagerUtilAdvice.class})
-	@NewEnv(type = NewEnv.Type.CLASSLOADER)
-	@Test
-	public void testBatchUpdateConcurrentWaitingForFutures()
-		throws SQLException {
-
-		testConcurrentWaitingForFutures(true);
-	}
-
 	@NewEnv(type = NewEnv.Type.CLASSLOADER)
 	@Test
 	public void testCINITFailure() throws ClassNotFoundException {
@@ -102,6 +93,32 @@ public class AutoBatchPreparedStatementUtilTest {
 		}
 	}
 
+	@AdviseWith(
+		adviceClasses = {CancelingPortalExecutorManagerUtilAdvice.class}
+	)
+	@NewEnv(type = NewEnv.Type.CLASSLOADER)
+	@Test
+	public void testConcurrentCancellationException() throws SQLException {
+		doTestConcurrentCancellationException(true);
+		doTestConcurrentCancellationException(false);
+	}
+
+	@AdviseWith(adviceClasses = {PortalExecutorManagerUtilAdvice.class})
+	@NewEnv(type = NewEnv.Type.CLASSLOADER)
+	@Test
+	public void testConcurrentExecutionException() throws SQLException {
+		doTestConcurrentExecutionExceptions(true);
+		doTestConcurrentExecutionExceptions(false);
+	}
+
+	@AdviseWith(adviceClasses = {PortalExecutorManagerUtilAdvice.class})
+	@NewEnv(type = NewEnv.Type.CLASSLOADER)
+	@Test
+	public void testConcurrentWaitingForFutures() throws SQLException {
+		doTestConcurrentWaitingForFutures(true);
+		doTestConcurrentWaitingForFutures(false);
+	}
+
 	@Test
 	public void testConstructor() throws ReflectiveOperationException {
 		Constructor<AutoBatchPreparedStatementUtil> constructor =
@@ -117,77 +134,20 @@ public class AutoBatchPreparedStatementUtilTest {
 	@AdviseWith(adviceClasses = {PortalExecutorManagerUtilAdvice.class})
 	@NewEnv(type = NewEnv.Type.CLASSLOADER)
 	@Test
-	public void testNoBatchUpdateConcurrentWaitingForFutures()
-		throws SQLException {
-
-		testConcurrentWaitingForFutures(false);
-	}
-
-	@AdviseWith(
-		adviceClasses = {CancelingPortalExecutorManagerUtilAdvice.class}
-	)
-	@NewEnv(type = NewEnv.Type.CLASSLOADER)
-	@Test
-	public void testNoSupportBatchUpdatesConcurrentCancellationException()
-		throws SQLException {
-
-		testConcurrentCancellationException(false);
-	}
-
-	@Test
 	public void testNotSupportBatchUpdates() throws Exception {
-		testNotSupportBatchUpdates(false);
+		doTestNotSupportBatchUpdates(true);
+		doTestNotSupportBatchUpdates(false);
 	}
 
 	@AdviseWith(adviceClasses = {PortalExecutorManagerUtilAdvice.class})
 	@NewEnv(type = NewEnv.Type.CLASSLOADER)
-	@Test
-	public void testNotSupportBatchUpdatesConcurrent() throws Exception {
-		testNotSupportBatchUpdates(true);
-	}
-
-	@AdviseWith(adviceClasses = {PortalExecutorManagerUtilAdvice.class})
-	@NewEnv(type = NewEnv.Type.CLASSLOADER)
-	@Test
-	public void testNotSupportBatchUpdatesConcurrentExecutionException()
-		throws SQLException {
-
-		testConcurrentExecutionExceptions(false);
-	}
-
 	@Test
 	public void testSupportBatchUpdates() throws Exception {
-		testSupportBaseUpdates(false);
+		doTestSupportBaseUpdates(true);
+		doTestSupportBaseUpdates(false);
 	}
 
-	@AdviseWith(adviceClasses = {PortalExecutorManagerUtilAdvice.class})
-	@NewEnv(type = NewEnv.Type.CLASSLOADER)
-	@Test
-	public void testSupportBatchUpdatesConcurrent() throws Exception {
-		testSupportBaseUpdates(true);
-	}
-
-	@AdviseWith(
-		adviceClasses = {CancelingPortalExecutorManagerUtilAdvice.class}
-	)
-	@NewEnv(type = NewEnv.Type.CLASSLOADER)
-	@Test
-	public void testSupportBatchUpdatesConcurrentCancellationException()
-		throws SQLException {
-
-		testConcurrentCancellationException(true);
-	}
-
-	@AdviseWith(adviceClasses = {PortalExecutorManagerUtilAdvice.class})
-	@NewEnv(type = NewEnv.Type.CLASSLOADER)
-	@Test
-	public void testSupportBatchUpdatesConcurrentExecutionException()
-		throws SQLException {
-
-		testConcurrentExecutionExceptions(true);
-	}
-
-	protected void testConcurrentCancellationException(
+	protected void doTestConcurrentCancellationException(
 			boolean supportBatchUpdates)
 		throws SQLException {
 
@@ -226,7 +186,7 @@ public class AutoBatchPreparedStatementUtilTest {
 		}
 	}
 
-	protected void testConcurrentExecutionExceptions(
+	protected void doTestConcurrentExecutionExceptions(
 			boolean supportBatchUpdates)
 		throws SQLException {
 
@@ -285,7 +245,8 @@ public class AutoBatchPreparedStatementUtilTest {
 		}
 	}
 
-	protected void testConcurrentWaitingForFutures(boolean supportBatchUpdates)
+	protected void doTestConcurrentWaitingForFutures(
+			boolean supportBatchUpdates)
 		throws SQLException {
 
 		ConnectionInvocationHandler connectionInvocationHandler =
@@ -317,7 +278,7 @@ public class AutoBatchPreparedStatementUtilTest {
 		Assert.assertTrue(testNoticeableFuture.hasCalledGet());
 	}
 
-	protected void testNotSupportBatchUpdates(boolean concurrent)
+	protected void doTestNotSupportBatchUpdates(boolean concurrent)
 		throws Exception {
 
 		ConnectionInvocationHandler connectionInvocationHandler =
@@ -394,7 +355,9 @@ public class AutoBatchPreparedStatementUtilTest {
 			PreparedStatement.class.getMethod("execute"), methods.remove(0));
 	}
 
-	protected void testSupportBaseUpdates(boolean concurrent) throws Exception {
+	protected void doTestSupportBaseUpdates(boolean concurrent)
+		throws Exception {
+
 		ConnectionInvocationHandler connectionInvocationHandler =
 			new ConnectionInvocationHandler(true);
 
