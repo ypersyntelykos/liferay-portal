@@ -154,26 +154,21 @@ public class AutoBatchPreparedStatementUtilTest {
 		ConnectionInvocationHandler connectionInvocationHandler =
 			new ConnectionInvocationHandler(supportBatchUpdates);
 
-		PreparedStatement preparedStatement =
-			AutoBatchPreparedStatementUtil.concurrentAutoBatch(
-				(Connection)ProxyUtil.newProxyInstance(
-					ClassLoader.getSystemClassLoader(),
-					new Class<?>[] {Connection.class},
-					connectionInvocationHandler),
-				StringPool.BLANK);
+		try (PreparedStatement preparedStatement =
+				AutoBatchPreparedStatementUtil.concurrentAutoBatch(
+					(Connection)ProxyUtil.newProxyInstance(
+						ClassLoader.getSystemClassLoader(),
+						new Class<?>[] {Connection.class},
+						connectionInvocationHandler),
+					StringPool.BLANK)) {
 
-		preparedStatement.addBatch();
+			preparedStatement.addBatch();
 
-		preparedStatement.executeBatch();
+			preparedStatement.executeBatch();
 
-		preparedStatement.addBatch();
+			preparedStatement.addBatch();
 
-		preparedStatement.executeBatch();
-
-		try {
-			preparedStatement.close();
-
-			Assert.fail();
+			preparedStatement.executeBatch();
 		}
 		catch (Throwable t) {
 			Assert.assertTrue(t.toString(), t instanceof CancellationException);
@@ -183,56 +178,57 @@ public class AutoBatchPreparedStatementUtilTest {
 			Assert.assertEquals(1, throwables.length);
 
 			Assert.assertTrue(throwables[0] instanceof CancellationException);
+
+			return;
 		}
+
+		Assert.fail();
 	}
 
 	protected void doTestConcurrentExecutionExceptions(
 			boolean supportBatchUpdates)
 		throws SQLException {
 
+		Set<Throwable> throwablesSet = new HashSet<>();
+
 		ConnectionInvocationHandler connectionInvocationHandler =
 			new ConnectionInvocationHandler(supportBatchUpdates);
 
-		PreparedStatement preparedStatement =
-			AutoBatchPreparedStatementUtil.concurrentAutoBatch(
-				(Connection)ProxyUtil.newProxyInstance(
-					ClassLoader.getSystemClassLoader(),
-					new Class<?>[] {Connection.class},
-					connectionInvocationHandler),
-				StringPool.BLANK);
+		try (PreparedStatement preparedStatement =
+				AutoBatchPreparedStatementUtil.concurrentAutoBatch(
+					(Connection)ProxyUtil.newProxyInstance(
+						ClassLoader.getSystemClassLoader(),
+						new Class<?>[] {Connection.class},
+						connectionInvocationHandler),
+					StringPool.BLANK)) {
 
-		PreparedStatementInvocationHandler preparedStatementInvocationHandler =
-			connectionInvocationHandler.getPSInvocationHandler();
+			PreparedStatementInvocationHandler
+				preparedStatementInvocationHandler =
+					connectionInvocationHandler.getPSInvocationHandler();
 
-		RuntimeException runtimeException = new RuntimeException();
+			RuntimeException runtimeException = new RuntimeException();
 
-		Set<Throwable> throwablesSet = new HashSet<>();
+			throwablesSet.add(runtimeException);
 
-		throwablesSet.add(runtimeException);
+			preparedStatementInvocationHandler.setException(runtimeException);
 
-		preparedStatementInvocationHandler.setException(runtimeException);
+			preparedStatement.addBatch();
 
-		preparedStatement.addBatch();
+			preparedStatement.executeBatch();
 
-		preparedStatement.executeBatch();
+			preparedStatementInvocationHandler =
+				connectionInvocationHandler.getPSInvocationHandler();
 
-		preparedStatementInvocationHandler =
-			connectionInvocationHandler.getPSInvocationHandler();
+			RuntimeException suppressedException = new RuntimeException();
 
-		RuntimeException suppressedException = new RuntimeException();
+			throwablesSet.add(suppressedException);
 
-		throwablesSet.add(suppressedException);
+			preparedStatementInvocationHandler.setException(
+				suppressedException);
 
-		preparedStatementInvocationHandler.setException(suppressedException);
+			preparedStatement.addBatch();
 
-		preparedStatement.addBatch();
-
-		preparedStatement.executeBatch();
-
-		try {
-			preparedStatement.close();
-
-			Assert.fail();
+			preparedStatement.executeBatch();
 		}
 		catch (RuntimeException re) {
 			Assert.assertTrue(throwablesSet.contains(re));
@@ -242,38 +238,41 @@ public class AutoBatchPreparedStatementUtilTest {
 			Assert.assertEquals(1, throwables.length);
 
 			Assert.assertTrue(throwablesSet.contains(throwables[0]));
+
+			return;
 		}
+
+		Assert.fail();
 	}
 
 	protected void doTestConcurrentWaitingForFutures(
 			boolean supportBatchUpdates)
 		throws SQLException {
 
-		ConnectionInvocationHandler connectionInvocationHandler =
-			new ConnectionInvocationHandler(supportBatchUpdates);
-
-		PreparedStatement preparedStatement =
-			AutoBatchPreparedStatementUtil.concurrentAutoBatch(
-				(Connection)ProxyUtil.newProxyInstance(
-					ClassLoader.getSystemClassLoader(),
-					new Class<?>[] {Connection.class},
-					connectionInvocationHandler),
-				StringPool.BLANK);
-
 		TestNoticeableFuture<Void> testNoticeableFuture =
 			new TestNoticeableFuture<>();
 
-		Set<Future<Void>> futures = new HashSet<>();
+		ConnectionInvocationHandler connectionInvocationHandler =
+			new ConnectionInvocationHandler(supportBatchUpdates);
 
-		futures.add(testNoticeableFuture);
+		try (PreparedStatement preparedStatement =
+				AutoBatchPreparedStatementUtil.concurrentAutoBatch(
+					(Connection)ProxyUtil.newProxyInstance(
+						ClassLoader.getSystemClassLoader(),
+						new Class<?>[] {Connection.class},
+						connectionInvocationHandler),
+					StringPool.BLANK)) {
 
-		InvocationHandler invocationHandler = ProxyUtil.getInvocationHandler(
-			preparedStatement);
+			Set<Future<Void>> futures = new HashSet<>();
 
-		ReflectionTestUtil.setFieldValue(
-			invocationHandler, "_futures", futures);
+			futures.add(testNoticeableFuture);
 
-		preparedStatement.close();
+			InvocationHandler invocationHandler =
+				ProxyUtil.getInvocationHandler(preparedStatement);
+
+			ReflectionTestUtil.setFieldValue(
+				invocationHandler, "_futures", futures);
+		}
 
 		Assert.assertTrue(testNoticeableFuture.hasCalledGet());
 	}
