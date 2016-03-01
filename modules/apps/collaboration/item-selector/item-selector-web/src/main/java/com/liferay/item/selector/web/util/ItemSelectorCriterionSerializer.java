@@ -62,12 +62,16 @@ public class ItemSelectorCriterionSerializer {
 			_itemSelectorReturnTypes.get(itemSelectorReturnTypeClass.getName());
 
 		if (itemSelectorReturnTypes == null) {
-			_itemSelectorReturnTypes.putIfAbsent(
-				itemSelectorReturnTypeClass.getName(),
-				new CopyOnWriteArrayList<ItemSelectorReturnType>());
+			itemSelectorReturnTypes = new CopyOnWriteArrayList<>();
 
-			itemSelectorReturnTypes = _itemSelectorReturnTypes.get(
-				itemSelectorReturnTypeClass.getName());
+			List<ItemSelectorReturnType> previousItemSelectorReturnTypes =
+				_itemSelectorReturnTypes.putIfAbsent(
+					itemSelectorReturnTypeClass.getName(),
+					itemSelectorReturnTypes);
+
+			if (previousItemSelectorReturnTypes != null) {
+				itemSelectorReturnTypes = previousItemSelectorReturnTypes;
+			}
 		}
 
 		itemSelectorReturnTypes.add(itemSelectorReturnType);
