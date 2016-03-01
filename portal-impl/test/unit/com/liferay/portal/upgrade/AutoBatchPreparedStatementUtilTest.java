@@ -281,120 +281,126 @@ public class AutoBatchPreparedStatementUtilTest {
 		PreparedStatementInvocationHandler preparedStatementInvocationHandler =
 			new PreparedStatementInvocationHandler(false);
 
-		PreparedStatement preparedStatement =
-			AutoBatchPreparedStatementUtil.autoBatch(
-				(PreparedStatement)ProxyUtil.newProxyInstance(
-					ClassLoader.getSystemClassLoader(),
-					new Class<?>[] {PreparedStatement.class},
-					preparedStatementInvocationHandler));
-
 		List<Method> methods = preparedStatementInvocationHandler.getMethods();
 
-		Assert.assertTrue(methods.toString(), methods.isEmpty());
+		try (PreparedStatement preparedStatement =
+				AutoBatchPreparedStatementUtil.autoBatch(
+					(PreparedStatement)ProxyUtil.newProxyInstance(
+						ClassLoader.getSystemClassLoader(),
+						new Class<?>[] {PreparedStatement.class},
+						preparedStatementInvocationHandler))) {
 
-		// Calling addBatch fallbacks to executeUpdate
+			Assert.assertTrue(methods.toString(), methods.isEmpty());
 
-		preparedStatement.addBatch();
+			// Calling addBatch fallbacks to executeUpdate
+
+			preparedStatement.addBatch();
+
+			Assert.assertEquals(methods.toString(), 1, methods.size());
+			Assert.assertEquals(
+				PreparedStatement.class.getMethod("executeUpdate"),
+				methods.remove(0));
+
+			// Calling executeBatch does nothing
+
+			Assert.assertArrayEquals(
+				new int[0], preparedStatement.executeBatch());
+			Assert.assertTrue(methods.toString(), methods.isEmpty());
+
+			// Other methods like execute pass through
+
+			preparedStatement.execute();
+
+			Assert.assertEquals(methods.toString(), 1, methods.size());
+			Assert.assertEquals(
+				PreparedStatement.class.getMethod("execute"),
+				methods.remove(0));
+		}
 
 		Assert.assertEquals(methods.toString(), 1, methods.size());
 		Assert.assertEquals(
-			PreparedStatement.class.getMethod("executeUpdate"),
-			methods.remove(0));
-
-		// Calling executeBatch does nothing
-
-		Assert.assertArrayEquals(new int[0], preparedStatement.executeBatch());
-		Assert.assertTrue(methods.toString(), methods.isEmpty());
-
-		// Other methods like execute pass through
-
-		preparedStatement.execute();
-
-		Assert.assertEquals(methods.toString(), 1, methods.size());
-		Assert.assertEquals(
-			PreparedStatement.class.getMethod("execute"), methods.remove(0));
+			PreparedStatement.class.getMethod("close"), methods.remove(0));
 	}
 
 	protected void doTestNotSupportBatchUpdatesConcurrent() throws Exception {
 		ConnectionInvocationHandler connectionInvocationHandler =
 			new ConnectionInvocationHandler(false);
 
-		PreparedStatement preparedStatement =
-			AutoBatchPreparedStatementUtil.concurrentAutoBatch(
-				(Connection)ProxyUtil.newProxyInstance(
-					ClassLoader.getSystemClassLoader(),
-					new Class<?>[] {Connection.class},
-					connectionInvocationHandler),
-				StringPool.BLANK);
+		connectionInvocationHandler.getPSInvocationHandler();
 
 		List<Method> methods = connectionInvocationHandler.getMethods();
 
-		Assert.assertTrue(methods.toString(), methods.isEmpty());
+		try (PreparedStatement preparedStatement =
+				AutoBatchPreparedStatementUtil.concurrentAutoBatch(
+					(Connection)ProxyUtil.newProxyInstance(
+						ClassLoader.getSystemClassLoader(),
+						new Class<?>[] {Connection.class},
+						connectionInvocationHandler),
+					StringPool.BLANK)) {
 
-		// Calling addBatch fallbacks to executeUpdate
+			Assert.assertTrue(methods.toString(), methods.isEmpty());
 
-		preparedStatement.addBatch();
+			// Calling addBatch fallbacks to executeUpdate
 
-		Assert.assertEquals(methods.toString(), 2, methods.size());
-		Assert.assertEquals(
-			PreparedStatement.class.getMethod("executeUpdate"),
-			methods.remove(0));
-		Assert.assertEquals(
-			PreparedStatement.class.getMethod("close"), methods.remove(0));
+			preparedStatement.addBatch();
 
-		// Calling executeBatch does nothing
+			Assert.assertEquals(methods.toString(), 2, methods.size());
+			Assert.assertEquals(
+				PreparedStatement.class.getMethod("executeUpdate"),
+				methods.remove(0));
+			Assert.assertEquals(
+				PreparedStatement.class.getMethod("close"), methods.remove(0));
 
-		Assert.assertArrayEquals(new int[0], preparedStatement.executeBatch());
-		Assert.assertTrue(methods.toString(), methods.isEmpty());
+			// Calling executeBatch does nothing
 
-		// Calling close waits for futures
+			Assert.assertArrayEquals(
+				new int[0], preparedStatement.executeBatch());
+			Assert.assertTrue(methods.toString(), methods.isEmpty());
 
-		preparedStatement.close();
+			// Other methods like execute pass through
+
+			preparedStatement.execute();
+
+			methods = connectionInvocationHandler.getMethods();
+
+			Assert.assertEquals(methods.toString(), 1, methods.size());
+			Assert.assertEquals(
+				PreparedStatement.class.getMethod("execute"),
+				methods.remove(0));
+		}
 
 		methods = connectionInvocationHandler.getMethods();
 
 		Assert.assertEquals(methods.toString(), 1, methods.size());
 		Assert.assertEquals(
 			PreparedStatement.class.getMethod("close"), methods.remove(0));
-
-		// Other methods like execute pass through
-
-		preparedStatement.execute();
-
-		methods = connectionInvocationHandler.getMethods();
-
-		Assert.assertEquals(methods.toString(), 1, methods.size());
-		Assert.assertEquals(
-			PreparedStatement.class.getMethod("execute"), methods.remove(0));
 	}
 
 	protected void doTestSupportBaseUpdates() throws Exception {
 		PreparedStatementInvocationHandler preparedStatementInvocationHandler =
 			new PreparedStatementInvocationHandler(true);
 
-		PreparedStatement preparedStatement =
-			AutoBatchPreparedStatementUtil.autoBatch(
-				(PreparedStatement)ProxyUtil.newProxyInstance(
-					ClassLoader.getSystemClassLoader(),
-					new Class<?>[] {PreparedStatement.class},
-					preparedStatementInvocationHandler));
-
-		InvocationHandler invocationHandler = ProxyUtil.getInvocationHandler(
-			preparedStatement);
-
-		Assert.assertEquals(
-			0, ReflectionTestUtil.getFieldValue(invocationHandler, "_count"));
-
 		List<Method> methods = preparedStatementInvocationHandler.getMethods();
-
-		Assert.assertTrue(methods.toString(), methods.isEmpty());
 
 		int hibernateJDBCBatchSize = PropsValues.HIBERNATE_JDBC_BATCH_SIZE;
 
 		ReflectionTestUtil.setFieldValue(
 			PropsValues.class, "HIBERNATE_JDBC_BATCH_SIZE", 2);
 
-		try {
+		try (PreparedStatement preparedStatement =
+				AutoBatchPreparedStatementUtil.autoBatch(
+					(PreparedStatement)ProxyUtil.newProxyInstance(
+						ClassLoader.getSystemClassLoader(),
+						new Class<?>[] {PreparedStatement.class},
+						preparedStatementInvocationHandler))) {
+
+			InvocationHandler invocationHandler =
+				ProxyUtil.getInvocationHandler(preparedStatement);
+
+			Assert.assertEquals(
+				0,
+				ReflectionTestUtil.getFieldValue(invocationHandler, "_count"));
+			Assert.assertTrue(methods.toString(), methods.isEmpty());
 
 			// Protection for executing empty batch
 
@@ -476,36 +482,38 @@ public class AutoBatchPreparedStatementUtilTest {
 				PropsValues.class, "HIBERNATE_JDBC_BATCH_SIZE",
 				hibernateJDBCBatchSize);
 		}
+
+		Assert.assertEquals(methods.toString(), 1, methods.size());
+		Assert.assertEquals(
+			PreparedStatement.class.getMethod("close"), methods.remove(0));
 	}
 
 	protected void doTestSupportBaseUpdatesConcurrent() throws Exception {
 		ConnectionInvocationHandler connectionInvocationHandler =
 			new ConnectionInvocationHandler(true);
 
-		PreparedStatement preparedStatement =
-			AutoBatchPreparedStatementUtil.concurrentAutoBatch(
-				(Connection)ProxyUtil.newProxyInstance(
-					ClassLoader.getSystemClassLoader(),
-					new Class<?>[] {Connection.class},
-					connectionInvocationHandler),
-				StringPool.BLANK);
-
-		InvocationHandler invocationHandler = ProxyUtil.getInvocationHandler(
-			preparedStatement);
-
-		Assert.assertEquals(
-			0, ReflectionTestUtil.getFieldValue(invocationHandler, "_count"));
-
 		List<Method> methods = connectionInvocationHandler.getMethods();
-
-		Assert.assertTrue(methods.toString(), methods.isEmpty());
 
 		int hibernateJDBCBatchSize = PropsValues.HIBERNATE_JDBC_BATCH_SIZE;
 
 		ReflectionTestUtil.setFieldValue(
 			PropsValues.class, "HIBERNATE_JDBC_BATCH_SIZE", 2);
 
-		try {
+		try (PreparedStatement preparedStatement =
+				AutoBatchPreparedStatementUtil.concurrentAutoBatch(
+					(Connection)ProxyUtil.newProxyInstance(
+						ClassLoader.getSystemClassLoader(),
+						new Class<?>[] {Connection.class},
+						connectionInvocationHandler),
+					StringPool.BLANK)) {
+
+			InvocationHandler invocationHandler =
+				ProxyUtil.getInvocationHandler(preparedStatement);
+
+			Assert.assertEquals(
+				0,
+				ReflectionTestUtil.getFieldValue(invocationHandler, "_count"));
+			Assert.assertTrue(methods.toString(), methods.isEmpty());
 
 			// Protection for executing empty batch
 
@@ -589,20 +597,16 @@ public class AutoBatchPreparedStatementUtilTest {
 			Assert.assertEquals(
 				0,
 				ReflectionTestUtil.getFieldValue(invocationHandler, "_count"));
-
-			// Calling close waits for futures
-
-			preparedStatement.close();
-
-			Assert.assertEquals(methods.toString(), 1, methods.size());
-			Assert.assertEquals(
-				PreparedStatement.class.getMethod("close"), methods.remove(0));
 		}
 		finally {
 			ReflectionTestUtil.setFieldValue(
 				PropsValues.class, "HIBERNATE_JDBC_BATCH_SIZE",
 				hibernateJDBCBatchSize);
 		}
+
+		Assert.assertEquals(methods.toString(), 1, methods.size());
+		Assert.assertEquals(
+			PreparedStatement.class.getMethod("close"), methods.remove(0));
 	}
 
 	private static class ConnectionInvocationHandler
@@ -613,11 +617,6 @@ public class AutoBatchPreparedStatementUtilTest {
 		}
 
 		public PreparedStatementInvocationHandler getPSInvocationHandler() {
-			if (_psInvocationHandler == null) {
-				_psInvocationHandler = new PreparedStatementInvocationHandler(
-					_supportBatchUpdates);
-			}
-
 			return _psInvocationHandler;
 		}
 
@@ -648,9 +647,11 @@ public class AutoBatchPreparedStatementUtilTest {
 
 		private ConnectionInvocationHandler(boolean supportBatchUpdates) {
 			_supportBatchUpdates = supportBatchUpdates;
+			_psInvocationHandler = new PreparedStatementInvocationHandler(
+				supportBatchUpdates);
 		}
 
-		private PreparedStatementInvocationHandler _psInvocationHandler;
+		private final PreparedStatementInvocationHandler _psInvocationHandler;
 		private final boolean _supportBatchUpdates;
 
 	}
