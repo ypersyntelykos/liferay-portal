@@ -245,7 +245,9 @@ public class ItemSelectorImpl implements ItemSelector {
 			sb.append(StringPool.COMMA);
 		}
 
-		sb.setIndex(sb.index() - 1);
+		if (itemSelectorCriteria.length > 0) {
+			sb.setIndex(sb.index() - 1);
+		}
 
 		parameters.put(PARAMETER_CRITERIA, new String[] {sb.toString()});
 

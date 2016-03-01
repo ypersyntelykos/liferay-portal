@@ -154,7 +154,12 @@ public class ItemSelectorCriterionSerializer {
 				sb.append(StringPool.COMMA);
 			}
 
-			sb.setStringAt(StringPool.QUOTE, sb.index() - 1);
+			if (desiredItemSelectorReturnTypes.isEmpty()) {
+				sb.append(StringPool.QUOTE);
+			}
+			else {
+				sb.setStringAt(StringPool.QUOTE, sb.index() - 1);
+			}
 
 			jsonContext.write(sb.toString());
 		}
