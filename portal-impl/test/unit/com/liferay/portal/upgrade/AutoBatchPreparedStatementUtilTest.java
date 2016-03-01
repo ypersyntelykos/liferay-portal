@@ -41,7 +41,6 @@ import java.sql.SQLException;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Set;
@@ -261,15 +260,13 @@ public class AutoBatchPreparedStatementUtilTest {
 								supportBatchUpdates))),
 					StringPool.BLANK)) {
 
-			Set<Future<Void>> futures = new HashSet<>();
-
-			futures.add(testNoticeableFuture);
-
 			InvocationHandler invocationHandler =
 				ProxyUtil.getInvocationHandler(preparedStatement);
 
-			ReflectionTestUtil.setFieldValue(
-				invocationHandler, "_futures", futures);
+			Set<Future<Void>> futures = ReflectionTestUtil.getFieldValue(
+				invocationHandler, "_futures");
+
+			futures.add(testNoticeableFuture);
 		}
 
 		Assert.assertTrue(testNoticeableFuture.hasCalledGet());
