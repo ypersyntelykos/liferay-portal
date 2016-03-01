@@ -152,7 +152,8 @@ public class AutoBatchPreparedStatementUtilTest {
 		throws SQLException {
 
 		ConnectionInvocationHandler connectionInvocationHandler =
-			new ConnectionInvocationHandler(supportBatchUpdates);
+			new ConnectionInvocationHandler(
+				new PreparedStatementInvocationHandler(supportBatchUpdates));
 
 		try (PreparedStatement preparedStatement =
 				AutoBatchPreparedStatementUtil.concurrentAutoBatch(
@@ -191,8 +192,11 @@ public class AutoBatchPreparedStatementUtilTest {
 
 		Set<Throwable> throwablesSet = new HashSet<>();
 
+		PreparedStatementInvocationHandler preparedStatementInvocationHandler =
+			new PreparedStatementInvocationHandler(supportBatchUpdates);
+
 		ConnectionInvocationHandler connectionInvocationHandler =
-			new ConnectionInvocationHandler(supportBatchUpdates);
+			new ConnectionInvocationHandler(preparedStatementInvocationHandler);
 
 		try (PreparedStatement preparedStatement =
 				AutoBatchPreparedStatementUtil.concurrentAutoBatch(
@@ -201,10 +205,6 @@ public class AutoBatchPreparedStatementUtilTest {
 						new Class<?>[] {Connection.class},
 						connectionInvocationHandler),
 					StringPool.BLANK)) {
-
-			PreparedStatementInvocationHandler
-				preparedStatementInvocationHandler =
-					connectionInvocationHandler.getPSInvocationHandler();
 
 			RuntimeException runtimeException = new RuntimeException();
 
@@ -215,9 +215,6 @@ public class AutoBatchPreparedStatementUtilTest {
 			preparedStatement.addBatch();
 
 			preparedStatement.executeBatch();
-
-			preparedStatementInvocationHandler =
-				connectionInvocationHandler.getPSInvocationHandler();
 
 			RuntimeException suppressedException = new RuntimeException();
 
@@ -253,7 +250,8 @@ public class AutoBatchPreparedStatementUtilTest {
 			new TestNoticeableFuture<>();
 
 		ConnectionInvocationHandler connectionInvocationHandler =
-			new ConnectionInvocationHandler(supportBatchUpdates);
+			new ConnectionInvocationHandler(
+				new PreparedStatementInvocationHandler(supportBatchUpdates));
 
 		try (PreparedStatement preparedStatement =
 				AutoBatchPreparedStatementUtil.concurrentAutoBatch(
@@ -323,12 +321,13 @@ public class AutoBatchPreparedStatementUtilTest {
 	}
 
 	protected void doTestNotSupportBatchUpdatesConcurrent() throws Exception {
+		PreparedStatementInvocationHandler preparedStatementInvocationHandler =
+			new PreparedStatementInvocationHandler(false);
+
 		ConnectionInvocationHandler connectionInvocationHandler =
-			new ConnectionInvocationHandler(false);
+			new ConnectionInvocationHandler(preparedStatementInvocationHandler);
 
-		connectionInvocationHandler.getPSInvocationHandler();
-
-		List<Method> methods = connectionInvocationHandler.getMethods();
+		List<Method> methods = preparedStatementInvocationHandler.getMethods();
 
 		try (PreparedStatement preparedStatement =
 				AutoBatchPreparedStatementUtil.concurrentAutoBatch(
@@ -485,10 +484,13 @@ public class AutoBatchPreparedStatementUtilTest {
 	}
 
 	protected void doTestSupportBaseUpdatesConcurrent() throws Exception {
-		ConnectionInvocationHandler connectionInvocationHandler =
-			new ConnectionInvocationHandler(true);
+		PreparedStatementInvocationHandler preparedStatementInvocationHandler =
+			new PreparedStatementInvocationHandler(true);
 
-		List<Method> methods = connectionInvocationHandler.getMethods();
+		ConnectionInvocationHandler connectionInvocationHandler =
+			new ConnectionInvocationHandler(preparedStatementInvocationHandler);
+
+		List<Method> methods = preparedStatementInvocationHandler.getMethods();
 
 		int hibernateJDBCBatchSize = PropsValues.HIBERNATE_JDBC_BATCH_SIZE;
 
@@ -604,14 +606,6 @@ public class AutoBatchPreparedStatementUtilTest {
 	private static class ConnectionInvocationHandler
 		implements InvocationHandler {
 
-		public List<Method> getMethods() {
-			return _psInvocationHandler.getMethods();
-		}
-
-		public PreparedStatementInvocationHandler getPSInvocationHandler() {
-			return _psInvocationHandler;
-		}
-
 		@Override
 		public Object invoke(Object proxy, Method method, Object[] args)
 			throws NoSuchMethodException {
@@ -621,7 +615,8 @@ public class AutoBatchPreparedStatementUtilTest {
 					ClassLoader.getSystemClassLoader(),
 					new Class<?>[] {DatabaseMetaData.class},
 					new DatabaseMetaDataInvocationHandler(
-						_supportBatchUpdates));
+						_preparedStatementInvocationHandler.
+							_supportBatchUpdates));
 			}
 
 			if (method.equals(
@@ -631,20 +626,22 @@ public class AutoBatchPreparedStatementUtilTest {
 				return ProxyUtil.newProxyInstance(
 					ClassLoader.getSystemClassLoader(),
 					new Class<?>[] {PreparedStatement.class},
-					getPSInvocationHandler());
+					_preparedStatementInvocationHandler);
 			}
 
 			throw new UnsupportedOperationException();
 		}
 
-		private ConnectionInvocationHandler(boolean supportBatchUpdates) {
-			_supportBatchUpdates = supportBatchUpdates;
-			_psInvocationHandler = new PreparedStatementInvocationHandler(
-				supportBatchUpdates);
+		private ConnectionInvocationHandler(
+			PreparedStatementInvocationHandler
+				preparedStatementInvocationHandler) {
+
+			_preparedStatementInvocationHandler =
+				preparedStatementInvocationHandler;
 		}
 
-		private final PreparedStatementInvocationHandler _psInvocationHandler;
-		private final boolean _supportBatchUpdates;
+		private final PreparedStatementInvocationHandler
+			_preparedStatementInvocationHandler;
 
 	}
 
@@ -689,7 +686,7 @@ public class AutoBatchPreparedStatementUtilTest {
 				return ProxyUtil.newProxyInstance(
 					ClassLoader.getSystemClassLoader(),
 					new Class<?>[] {Connection.class},
-					new ConnectionInvocationHandler(_supportBatchUpdates));
+					new ConnectionInvocationHandler(this));
 			}
 
 			_methods.add(method);
