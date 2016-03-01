@@ -151,16 +151,14 @@ public class AutoBatchPreparedStatementUtilTest {
 			boolean supportBatchUpdates)
 		throws SQLException {
 
-		ConnectionInvocationHandler connectionInvocationHandler =
-			new ConnectionInvocationHandler(
-				new PreparedStatementInvocationHandler(supportBatchUpdates));
-
 		try (PreparedStatement preparedStatement =
 				AutoBatchPreparedStatementUtil.concurrentAutoBatch(
 					(Connection)ProxyUtil.newProxyInstance(
 						ClassLoader.getSystemClassLoader(),
 						new Class<?>[] {Connection.class},
-						connectionInvocationHandler),
+						new ConnectionInvocationHandler(
+							new PreparedStatementInvocationHandler(
+								supportBatchUpdates))),
 					StringPool.BLANK)) {
 
 			preparedStatement.addBatch();
@@ -195,15 +193,13 @@ public class AutoBatchPreparedStatementUtilTest {
 		PreparedStatementInvocationHandler preparedStatementInvocationHandler =
 			new PreparedStatementInvocationHandler(supportBatchUpdates);
 
-		ConnectionInvocationHandler connectionInvocationHandler =
-			new ConnectionInvocationHandler(preparedStatementInvocationHandler);
-
 		try (PreparedStatement preparedStatement =
 				AutoBatchPreparedStatementUtil.concurrentAutoBatch(
 					(Connection)ProxyUtil.newProxyInstance(
 						ClassLoader.getSystemClassLoader(),
 						new Class<?>[] {Connection.class},
-						connectionInvocationHandler),
+						new ConnectionInvocationHandler(
+							preparedStatementInvocationHandler)),
 					StringPool.BLANK)) {
 
 			RuntimeException runtimeException = new RuntimeException();
@@ -249,16 +245,14 @@ public class AutoBatchPreparedStatementUtilTest {
 		TestNoticeableFuture<Void> testNoticeableFuture =
 			new TestNoticeableFuture<>();
 
-		ConnectionInvocationHandler connectionInvocationHandler =
-			new ConnectionInvocationHandler(
-				new PreparedStatementInvocationHandler(supportBatchUpdates));
-
 		try (PreparedStatement preparedStatement =
 				AutoBatchPreparedStatementUtil.concurrentAutoBatch(
 					(Connection)ProxyUtil.newProxyInstance(
 						ClassLoader.getSystemClassLoader(),
 						new Class<?>[] {Connection.class},
-						connectionInvocationHandler),
+						new ConnectionInvocationHandler(
+							new PreparedStatementInvocationHandler(
+								supportBatchUpdates))),
 					StringPool.BLANK)) {
 
 			Set<Future<Void>> futures = new HashSet<>();
@@ -324,9 +318,6 @@ public class AutoBatchPreparedStatementUtilTest {
 		PreparedStatementInvocationHandler preparedStatementInvocationHandler =
 			new PreparedStatementInvocationHandler(false);
 
-		ConnectionInvocationHandler connectionInvocationHandler =
-			new ConnectionInvocationHandler(preparedStatementInvocationHandler);
-
 		List<Method> methods = preparedStatementInvocationHandler.getMethods();
 
 		try (PreparedStatement preparedStatement =
@@ -334,7 +325,8 @@ public class AutoBatchPreparedStatementUtilTest {
 					(Connection)ProxyUtil.newProxyInstance(
 						ClassLoader.getSystemClassLoader(),
 						new Class<?>[] {Connection.class},
-						connectionInvocationHandler),
+						new ConnectionInvocationHandler(
+							preparedStatementInvocationHandler)),
 					StringPool.BLANK)) {
 
 			Assert.assertTrue(methods.toString(), methods.isEmpty());
@@ -487,9 +479,6 @@ public class AutoBatchPreparedStatementUtilTest {
 		PreparedStatementInvocationHandler preparedStatementInvocationHandler =
 			new PreparedStatementInvocationHandler(true);
 
-		ConnectionInvocationHandler connectionInvocationHandler =
-			new ConnectionInvocationHandler(preparedStatementInvocationHandler);
-
 		List<Method> methods = preparedStatementInvocationHandler.getMethods();
 
 		int hibernateJDBCBatchSize = PropsValues.HIBERNATE_JDBC_BATCH_SIZE;
@@ -502,7 +491,8 @@ public class AutoBatchPreparedStatementUtilTest {
 					(Connection)ProxyUtil.newProxyInstance(
 						ClassLoader.getSystemClassLoader(),
 						new Class<?>[] {Connection.class},
-						connectionInvocationHandler),
+						new ConnectionInvocationHandler(
+							preparedStatementInvocationHandler)),
 					StringPool.BLANK)) {
 
 			InvocationHandler invocationHandler =
