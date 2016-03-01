@@ -62,7 +62,7 @@ public class AutoBatchPreparedStatementUtilTest {
 	@Rule
 	public static final AggregateTestRule aggregateTestRule =
 		new AggregateTestRule(
-			CodeCoverageAssertor.INSTANCE, AspectJNewEnvTestRule.INSTANCE);
+			AspectJNewEnvTestRule.INSTANCE, CodeCoverageAssertor.INSTANCE);
 
 	@AdviseWith(adviceClasses = {PortalExecutorManagerUtilAdvice.class})
 	@NewEnv(type = NewEnv.Type.CLASSLOADER)
