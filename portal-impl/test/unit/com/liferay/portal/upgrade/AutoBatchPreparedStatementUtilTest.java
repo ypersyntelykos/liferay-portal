@@ -361,15 +361,11 @@ public class AutoBatchPreparedStatementUtilTest {
 
 			preparedStatement.execute();
 
-			methods = connectionInvocationHandler.getMethods();
-
 			Assert.assertEquals(methods.toString(), 1, methods.size());
 			Assert.assertEquals(
 				PreparedStatement.class.getMethod("execute"),
 				methods.remove(0));
 		}
-
-		methods = connectionInvocationHandler.getMethods();
 
 		Assert.assertEquals(methods.toString(), 1, methods.size());
 		Assert.assertEquals(
@@ -560,8 +556,6 @@ public class AutoBatchPreparedStatementUtilTest {
 
 			preparedStatement.addBatch();
 
-			methods = connectionInvocationHandler.getMethods();
-
 			Assert.assertEquals(methods.toString(), 1, methods.size());
 			Assert.assertEquals(
 				PreparedStatement.class.getMethod("addBatch"),
@@ -587,8 +581,6 @@ public class AutoBatchPreparedStatementUtilTest {
 			// Other methods like execute pass through
 
 			preparedStatement.execute();
-
-			methods = connectionInvocationHandler.getMethods();
 
 			Assert.assertEquals(methods.toString(), 1, methods.size());
 			Assert.assertEquals(
