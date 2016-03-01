@@ -40,7 +40,9 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CancellationException;
@@ -170,13 +172,16 @@ public class AutoBatchPreparedStatementUtilTest {
 			preparedStatement.executeBatch();
 		}
 		catch (Throwable t) {
-			Assert.assertTrue(t.toString(), t instanceof CancellationException);
+			Assert.assertSame(CancellationException.class, t.getClass());
 
 			Throwable[] throwables = t.getSuppressed();
 
 			Assert.assertEquals(1, throwables.length);
 
-			Assert.assertTrue(throwables[0] instanceof CancellationException);
+			Throwable throwable = throwables[0];
+
+			Assert.assertSame(
+				CancellationException.class, throwable.getClass());
 
 			return;
 		}
@@ -188,10 +193,11 @@ public class AutoBatchPreparedStatementUtilTest {
 			boolean supportBatchUpdates)
 		throws SQLException {
 
-		Set<Throwable> throwablesSet = new HashSet<>();
-
 		PreparedStatementInvocationHandler preparedStatementInvocationHandler =
 			new PreparedStatementInvocationHandler(supportBatchUpdates);
+
+		Set<Throwable> throwables = Collections.newSetFromMap(
+			new IdentityHashMap<Throwable, Boolean>());
 
 		try (PreparedStatement preparedStatement =
 				AutoBatchPreparedStatementUtil.concurrentAutoBatch(
@@ -202,35 +208,35 @@ public class AutoBatchPreparedStatementUtilTest {
 							preparedStatementInvocationHandler)),
 					StringPool.BLANK)) {
 
-			RuntimeException runtimeException = new RuntimeException();
+			RuntimeException runtimeException1 = new RuntimeException();
 
-			throwablesSet.add(runtimeException);
+			throwables.add(runtimeException1);
 
-			preparedStatementInvocationHandler.setException(runtimeException);
+			preparedStatementInvocationHandler.setRuntimeException(
+				runtimeException1);
 
 			preparedStatement.addBatch();
 
 			preparedStatement.executeBatch();
 
-			RuntimeException suppressedException = new RuntimeException();
+			RuntimeException runtimeException2 = new RuntimeException();
 
-			throwablesSet.add(suppressedException);
+			throwables.add(runtimeException2);
 
-			preparedStatementInvocationHandler.setException(
-				suppressedException);
+			preparedStatementInvocationHandler.setRuntimeException(
+				runtimeException2);
 
 			preparedStatement.addBatch();
 
 			preparedStatement.executeBatch();
 		}
-		catch (RuntimeException re) {
-			Assert.assertTrue(throwablesSet.contains(re));
+		catch (Throwable t) {
+			Assert.assertTrue(throwables.contains(t));
 
-			Throwable[] throwables = re.getSuppressed();
+			Throwable[] suppressedThrowables = t.getSuppressed();
 
-			Assert.assertEquals(1, throwables.length);
-
-			Assert.assertTrue(throwablesSet.contains(throwables[0]));
+			Assert.assertEquals(1, suppressedThrowables.length);
+			Assert.assertTrue(throwables.contains(suppressedThrowables[0]));
 
 			return;
 		}
@@ -716,7 +722,7 @@ public class AutoBatchPreparedStatementUtilTest {
 			throw new UnsupportedOperationException();
 		}
 
-		public void setException(RuntimeException runtimeException) {
+		public void setRuntimeException(RuntimeException runtimeException) {
 			_runtimeException = runtimeException;
 		}
 
