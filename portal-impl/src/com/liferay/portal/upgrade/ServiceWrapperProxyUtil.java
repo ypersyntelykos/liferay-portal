@@ -15,12 +15,14 @@
 package com.liferay.portal.upgrade;
 
 import com.liferay.portal.kernel.util.ProxyUtil;
+import com.liferay.portal.kernel.util.ReflectionUtil;
 import com.liferay.portal.spring.aop.ServiceBeanAopProxy;
 
 import java.io.Closeable;
 import java.io.IOException;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 
 import org.springframework.aop.TargetSource;
 import org.springframework.aop.framework.AdvisedSupport;
@@ -69,6 +71,69 @@ public class ServiceWrapperProxyUtil {
 				}
 				catch (Exception e) {
 					throw new IOException(e);
+				}
+			}
+
+		};
+	}
+
+	public static Closeable injectFieldProxy(
+			Object springServiceProxy, String fieldName, Class<?> wrapperClass)
+		throws Exception {
+
+		if (!ProxyUtil.isProxyClass(springServiceProxy.getClass())) {
+			throw new IllegalArgumentException(
+				springServiceProxy + " is not a Spring service proxy");
+		}
+
+		AdvisedSupport advisedSupport = ServiceBeanAopProxy.getAdvisedSupport(
+			springServiceProxy);
+
+		TargetSource targetSource = advisedSupport.getTargetSource();
+
+		final Object targetService = targetSource.getTarget();
+
+		Class<?> clazz = targetService.getClass();
+
+		Field field = null;
+
+		while (clazz != null) {
+			try {
+				field = ReflectionUtil.getDeclaredField(clazz, fieldName);
+
+				break;
+			}
+			catch (NoSuchFieldException nsfe) {
+				clazz = clazz.getSuperclass();
+			}
+		}
+
+		if (field == null) {
+			throw new IllegalArgumentException(
+				"Unable to locate field " + fieldName + " in " + targetService);
+		}
+
+		final Field finalField = field;
+
+		final Object previousValue = finalField.get(targetService);
+
+		Constructor<?>[] constructors = wrapperClass.getDeclaredConstructors();
+
+		Constructor<?> constructor = constructors[0];
+
+		constructor.setAccessible(true);
+
+		finalField.set(targetService, constructor.newInstance(previousValue));
+
+		return new Closeable() {
+
+			@Override
+			public void close() throws IOException {
+				try {
+					finalField.set(targetService, previousValue);
+				}
+				catch (ReflectiveOperationException roe) {
+					throw new IOException(roe);
 				}
 			}
 
