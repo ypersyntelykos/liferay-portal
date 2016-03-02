@@ -234,8 +234,7 @@ public class ResourcePermissionLocalServiceImpl
 
 			for (Object[] resourcePermissionArray : resourcePermissionArrays) {
 				long resourcePermissionId = counterLocalService.increment(
-					ResourcePermissionClassThreadLocal.
-						getResourcePermissionClassName());
+					ResourcePermission.class.getName());
 
 				ResourcePermission resourcePermission =
 					resourcePermissionPersistence.create(resourcePermissionId);
@@ -1238,8 +1237,7 @@ public class ResourcePermissionLocalServiceImpl
 			}
 
 			long resourcePermissionId = counterLocalService.increment(
-				ResourcePermissionClassThreadLocal.
-					getResourcePermissionClassName());
+				ResourcePermission.class.getName());
 
 			resourcePermission = resourcePermissionPersistence.create(
 				resourcePermissionId);
