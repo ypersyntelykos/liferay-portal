@@ -14,7 +14,6 @@
 
 package com.liferay.portal.upgrade;
 
-import com.liferay.counter.service.persistence.impl.CounterClassNameThreadLocal;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.kernel.util.ReleaseInfo;
 import com.liferay.portal.upgrade.v5_2_5_to_6_0_0.UpgradeGroup;
@@ -43,9 +42,6 @@ public class UpgradeProcess_5_2_5_to_6_0_0 extends UpgradeProcess {
 
 	@Override
 	protected void doUpgrade() throws Exception {
-		CounterClassNameThreadLocal.setCounterClassName(
-			"com.liferay.counter.model.Counter");
-
 		upgrade(UpgradeSchema.class);
 
 		upgrade(UpgradeAsset.class);
@@ -62,9 +58,6 @@ public class UpgradeProcess_5_2_5_to_6_0_0 extends UpgradeProcess {
 		upgrade(UpgradeWiki.class);
 
 		clearIndexesCache();
-
-		CounterClassNameThreadLocal.setCounterClassName(
-			"com.liferay.counter.kernel.model.Counter");
 	}
 
 }

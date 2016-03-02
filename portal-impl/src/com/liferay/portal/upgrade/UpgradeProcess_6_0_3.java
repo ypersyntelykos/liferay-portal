@@ -14,7 +14,6 @@
 
 package com.liferay.portal.upgrade;
 
-import com.liferay.counter.service.persistence.impl.CounterClassNameThreadLocal;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.kernel.util.ReleaseInfo;
 import com.liferay.portal.upgrade.v6_0_3.UpgradeAsset;
@@ -39,9 +38,6 @@ public class UpgradeProcess_6_0_3 extends UpgradeProcess {
 
 	@Override
 	protected void doUpgrade() throws Exception {
-		CounterClassNameThreadLocal.setCounterClassName(
-			"com.liferay.counter.model.Counter");
-
 		upgrade(UpgradeSchema.class);
 
 		upgrade(UpgradeAsset.class);
@@ -54,9 +50,6 @@ public class UpgradeProcess_6_0_3 extends UpgradeProcess {
 		upgrade(UpgradeSitemap.class);
 
 		clearIndexesCache();
-
-		CounterClassNameThreadLocal.setCounterClassName(
-			"com.liferay.counter.kernel.model.Counter");
 	}
 
 }
