@@ -29,9 +29,4 @@ public class UpgradeAdminPortlets extends BaseUpgradeAdminPortlets {
 			BookmarksPortletKeys.BOOKMARKS_ADMIN);
 	}
 
-	@Override
-	protected String getResourcePermissionClassName() {
-		return "com.liferay.portal.kernel.model.ResourcePermission";
-	}
-
 }

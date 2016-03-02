@@ -27,9 +27,4 @@ public class UpgradeAdminPortlets extends BaseUpgradeAdminPortlets {
 		updateAccessInControlPanelPermission("33", "161");
 	}
 
-	@Override
-	protected String getResourcePermissionClassName() {
-		return "com.liferay.portal.model.ResourcePermission";
-	}
-
 }
