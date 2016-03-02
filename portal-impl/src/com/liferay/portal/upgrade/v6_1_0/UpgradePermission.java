@@ -22,7 +22,6 @@ import com.liferay.portal.kernel.model.ResourceBlock;
 import com.liferay.portal.kernel.model.ResourceBlockPermissionsContainer;
 import com.liferay.portal.kernel.model.ResourceConstants;
 import com.liferay.portal.kernel.model.ResourcePermission;
-import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.RoleConstants;
 import com.liferay.portal.kernel.security.permission.ResourceActionsUtil;
 import com.liferay.portal.kernel.service.ResourceActionLocalServiceUtil;
@@ -33,8 +32,6 @@ import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LoggingTimer;
 import com.liferay.portal.kernel.util.StringBundler;
-import com.liferay.portal.service.impl.ResourcePermissionClassThreadLocal;
-import com.liferay.portal.service.impl.RoleClassNameThreadLocal;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -129,12 +126,6 @@ public class UpgradePermission extends UpgradeProcess {
 
 	@Override
 	protected void doUpgrade() throws Exception {
-		ResourcePermissionClassThreadLocal.setResourcePermissionClassName(
-			"com.liferay.portal.model.ResourcePermission");
-
-		RoleClassNameThreadLocal.setRoleClassName(
-			"com.liferay.portal.model.Role");
-
 		Class<? extends UpgradePermission> upgradePermissionClass =
 			this.getClass();
 
@@ -166,11 +157,6 @@ public class UpgradePermission extends UpgradeProcess {
 		convertResourcePermissions(
 			"com.liferay.portlet.bookmarks.model.BookmarksFolder",
 			"BookmarksFolder", "folderId");
-
-		ResourcePermissionClassThreadLocal.setResourcePermissionClassName(
-			ResourcePermission.class.getName());
-
-		RoleClassNameThreadLocal.setRoleClassName(Role.class.getName());
 	}
 
 	protected ResourceBlockPermissionsContainer
