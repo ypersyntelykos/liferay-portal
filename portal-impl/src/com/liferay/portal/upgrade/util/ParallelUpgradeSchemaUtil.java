@@ -28,21 +28,17 @@ import java.util.concurrent.Future;
 /**
  * @author Miguel Pastor
  */
-public class ParallelUpgradeSchemaExecutor {
+public class ParallelUpgradeSchemaUtil {
 
-	public ParallelUpgradeSchemaExecutor(String... sqlFileNames) {
-		_sqlFileNames = sqlFileNames;
-	}
-
-	public void execute() throws Exception {
+	public static void execute(String... sqlFileNames) throws Exception {
 		ThreadPoolExecutor threadPoolExecutor =
 			PortalExecutorManagerUtil.getPortalExecutor(
-				ParallelUpgradeSchemaExecutor.class.getName());
+				ParallelUpgradeSchemaUtil.class.getName());
 
 		List<Future<Void>> futures = new ArrayList<>();
 
 		try {
-			for (String sqlFileName : _sqlFileNames) {
+			for (String sqlFileName : sqlFileNames) {
 				futures.add(
 					threadPoolExecutor.submit(
 						new CallableSQLExecutor(sqlFileName)));
@@ -56,8 +52,6 @@ public class ParallelUpgradeSchemaExecutor {
 			threadPoolExecutor.shutdown();
 		}
 	}
-
-	private final String[] _sqlFileNames;
 
 	private static class CallableSQLExecutor implements Callable<Void> {
 
