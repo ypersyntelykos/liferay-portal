@@ -14,15 +14,15 @@
 
 package com.liferay.portal.upgrade.util;
 
+import com.liferay.portal.kernel.concurrent.ThreadPoolExecutor;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
+import com.liferay.portal.kernel.executor.PortalExecutorManagerUtil;
 import com.liferay.portal.kernel.util.LoggingTimer;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 /**
@@ -35,14 +35,16 @@ public class ParallelUpgradeSchemaExecutor {
 	}
 
 	public void execute() throws Exception {
-		ExecutorService executorService = Executors.newFixedThreadPool(3);
+		ThreadPoolExecutor threadPoolExecutor =
+			PortalExecutorManagerUtil.getPortalExecutor(
+				ParallelUpgradeSchemaExecutor.class.getName());
 
 		List<Future<Void>> futures = new ArrayList<>();
 
 		try {
 			for (String sqlFileName : _sqlFileNames) {
 				futures.add(
-					executorService.submit(
+					threadPoolExecutor.submit(
 						new CallableSQLExecutor(sqlFileName)));
 			}
 
@@ -51,7 +53,7 @@ public class ParallelUpgradeSchemaExecutor {
 			}
 		}
 		finally {
-			executorService.shutdown();
+			threadPoolExecutor.shutdown();
 		}
 	}
 
