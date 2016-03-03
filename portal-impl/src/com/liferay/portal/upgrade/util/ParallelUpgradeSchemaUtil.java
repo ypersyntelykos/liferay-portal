@@ -35,7 +35,7 @@ public class ParallelUpgradeSchemaUtil {
 			PortalExecutorManagerUtil.getPortalExecutor(
 				ParallelUpgradeSchemaUtil.class.getName());
 
-		List<Future<Void>> futures = new ArrayList<>();
+		List<Future<Void>> futures = new ArrayList<>(sqlFileNames.length);
 
 		try {
 			for (String sqlFileName : sqlFileNames) {
