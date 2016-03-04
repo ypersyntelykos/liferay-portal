@@ -1294,7 +1294,7 @@ public class DataFactory {
 		for (int i = 0; i < _maxDDLCustomFieldCount; i++) {
 			sb.append("{\"columns\": [{\"fieldNames\": [\"");
 			sb.append(nextDDLCustomFieldName(groupId, i));
-			sb.append("\"]}]}");
+			sb.append("\"], \"size\": 12}]}");
 			sb.append(", ");
 		}
 
@@ -1302,7 +1302,7 @@ public class DataFactory {
 			sb.setIndex(sb.index() - 1);
 		}
 
-		sb.append("\"], \"size\": 12}]},], \"title\": {\"en_US\": \"\"}}],");
+		sb.append("], \"title\": {\"en_US\": \"\"}}],");
 		sb.append("\"paginationMode\": \"single-page\"}");
 
 		return newDDMStructureLayoutModel(
