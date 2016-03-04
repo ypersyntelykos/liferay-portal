@@ -1,5 +1,7 @@
+<#assign ddmStructureModel = dataFactory.defaultJournalDDMStructureModel>
+
 <@insertDDMStructure
-	_ddmStructureModel = dataFactory.defaultJournalDDMStructureModel
+	_ddmStructureModel = ddmStructureModel
 	_ddmStructureLayoutModel = dataFactory.defaultJournalDDMStructureLayoutModel
 	_ddmStructureVersionModel = dataFactory.defaultJournalDDMStructureVersionModel
 />
@@ -58,6 +60,10 @@ insert into DDMTemplate values ('${ddmTemplateModel.uuid}', ${ddmTemplateModel.t
 			<#assign ddmTemplateLinkModel = dataFactory.newDDMTemplateLinkModel(journalArticleModel, ddmTemplateModel.templateId)>
 
 			insert into DDMTemplateLink values (${ddmTemplateLinkModel.templateLinkId}, ${ddmTemplateLinkModel.companyId}, ${ddmTemplateLinkModel.classNameId}, ${ddmTemplateLinkModel.classPK}, ${ddmTemplateLinkModel.templateId});
+
+			<@insertDDMStorageLink
+				_ddmStorageLinkModel = dataFactory.newDDMStorageLinkModel(journalArticleModel, ddmStructureModel.structureId)
+			/>
 
 			<@insertSocialActivity
 				_entry = journalArticleModel

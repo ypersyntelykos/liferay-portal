@@ -1492,6 +1492,21 @@ public class DataFactory {
 	}
 
 	public DDMStorageLinkModel newDDMStorageLinkModel(
+		JournalArticleModel journalArticleModel, long structureId) {
+
+		DDMStorageLinkModel ddmStorageLinkModel = new DDMStorageLinkModelImpl();
+
+		ddmStorageLinkModel.setUuid(SequentialUUID.generate());
+		ddmStorageLinkModel.setStorageLinkId(_counter.get());
+		ddmStorageLinkModel.setClassNameId(
+			getClassNameId(JournalArticle.class));
+		ddmStorageLinkModel.setClassPK(journalArticleModel.getId());
+		ddmStorageLinkModel.setStructureId(structureId);
+
+		return ddmStorageLinkModel;
+	}
+
+	public DDMStorageLinkModel newDDMStorageLinkModel(
 		long ddmStorageLinkId, DDMContentModel ddmContentModel,
 		long structureId) {
 
