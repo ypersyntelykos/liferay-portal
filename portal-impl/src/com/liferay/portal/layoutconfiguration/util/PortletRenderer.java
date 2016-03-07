@@ -200,20 +200,19 @@ public class PortletRenderer {
 			while (attributeNames.hasMoreElements()) {
 				String attributeName = attributeNames.nextElement();
 
-				if (!RestrictPortletServletRequest.isSharedRequestAttribute(
-						attributeName)) {
+				Object attribute = request.getAttribute(attributeName);
+
+				if (!(attribute instanceof Mergeable<?>) ||
+						!RestrictPortletServletRequest.isSharedRequestAttribute(
+							attributeName)) {
 
 					continue;
 				}
 
-				Object attribute = request.getAttribute(attributeName);
+				Mergeable<?> mergeable = (Mergeable<?>)attribute;
 
-				if (attribute instanceof Mergeable<?>) {
-					Mergeable<?> mergeable = (Mergeable<?>)attribute;
-
-					restrictPortletServletRequest.setAttribute(
-						attributeName, mergeable.split());
-				}
+				restrictPortletServletRequest.setAttribute(
+					attributeName, mergeable.split());
 			}
 		}
 
