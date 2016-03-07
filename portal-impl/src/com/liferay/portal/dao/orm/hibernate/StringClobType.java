@@ -14,8 +14,15 @@
 
 package com.liferay.portal.dao.orm.hibernate;
 
+import com.liferay.portal.kernel.memory.SoftReferenceThreadLocal;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
+
+import java.io.IOException;
+import java.io.Reader;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 /**
  * @author Shuyang Zhou
@@ -36,6 +43,58 @@ public class StringClobType extends org.hibernate.type.StringClobType {
 		else {
 			return false;
 		}
+	}
+
+	@Override
+	public Object nullSafeGet(ResultSet rs, String[] names, Object owner)
+		throws SQLException {
+
+		Reader reader = rs.getCharacterStream(names[0]);
+
+		if (reader == null) {
+			return null;
+		}
+
+		BufferBag bufferBag = _bufferBagThreadLocal.get();
+
+		if (bufferBag == null) {
+			bufferBag = new BufferBag(1024);
+
+			_bufferBagThreadLocal.set(bufferBag);
+		}
+
+		char[] buffer = bufferBag._buffer;
+		StringBuilder sb = bufferBag._sb;
+
+		sb.setLength(0);
+
+		int index = -1;
+
+		try {
+			while ((index = reader.read(buffer)) != -1) {
+				sb.append(buffer, 0, index);
+			}
+		}
+		catch (IOException ioe) {
+			throw new SQLException(ioe);
+		}
+
+		return sb.toString();
+	}
+
+	private static final ThreadLocal<BufferBag> _bufferBagThreadLocal =
+		new SoftReferenceThreadLocal<>();
+
+	private static class BufferBag {
+
+		public BufferBag(int size) {
+			_buffer = new char[size];
+			_sb = new StringBuilder(size);
+		}
+
+		private final char[] _buffer;
+		private final StringBuilder _sb;
+
 	}
 
 }
