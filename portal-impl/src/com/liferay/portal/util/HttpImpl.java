@@ -455,15 +455,30 @@ public class HttpImpl implements Http {
 			return url;
 		}
 
-		url = removeProtocol(url);
+		int index = 0;
 
-		int pos = url.indexOf(CharPool.SLASH);
+		if (url.startsWith(Http.HTTP_WITH_SLASH)) {
+			index = Http.HTTP_WITH_SLASH.length();
+		}
+		else if (url.startsWith(Http.HTTPS_WITH_SLASH)) {
+			index = Http.HTTPS_WITH_SLASH.length();
+		}
 
-		if (pos != -1) {
+		int pos = url.indexOf(index, CharPool.SLASH);
+
+		if (pos == -1) {
+			if (index == 0) {
+				return url;
+			}
+
+			return url.substring(index);
+		}
+
+		if (index == 0) {
 			return url.substring(0, pos);
 		}
 
-		return url;
+		return url.substring(index, pos);
 	}
 
 	/**
@@ -974,9 +989,16 @@ public class HttpImpl implements Http {
 			return url;
 		}
 
-		url = removeProtocol(url);
+		int index = 0;
 
-		int pos = url.indexOf(CharPool.SLASH);
+		if (url.startsWith(Http.HTTP_WITH_SLASH)) {
+			index = Http.HTTP_WITH_SLASH.length();
+		}
+		else if (url.startsWith(Http.HTTPS_WITH_SLASH)) {
+			index = Http.HTTPS_WITH_SLASH.length();
+		}
+
+		int pos = url.indexOf(index, CharPool.SLASH);
 
 		if (pos > 0) {
 			return url.substring(pos);
