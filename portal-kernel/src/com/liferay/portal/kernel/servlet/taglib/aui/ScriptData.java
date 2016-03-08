@@ -206,8 +206,8 @@ public class ScriptData implements Mergeable<ScriptData>, Serializable {
 
 		char c = name.charAt(0);
 
-		if (Character.isLetter(c) || (c == CharPool.NEW_LINE) ||
-			(c == CharPool.RETURN)) {
+		if (((c >= CharPool.LOWER_CASE_A) && (c <= CharPool.LOWER_CASE_Z)) ||
+			(c == CharPool.NEW_LINE) || (c == CharPool.RETURN)) {
 
 			sb.append(c);
 		}
@@ -218,8 +218,11 @@ public class ScriptData implements Mergeable<ScriptData>, Serializable {
 		for (int i = 1; i < name.length(); i++) {
 			c = name.charAt(i);
 
-			if (Character.isLetterOrDigit(c) || (c == CharPool.NEW_LINE) ||
-				(c == CharPool.RETURN) || (c == CharPool.UNDERLINE)) {
+			if (((c >= CharPool.LOWER_CASE_A) &&
+				 (c <= CharPool.LOWER_CASE_Z)) ||
+				((c >= CharPool.NUMBER_0) && (c <= CharPool.NUMBER_9)) ||
+				(c == CharPool.NEW_LINE) || (c == CharPool.RETURN) ||
+				(c == CharPool.UNDERLINE)) {
 
 				sb.append(c);
 			}
