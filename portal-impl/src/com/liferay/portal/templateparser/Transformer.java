@@ -112,9 +112,7 @@ public class Transformer {
 			long classNameId = 0;
 
 			if (contextObjects != null) {
-				for (String key : contextObjects.keySet()) {
-					template.put(key, contextObjects.get(key));
-				}
+				template.putAll(contextObjects);
 
 				classNameId = GetterUtil.getLong(
 					contextObjects.get(TemplateConstants.CLASS_NAME_ID));
