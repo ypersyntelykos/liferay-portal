@@ -109,14 +109,10 @@ public class Transformer {
 		try {
 			prepareTemplate(themeDisplay, template);
 
-			long classNameId = 0;
+			template.putAll(contextObjects);
 
-			if (contextObjects != null) {
-				template.putAll(contextObjects);
-
-				classNameId = GetterUtil.getLong(
-					contextObjects.get(TemplateConstants.CLASS_NAME_ID));
-			}
+			long classNameId = GetterUtil.getLong(
+				contextObjects.get(TemplateConstants.CLASS_NAME_ID));
 
 			template.put("company", getCompany(themeDisplay, companyId));
 			template.put("companyId", companyId);
