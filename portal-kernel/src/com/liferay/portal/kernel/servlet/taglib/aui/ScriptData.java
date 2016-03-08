@@ -202,7 +202,7 @@ public class ScriptData implements Mergeable<ScriptData>, Serializable {
 	}
 
 	private String _generateVariable(String name) {
-		StringBundler sb = new StringBundler();
+		StringBuilder sb = new StringBuilder();
 
 		char c = name.charAt(0);
 
@@ -212,7 +212,7 @@ public class ScriptData implements Mergeable<ScriptData>, Serializable {
 			sb.append(c);
 		}
 		else {
-			sb.append(StringPool.UNDERLINE);
+			sb.append(CharPool.UNDERLINE);
 		}
 
 		for (int i = 1; i < name.length(); i++) {
