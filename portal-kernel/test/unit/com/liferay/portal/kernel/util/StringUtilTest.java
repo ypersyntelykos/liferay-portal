@@ -237,6 +237,19 @@ public class StringUtilTest {
 	}
 
 	@Test
+	public void testReplaceCharArray() throws Exception {
+		Assert.assertEquals(
+			"227_0_0_2",
+			StringUtil.replace(
+				"127.0.0.1", new char[] {'.', '1'}, new char[] {'_', '2'}));
+		Assert.assertEquals(
+			"227_0_0_2",
+			StringUtil.replace(
+				"127.0.0.1", new char[] {'.', '.', '1', '1'},
+				new char[] {'_', '_', '2', '2'}));
+	}
+
+	@Test
 	public void testReplaceCharStringArrays() {
 		Assert.assertEquals(
 			"Hello World,HELLO WORLD,Hello World",

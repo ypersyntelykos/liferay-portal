@@ -2515,8 +2515,28 @@ public class StringUtil {
 			return s;
 		}
 
-		for (int i = 0; i < oldSubs.length; i++) {
-			s = s.replace(oldSubs[i], newSubs[i]);
+		StringBuilder sb = new StringBuilder(s.length());
+
+		sb.append(s);
+
+		boolean modified = false;
+
+		for (int i = 0; i < sb.length(); i++) {
+			char c = sb.charAt(i);
+
+			for (int j = 0; j < oldSubs.length; j++) {
+				if (c == oldSubs[j]) {
+					sb.setCharAt(i, newSubs[j]);
+
+					modified = true;
+
+					break;
+				}
+			}
+		}
+
+		if (modified) {
+			return sb.toString();
 		}
 
 		return s;
