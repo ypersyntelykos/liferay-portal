@@ -244,6 +244,17 @@ public class StringUtilTest {
 				"Hello World/HI WORLD/Hello World",
 				new char[] {CharPool.SLASH, CharPool.UPPER_CASE_I},
 				new String[] {StringPool.COMMA, "ELLO"}));
+		Assert.assertEquals(
+			"Hello World,HELLO WORLD,Hello World",
+			StringUtil.replace(
+				"Hello World/HI WORLD/Hello World",
+				new char[] {
+					CharPool.SLASH, CharPool.SLASH, CharPool.UPPER_CASE_I,
+					CharPool.UPPER_CASE_I
+				},
+				new String[] {
+					StringPool.COMMA, StringPool.COMMA, "ELLO", "ELLO"
+				}));
 	}
 
 	@Test

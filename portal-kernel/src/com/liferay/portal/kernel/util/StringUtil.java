@@ -2551,6 +2551,8 @@ public class StringUtil {
 					sb.append(newSubs[j]);
 
 					lastReplacementIndex = i + 1;
+
+					break;
 				}
 			}
 		}
