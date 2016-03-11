@@ -2288,11 +2288,26 @@ public class StringUtil {
 			return s;
 		}
 
-		for (char oldSub : oldSubs) {
-			s = removeChar(s, oldSub);
+		StringBuilder sb = new StringBuilder(s.length());
+
+		iterate:
+		for (int i = 0; i < s.length(); i++) {
+			char c = s.charAt(i);
+
+			for (int j = 0; j < oldSubs.length; j++) {
+				if (c == oldSubs[j]) {
+					continue iterate;
+				}
+			}
+
+			sb.append(c);
 		}
 
-		return s;
+		if (s.length() == sb.length()) {
+			return s;
+		}
+
+		return sb.toString();
 	}
 
 	/**

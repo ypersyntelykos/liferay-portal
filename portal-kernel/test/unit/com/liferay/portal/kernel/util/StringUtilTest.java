@@ -231,6 +231,28 @@ public class StringUtilTest {
 	}
 
 	@Test
+	public void testRemoveChar() {
+		Assert.assertEquals("abcd", StringUtil.removeChar("a.b.c.d", '.'));
+		Assert.assertEquals("abcd", StringUtil.removeChar(".a.b.c.d.", '.'));
+
+		String s = "a.b.c.d";
+
+		Assert.assertSame(s, StringUtil.removeChar(s, '?'));
+	}
+
+	@Test
+	public void testRemoveChars() {
+		Assert.assertEquals(
+			"abcd", StringUtil.removeChars("a.*b./c.*d", '.', '*', '/'));
+		Assert.assertEquals(
+			"abcd", StringUtil.removeChars("/.*a./b.c.*d./", '.', '*', '/'));
+
+		String s = "/.*a./b.c.*d./";
+
+		Assert.assertSame(s, StringUtil.removeChars(s, 'x', 'y', 'z'));
+	}
+
+	@Test
 	public void testReplaceChar() {
 		Assert.assertEquals(
 			"127_0_0_1", StringUtil.replace("127.0.0.1", '.', '_'));
