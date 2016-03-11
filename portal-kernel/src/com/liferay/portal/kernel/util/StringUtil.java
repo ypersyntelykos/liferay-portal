@@ -2251,6 +2251,50 @@ public class StringUtil {
 		return removeFromList(s, element, delimiter);
 	}
 
+	public static String removeChar(String s, char oldSub) {
+		if (s == null) {
+			return null;
+		}
+
+		int y = s.indexOf(oldSub);
+
+		if (y >= 0) {
+			StringBundler sb = new StringBundler();
+
+			int x = 0;
+
+			while (x <= y) {
+				sb.append(s.substring(x, y));
+
+				x = y + 1;
+				y = s.indexOf(oldSub, x);
+			}
+
+			sb.append(s.substring(x));
+
+			return sb.toString();
+		}
+		else {
+			return s;
+		}
+	}
+
+	public static String removeChars(String s, char[] oldSubs) {
+		if (s == null) {
+			return null;
+		}
+
+		if (oldSubs == null) {
+			return s;
+		}
+
+		for (char oldSub : oldSubs) {
+			s = removeChar(s, oldSub);
+		}
+
+		return s;
+	}
+
 	/**
 	 * Removes the <code>remove</code> string from string <code>s</code> that
 	 * represents a list of comma delimited strings.
@@ -2355,34 +2399,6 @@ public class StringUtil {
 		return s;
 	}
 
-	public static String removeSubstring(String s, char oldSub) {
-		if (s == null) {
-			return null;
-		}
-
-		int y = s.indexOf(oldSub);
-
-		if (y >= 0) {
-			StringBundler sb = new StringBundler();
-
-			int x = 0;
-
-			while (x <= y) {
-				sb.append(s.substring(x, y));
-
-				x = y + 1;
-				y = s.indexOf(oldSub, x);
-			}
-
-			sb.append(s.substring(x));
-
-			return sb.toString();
-		}
-		else {
-			return s;
-		}
-	}
-
 	public static String removeSubstring(String s, String oldSub) {
 		if (s == null) {
 			return null;
@@ -2414,22 +2430,6 @@ public class StringUtil {
 		else {
 			return s;
 		}
-	}
-
-	public static String removeSubstrings(String s, char[] oldSubs) {
-		if (s == null) {
-			return null;
-		}
-
-		if (oldSubs == null) {
-			return s;
-		}
-
-		for (char oldSub : oldSubs) {
-			s = removeSubstring(s, oldSub);
-		}
-
-		return s;
 	}
 
 	public static String removeSubstrings(String s, String oldSubs[]) {

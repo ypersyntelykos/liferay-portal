@@ -927,7 +927,7 @@ public abstract class BaseDB implements DB {
 
 			while ((line = unsyncBufferedReader.readLine()) != null) {
 				if (!line.startsWith(comments)) {
-					line = StringUtil.removeSubstrings(
+					line = StringUtil.removeChars(
 						line, new char[] {'\n', '\t'});
 
 					if (line.endsWith(";")) {

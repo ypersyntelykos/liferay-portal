@@ -574,7 +574,7 @@ public class ShoppingItemLocalServiceImpl
 	}
 
 	protected String checkItemField(String value) {
-		return StringUtil.removeSubstrings(
+		return StringUtil.removeChars(
 			value,
 			new char[] {
 				CharPool.AMPERSAND, CharPool.APOSTROPHE, CharPool.EQUAL,
