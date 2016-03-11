@@ -107,7 +107,7 @@ public class BaseWebDAVTestCase {
 						stackTraceElement.getClassName(), CharPool.PERIOD);
 
 					testName = StringUtil.removeSubstrings(
-						testName, new String[] {"WebDAV", "Test"});
+						testName, "WebDAV", "Test");
 
 					headers.put(
 						"X-Litmus",

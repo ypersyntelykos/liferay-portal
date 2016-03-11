@@ -2279,7 +2279,7 @@ public class StringUtil {
 		}
 	}
 
-	public static String removeChars(String s, char[] oldSubs) {
+	public static String removeChars(String s, char... oldSubs) {
 		if (s == null) {
 			return null;
 		}
@@ -2432,7 +2432,7 @@ public class StringUtil {
 		}
 	}
 
-	public static String removeSubstrings(String s, String oldSubs[]) {
+	public static String removeSubstrings(String s, String... oldSubs) {
 		if (s == null) {
 			return null;
 		}

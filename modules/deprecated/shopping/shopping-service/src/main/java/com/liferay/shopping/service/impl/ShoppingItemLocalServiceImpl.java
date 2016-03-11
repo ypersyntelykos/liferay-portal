@@ -575,11 +575,8 @@ public class ShoppingItemLocalServiceImpl
 
 	protected String checkItemField(String value) {
 		return StringUtil.removeChars(
-			value,
-			new char[] {
-				CharPool.AMPERSAND, CharPool.APOSTROPHE, CharPool.EQUAL,
-				CharPool.PIPE, CharPool.QUOTE
-			});
+			value, CharPool.AMPERSAND, CharPool.APOSTROPHE, CharPool.EQUAL,
+			CharPool.PIPE, CharPool.QUOTE);
 	}
 
 	protected long getCategory(ShoppingItem item, long categoryId) {

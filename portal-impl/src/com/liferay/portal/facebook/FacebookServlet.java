@@ -89,10 +89,7 @@ public class FacebookServlet extends HttpServlet {
 	}
 
 	protected String fixFbml(String fbml) {
-		fbml = StringUtil.removeSubstrings(
-			fbml, new String[] {"<nobr>", "</nobr>"});
-
-		return fbml;
+		return StringUtil.removeSubstrings(fbml, "<nobr>", "</nobr>");
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

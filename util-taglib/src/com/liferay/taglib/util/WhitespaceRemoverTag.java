@@ -52,7 +52,7 @@ public class WhitespaceRemoverTag extends BodyTagSupport {
 		String bodyContentString = StringUtil.trim(bodyContent.getString());
 
 		bodyContentString = StringUtil.removeChars(
-			bodyContentString, new char[] {CharPool.NEW_LINE, CharPool.TAB});
+			bodyContentString, CharPool.NEW_LINE, CharPool.TAB);
 
 		return bodyContentString;
 	}
