@@ -462,10 +462,8 @@ public class StringUtil {
 			return false;
 		}
 
-		s1 = removeSubstrings(
-			s1, new String[] {StringPool.RETURN_NEW_LINE, StringPool.NEW_LINE});
-		s2 = removeSubstrings(
-			s2, new String[] {StringPool.RETURN_NEW_LINE, StringPool.NEW_LINE});
+		s1 = removeChars(s1, CharPool.RETURN, CharPool.NEW_LINE);
+		s2 = removeChars(s2, CharPool.RETURN, CharPool.NEW_LINE);
 
 		if (s1.length() != s2.length()) {
 			return false;
