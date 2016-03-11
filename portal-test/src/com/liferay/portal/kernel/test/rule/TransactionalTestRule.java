@@ -41,13 +41,9 @@ public class TransactionalTestRule implements TestRule {
 	}
 
 	public TransactionalTestRule(Propagation propagation) {
-		TransactionConfig.Builder builder = new TransactionConfig.Builder();
-
-		builder.setPropagation(propagation);
-		builder.setRollbackForClasses(
-			PortalException.class, SystemException.class);
-
-		_transactionConfig = builder.build();
+		_transactionConfig = TransactionConfig.Factory.create(
+			propagation,
+			new Class<?>[] {PortalException.class, SystemException.class});
 	}
 
 	@Override
