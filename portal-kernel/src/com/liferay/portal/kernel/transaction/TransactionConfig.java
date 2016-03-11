@@ -14,12 +14,49 @@
 
 package com.liferay.portal.kernel.transaction;
 
+import com.liferay.portal.kernel.util.HashUtil;
 import com.liferay.portal.kernel.util.StringPool;
+
+import java.util.Arrays;
 
 /**
  * @author Shuyang Zhou
  */
 public class TransactionConfig {
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+
+		if (!(obj instanceof TransactionConfig)) {
+			return false;
+		}
+
+		TransactionConfig transactionConfig = (TransactionConfig)obj;
+
+		if ((_isolation == transactionConfig._isolation) &&
+			Arrays.equals(
+				_noRollbackForClassNames,
+				transactionConfig._noRollbackForClassNames) &&
+			Arrays.equals(
+				_noRollbackForClasses,
+				transactionConfig._noRollbackForClasses) &&
+			(_propagation == transactionConfig._propagation) &&
+			(_readOnly == transactionConfig._readOnly) &&
+			Arrays.equals(
+				_rollbackForClassNames,
+				transactionConfig._rollbackForClassNames) &&
+			Arrays.equals(
+				_rollbackForClasses, transactionConfig._rollbackForClasses) &&
+			(_timeout == transactionConfig._timeout)) {
+
+			return true;
+		}
+
+		return false;
+	}
 
 	public Isolation getIsolation() {
 		return _isolation;
@@ -47,6 +84,55 @@ public class TransactionConfig {
 
 	public int getTimeout() {
 		return _timeout;
+	}
+
+	@Override
+	public int hashCode() {
+		int hash = HashUtil.hash(0, _isolation);
+
+		if (_noRollbackForClassNames == null) {
+			hash = HashUtil.hash(hash, 0);
+		}
+		else {
+			for (String noRollbackForClassName : _noRollbackForClassNames) {
+				hash = HashUtil.hash(hash, noRollbackForClassName);
+			}
+		}
+
+		if (_noRollbackForClasses == null) {
+			hash = HashUtil.hash(hash, 0);
+		}
+		else {
+			for (Class<?> noRollbackForClass : _noRollbackForClasses) {
+				hash = HashUtil.hash(hash, noRollbackForClass);
+			}
+		}
+
+		hash = HashUtil.hash(hash, _propagation);
+
+		hash = HashUtil.hash(hash, _readOnly);
+
+		if (_rollbackForClassNames == null) {
+			hash = HashUtil.hash(hash, 0);
+		}
+		else {
+			for (String rollbackForClassName : _rollbackForClassNames) {
+				hash = HashUtil.hash(hash, rollbackForClassName);
+			}
+		}
+
+		if (_rollbackForClasses == null) {
+			hash = HashUtil.hash(hash, 0);
+		}
+		else {
+			for (Class<?> rollbackForClass : _rollbackForClasses) {
+				hash = HashUtil.hash(hash, rollbackForClass);
+			}
+		}
+
+		hash = HashUtil.hash(hash, _timeout);
+
+		return hash;
 	}
 
 	public boolean isReadOnly() {
