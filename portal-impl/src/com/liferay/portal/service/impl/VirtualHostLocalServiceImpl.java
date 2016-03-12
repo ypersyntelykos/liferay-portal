@@ -22,6 +22,8 @@ import com.liferay.portal.kernel.model.LayoutSet;
 import com.liferay.portal.kernel.model.VirtualHost;
 import com.liferay.portal.kernel.transaction.TransactionCommitCallbackUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.model.impl.LayoutSetImpl;
+import com.liferay.portal.model.impl.LayoutSetModelImpl;
 import com.liferay.portal.service.base.VirtualHostLocalServiceBaseImpl;
 import com.liferay.portal.util.PropsValues;
 
@@ -57,7 +59,7 @@ public class VirtualHostLocalServiceImpl
 
 	@Override
 	public VirtualHost updateVirtualHost(
-		long companyId, long layoutSetId, String hostname) {
+		long companyId, final long layoutSetId, String hostname) {
 
 		VirtualHost virtualHost = virtualHostPersistence.fetchByC_L(
 			companyId, layoutSetId);
@@ -111,23 +113,21 @@ public class VirtualHostLocalServiceImpl
 		}
 
 		if (layoutSet != null) {
-			final LayoutSet cachedLayoutSet = layoutSet;
+			layoutSetPersistence.clearCache(layoutSet);
+
 			TransactionCommitCallbackUtil.registerCallback(
 				new Callable<Void>() {
 
 					@Override
-					public Void call() throws Exception {
+					public Void call() {
 						EntityCacheUtil.removeResult(
-							cachedLayoutSet.isEntityCacheEnabled(),
-							cachedLayoutSet.getClass(),
-							cachedLayoutSet.getPrimaryKeyObj());
+							LayoutSetModelImpl.ENTITY_CACHE_ENABLED,
+							LayoutSetImpl.class, layoutSetId);
 
 						return null;
 					}
 
 				});
-
-			layoutSetPersistence.clearCache(cachedLayoutSet);
 		}
 
 		return virtualHost;
