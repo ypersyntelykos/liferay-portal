@@ -15,6 +15,7 @@
 package com.liferay.portal.kernel.transaction;
 
 import com.liferay.portal.kernel.util.HashUtil;
+import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 
 import java.util.Arrays;
@@ -137,6 +138,31 @@ public class TransactionConfig {
 
 	public boolean isReadOnly() {
 		return _readOnly;
+	}
+
+	@Override
+	public String toString() {
+		StringBundler sb = new StringBundler(17);
+
+		sb.append("{isolation=");
+		sb.append(_isolation);
+		sb.append(", noRollbackForClassNames=");
+		sb.append(Arrays.toString(_noRollbackForClassNames));
+		sb.append(", noRollbackForClasses=");
+		sb.append(Arrays.toString(_noRollbackForClasses));
+		sb.append(", propagation=");
+		sb.append(_propagation);
+		sb.append(", readOnly=");
+		sb.append(_readOnly);
+		sb.append(", rollbackForClassNames=");
+		sb.append(Arrays.toString(_rollbackForClassNames));
+		sb.append(", rollbackForClasses=");
+		sb.append(Arrays.toString(_rollbackForClasses));
+		sb.append(", timeout=");
+		sb.append(_timeout);
+		sb.append(StringPool.CLOSE_CURLY_BRACE);
+
+		return sb.toString();
 	}
 
 	public static class Builder {
