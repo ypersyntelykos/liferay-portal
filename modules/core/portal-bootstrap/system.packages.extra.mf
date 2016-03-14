@@ -1,11 +1,11 @@
 Manifest-Version: 1.0
-Bnd-LastModified: 1457818068662
+Bnd-LastModified: 1457995642985
 Bundle-ManifestVersion: 2
 Bundle-Name: portal-bootstrap
 Bundle-SymbolicName: portal-bootstrap
 Bundle-Vendor: Liferay, Inc.
 Bundle-Version: 1.0.0
-Created-By: 1.7.0_95 (Oracle Corporation)
+Created-By: 1.7.0_80 (Oracle Corporation)
 Export-Package: com.liferay.ibm.icu;version="4.0.1",com.liferay.ibm.ic
  u.impl;version="4.0.1";uses:="com.liferay.ibm.icu.math,com.liferay.ib
  m.icu.text,com.liferay.ibm.icu.util",com.liferay.ibm.icu.impl.coll;ve
@@ -2427,10 +2427,10 @@ Export-Package: com.liferay.ibm.icu;version="4.0.1",com.liferay.ibm.ic
  ,com.liferay.portal.kernel.util",com.liferay.mobile.device.rules.kern
  el;version="1.0.0";uses:="com.liferay.expando.kernel.model,com.lifera
  y.exportimport.kernel.lar",com.liferay.osgi.service.tracker.collectio
- ns;version="1.0.1";uses:="org.osgi.framework",com.liferay.osgi.servic
- e.tracker.collections.list;version="1.0.1";uses:="org.osgi.framework,
+ ns;version="1.0.2";uses:="org.osgi.framework",com.liferay.osgi.servic
+ e.tracker.collections.list;version="1.0.2";uses:="org.osgi.framework,
  org.osgi.util.tracker",com.liferay.osgi.service.tracker.collections.m
- ap;version="1.0.1";uses:="com.liferay.osgi.service.tracker.collection
+ ap;version="1.0.2";uses:="com.liferay.osgi.service.tracker.collection
  s,org.osgi.framework,org.osgi.util.tracker",com.liferay.portal;versio
  n="1.0.0",com.liferay.portal.action;uses:="com.liferay.portal.kernel.
  exception,com.liferay.portal.kernel.json,com.liferay.portal.kernel.mo
@@ -4263,7 +4263,7 @@ Export-Package: com.liferay.ibm.icu;version="4.0.1",com.liferay.ibm.ic
  s.kernel.model,javax.portlet",com.liferay.registry;version="1.0.0";us
  es:="com.liferay.registry.dependency",com.liferay.registry.collection
  s;version="1.0.0";uses:="com.liferay.registry",com.liferay.registry.d
- ependency;version="1.0.0";uses:="com.liferay.registry",com.liferay.re
+ ependency;version="1.0.1";uses:="com.liferay.registry",com.liferay.re
  gistry.util;version="1.0.0",com.liferay.roles.admin.kernel.util;versi
  on="1.0.0";uses:="com.liferay.portal.kernel.model",com.liferay.sites.
  kernel.util;version="1.0.0";uses:="com.liferay.portal.kernel.exceptio
