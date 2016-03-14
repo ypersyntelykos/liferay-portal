@@ -169,14 +169,14 @@ public class FreeMarkerManager extends BaseSingleTemplateManager {
 
 		// Legacy
 
-		addTaglibFactory(contextObjects, "PortalJspTagLibs", servletContext);
-		addTaglibFactory(contextObjects, "PortletJspTagLibs", servletContext);
-		addTaglibFactory(contextObjects, "taglibLiferayHash", servletContext);
-
-		// Contributed
-
 		TaglibFactoryWrapper taglibFactoryWrapper = new TaglibFactoryWrapper(
 			servletContext);
+
+		contextObjects.put("PortalJspTagLibs", taglibFactoryWrapper);
+		contextObjects.put("PortletJspTagLibs", taglibFactoryWrapper);
+		contextObjects.put("taglibLiferayHash", taglibFactoryWrapper);
+
+		// Contributed
 
 		for (Map.Entry<String, String> entry : _taglibMappings.entrySet()) {
 			try {
