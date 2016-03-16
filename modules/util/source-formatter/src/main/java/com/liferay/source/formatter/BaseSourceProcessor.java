@@ -174,7 +174,7 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 	protected void checkIfClauseParentheses(
 		String ifClause, String fileName, int lineCount) {
 
-		int quoteCount = StringUtil.count(ifClause, StringPool.QUOTE);
+		int quoteCount = StringUtil.count(ifClause, CharPool.QUOTE);
 
 		if ((quoteCount % 2) == 1) {
 			return;
@@ -201,7 +201,7 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 		ifClause = stripRedundantParentheses(ifClause);
 
 		int level = 0;
-		int max = StringUtil.count(ifClause, StringPool.OPEN_PARENTHESIS);
+		int max = StringUtil.count(ifClause, CharPool.OPEN_PARENTHESIS);
 		int previousParenthesisPos = -1;
 
 		int[] levels = new int[max];
