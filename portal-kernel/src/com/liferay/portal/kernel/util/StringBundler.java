@@ -31,7 +31,7 @@ import java.io.Writer;
 public class StringBundler implements Serializable {
 
 	public StringBundler() {
-		_array = new String[_DEFAULT_ARRAY_CAPACITY];
+		_charSequences = new CharSequence[_DEFAULT_ARRAY_CAPACITY];
 	}
 
 	public StringBundler(int initialCapacity) {
@@ -39,15 +39,15 @@ public class StringBundler implements Serializable {
 			initialCapacity = _DEFAULT_ARRAY_CAPACITY;
 		}
 
-		_array = new String[initialCapacity];
+		_charSequences = new CharSequence[initialCapacity];
 	}
 
 	public StringBundler(String s) {
-		_array = new String[_DEFAULT_ARRAY_CAPACITY];
+		_charSequences = new CharSequence[_DEFAULT_ARRAY_CAPACITY];
 
-		_array[0] = s;
+		_charSequences[0] = s;
 
-		_arrayIndex = 1;
+		_index = 1;
 	}
 
 	public StringBundler(String[] stringArray) {
@@ -55,11 +55,11 @@ public class StringBundler implements Serializable {
 	}
 
 	public StringBundler(String[] stringArray, int extraSpace) {
-		_array = new String[stringArray.length + extraSpace];
+		_charSequences = new String[stringArray.length + extraSpace];
 
 		for (String s : stringArray) {
 			if ((s != null) && (s.length() > 0)) {
-				_array[_arrayIndex++] = s;
+				_charSequences[_index++] = s;
 			}
 		}
 	}
@@ -84,6 +84,24 @@ public class StringBundler implements Serializable {
 		else {
 			return append(new String(chars));
 		}
+	}
+
+	public StringBundler append(CharSequence charSequence) {
+		if (charSequence == null) {
+			charSequence = StringPool.NULL;
+		}
+
+		if (charSequence.length() == 0) {
+			return this;
+		}
+
+		if (_index >= _charSequences.length) {
+			expandCapacity(_charSequences.length * 2);
+		}
+
+		_charSequences[_index++] = charSequence;
+
+		return this;
 	}
 
 	public StringBundler append(double d) {
@@ -115,11 +133,11 @@ public class StringBundler implements Serializable {
 			return this;
 		}
 
-		if (_arrayIndex >= _array.length) {
-			expandCapacity(_array.length * 2);
+		if (_index >= _charSequences.length) {
+			expandCapacity(_charSequences.length * 2);
 		}
 
-		_array[_arrayIndex++] = s;
+		_charSequences[_index++] = s;
 
 		return this;
 	}
@@ -129,13 +147,13 @@ public class StringBundler implements Serializable {
 			return this;
 		}
 
-		if ((_array.length - _arrayIndex) < stringArray.length) {
-			expandCapacity((_array.length + stringArray.length) * 2);
+		if ((_charSequences.length - _index) < stringArray.length) {
+			expandCapacity((_charSequences.length + stringArray.length) * 2);
 		}
 
 		for (String s : stringArray) {
 			if ((s != null) && (s.length() > 0)) {
-				_array[_arrayIndex++] = s;
+				_charSequences[_index++] = s;
 			}
 		}
 
@@ -143,41 +161,68 @@ public class StringBundler implements Serializable {
 	}
 
 	public StringBundler append(StringBundler sb) {
-		if ((sb == null) || (sb._arrayIndex == 0)) {
+		if ((sb == null) || (sb._index == 0)) {
 			return this;
 		}
 
-		if ((_array.length - _arrayIndex) < sb._arrayIndex) {
-			expandCapacity((_array.length + sb._arrayIndex) * 2);
+		if ((_charSequences.length - _index) < sb._index) {
+			expandCapacity((_charSequences.length + sb._index) * 2);
 		}
 
-		System.arraycopy(sb._array, 0, _array, _arrayIndex, sb._arrayIndex);
+		System.arraycopy(
+			sb._charSequences, 0, _charSequences, _index, sb._index);
 
-		_arrayIndex += sb._arrayIndex;
+		_index += sb._index;
 
 		return this;
 	}
 
 	public int capacity() {
-		return _array.length;
+		return _charSequences.length;
+	}
+
+	public CharSequence charSequenceAt(int index) {
+		if ((index < 0) || (index >= _index)) {
+			throw new ArrayIndexOutOfBoundsException(index);
+		}
+
+		return _charSequences[index];
+	}
+
+	public CharSequence[] getCharSequences() {
+		return _charSequences;
 	}
 
 	public String[] getStrings() {
-		return _array;
+		String[] strings = new String[_index];
+
+		for (int i = 0; i < _index; i++) {
+			strings[i] = _charSequences[i].toString();
+		}
+
+		return strings;
 	}
 
 	public int index() {
-		return _arrayIndex;
+		return _index;
 	}
 
 	public int length() {
 		int length = 0;
 
-		for (int i = 0; i < _arrayIndex; i++) {
-			length += _array[i].length();
+		for (int i = 0; i < _index; i++) {
+			length += _charSequences[i].length();
 		}
 
 		return length;
+	}
+
+	public void setCharSequenceAt(CharSequence charSequence, int index) {
+		if ((index < 0) || (index >= _index)) {
+			throw new ArrayIndexOutOfBoundsException(index);
+		}
+
+		_charSequences[index] = charSequence;
 	}
 
 	public void setIndex(int newIndex) {
@@ -185,67 +230,68 @@ public class StringBundler implements Serializable {
 			throw new ArrayIndexOutOfBoundsException(newIndex);
 		}
 
-		if (newIndex > _array.length) {
-			String[] newArray = new String[newIndex];
+		if (newIndex > _charSequences.length) {
+			CharSequence[] newCharSequences = new CharSequence[newIndex];
 
-			System.arraycopy(_array, 0, newArray, 0, _arrayIndex);
+			System.arraycopy(_charSequences, 0, newCharSequences, 0, _index);
 
-			_array = newArray;
+			_charSequences = newCharSequences;
 		}
 
-		if (_arrayIndex < newIndex) {
-			for (int i = _arrayIndex; i < newIndex; i++) {
-				_array[i] = StringPool.BLANK;
+		if (_index < newIndex) {
+			for (int i = _index; i < newIndex; i++) {
+				_charSequences[i] = EmptyCharSequenece.INSTANCE;
 			}
 		}
 
-		if (_arrayIndex > newIndex) {
-			for (int i = newIndex; i < _arrayIndex; i++) {
-				_array[i] = null;
+		if (_index > newIndex) {
+			for (int i = newIndex; i < _index; i++) {
+				_charSequences[i] = null;
 			}
 		}
 
-		_arrayIndex = newIndex;
+		_index = newIndex;
 	}
 
 	public void setStringAt(String s, int index) {
-		if ((index < 0) || (index >= _arrayIndex)) {
-			throw new ArrayIndexOutOfBoundsException(index);
-		}
-
-		_array[index] = s;
+		setCharSequenceAt(s, index);
 	}
 
 	public String stringAt(int index) {
-		if ((index < 0) || (index >= _arrayIndex)) {
-			throw new ArrayIndexOutOfBoundsException(index);
-		}
+		CharSequence charSequence = charSequenceAt(index);
 
-		return _array[index];
+		return charSequence.toString();
 	}
 
 	@Override
 	public String toString() {
-		if (_arrayIndex == 0) {
+		if (_index == 0) {
 			return StringPool.BLANK;
 		}
 
-		if (_arrayIndex == 1) {
-			return _array[0];
+		if (_index == 1) {
+			return _charSequences[0].toString();
 		}
 
-		if (_arrayIndex == 2) {
-			return _array[0].concat(_array[1]);
+		if (_index == 2) {
+			String s1 = _charSequences[0].toString();
+			String s2 = _charSequences[1].toString();
+
+			return s1.concat(s2);
 		}
 
-		if (_arrayIndex == 3) {
-			return _array[0].concat(_array[1]).concat(_array[2]);
+		if (_index == 3) {
+			String s1 = _charSequences[0].toString();
+			String s2 = _charSequences[1].toString();
+			String s3 = _charSequences[3].toString();
+
+			return s1.concat(s2).concat(s3);
 		}
 
 		int length = 0;
 
-		for (int i = 0; i < _arrayIndex; i++) {
-			length += _array[i].length();
+		for (int i = 0; i < _index; i++) {
+			length += _charSequences[i].length();
 		}
 
 		StringBuilder sb = null;
@@ -268,25 +314,372 @@ public class StringBundler implements Serializable {
 			sb = new StringBuilder(length);
 		}
 
-		for (int i = 0; i < _arrayIndex; i++) {
-			sb.append(_array[i]);
+		for (int i = 0; i < _index; i++) {
+			CharSequence charSequence = _charSequences[i];
+
+			if (charSequence instanceof EnhancedCharSequence) {
+				EnhancedCharSequence enhancedCharSequence =
+					(EnhancedCharSequence)charSequence;
+
+				enhancedCharSequence.appendTo(sb);
+			}
+			else {
+				sb.append(_charSequences[i]);
+			}
 		}
 
 		return sb.toString();
 	}
 
 	public void writeTo(Writer writer) throws IOException {
-		for (int i = 0; i < _arrayIndex; i++) {
-			writer.write(_array[i]);
+		for (int i = 0; i < _index; i++) {
+			writer.write(_charSequences[i].toString());
 		}
+	}
+
+	public static class ArrayCharSequence implements EnhancedCharSequence {
+
+		public ArrayCharSequence(char[] chars, int start, int end) {
+			_chars = chars;
+			_start = start;
+			_end = end;
+		}
+
+		@Override
+		public void appendTo(StringBuilder sb) {
+			sb.append(_chars, _start, _end);
+		}
+
+		@Override
+		public char charAt(int index) {
+			if ((index < 0) || (index >= (_end - _start))) {
+				throw new StringIndexOutOfBoundsException(index);
+			}
+
+			return _chars[index];
+		}
+
+		@Override
+		public boolean equals(Object object) {
+			if (this == object) {
+				return true;
+			}
+
+			if (!(object instanceof ArrayCharSequence)) {
+				return false;
+			}
+
+			ArrayCharSequence arrayCharSequence = (ArrayCharSequence)object;
+
+			int length = length();
+
+			if (length != arrayCharSequence.length()) {
+				return false;
+			}
+
+			for (int i = 0; i < length; i++) {
+				if (_chars[_start + i] !=
+						arrayCharSequence.
+							_chars[arrayCharSequence._start + i]) {
+
+					return false;
+				}
+			}
+
+			return true;
+		}
+
+		@Override
+		public int hashCode() {
+			int hash = _hash;
+
+			if ((hash == 0) && (_end > _start)) {
+				for (int i = _start; i < _end; i++) {
+					hash = 31 * hash + _chars[i];
+				}
+
+				_hash = hash;
+			}
+
+			return hash;
+		}
+
+		@Override
+		public int length() {
+			return _end - _start;
+		}
+
+		@Override
+		public CharSequence subSequence(int start, int end) {
+			if (start < 0) {
+				throw new StringIndexOutOfBoundsException(start);
+			}
+
+			int length = length();
+
+			if (end > length) {
+				throw new StringIndexOutOfBoundsException(end);
+			}
+
+			int subLength = end - start;
+
+			if (subLength < 0) {
+				throw new StringIndexOutOfBoundsException(subLength);
+			}
+
+			if ((start == 0) && (end == length)) {
+				return this;
+			}
+
+			return new ArrayCharSequence(_chars, _start + start, _start + end);
+		}
+
+		@Override
+		public String toString() {
+			return new String(_chars, _start, _end - _start);
+		}
+
+		private final char[] _chars;
+		private final int _end;
+		private int _hash;
+		private final int _start;
+
+	}
+
+	public static class EmptyCharSequenece implements EnhancedCharSequence {
+
+		public static final EmptyCharSequenece INSTANCE =
+			new EmptyCharSequenece();
+
+		@Override
+		public void appendTo(StringBuilder sb) {
+		}
+
+		@Override
+		public char charAt(int index) {
+			throw new ArrayIndexOutOfBoundsException(index);
+		}
+
+		@Override
+		public boolean equals(Object object) {
+			if (this == object) {
+				return true;
+			}
+
+			return false;
+		}
+
+		@Override
+		public int hashCode() {
+			return 0;
+		}
+
+		@Override
+		public int length() {
+			return 0;
+		}
+
+		@Override
+		public CharSequence subSequence(int start, int end) {
+			throw new ArrayIndexOutOfBoundsException(start);
+		}
+
+		@Override
+		public String toString() {
+			return StringPool.BLANK;
+		}
+
+		private EmptyCharSequenece() {
+		}
+
+	}
+
+	public static class SingleCharSequence implements EnhancedCharSequence {
+
+		public SingleCharSequence(char c) {
+			_c = c;
+		}
+
+		@Override
+		public void appendTo(StringBuilder sb) {
+			sb.append(_c);
+		}
+
+		@Override
+		public char charAt(int index) {
+			if (index != 0) {
+				throw new ArrayIndexOutOfBoundsException(index);
+			}
+
+			return _c;
+		}
+
+		@Override
+		public boolean equals(Object object) {
+			if (this == object) {
+				return true;
+			}
+
+			if (!(object instanceof SingleCharSequence)) {
+				return false;
+			}
+
+			SingleCharSequence singleCharSequence = (SingleCharSequence)object;
+
+			if (_c == singleCharSequence._c) {
+				return true;
+			}
+
+			return false;
+		}
+
+		@Override
+		public int hashCode() {
+			return _c;
+		}
+
+		@Override
+		public int length() {
+			return 1;
+		}
+
+		@Override
+		public CharSequence subSequence(int start, int end) {
+			if (start != 0) {
+				throw new ArrayIndexOutOfBoundsException(start);
+			}
+
+			if ((end < 0) || (end > 1)) {
+				throw new ArrayIndexOutOfBoundsException(end);
+			}
+
+			if (end == 0) {
+				return EmptyCharSequenece.INSTANCE;
+			}
+
+			return this;
+		}
+
+		@Override
+		public String toString() {
+			return new String(new char[] {_c});
+		}
+
+		private final char _c;
+
+	}
+
+	public static class StringPart implements EnhancedCharSequence {
+
+		public StringPart(String s, int start) {
+			this(s, start, s.length());
+		}
+
+		public StringPart(String s, int start, int end) {
+			_s = s;
+			_start = start;
+			_end = end;
+		}
+
+		@Override
+		public void appendTo(StringBuilder sb) {
+			sb.append(_s, _start, _end);
+		}
+
+		@Override
+		public char charAt(int index) {
+			if ((index < 0) || (index >= (_end - _start))) {
+				throw new StringIndexOutOfBoundsException(index);
+			}
+
+			return _s.charAt(_start + index);
+		}
+
+		@Override
+		public boolean equals(Object object) {
+			if (this == object) {
+				return true;
+			}
+
+			if (!(object instanceof StringPart)) {
+				return false;
+			}
+
+			StringPart stringPart = (StringPart)object;
+
+			return _s.regionMatches(
+				_start, stringPart._s, stringPart._start, stringPart.length());
+		}
+
+		@Override
+		public int hashCode() {
+			int hash = _hash;
+
+			if ((hash == 0) && (_end > _start)) {
+				for (int i = _start; i < _end; i++) {
+					hash = 31 * hash + _s.charAt(i);
+				}
+
+				_hash = hash;
+			}
+
+			return hash;
+		}
+
+		@Override
+		public int length() {
+			return _end - _start;
+		}
+
+		@Override
+		public CharSequence subSequence(int start, int end) {
+			if (start < 0) {
+				throw new StringIndexOutOfBoundsException(start);
+			}
+
+			int length = length();
+
+			if (end > length) {
+				throw new StringIndexOutOfBoundsException(end);
+			}
+
+			int subLength = end - start;
+
+			if (subLength < 0) {
+				throw new StringIndexOutOfBoundsException(subLength);
+			}
+
+			if ((start == 0) && (end == length)) {
+				return this;
+			}
+
+			return new StringPart(_s, _start + start, _start + end);
+		}
+
+		@Override
+		public String toString() {
+			return _s.substring(_start, _end);
+		}
+
+		private final int _end;
+		private int _hash;
+		private final String _s;
+		private final int _start;
+
+	}
+
+	public interface EnhancedCharSequence extends CharSequence {
+
+		public void appendTo(StringBuilder sb);
+
 	}
 
 	protected void expandCapacity(int newCapacity) {
 		String[] newArray = new String[newCapacity];
 
-		System.arraycopy(_array, 0, newArray, 0, _arrayIndex);
+		System.arraycopy(_charSequences, 0, newArray, 0, _index);
 
-		_array = newArray;
+		_charSequences = newArray;
 	}
 
 	private static final int _DEFAULT_ARRAY_CAPACITY = 16;
@@ -316,7 +709,7 @@ public class StringBundler implements Serializable {
 		}
 	}
 
-	private String[] _array;
-	private int _arrayIndex;
+	private CharSequence[] _charSequences;
+	private int _index;
 
 }
