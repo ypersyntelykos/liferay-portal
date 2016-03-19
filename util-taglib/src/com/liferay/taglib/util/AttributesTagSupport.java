@@ -66,18 +66,14 @@ public class AttributesTagSupport
 			value = String.valueOf(value);
 		}
 
-		request.setAttribute(_encodeKey(key), value);
+		request.setAttribute(encodeKey(key), value);
 	}
 
 	public void setScopedAttribute(String name, Object value) {
 		_scopedAttributes.put(name, value);
 	}
 
-	protected Map<String, Object> getDynamicAttributes() {
-		return _dynamicAttributes;
-	}
-
-	private String _encodeKey(String key) {
+	protected String encodeKey(String key) {
 		String attributeNamespace = getAttributeNamespace();
 
 		if (attributeNamespace.isEmpty()) {
@@ -85,6 +81,10 @@ public class AttributesTagSupport
 		}
 
 		return attributeNamespace.concat(key);
+	}
+
+	protected Map<String, Object> getDynamicAttributes() {
+		return _dynamicAttributes;
 	}
 
 	private Map<String, Object> _dynamicAttributes = new HashMap<>();
