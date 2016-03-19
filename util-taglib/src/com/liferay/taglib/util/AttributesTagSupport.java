@@ -34,7 +34,7 @@ public class AttributesTagSupport
 	}
 
 	public String getAttributeNamespace() {
-		return _attributeNamespace;
+		return StringPool.BLANK;
 	}
 
 	public Map<String, Object> getScopedAttributes() {
@@ -45,13 +45,8 @@ public class AttributesTagSupport
 	public void release() {
 		super.release();
 
-		_attributeNamespace = null;
 		_dynamicAttributes = null;
 		_scopedAttributes = null;
-	}
-
-	public void setAttributeNamespace(String attributeNamespace) {
-		_attributeNamespace = attributeNamespace;
 	}
 
 	@Override
@@ -83,15 +78,15 @@ public class AttributesTagSupport
 	}
 
 	private String _encodeKey(String key) {
-		if (_attributeNamespace.length() == 0) {
+		String attributeNamespace = getAttributeNamespace();
+
+		if (attributeNamespace.isEmpty()) {
 			return key;
 		}
-		else {
-			return _attributeNamespace.concat(key);
-		}
+
+		return attributeNamespace.concat(key);
 	}
 
-	private String _attributeNamespace = StringPool.BLANK;
 	private Map<String, Object> _dynamicAttributes = new HashMap<>();
 	private Map<String, Object> _scopedAttributes = new HashMap<>();
 
