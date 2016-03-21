@@ -564,31 +564,80 @@ public class HttpImpl implements Http {
 			return StringPool.BLANK;
 		}
 
-		String[] parts = StringUtil.split(url, CharPool.QUESTION);
+		int questionPos = url.indexOf(CharPool.QUESTION);
 
-		if (parts.length == 2) {
-			String[] params = null;
+		if (questionPos == -1) {
+			return StringPool.BLANK;
+		}
+
+		int pos = url.indexOf(name, questionPos + 1);
+
+		if ((pos == (questionPos + 1)) &&
+			(url.charAt(pos + name.length()) == CharPool.EQUAL)) {
+
+			int start = pos + name.length() + 1;
+			int end = 0;
 
 			if (escaped) {
-				params = StringUtil.split(parts[1], "&amp;");
+				end = url.indexOf("&amp;", start);
 			}
 			else {
-				params = StringUtil.split(parts[1], CharPool.AMPERSAND);
+				end = url.indexOf(CharPool.AMPERSAND, start);
 			}
 
-			for (String param : params) {
-				String[] kvp = StringUtil.split(param, CharPool.EQUAL);
+			if (end == -1) {
+				end = url.indexOf(CharPool.POUND, start);
+			}
 
-				if ((kvp.length == 2) && kvp[0].equals(name)) {
-					int anchor = kvp[1].indexOf(CharPool.POUND);
+			if (end == -1) {
+				return url.substring(start);
+			}
 
-					if (anchor < 0) {
-						return kvp[1];
+			return url.substring(start, end);
+		}
+
+		while (pos != -1) {
+			int start = name.length() + pos + 1;
+
+			if (url.charAt(pos + name.length()) == CharPool.EQUAL) {
+				if (escaped) {
+					if ((url.charAt(pos - 5) == CharPool.AMPERSAND) &&
+						(url.charAt(pos - 4) == CharPool.LOWER_CASE_A) &&
+						(url.charAt(pos - 3) == CharPool.LOWER_CASE_M) &&
+						(url.charAt(pos - 2) == CharPool.LOWER_CASE_P) &&
+						(url.charAt(pos - 1) == CharPool.SEMICOLON)) {
+
+						int end = url.indexOf("&amp;", start);
+
+						if (end == -1) {
+							end = url.indexOf(CharPool.POUND, start);
+
+							if (end == -1) {
+								return url.substring(start);
+							}
+						}
+
+						return url.substring(start, end);
 					}
+				}
+				else {
+					if (url.charAt(pos - 1) == CharPool.AMPERSAND) {
+						int end = url.indexOf(CharPool.AMPERSAND, start);
 
-					return kvp[1].substring(0, anchor);
+						if (end == -1) {
+							end = url.indexOf(CharPool.POUND, start);
+
+							if (end == -1) {
+								return url.substring(start);
+							}
+						}
+
+						return url.substring(start, end);
+					}
 				}
 			}
+
+			pos = url.indexOf(name, start);
 		}
 
 		return StringPool.BLANK;
