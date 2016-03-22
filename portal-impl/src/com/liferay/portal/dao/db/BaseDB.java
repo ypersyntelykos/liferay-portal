@@ -381,7 +381,7 @@ public abstract class BaseDB implements DB {
 			String line = null;
 
 			while ((line = unsyncBufferedReader.readLine()) != null) {
-				if (line.startsWith("##")) {
+				if (line.isEmpty() || line.startsWith("##")) {
 					continue;
 				}
 
@@ -427,7 +427,7 @@ public abstract class BaseDB implements DB {
 						sb.setIndex(0);
 
 						try {
-							if (!sql.equals("COMMIT_TRANSACTION;")) {
+							if (!sql.equals("COMMIT_TRANSACTION;\n")) {
 								runSQL(connection, sql);
 							}
 							else {
