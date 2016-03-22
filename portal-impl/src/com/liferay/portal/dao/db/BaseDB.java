@@ -279,7 +279,7 @@ public abstract class BaseDB implements DB {
 					sql = sql.substring(0, sql.length() - 1);
 				}
 
-				if (sql.endsWith(" go")) {
+				if (sql.endsWith("\ngo")) {
 					sql = sql.substring(0, sql.length() - 3);
 				}
 
