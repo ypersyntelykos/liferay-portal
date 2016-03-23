@@ -17,9 +17,7 @@ package com.liferay.portal.util;
 import com.liferay.portal.kernel.test.CaptureHandler;
 import com.liferay.portal.kernel.test.JDKLoggerTestUtil;
 import com.liferay.portal.kernel.util.CharPool;
-import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PredicateFilter;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 
 import java.util.List;
@@ -29,40 +27,39 @@ import java.util.logging.LogRecord;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
 
 /**
  * @author Miguel Pastor
  * @author Preston Crary
  */
-@PowerMockIgnore("javax.xml.datatype.*")
-@PrepareForTest({PortalUtil.class})
-@RunWith(PowerMockRunner.class)
-public class HttpImplTest extends PowerMockito {
+public class HttpImplTest {
 
 	@Test
 	public void testAddBooleanParameter() {
-		_addParameter("http://foo.com", "p", String.valueOf(Boolean.TRUE));
+		Assert.assertEquals(
+			"http://foo?p1=true",
+			_httpImpl.addParameter("http://foo", "p1", true));
 	}
 
 	@Test
 	public void testAddDoubleParameter() {
-		_addParameter("http://foo.com", "p", String.valueOf(111.1D));
+		Assert.assertEquals(
+			"http://foo?p1=1.0",
+			_httpImpl.addParameter("http://foo", "p1", 1.0));
 	}
 
 	@Test
 	public void testAddIntParameter() {
-		_addParameter("http://foo.com", "p", String.valueOf(1));
+		Assert.assertEquals(
+			"http://foo?p1=1",
+			_httpImpl.addParameter("http://foo", "p1", 1));
 	}
 
 	@Test
 	public void testAddLongParameter() {
-		_addParameter("http://foo.com", "p", String.valueOf(111111L));
+		Assert.assertEquals(
+			"http://foo?p1=1",
+			_httpImpl.addParameter("http://foo", "p1", 1L));
 	}
 
 	@Test
@@ -109,12 +106,16 @@ public class HttpImplTest extends PowerMockito {
 
 	@Test
 	public void testAddShortParameter() {
-		_addParameter("http://foo.com", "p", String.valueOf((short)1));
+		Assert.assertEquals(
+			"http://foo?p1=1",
+			_httpImpl.addParameter("http://foo", "p1", (short)1));
 	}
 
 	@Test
 	public void testAddStringParameter() {
-		_addParameter("http://foo.com", "p", new String("foo"));
+		Assert.assertEquals(
+			"http://foo?p1=1",
+			_httpImpl.addParameter("http://foo", "p1", "1"));
 	}
 
 	@Test
@@ -482,33 +483,6 @@ public class HttpImplTest extends PowerMockito {
 
 	protected void testDecodeURLWithNotHexChars(String url) {
 		_testDecodeURL(url, "is not a hex char");
-	}
-
-	private void _addParameter(
-		String url, String parameterName, String parameterValue) {
-
-		mockStatic(PortalUtil.class);
-
-		when(
-			PortalUtil.stripURLAnchor(url, CharPool.POUND)
-		).thenReturn(
-			new String[] {url, StringPool.BLANK}
-		);
-
-		String newURL = _httpImpl.addParameter(
-			url, parameterName, parameterValue);
-
-		verifyStatic();
-
-		StringBundler sb = new StringBundler(5);
-
-		sb.append(url);
-		sb.append(StringPool.QUESTION);
-		sb.append(parameterName);
-		sb.append(StringPool.EQUAL);
-		sb.append(parameterValue);
-
-		Assert.assertEquals(sb.toString(), newURL);
 	}
 
 	private void _testDecodeURL(String url, String expectedMessage) {
