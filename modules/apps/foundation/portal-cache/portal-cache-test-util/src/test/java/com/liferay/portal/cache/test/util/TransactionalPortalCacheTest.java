@@ -15,9 +15,6 @@
 package com.liferay.portal.cache.test.util;
 
 import com.liferay.portal.cache.TransactionalPortalCache;
-import com.liferay.portal.cache.test.util.TestPortalCache;
-import com.liferay.portal.cache.test.util.TestPortalCacheListener;
-import com.liferay.portal.cache.test.util.TestPortalCacheReplicator;
 import com.liferay.portal.kernel.cache.PortalCache;
 import com.liferay.portal.kernel.cache.PortalCacheHelperUtil;
 import com.liferay.portal.kernel.cache.transactional.TransactionalPortalCacheHelper;
@@ -65,6 +62,8 @@ public class TransactionalPortalCacheTest {
 
 			@Override
 			public void appendAssertClasses(List<Class<?>> assertClasses) {
+				assertClasses.add(TransactionalPortalCache.class);
+
 				Class<TransactionalPortalCacheHelper> clazz =
 					TransactionalPortalCacheHelper.class;
 
