@@ -272,16 +272,31 @@ NumberFormat numberFormat = NumberFormat.getNumberInstance(locale);
 </c:if>
 
 <%!
-private String _getHREF(String formName, String curParam, int cur, String jsCall, String url, String urlAnchor) throws Exception {
-	String href = null;
-
+private String _getHREF(String formName, String curParam, int cur, String jsCall, String url, String urlAnchor) {
 	if (Validator.isNotNull(url)) {
-		href = HtmlUtil.escape(url + curParam + "=" + cur + urlAnchor);
+		StringBundler sb = new StringBundler(5);
+
+		sb.append(url);
+		sb.append(curParam);
+		sb.append(StringPool.EQUAL);
+		sb.append(cur);
+		sb.append(urlAnchor);
+
+		return HtmlUtil.escape(sb.toString());
 	}
 	else {
-		href = "javascript:document." + formName + "." + curParam + ".value = '" + cur + "'; " + jsCall;
-	}
+		StringBundler sb = new StringBundler(8);
 
-	return href;
+		sb.append("javascript:document.");
+		sb.append(formName);
+		sb.append(StringPool.PERIOD);
+		sb.append(curParam);
+		sb.append(".value = '");
+		sb.append(cur);
+		sb.append("'; ");
+		sb.append(jsCall);
+
+		return sb.toString();
+	}
 }
 %>
