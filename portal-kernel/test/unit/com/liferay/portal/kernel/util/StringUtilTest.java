@@ -194,6 +194,21 @@ public class StringUtilTest {
 	}
 
 	@Test
+	public void testIsMadeOf() {
+		Assert.assertFalse(StringUtil.isMadeOf("Test String ABC"));
+		Assert.assertFalse(StringUtil.isMadeOf("Test String ABC", "Test"));
+		Assert.assertFalse(
+			StringUtil.isMadeOf("Test String ABC", "Test", " String"));
+		Assert.assertFalse(
+			StringUtil.isMadeOf("Test String ABC", "Test", " String", "ABC"));
+		Assert.assertTrue(
+			StringUtil.isMadeOf("Test String ABC", "Test", " String", " ABC"));
+		Assert.assertFalse(
+			StringUtil.isMadeOf(
+				"Test String ABC", "Test", " String", " ABC", " DEF"));
+	}
+
+	@Test
 	public void testIsUpperCase() {
 		Assert.assertFalse(StringUtil.isUpperCase("hello world"));
 		Assert.assertFalse(StringUtil.isUpperCase("Hello World"));

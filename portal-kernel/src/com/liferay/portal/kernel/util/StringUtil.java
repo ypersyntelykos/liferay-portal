@@ -1194,6 +1194,30 @@ public class StringUtil {
 		return true;
 	}
 
+	public static boolean isMadeOf(String s, String... parts) {
+		int length = 0;
+
+		for (String part : parts) {
+			length += part.length();
+		}
+
+		if (length != s.length()) {
+			return false;
+		}
+
+		int index = 0;
+
+		for (String part : parts) {
+			if (!s.regionMatches(index, part, 0, part.length())) {
+				return false;
+			}
+
+			index += part.length();
+		}
+
+		return true;
+	}
+
 	/**
 	 * Returns <code>true</code> if all the characters in string <code>s</code>
 	 * are upper case, ignoring any non-alphabetic characters.
