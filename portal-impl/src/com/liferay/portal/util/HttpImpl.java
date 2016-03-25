@@ -233,32 +233,34 @@ public class HttpImpl implements Http {
 		StringBuilder sb = new StringBuilder(
 			url.length() + name.length() + value.length() + 2);
 
-		int pos = url.indexOf(CharPool.POUND);
+		int anchorIndex = url.indexOf(CharPool.POUND);
 
-		String anchor = StringPool.BLANK;
-
-		if (pos != -1) {
-			anchor = url.substring(pos);
-			url = url.substring(0, pos);
+		if (anchorIndex == -1) {
+			sb.append(url);
 		}
-
-		sb.append(url);
+		else {
+			sb.append(url, 0, anchorIndex);
+		}
 
 		if (url.indexOf(CharPool.QUESTION) == -1) {
 			sb.append(CharPool.QUESTION);
 		}
-		else if ((url.charAt(url.length() - 1) != CharPool.QUESTION) &&
-				 (url.charAt(url.length() - 1) != CharPool.AMPERSAND)) {
+		else {
+			char lastChar = sb.charAt(sb.length() - 1);
 
-			sb.append(CharPool.AMPERSAND);
+			if ((lastChar != CharPool.QUESTION) &&
+				(lastChar != CharPool.AMPERSAND)) {
+
+				sb.append(CharPool.AMPERSAND);
+			}
 		}
 
 		sb.append(name);
 		sb.append(CharPool.EQUAL);
 		sb.append(value);
 
-		if (pos != -1) {
-			sb.append(anchor);
+		if (anchorIndex != -1) {
+			sb.append(url, anchorIndex, url.length());
 		}
 
 		String result = sb.toString();
