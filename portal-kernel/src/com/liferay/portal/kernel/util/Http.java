@@ -14,6 +14,8 @@
 
 package com.liferay.portal.kernel.util;
 
+import aQute.bnd.annotation.ProviderType;
+
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -34,6 +36,7 @@ import javax.servlet.http.HttpServletRequest;
  * @author Brian Wing Shun Chan
  * @author Hugo Huijser
  */
+@ProviderType
 public interface Http {
 
 	public static final String HTTP = "http";
