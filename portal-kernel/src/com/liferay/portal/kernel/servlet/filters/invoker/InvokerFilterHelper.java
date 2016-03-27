@@ -272,7 +272,7 @@ public class InvokerFilterHelper {
 
 	protected Filter initFilter(
 		ServletContext servletContext, String filterClassName,
-		String filterName, FilterConfig filterConfig) {
+		FilterConfig filterConfig) {
 
 		ClassLoader pluginClassLoader =
 			(ClassLoader)servletContext.getAttribute(
@@ -308,6 +308,18 @@ public class InvokerFilterHelper {
 				currentThread.setContextClassLoader(contextClassLoader);
 			}
 		}
+	}
+
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link
+	 *             #initFilter(ServletContext, String, FilterConfig)}
+	 */
+	@Deprecated
+	protected Filter initFilter(
+		ServletContext servletContext, String filterClassName,
+		String filterName, FilterConfig filterConfig) {
+
+		return initFilter(servletContext, filterClassName, filterConfig);
 	}
 
 	protected void readLiferayFilterWebXML(
@@ -347,7 +359,7 @@ public class InvokerFilterHelper {
 				servletContext, filterName, initParameterMap);
 
 			Filter filter = initFilter(
-				servletContext, filterClassName, filterName, filterConfig);
+				servletContext, filterClassName, filterConfig);
 
 			if (filter != null) {
 				filterObjectValuePairs.put(
