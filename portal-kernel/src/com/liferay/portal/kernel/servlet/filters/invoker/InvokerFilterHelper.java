@@ -18,9 +18,11 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.servlet.PluginContextListener;
 import com.liferay.portal.kernel.servlet.ServletContextPool;
+import com.liferay.portal.kernel.util.AggregateClassLoader;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.InstanceFactory;
 import com.liferay.portal.kernel.util.ObjectValuePair;
+import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -284,6 +286,13 @@ public class InvokerFilterHelper {
 
 		if (pluginClassLoader == null) {
 			pluginClassLoader = contextClassLoader;
+		}
+
+		ClassLoader portalClassLoader = PortalClassLoaderUtil.getClassLoader();
+
+		if (portalClassLoader != pluginClassLoader) {
+			pluginClassLoader = AggregateClassLoader.getAggregateClassLoader(
+				portalClassLoader, pluginClassLoader);
 		}
 
 		if (contextClassLoader != pluginClassLoader) {
