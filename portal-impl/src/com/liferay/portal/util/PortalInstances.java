@@ -384,14 +384,10 @@ public class PortalInstances {
 			long userId = PrincipalThreadLocal.getUserId();
 
 			if (userId > 0) {
-				try {
-					User user = UserLocalServiceUtil.getUser(userId);
+				User user = UserLocalServiceUtil.fetchUser(userId);
 
-					if (user.getCompanyId() == companyId) {
-						principalName = currentThreadPrincipalName;
-					}
-				}
-				catch (Exception e) {
+				if ((user != null) && (user.getCompanyId() == companyId)) {
+					principalName = currentThreadPrincipalName;
 				}
 			}
 
