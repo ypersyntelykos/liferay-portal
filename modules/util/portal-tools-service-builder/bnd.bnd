@@ -69,11 +69,11 @@ Main-Class: com.liferay.portal.tools.service.builder.ServiceBuilder
 	@com.liferay.portal.kernel-*.jar!/com/liferay/portal/kernel/language/LanguageUtil.class,\
 	@com.liferay.portal.kernel-*.jar!/com/liferay/portal/kernel/log/*,\
 	@com.liferay.portal.kernel-*.jar!/com/liferay/portal/kernel/memory/SoftReferenceThreadLocal.class,\
-	@com.liferay.portal.kernel-*.jar!/com/liferay/portal/kernel/model/CacheField.class,\
 	@com.liferay.portal.kernel-*.jar!/com/liferay/portal/kernel/model/ModelHints.class,\
 	@com.liferay.portal.kernel-*.jar!/com/liferay/portal/kernel/model/ModelHintsCallback.class,\
 	@com.liferay.portal.kernel-*.jar!/com/liferay/portal/kernel/model/ModelHintsConstants.class,\
 	@com.liferay.portal.kernel-*.jar!/com/liferay/portal/kernel/model/ModelHintsUtil.class,\
+	@com.liferay.portal.kernel-*.jar!/com/liferay/portal/kernel/model/cache/CacheField.class,\
 	@com.liferay.portal.kernel-*.jar!/com/liferay/portal/kernel/nio/charset/*,\
 	@com.liferay.portal.kernel-*.jar!/com/liferay/portal/kernel/plugin/Version.class,\
 	@com.liferay.portal.kernel-*.jar!/com/liferay/portal/kernel/search/Document.class,\
