@@ -17,7 +17,9 @@ package com.liferay.portlet;
 import com.liferay.portal.kernel.cache.MultiVMPoolUtil;
 import com.liferay.portal.kernel.cache.PortalCache;
 import com.liferay.portal.kernel.cache.PortalCacheHelperUtil;
-import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.HashUtil;
+
+import java.io.Serializable;
 
 /**
  * @author Shuyang Zhou
@@ -28,38 +30,56 @@ public class PortalPreferencesWrapperCacheUtil {
 		PortalPreferencesWrapperCacheUtil.class.getName();
 
 	public static PortalPreferencesWrapper get(long ownerId, int ownerType) {
-		String cacheKey = _getCacheKey(ownerId, ownerType);
-
-		return _portalPreferencesWrapperPortalCache.get(cacheKey);
+		return _portalPreferencesWrapperPortalCache.get(
+			new CacheKey(ownerId, ownerType));
 	}
 
 	public static void put(
 		long ownerId, int ownerType,
 		PortalPreferencesWrapper portalPreferencesWrapper) {
 
-		String cacheKey = _getCacheKey(ownerId, ownerType);
-
 		PortalCacheHelperUtil.putWithoutReplicator(
-			_portalPreferencesWrapperPortalCache, cacheKey,
-			portalPreferencesWrapper);
+			_portalPreferencesWrapperPortalCache,
+			new CacheKey(ownerId, ownerType), portalPreferencesWrapper);
 	}
 
 	public static void remove(long ownerId, int ownerType) {
-		String cacheKey = _getCacheKey(ownerId, ownerType);
-
-		_portalPreferencesWrapperPortalCache.remove(cacheKey);
+		_portalPreferencesWrapperPortalCache.remove(
+			new CacheKey(ownerId, ownerType));
 	}
 
-	private static String _getCacheKey(long ownerId, int ownerType) {
-		String cacheKey = StringUtil.toHexString(ownerId);
-
-		cacheKey = cacheKey.concat(StringUtil.toHexString(ownerType));
-
-		return cacheKey;
-	}
-
-	private static final PortalCache<String, PortalPreferencesWrapper>
+	private static final PortalCache<CacheKey, PortalPreferencesWrapper>
 		_portalPreferencesWrapperPortalCache = MultiVMPoolUtil.getPortalCache(
 			CACHE_NAME);
+
+	private static class CacheKey implements Serializable {
+
+		public CacheKey(long ownerId, int ownerType) {
+			_ownerId = ownerId;
+			_ownerType = ownerType;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			CacheKey cacheKey = (CacheKey)obj;
+
+			if ((cacheKey._ownerId == _ownerId) &&
+				(cacheKey._ownerType == _ownerType)) {
+
+				return true;
+			}
+
+			return false;
+		}
+
+		@Override
+		public int hashCode() {
+			return HashUtil.hash(_ownerType, _ownerId);
+		}
+
+		private long _ownerId;
+		private int _ownerType;
+
+	}
 
 }
