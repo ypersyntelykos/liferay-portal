@@ -29,6 +29,7 @@ import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.PropsUtil;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.registry.Registry;
@@ -43,12 +44,13 @@ import com.liferay.taglib.util.TagResourceBundleUtil;
 
 import java.io.IOException;
 
-import java.util.Collection;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
-import java.util.Set;
 
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
@@ -419,7 +421,11 @@ public class InputEditorTag extends IncludeTag {
 			"liferay-ui:input-editor:toolbarSet", getToolbarSet());
 		request.setAttribute("liferay-ui:input-editor:width", _width);
 
-		request.setAttribute("liferay-ui:input-editor:data", new DataWrapper());
+		request.setAttribute(
+			"liferay-ui:input-editor:data",
+			ProxyUtil.newProxyInstance(
+				ClassLoader.getSystemClassLoader(), new Class<?>[] {Map.class},
+				new LazyDataInvocationHandler()));
 	}
 
 	private static final String _EDITOR_WYSIWYG_DEFAULT = PropsUtil.get(
@@ -476,79 +482,20 @@ public class InputEditorTag extends IncludeTag {
 	private String _toolbarSet = _TOOLBAR_SET_DEFAULT;
 	private String _width;
 
-	private class DataWrapper implements Map<String, Object> {
+	private class LazyDataInvocationHandler implements InvocationHandler {
 
 		@Override
-		public void clear() {
-			_getInnerData().clear();
-		}
+		public Object invoke(Object proxy, Method method, Object[] args)
+			throws ReflectiveOperationException {
 
-		@Override
-		public boolean containsKey(Object key) {
-			return _getInnerData().containsKey(key);
-		}
-
-		@Override
-		public boolean containsValue(Object value) {
-			return _getInnerData().containsValue(value);
-		}
-
-		@Override
-		public Set<Entry<String, Object>> entrySet() {
-			return _getInnerData().entrySet();
-		}
-
-		@Override
-		public Object get(Object key) {
-			return _getInnerData().get(key);
-		}
-
-		@Override
-		public boolean isEmpty() {
-			return _getInnerData().isEmpty();
-		}
-
-		@Override
-		public Set<String> keySet() {
-			return _getInnerData().keySet();
-		}
-
-		@Override
-		public Object put(String key, Object value) {
-			return _getInnerData().put(key, value);
-		}
-
-		@Override
-		public void putAll(Map<? extends String, ? extends Object> map) {
-			_getInnerData().putAll(map);
-		}
-
-		@Override
-		public Object remove(Object key) {
-			return _getInnerData().remove(key);
-		}
-
-		@Override
-		public int size() {
-			return _getInnerData().size();
-		}
-
-		@Override
-		public Collection<Object> values() {
-			return _getInnerData().values();
-		}
-
-		private Map<String, Object> _getInnerData() {
-			if (_innerData != null) {
-				return _innerData;
+			if (_data == null) {
+				_data = getData();
 			}
 
-			_innerData = getData();
-
-			return _innerData;
+			return method.invoke(_data, args);
 		}
 
-		private Map<String, Object> _innerData;
+		private Map<String, Object> _data;
 
 	}
 
