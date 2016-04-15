@@ -188,18 +188,21 @@ public class WikiAttachmentsTest {
 
 		foldersCount = DLFolderLocalServiceUtil.getDLFoldersCount();
 
-		Group oldGroup = _group;
+		Group group = _group;
 
 		_group = null;
 		_node = null;
 		_page = null;
 
-		addWikiPageAttachment();
+		try {
+			addWikiPageAttachment();
 
-		Assert.assertEquals(
-			foldersCount + 3, DLFolderLocalServiceUtil.getDLFoldersCount());
-
-		GroupLocalServiceUtil.deleteGroup(oldGroup);
+			Assert.assertEquals(
+				foldersCount + 3, DLFolderLocalServiceUtil.getDLFoldersCount());
+		}
+		finally {
+			GroupLocalServiceUtil.deleteGroup(group);
+		}
 	}
 
 	@Test
