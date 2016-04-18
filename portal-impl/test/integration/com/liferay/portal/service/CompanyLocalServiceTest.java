@@ -93,7 +93,7 @@ import org.springframework.mock.web.MockServletContext;
  * @author Mika Koivisto
  * @author Dale Shan
  */
-@SybaseDumpTransactionLog(dumpBefore = SybaseDump.CLASS_AND_METHOD)
+@SybaseDumpTransactionLog(dumpBefore = {SybaseDump.CLASS, SybaseDump.METHOD})
 @Sync
 public class CompanyLocalServiceTest {
 

@@ -30,6 +30,6 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 public @interface SybaseDumpTransactionLog {
 
-	public SybaseDump dumpBefore() default SybaseDump.CLASS;
+	public SybaseDump[] dumpBefore() default SybaseDump.CLASS;
 
 }

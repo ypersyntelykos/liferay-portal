@@ -19,6 +19,7 @@ import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.db.DBType;
 import com.liferay.portal.kernel.dao.jdbc.DataAccess;
 import com.liferay.portal.kernel.test.rule.callback.BaseTestCallback;
+import com.liferay.portal.kernel.util.ArrayUtil;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -41,16 +42,14 @@ public class SybaseDumpTransactionLogTestCallback
 			description.getAnnotation(SybaseDumpTransactionLog.class);
 
 		if (sybaseDumpTransactionLog != null) {
-			SybaseDump sybaseDump = sybaseDumpTransactionLog.dumpBefore();
+			SybaseDump[] sybaseDumps = sybaseDumpTransactionLog.dumpBefore();
 
-			if (!sybaseDump.equals(SybaseDump.CLASS) &&
-					!sybaseDump.equals(SybaseDump.CLASS_AND_METHOD)) {
-
+			if (!ArrayUtil.contains(sybaseDumps, SybaseDump.CLASS)) {
 				return null;
 			}
 		}
 
-		dumpTransactionLog();
+		_dumpTransactionLog();
 
 		return null;
 	}
@@ -65,19 +64,20 @@ public class SybaseDumpTransactionLogTestCallback
 			testClass.getAnnotation(SybaseDumpTransactionLog.class);
 
 		if (sybaseDumpTransactionLog != null) {
-			SybaseDump sybaseDump = sybaseDumpTransactionLog.dumpBefore();
+			SybaseDump[] sybaseDumps = sybaseDumpTransactionLog.dumpBefore();
 
-			if (sybaseDump.equals(SybaseDump.CLASS_AND_METHOD) ||
-					sybaseDump.equals(SybaseDump.METHOD)) {
-
-				dumpTransactionLog();
+			if (ArrayUtil.contains(sybaseDumps, SybaseDump.METHOD)) {
+				_dumpTransactionLog();
 			}
 		}
 
 		return null;
 	}
 
-	private void dumpTransactionLog() throws SQLException {
+	private SybaseDumpTransactionLogTestCallback() {
+	}
+
+	private void _dumpTransactionLog() throws SQLException {
 		DB db = DBManagerUtil.getDB();
 
 		if (db.getDBType() != DBType.SYBASE) {
@@ -90,9 +90,6 @@ public class SybaseDumpTransactionLogTestCallback
 			statement.execute(
 				"dump transaction " + connection.getCatalog() + " with no_log");
 		}
-	}
-
-	private SybaseDumpTransactionLogTestCallback() {
 	}
 
 }

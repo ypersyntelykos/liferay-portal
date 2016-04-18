@@ -19,6 +19,6 @@ package com.liferay.portal.test.rule.callback;
  */
 public enum SybaseDump {
 
-	CLASS, CLASS_AND_METHOD, METHOD, NONE
+	CLASS, METHOD, NONE
 
 }
