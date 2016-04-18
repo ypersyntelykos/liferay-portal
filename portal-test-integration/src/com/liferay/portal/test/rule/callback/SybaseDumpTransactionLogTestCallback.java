@@ -59,15 +59,10 @@ public class SybaseDumpTransactionLogTestCallback
 	public Void beforeMethod(Description description, Object target)
 		throws SQLException {
 
+		Class<?> testClass = description.getTestClass();
+
 		SybaseDumpTransactionLog sybaseDumpTransactionLog =
-			description.getAnnotation(SybaseDumpTransactionLog.class);
-
-		if (sybaseDumpTransactionLog == null) {
-			Class<?> testClass = description.getTestClass();
-
-			sybaseDumpTransactionLog = testClass.getAnnotation(
-				SybaseDumpTransactionLog.class);
-		}
+			testClass.getAnnotation(SybaseDumpTransactionLog.class);
 
 		if (sybaseDumpTransactionLog != null) {
 			SybaseDump sybaseDump = sybaseDumpTransactionLog.dumpBefore();

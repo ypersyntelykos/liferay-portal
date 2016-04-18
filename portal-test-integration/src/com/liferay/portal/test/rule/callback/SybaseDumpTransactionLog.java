@@ -27,7 +27,7 @@ import java.lang.annotation.Target;
 @Documented
 @Inherited
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.METHOD, ElementType.TYPE})
+@Target(ElementType.TYPE)
 public @interface SybaseDumpTransactionLog {
 
 	public SybaseDump dumpBefore() default SybaseDump.CLASS;
