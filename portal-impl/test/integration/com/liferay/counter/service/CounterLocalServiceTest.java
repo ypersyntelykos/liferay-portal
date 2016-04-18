@@ -228,7 +228,9 @@ public class CounterLocalServiceTest {
 
 			// Tomcat JDBC Connection Pool
 
+			System.setProperty("portal:jdbc.default.initialSize", "0");
 			System.setProperty("portal:jdbc.default.maxActive", "1");
+			System.setProperty("portal:jdbc.default.maxIdle", "0");
 			System.setProperty("portal:jdbc.default.minIdle", "0");
 
 			CacheKeyGeneratorUtil cacheKeyGeneratorUtil =
