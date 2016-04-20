@@ -27,7 +27,6 @@ import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.registry.Registry;
@@ -186,9 +185,11 @@ public class MVCPortletAuthTokenWhitelist extends BaseAuthTokenWhitelist {
 		String[] actionNames = ParamUtil.getParameterValues(
 			request, namespace + ActionRequest.ACTION_NAME);
 
-		String actions = StringUtil.merge(actionNames);
+		if (actionNames == null) {
+			return StringPool.EMPTY_ARRAY;
+		}
 
-		return StringUtil.split(actions);
+		return actionNames;
 	}
 
 	protected String[] getMVCActionCommandNames(
@@ -199,9 +200,11 @@ public class MVCPortletAuthTokenWhitelist extends BaseAuthTokenWhitelist {
 
 		String[] actionNames = parameterMap.get(ActionRequest.ACTION_NAME);
 
-		String actions = StringUtil.merge(actionNames);
+		if (actionNames == null) {
+			return StringPool.EMPTY_ARRAY;
+		}
 
-		return StringUtil.split(actions);
+		return actionNames;
 	}
 
 	protected String getWhitelistValue(
