@@ -183,7 +183,7 @@ public class MVCPortletAuthTokenWhitelist extends BaseAuthTokenWhitelist {
 		String namespace = PortalUtil.getPortletNamespace(portletId);
 
 		String[] actionNames = ParamUtil.getParameterValues(
-			request, namespace + ActionRequest.ACTION_NAME);
+			request, namespace.concat(ActionRequest.ACTION_NAME));
 
 		if (actionNames == null) {
 			return StringPool.EMPTY_ARRAY;
@@ -210,7 +210,7 @@ public class MVCPortletAuthTokenWhitelist extends BaseAuthTokenWhitelist {
 	protected String getWhitelistValue(
 		String portletName, String whitelistAction) {
 
-		return portletName + StringPool.POUND + whitelistAction;
+		return portletName.concat(StringPool.POUND).concat(whitelistAction);
 	}
 
 	protected void trackWhitelistServices(
