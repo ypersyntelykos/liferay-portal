@@ -21,7 +21,15 @@ import aQute.bnd.osgi.Packages;
 import aQute.bnd.osgi.Resource;
 import aQute.bnd.service.AnalyzerPlugin;
 
+import java.io.IOException;
 import java.io.InputStream;
+
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -29,6 +37,9 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import org.xml.sax.EntityResolver;
+import org.xml.sax.InputSource;
 
 /**
  * @author Andrea Di Giorgi
@@ -98,6 +109,44 @@ public class SocialAnalyzerPlugin implements AnalyzerPlugin {
 			DocumentBuilder documentBuilder =
 				_documentBuilderFactory.newDocumentBuilder();
 
+			documentBuilder.setEntityResolver(
+				new EntityResolver() {
+
+					@Override
+					public InputSource resolveEntity(
+							String publicId, String systemId)
+						throws IOException {
+
+						String location = _publicIds.get(publicId);
+
+						if (location == null) {
+							return null;
+						}
+
+						Path path = Paths.get(System.getProperty("user.dir"));
+
+						while ((path != null) &&
+							   !Files.exists(
+								   path.resolve("release.properties"))) {
+
+							path = path.getParent();
+						}
+
+						if (path == null) {
+							return null;
+						}
+
+						path = path.resolve(location);
+
+						if (Files.notExists(path)) {
+							return null;
+						}
+
+						return new InputSource(Files.newInputStream(path));
+					}
+
+				});
+
 			return documentBuilder.parse(inputStream);
 		}
 		finally {
@@ -107,5 +156,18 @@ public class SocialAnalyzerPlugin implements AnalyzerPlugin {
 
 	private static final DocumentBuilderFactory _documentBuilderFactory =
 		DocumentBuilderFactory.newInstance();
+	private static final Map<String, String> _publicIds = new HashMap<>();
+
+	static {
+		_publicIds.put(
+			"-//Liferay//DTD Social 6.1.0//EN",
+			"definitions/liferay-social_6_1_0.dtd");
+		_publicIds.put(
+			"-//Liferay//DTD Social 6.2.0//EN",
+			"definitions/liferay-social_6_2_0.dtd");
+		_publicIds.put(
+			"-//Liferay//DTD Social 7.0.0//EN",
+			"definitions/liferay-social_7_0_0.dtd");
+	}
 
 }
