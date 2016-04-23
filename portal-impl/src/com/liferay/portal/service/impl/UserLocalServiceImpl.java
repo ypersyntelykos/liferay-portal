@@ -325,7 +325,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 		long[] groupIds = ArrayUtil.toArray(
 			groupIdsSet.toArray(new Long[groupIdsSet.size()]));
 
-		groupLocalService.addUserGroups(userId, groupIds);
+		userPersistence.addUserGroups(userId, groupIds);
 
 		for (long groupId : groupIds) {
 			addDefaultRolesAndTeams(groupId, new long[] {userId});
