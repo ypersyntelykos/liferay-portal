@@ -147,7 +147,7 @@ public class PortalHibernateConfiguration extends LocalSessionFactoryBean {
 		properties.remove("hibernate.cache.region.factory_class");
 
 		if (DBManagerUtil.getDBType(dialect) == DBType.SYBASE) {
-			properties.setProperty("hibernate.jdbc.batch_size", "0");
+			properties.setProperty(PropsKeys.HIBERNATE_JDBC_BATCH_SIZE, "0");
 		}
 
 		configuration.setProperties(properties);
