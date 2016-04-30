@@ -55,16 +55,20 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 
+import java.io.InputStream;
 import java.net.URL;
 
 import java.security.CodeSource;
 import java.security.ProtectionDomain;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Dictionary;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -77,6 +81,8 @@ import java.util.jar.Attributes;
 import java.util.jar.JarInputStream;
 import java.util.jar.Manifest;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.servlet.ServletContext;
 
 import org.osgi.framework.Bundle;
@@ -84,14 +90,25 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
 import org.osgi.framework.BundleException;
 import org.osgi.framework.Constants;
+import org.osgi.framework.Filter;
 import org.osgi.framework.FrameworkEvent;
 import org.osgi.framework.FrameworkListener;
+import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.framework.launch.Framework;
 import org.osgi.framework.launch.FrameworkFactory;
+import org.osgi.framework.namespace.AbstractWiringNamespace;
+import org.osgi.framework.namespace.BundleNamespace;
+import org.osgi.framework.namespace.HostNamespace;
+import org.osgi.framework.namespace.PackageNamespace;
 import org.osgi.framework.startlevel.BundleStartLevel;
 import org.osgi.framework.startlevel.FrameworkStartLevel;
+import org.osgi.framework.wiring.BundleCapability;
 import org.osgi.framework.wiring.BundleRevision;
+import org.osgi.framework.wiring.FrameworkWiring;
+import org.osgi.resource.Capability;
+import org.osgi.resource.Namespace;
+import org.osgi.resource.Requirement;
 import org.osgi.util.tracker.BundleTracker;
 
 import org.springframework.beans.factory.BeanIsAbstractException;
@@ -406,7 +423,133 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 		if (_log.isDebugEnabled()) {
 			_log.debug("Started the OSGi framework");
 		}
+
+		BundleContext bundleContext = _framework.getBundleContext();
+
+		FrameworkWiring frameworkWiring = _framework.adapt(
+			FrameworkWiring.class);
+
+		Map<String, List<Capability>> capabilities = new HashMap<>();
+
+		for (Bundle bundle : bundleContext.getBundles()) {
+			BundleRevision bundleRevision = bundle.adapt(
+				BundleRevision.class);
+
+			for (Capability capability : bundleRevision.getCapabilities(null)) {
+				String namespace = capability.getNamespace();
+
+				List<Capability> capabilityList = capabilities.get(namespace);
+
+				if (capabilityList == null) {
+					capabilityList = new ArrayList<>();
+
+					capabilities.put(namespace, capabilityList);
+				}
+
+				capabilityList.add(capability);
+			}
+		}
+
+//		System.out.println("@@@@@@@@" + capabilities);
+
+		Set<String> mandatoryNamespaces = new HashSet<>(
+			Arrays.asList(
+				PackageNamespace.PACKAGE_NAMESPACE,
+				BundleNamespace.BUNDLE_NAMESPACE,
+				HostNamespace.HOST_NAMESPACE));
+
+		for (Bundle bundle : bundleContext.getBundles()) {
+			BundleRevision bundleRevision = bundle.adapt(
+				BundleRevision.class);
+
+			for (Requirement requirement : bundleRevision.getRequirements(
+				null)) {
+
+				List<BundleCapability> expectedCapabilities =
+					new ArrayList<>(frameworkWiring.findProviders(requirement));
+
+				Collections.sort(expectedCapabilities, new Comparator<BundleCapability>() {
+					@Override
+					public int compare(BundleCapability o1, BundleCapability o2) {
+						return System.identityHashCode(o1) - System.identityHashCode(o2);
+					}
+				});
+
+				String namespace = requirement.getNamespace();
+
+				String filterString = requirement.getDirectives().get(
+						Namespace.REQUIREMENT_FILTER_DIRECTIVE);
+
+				Filter filter = FrameworkUtil.createFilter(filterString);
+
+				List<Capability> actualCapabilities = new ArrayList<>(
+					capabilities.get(namespace));
+
+				if (filter != null) {
+					Iterator<Capability> iterator = actualCapabilities.iterator();
+
+					while (iterator.hasNext()) {
+						Capability capability = iterator.next();
+
+						if (!filter.matches(capability.getAttributes())) {
+							iterator.remove();
+
+							continue;
+						}
+
+						if (mandatoryNamespaces.contains(namespace)) {
+							String mandatory = capability.getDirectives().get(
+								AbstractWiringNamespace.CAPABILITY_MANDATORY_DIRECTIVE);
+
+							if (mandatory == null) {
+								continue;
+							}
+
+							Matcher matcher = MANDATORY_ATTR.matcher(filterString);
+
+							boolean allPresent = true;
+
+							for (String mandatoryAttribute : StringUtil.split(
+								mandatory)) {
+
+								matcher.reset();
+
+								boolean found = false;
+
+								while (matcher.find()) {
+									int numGroups = matcher.groupCount();
+									for (int i = 1; i <= numGroups; i++) {
+										if (mandatoryAttribute.equals(matcher.group(i))) {
+											found = true;
+										}
+									}
+								}
+
+								allPresent &= found;
+							}
+
+							if (!allPresent) {
+								iterator.remove();
+							}
+						}
+					}
+				}
+
+				Collections.sort(actualCapabilities, new Comparator<Capability>() {
+					@Override
+					public int compare(Capability o1, Capability o2) {
+						return System.identityHashCode(o1) - System.identityHashCode(o2);
+					}
+				});
+
+				if (!expectedCapabilities.equals(actualCapabilities)) {
+					System.out.println("#### expected : " + expectedCapabilities + ", actual : " + actualCapabilities);
+				}
+			}
+		}
 	}
+
+	public static final Pattern MANDATORY_ATTR = Pattern.compile("\\(([^(=<>]+)\\s*[=<>]\\s*[^)]+\\)");
 
 	@Override
 	public void startRuntime() throws Exception {
