@@ -1343,7 +1343,7 @@ public class TableMapperTest {
 	public void testTableMapperFactoryCache() {
 		Set<String> cacheMappingTableNames =
 			ReflectionTestUtil.getAndSetFieldValue(
-				TableMapperFactory.class, "cachelessMappingTableNames",
+				TableMapperFactory.class, "_cachelessMappingTableNames",
 				new HashSet<String>() {
 
 					@Override
@@ -1358,7 +1358,7 @@ public class TableMapperTest {
 		}
 		finally {
 			ReflectionTestUtil.setFieldValue(
-				TableMapperFactory.class, "cachelessMappingTableNames",
+				TableMapperFactory.class, "_cachelessMappingTableNames",
 				cacheMappingTableNames);
 		}
 	}
