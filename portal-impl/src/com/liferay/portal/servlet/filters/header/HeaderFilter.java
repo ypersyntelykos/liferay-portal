@@ -46,39 +46,6 @@ import javax.servlet.http.HttpSession;
  */
 public class HeaderFilter extends BasePortalFilter {
 
-	protected void addHeader(
-		HttpServletRequest request, HttpServletResponse response, String name,
-		String value) {
-
-		// LEP-5895 and LPS-15802
-
-		if (StringUtil.equalsIgnoreCase(name, HttpHeaders.CACHE_CONTROL)) {
-			if (PropsValues.WEB_SERVER_PROXY_LEGACY_MODE) {
-				if (isNewSession(request)) {
-					String contextPath = request.getContextPath();
-
-					if (contextPath.equals(PortalUtil.getPathContext())) {
-						return;
-					}
-				}
-			}
-		}
-		else if (StringUtil.equalsIgnoreCase(name, HttpHeaders.EXPIRES)) {
-			if (isNewSession(request)) {
-				return;
-			}
-
-			if (Validator.isNumber(value)) {
-				int seconds = GetterUtil.getInteger(value);
-
-				value = _dateFormat.format(
-					System.currentTimeMillis() + (seconds * Time.SECOND));
-			}
-		}
-
-		response.addHeader(name, value);
-	}
-
 	protected long getLastModified(HttpServletRequest request) {
 		String value = HttpUtil.getParameter(request.getQueryString(), "t");
 
@@ -87,16 +54,6 @@ public class HeaderFilter extends BasePortalFilter {
 		}
 
 		return GetterUtil.getLong(value);
-	}
-
-	protected boolean isNewSession(HttpServletRequest request) {
-		HttpSession session = request.getSession(false);
-
-		if ((session == null) || session.isNew()) {
-			return true;
-		}
-
-		return false;
 	}
 
 	@Override
@@ -113,7 +70,7 @@ public class HeaderFilter extends BasePortalFilter {
 			String name = enu.nextElement();
 
 			if (!_requestHeaderIgnoreInitParams.contains(name)) {
-				addHeader(
+				_addHeader(
 					request, response, name,
 					filterConfig.getInitParameter(name));
 			}
@@ -138,6 +95,49 @@ public class HeaderFilter extends BasePortalFilter {
 
 		processFilter(
 			HeaderFilter.class.getName(), request, response, filterChain);
+	}
+
+	private void _addHeader(
+		HttpServletRequest request, HttpServletResponse response, String name,
+		String value) {
+
+		// LEP-5895 and LPS-15802
+
+		if (StringUtil.equalsIgnoreCase(name, HttpHeaders.CACHE_CONTROL)) {
+			if (PropsValues.WEB_SERVER_PROXY_LEGACY_MODE) {
+				if (_isNewSession(request)) {
+					String contextPath = request.getContextPath();
+
+					if (contextPath.equals(PortalUtil.getPathContext())) {
+						return;
+					}
+				}
+			}
+		}
+		else if (StringUtil.equalsIgnoreCase(name, HttpHeaders.EXPIRES)) {
+			if (_isNewSession(request)) {
+				return;
+			}
+
+			if (Validator.isNumber(value)) {
+				int seconds = GetterUtil.getInteger(value);
+
+				value = _dateFormat.format(
+					System.currentTimeMillis() + (seconds * Time.SECOND));
+			}
+		}
+
+		response.addHeader(name, value);
+	}
+
+	private boolean _isNewSession(HttpServletRequest request) {
+		HttpSession session = request.getSession(false);
+
+		if ((session == null) || session.isNew()) {
+			return true;
+		}
+
+		return false;
 	}
 
 	private static final Format _dateFormat =
