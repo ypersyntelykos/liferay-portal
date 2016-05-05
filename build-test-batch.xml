@@ -691,6 +691,8 @@ app.server.type=@{app.server.type}]]></echo>
 								<property name="osgi.dir" value="${app.server.parent.dir}/osgi" />
 							</ant>
 
+							<delete file="${app.server.parent.dir}/osgi/marketplace/foundation.lpkg" />
+
 							<antcall inheritall="false" target="start-app-server" />
 
 							<ant dir="portal-kernel" inheritAll="false" target="test-class">
