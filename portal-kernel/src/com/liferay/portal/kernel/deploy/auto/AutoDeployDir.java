@@ -70,18 +70,18 @@ public class AutoDeployDir {
 		String fileName = file.getName();
 
 		if (StringUtil.endsWith(fileName, ".lpkg")) {
-			String lpkgDeployerDirName = PropsUtil.get(
+			String lpkgDeployerDirString = PropsUtil.get(
 				PropsKeys.MODULE_FRAMEWORK_PROPERTIES.concat(
 					"lpkg.deployer.dir"));
 
-			File lpkgDeployerDir = new File(lpkgDeployerDirName);
+			File lpkgDeployerDir = new File(lpkgDeployerDirString);
 
 			FileUtil.move(file, new File(lpkgDeployerDir, file.getName()));
 
 			if (_log.isInfoEnabled()) {
 				_log.info(
 					"Restart is required to complete the installation of " +
-						fileName);
+						file.getName());
 			}
 
 			try {
@@ -90,8 +90,7 @@ public class AutoDeployDir {
 			catch (Exception e) {
 				_log.error(
 					"Unable to automatically shutdown the portal to " +
-						"complete the installation of " + fileName,
-					e);
+						"complete installation.");
 			}
 
 			return;
