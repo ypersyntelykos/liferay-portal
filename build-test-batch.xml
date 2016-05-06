@@ -691,11 +691,17 @@ app.server.type=@{app.server.type}]]></echo>
 								<property name="osgi.dir" value="${app.server.parent.dir}/osgi" />
 							</ant>
 
-							<antcall inheritall="false" target="start-app-server" />
+							<trycatch>
+								<try>
+									<antcall inheritall="false" target="start-app-server" />
+								</try>
 
-							<ant dir="portal-kernel" inheritAll="false" target="test-class">
-								<property name="test.class" value="PortalLogAssertorTest" />
-							</ant>
+								<finally>
+									<ant dir="portal-kernel" inheritAll="false" target="test-class">
+										<property name="test.class" value="PortalLogAssertorTest" />
+									</ant>
+								</finally>
+							</trycatch>
 						</test-action>
 					</database-test-run-test>
 				</test-action>
