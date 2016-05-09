@@ -57,7 +57,6 @@ public class GroupPortletRatingsDefinitionDisplayContext {
 		for (Map.Entry<String, PortletRatingsDefinitionValues> entry :
 				portletRatingsDefinitionValuesMap.entrySet()) {
 
-			String className = entry.getKey();
 			PortletRatingsDefinitionValues portletRatingsDefinitionValues =
 				entry.getValue();
 
@@ -75,6 +74,8 @@ public class GroupPortletRatingsDefinitionDisplayContext {
 
 				continue;
 			}
+
+			String className = entry.getKey();
 
 			Map<String, RatingsType> ratingsTypeMap = new HashMap<>();
 

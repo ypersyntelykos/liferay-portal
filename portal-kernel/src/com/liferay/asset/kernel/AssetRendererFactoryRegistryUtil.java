@@ -140,14 +140,13 @@ public class AssetRendererFactoryRegistryUtil {
 		for (Map.Entry<String, AssetRendererFactory<?>> entry :
 				assetRendererFactories.entrySet()) {
 
-			String className = entry.getKey();
 			AssetRendererFactory<?> assetRendererFactory = entry.getValue();
 
 			if (assetRendererFactory.isActive(companyId) &&
 				(!filterSelectable || assetRendererFactory.isSelectable())) {
 
 				filteredAssetRendererFactories.put(
-					className, assetRendererFactory);
+					entry.getKey(), assetRendererFactory);
 			}
 		}
 

@@ -390,12 +390,9 @@ public class DDMBeanTranslatorImpl implements DDMBeanTranslator {
 
 		translatedLocalizedValue.setDefaultLocale(value.getDefaultLocale());
 
-		Map<Locale, String> values = value.getValues();
+		Map<Locale, String> values = translatedLocalizedValue.getValues();
 
-		for (Map.Entry<Locale, String> entry : values.entrySet()) {
-			translatedLocalizedValue.addString(
-				entry.getKey(), entry.getValue());
-		}
+		values.putAll(value.getValues());
 
 		return translatedLocalizedValue;
 	}
@@ -413,12 +410,9 @@ public class DDMBeanTranslatorImpl implements DDMBeanTranslator {
 
 		translatedLocalizedValue.setDefaultLocale(value.getDefaultLocale());
 
-		Map<Locale, String> values = value.getValues();
+		Map<Locale, String> values = translatedLocalizedValue.getValues();
 
-		for (Map.Entry<Locale, String> entry : values.entrySet()) {
-			translatedLocalizedValue.addString(
-				entry.getKey(), entry.getValue());
-		}
+		values.putAll(value.getValues());
 
 		return translatedLocalizedValue;
 	}

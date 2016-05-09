@@ -68,6 +68,7 @@ import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.util.test.LayoutTestUtil;
 
 import java.io.File;
+import java.io.Serializable;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -278,12 +279,10 @@ public class StagingImplTest {
 		ServiceContext serviceContext =
 			ServiceContextTestUtil.getServiceContext(_group.getGroupId());
 
-		Map<String, String[]> stagingParameters =
-			ExportImportConfigurationParameterMapFactory.buildParameterMap();
+		Map<String, Serializable> attributes = serviceContext.getAttributes();
 
-		for (Map.Entry<String, String[]> entry : stagingParameters.entrySet()) {
-			serviceContext.setAttribute(entry.getKey(), entry.getValue()[0]);
-		}
+		attributes.putAll(
+			ExportImportConfigurationParameterMapFactory.buildParameterMap());
 
 		if (branching) {
 			serviceContext.setSignedIn(true);
@@ -388,9 +387,9 @@ public class StagingImplTest {
 			StagingUtil.getStagedPortletId(JournalPortletKeys.JOURNAL),
 			stageJournal);
 
-		for (Map.Entry<String, String[]> entry : parameters.entrySet()) {
-			serviceContext.setAttribute(entry.getKey(), entry.getValue()[0]);
-		}
+		Map<String, Serializable> attributes = serviceContext.getAttributes();
+
+		attributes.putAll(parameters);
 
 		enableLocalStaging(branching, serviceContext);
 
