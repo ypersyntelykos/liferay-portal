@@ -642,9 +642,6 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 		// Framework
 
 		properties.put(
-			Constants.FRAMEWORK_BEGINNING_STARTLEVEL,
-			String.valueOf(PropsValues.MODULE_FRAMEWORK_BEGINNING_START_LEVEL));
-		properties.put(
 			Constants.FRAMEWORK_BUNDLE_PARENT,
 			Constants.FRAMEWORK_BUNDLE_PARENT_APP);
 		properties.put(
@@ -1090,6 +1087,12 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 
 			_installInitialBundle(initialBundle);
 		}
+
+		FrameworkStartLevel frameworkStartLevel = _framework.adapt(
+			FrameworkStartLevel.class);
+
+		frameworkStartLevel.setStartLevel(
+			PropsValues.MODULE_FRAMEWORK_BEGINNING_START_LEVEL);
 
 		if (_log.isDebugEnabled()) {
 			_log.debug("Started initial bundles");
