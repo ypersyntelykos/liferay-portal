@@ -52,7 +52,7 @@ public class WarArtifactUrlTransformer implements ArtifactUrlTransformer {
 
 		String path = artifact.getPath();
 
-		int x = path.lastIndexOf("/");
+		int x = path.lastIndexOf('/');
 		int y = path.lastIndexOf(".war");
 
 		String contextName = path.substring(x + 1, y);
