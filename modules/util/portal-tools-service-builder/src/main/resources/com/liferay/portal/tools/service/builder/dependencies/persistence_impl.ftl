@@ -1356,15 +1356,7 @@ public class ${entity.name}PersistenceImpl extends BasePersistenceImpl<${entity.
 				 */
 				@Override
 				public void add${tempEntity.names}(${entity.PKClassName} pk, List<${tempEntity.apiPackagePath}.model.${tempEntity.name}> ${tempEntity.varNames}) {
-					long[] ${tempEntity.varName}PKs = new long[${tempEntity.varNames}.size()];
-
-					for (int i = 0; i < ${tempEntity.varNames}.size(); i++) {
-						${tempEntity.apiPackagePath}.model.${tempEntity.name} ${tempEntity.varName} = ${tempEntity.varNames}.get(i);
-
-						${tempEntity.varName}PKs[i] = ${tempEntity.varName}.getPrimaryKey();
-					}
-
-					add${tempEntity.names}(pk, ${tempEntity.varName}PKs);
+					add${tempEntity.names}(pk, ListUtil.toLongArray(${tempEntity.varNames}, ${tempEntity.apiPackagePath}.model.${tempEntity.name}.${textFormatter.format(textFormatter.format(tempEntity.getPKVarName(), 7), 0)}_ACCESSOR));
 				}
 
 				/**
@@ -1418,15 +1410,7 @@ public class ${entity.name}PersistenceImpl extends BasePersistenceImpl<${entity.
 				 */
 				@Override
 				public void remove${tempEntity.names}(${entity.PKClassName} pk, List<${tempEntity.apiPackagePath}.model.${tempEntity.name}> ${tempEntity.varNames}) {
-					long[] ${tempEntity.varName}PKs = new long[${tempEntity.varNames}.size()];
-
-					for (int i = 0; i < ${tempEntity.varNames}.size(); i++) {
-						${tempEntity.apiPackagePath}.model.${tempEntity.name} ${tempEntity.varName} = ${tempEntity.varNames}.get(i);
-
-						${tempEntity.varName}PKs[i] = ${tempEntity.varName}.getPrimaryKey();
-					}
-
-					remove${tempEntity.names}(pk, ${tempEntity.varName}PKs);
+					remove${tempEntity.names}(pk, ListUtil.toLongArray(${tempEntity.varNames}, ${tempEntity.apiPackagePath}.model.${tempEntity.name}.${textFormatter.format(textFormatter.format(tempEntity.getPKVarName(), 7), 0)}_ACCESSOR));
 				}
 
 				/**
@@ -1444,25 +1428,9 @@ public class ${entity.name}PersistenceImpl extends BasePersistenceImpl<${entity.
 
 					remove${tempEntity.name}PKsSet.removeAll(new${tempEntity.name}PKsSet);
 
-					long[] remove${tempEntity.name}PKs = new long[remove${tempEntity.name}PKsSet.size()];
-
-					int i = 0;
-
-					for (long remove${tempEntity.name}PK : remove${tempEntity.name}PKsSet) {
-						remove${tempEntity.name}PKs[i++] = remove${tempEntity.name}PK;
-					}
-
-					${entity.varName}To${tempEntity.name}TableMapper.deleteTableMappings(pk, remove${tempEntity.name}PKs);
+					${entity.varName}To${tempEntity.name}TableMapper.deleteTableMappings(pk, ArrayUtil.toLongArray(remove${tempEntity.name}PKsSet));
 
 					new${tempEntity.name}PKsSet.removeAll(old${tempEntity.name}PKsSet);
-
-					long[] new${tempEntity.name}PKs = new long[new${tempEntity.name}PKsSet.size()];
-
-					i = 0;
-
-					for (long new${tempEntity.name}PK : new${tempEntity.name}PKsSet) {
-						new${tempEntity.name}PKs[i++] = new${tempEntity.name}PK;
-					}
 
 					long companyId = 0;
 
@@ -1475,7 +1443,7 @@ public class ${entity.name}PersistenceImpl extends BasePersistenceImpl<${entity.
 						companyId = ${entity.varName}.getCompanyId();
 					}
 
-					${entity.varName}To${tempEntity.name}TableMapper.addTableMappings(companyId, pk, new${tempEntity.name}PKs);
+					${entity.varName}To${tempEntity.name}TableMapper.addTableMappings(companyId, pk, ArrayUtil.toLongArray(new${tempEntity.name}PKsSet));
 				}
 
 				/**
