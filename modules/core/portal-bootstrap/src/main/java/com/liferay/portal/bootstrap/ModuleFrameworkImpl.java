@@ -1119,7 +1119,7 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 
 		Bundle[] installedBundles = bundleContext.getBundles();
 
-		List<String> fragmentHosts = new ArrayList<>();
+		List<String> hostBundleSymbolicNames = new ArrayList<>();
 
 		for (Bundle bundle : installedBundles) {
 			BundleStartLevel bundleStartLevel = bundle.adapt(
@@ -1139,21 +1139,21 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 				continue;
 			}
 
-			fragmentHosts.add(fragmentHost);
+			hostBundleSymbolicNames.add(fragmentHost);
 		}
 
-		List<Bundle> refreshBundles = new ArrayList<>();
+		List<Bundle> hostBundles = new ArrayList<>();
 
 		for (Bundle bundle : installedBundles) {
-			if (fragmentHosts.contains(bundle.getSymbolicName())) {
-				refreshBundles.add(bundle);
+			if (hostBundleSymbolicNames.contains(bundle.getSymbolicName())) {
+				hostBundles.add(bundle);
 			}
 		}
 
 		FrameworkWiring frameworkWiring = _framework.adapt(
 			FrameworkWiring.class);
 
-		frameworkWiring.refreshBundles(refreshBundles);
+		frameworkWiring.refreshBundles(hostBundles);
 	}
 
 	private void _setUpPrerequisiteFrameworkServices(
