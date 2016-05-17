@@ -1147,10 +1147,9 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 		for (Bundle bundle : installedBundles) {
 			if (fragmentHosts.contains(bundle.getSymbolicName())) {
 				refreshBundles.add(bundle);
-
-				break;
 			}
 		}
+
 		FrameworkWiring frameworkWiring = _framework.adapt(
 			FrameworkWiring.class);
 
