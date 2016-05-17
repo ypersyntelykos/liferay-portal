@@ -26,6 +26,7 @@ import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.spring.osgi.OSGiBeanProperties;
+import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapDictionary;
@@ -1137,6 +1138,12 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 
 			if (fragmentHost == null) {
 				continue;
+			}
+
+			int index = fragmentHost.indexOf(CharPool.SEMICOLON);
+
+			if (index != -1) {
+				fragmentHost = fragmentHost.substring(0, index);
 			}
 
 			hostBundleSymbolicNames.add(fragmentHost);
