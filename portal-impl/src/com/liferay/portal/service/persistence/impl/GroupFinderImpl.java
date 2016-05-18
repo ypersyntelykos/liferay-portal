@@ -1259,7 +1259,7 @@ public class GroupFinderImpl
 
 		for (Map<String, Object> param : params) {
 			if (param != null) {
-				size += param.size() * 4;
+				size += param.size() * 5;
 			}
 		}
 
