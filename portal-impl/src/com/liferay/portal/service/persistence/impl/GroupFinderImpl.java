@@ -487,6 +487,9 @@ public class GroupFinderImpl
 
 		boolean doUnion = Validator.isNotNull(userId) && inherit;
 
+		long[] groupOrganizationClassNameIds =
+			_getGroupOrganizationClassNameIds();
+
 		if (doUnion) {
 			params2 = new LinkedHashMap<>(params1);
 
@@ -497,13 +500,8 @@ public class GroupFinderImpl
 
 			params3.remove("usersGroups");
 			params3.put("groupsOrgs", userId);
-
-			long groupClassNameId = _getGroupOrganizationClassNameIds()[0];
-			long organizationClassNameId =
-				_getGroupOrganizationClassNameIds()[1];
-
-			params2.put("classNameIds", organizationClassNameId);
-			params3.put("classNameIds", groupClassNameId);
+			params2.put("classNameIds", groupOrganizationClassNameIds[1]);
+			params3.put("classNameIds", groupOrganizationClassNameIds[0]);
 		}
 
 		params1.put("classNameIds", _getGroupOrganizationClassNameIds());
@@ -1470,8 +1468,12 @@ public class GroupFinderImpl
 			return false;
 		}
 
-		long groupClassNameId = _getGroupOrganizationClassNameIds()[0];
-		long organizationClassNameId = _getGroupOrganizationClassNameIds()[1];
+		long[] groupOrganizationClassNameIds =
+			_getGroupOrganizationClassNameIds();
+
+		long groupClassNameId = groupOrganizationClassNameIds[0];
+		long organizationClassNameId = groupOrganizationClassNameIds[1];
+
 		long userGroupClassNameId = _getUserGroupClassNameId();
 
 		for (long classNameId : classNameIds) {
@@ -1501,12 +1503,15 @@ public class GroupFinderImpl
 		params4.remove("usersGroups");
 		params4.put("groupsUserGroups", userId);
 
-		long groupClassNameId = _getGroupOrganizationClassNameIds()[0];
-		long organizationClassNameId = _getGroupOrganizationClassNameIds()[1];
+		long[] groupOrganizationClassNameIds =
+			_getGroupOrganizationClassNameIds();
+
+		long groupClassNameId = groupOrganizationClassNameIds[0];
+		long organizationClassNameId = groupOrganizationClassNameIds[1];
 		long userGroupClassNameId = _getUserGroupClassNameId();
 
 		if (classNameIds == null) {
-			params1.put("classNameIds", _getGroupOrganizationClassNameIds());
+			params1.put("classNameIds", groupOrganizationClassNameIds);
 			params2.put("classNameIds", organizationClassNameId);
 			params3.put("classNameIds", groupClassNameId);
 			params4.put("classNameIds", userGroupClassNameId);
