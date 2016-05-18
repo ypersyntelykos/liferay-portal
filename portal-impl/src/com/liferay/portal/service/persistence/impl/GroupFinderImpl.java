@@ -1008,11 +1008,11 @@ public class GroupFinderImpl
 					long[] classNameIds = (long[])entry.getValue();
 
 					for (int i = 0; i < classNameIds.length; i++) {
-						sb.append("(Group_.classNameId = ?) ");
-						sb.append("OR ");
+						sb.append("(Group_.classNameId = ?) OR ");
 					}
 
-					sb.setStringAt(") AND ", sb.index() - 1);
+					sb.setStringAt(
+						"(Group_.classNameId = ?)) AND ", sb.index() - 1);
 				}
 			}
 			else if (key.equals("excludedGroupIds")) {
@@ -1022,14 +1022,11 @@ public class GroupFinderImpl
 					sb.append(StringPool.OPEN_PARENTHESIS);
 
 					for (int i = 0; i < excludedGroupIds.size(); i++) {
-						sb.append("(Group_.groupId != ?)");
-
-						if ((i + 1) < excludedGroupIds.size()) {
-							sb.append(" AND ");
-						}
+						sb.append("(Group_.groupId != ?) AND ");
 					}
 
-					sb.append(") AND ");
+					sb.setStringAt(
+						"(Group_.groupId != ?)) AND ", sb.index() - 1);
 				}
 			}
 			else if (key.equals("groupsTree")) {
@@ -1039,14 +1036,11 @@ public class GroupFinderImpl
 					sb.append(StringPool.OPEN_PARENTHESIS);
 
 					for (int i = 0; i < groupsTree.size(); i++) {
-						sb.append("(Group_.treePath LIKE ?) ");
-
-						if ((i + 1) < groupsTree.size()) {
-							sb.append("OR ");
-						}
+						sb.append("(Group_.treePath LIKE ?) OR ");
 					}
 
-					sb.append(") AND ");
+					sb.setStringAt(
+						"(Group_.treePath LIKE ?)) AND ", sb.index() - 1);
 				}
 			}
 			else if (key.equals("types")) {
@@ -1056,14 +1050,10 @@ public class GroupFinderImpl
 					sb.append(StringPool.OPEN_PARENTHESIS);
 
 					for (int i = 0; i < types.size(); i++) {
-						sb.append("(Group_.type_ = ?) ");
-
-						if ((i + 1) < types.size()) {
-							sb.append("OR ");
-						}
+						sb.append("(Group_.type_ = ?) OR ");
 					}
 
-					sb.append(") AND ");
+					sb.setStringAt("(Group_.type_ = ?)) AND ", sb.index() - 1);
 				}
 			}
 			else {
