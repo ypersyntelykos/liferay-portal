@@ -506,11 +506,9 @@ public class GroupFinderImpl
 
 		params1.put("classNameIds", _getGroupOrganizationClassNameIds());
 
-		String sql = null;
-
 		String sqlKey = _buildSQLCacheKey(obc, params1, params2, params3);
 
-		sql = _findByCompanyIdSQLCache.get(sqlKey);
+		String sql = _findByCompanyIdSQLCache.get(sqlKey);
 
 		if (sql == null) {
 			String findByCompanyIdSQL = CustomSQLUtil.get(FIND_BY_COMPANY_ID);
