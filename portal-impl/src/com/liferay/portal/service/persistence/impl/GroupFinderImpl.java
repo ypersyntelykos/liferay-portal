@@ -1268,43 +1268,45 @@ public class GroupFinderImpl
 		sb.append(sql);
 
 		for (Map<String, Object> param : params) {
-			if (param != null) {
-				for (Map.Entry<String, Object> entry : param.entrySet()) {
-					sb.append(StringPool.COMMA);
+			if (param == null) {
+				continue;
+			}
 
-					String key = entry.getKey();
-					Object value = entry.getValue();
+			for (Map.Entry<String, Object> entry : param.entrySet()) {
+				sb.append(StringPool.COMMA);
 
-					if (key.equals("rolePermissions")) {
-						RolePermissions rolePermissions =
-							(RolePermissions)entry.getValue();
+				String key = entry.getKey();
+				Object value = entry.getValue();
 
-						if (ResourceBlockLocalServiceUtil.isSupported(
-								rolePermissions.getName())) {
+				if (key.equals("rolePermissions")) {
+					RolePermissions rolePermissions =
+						(RolePermissions)entry.getValue();
 
-							key = "rolePermissions_6_block";
-						}
-						else {
-							key = "rolePermissions_6";
-						}
+					if (ResourceBlockLocalServiceUtil.isSupported(
+							rolePermissions.getName())) {
+
+						key = "rolePermissions_6_block";
 					}
-
-					sb.append(key);
-					sb.append(StringPool.DASH);
-
-					if (value instanceof long[]) {
-						long[] values = (long[])value;
-
-						sb.append(values.length);
+					else {
+						key = "rolePermissions_6";
 					}
-					else if (value instanceof Collection<?>) {
-						Collection<?> values = (Collection<?>)value;
-
-						sb.append(values.size());
-					}
-
-					sb.append(StringPool.COMMA);
 				}
+
+				sb.append(key);
+				sb.append(StringPool.DASH);
+
+				if (value instanceof long[]) {
+					long[] values = (long[])value;
+
+					sb.append(values.length);
+				}
+				else if (value instanceof Collection<?>) {
+					Collection<?> values = (Collection<?>)value;
+
+					sb.append(values.size());
+				}
+
+				sb.append(StringPool.COMMA);
 			}
 		}
 
