@@ -65,10 +65,11 @@ public class SplitPackagesTest {
 				exportPackages = exportPackages.replaceAll(
 					";uses:=\"[^\"]*\"", "");
 
-				String bundleName = headers.get("Bundle-Name");
+				String symbolicName = bundle.getSymbolicName();
 
 				Map<String, Packages> currentBundlePackages =
-					_createCurrentBundlePackagesMap(bundleName, exportPackages);
+					_createCurrentBundlePackagesMap(
+						symbolicName, exportPackages);
 
 				for (Map.Entry<Bundle, Map<String, Packages>> entry :
 						bundlesMap.entrySet()) {
@@ -84,7 +85,7 @@ public class SplitPackagesTest {
 						_processDuplicatedPackages(
 							entry.getKey(), mapBundlePackages.values(),
 							currentBundlePackages, suitableImportsMap,
-							bundleName);
+							symbolicName);
 					}
 				}
 
@@ -109,7 +110,7 @@ public class SplitPackagesTest {
 	}
 
 	private Map<String, Packages> _createCurrentBundlePackagesMap(
-		String bundleName, String exportPackages) {
+		String symbolicName, String exportPackages) {
 
 		Map<String, Packages> currentBundlePackages = new HashMap<>();
 
@@ -123,12 +124,12 @@ public class SplitPackagesTest {
 					exportPackageSplit[0],
 					new Packages(
 						exportPackageSplit[0], StringUtil.unquote(version[1]),
-						bundleName));
+						symbolicName));
 			}
 			else {
 				currentBundlePackages.put(
 					exportPackageSplit[0],
-					new Packages(exportPackageSplit[0], "0.0", bundleName));
+					new Packages(exportPackageSplit[0], "0.0", symbolicName));
 			}
 		}
 
@@ -164,11 +165,9 @@ public class SplitPackagesTest {
 	private void _processDuplicatedPackages(
 		Bundle mapBundle, Collection<Packages> duplicatedPackages,
 		Map<String, Packages> currentBundlePackages,
-		Map<String, Packages> suitableImportsMap, String bundleName) {
+		Map<String, Packages> suitableImportsMap, String currentSymbolicName) {
 
-		Dictionary<String, String> mapBundleHeaders = mapBundle.getHeaders();
-
-		String mapBundleName = mapBundleHeaders.get("Bundle-Name");
+		String symbolicName = mapBundle.getSymbolicName();
 
 		for (Packages duplicatedPackage : duplicatedPackages) {
 			String duplicatedPackageName = duplicatedPackage.getName();
@@ -183,13 +182,13 @@ public class SplitPackagesTest {
 					duplicatedPackage.getVersion())) {
 
 				Assert.assertTrue(
-					"Detected split packages in " + bundleName + " and " +
-						mapBundleName + ": " + duplicatedPackageName,
+					"Detected split packages in " + currentSymbolicName +
+						" and " + symbolicName + ": " + duplicatedPackageName,
 					suitableImportsMap.containsKey(duplicatedPackageName));
 
 				Assert.assertTrue(
-					"Detected split packages in " + bundleName + " and " +
-						mapBundleName + ": " + duplicatedPackages,
+					"Detected split packages in " + currentSymbolicName +
+						" and " + symbolicName + ": " + duplicatedPackages,
 					_checkSuitableImportContains(
 						suitableImportsMap.get(duplicatedPackageName),
 						currentBundlePackage));
