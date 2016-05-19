@@ -18,6 +18,7 @@ import aQute.bnd.header.OSGiHeader;
 import aQute.bnd.header.Parameters;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
+import com.liferay.portal.kernel.util.HashUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.module.framework.ModuleFrameworkUtilAdapter;
@@ -28,6 +29,7 @@ import java.util.Collection;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import org.apache.commons.io.IOUtils;
@@ -56,22 +58,22 @@ public class SplitPackagesTest {
 
 		Bundle[] frameworkBundles = frameworkBundleContext.getBundles();
 
-		Map<Bundle, Map<String, Packages>> bundlesMap = new HashMap<>();
+		Map<Bundle, Map<String, ExportPackage>> bundlesMap = new HashMap<>();
 
 		Map<String, Packages> suitableImportsMap = _createSuitableImportsMap();
 
 		for (Bundle bundle : frameworkBundles) {
-			Map<String, Packages> bundleExportPackages =
+			Map<String, ExportPackage> bundleExportPackages =
 				_getBundleExportPackages(bundle);
 
 			if (bundleExportPackages == null) {
 				continue;
 			}
 
-			for (Map.Entry<Bundle, Map<String, Packages>> entry :
+			for (Map.Entry<Bundle, Map<String, ExportPackage>> entry :
 					bundlesMap.entrySet()) {
 
-				Map<String, Packages> mapBundlePackages = new HashMap<>(
+				Map<String, ExportPackage> mapBundlePackages = new HashMap<>(
 					entry.getValue());
 
 				Set<String> keySet = mapBundlePackages.keySet();
@@ -91,13 +93,14 @@ public class SplitPackagesTest {
 	}
 
 	private boolean _checkSuitableImportContains(
-		Packages suitableImportPackage, Packages duplicatedPackage) {
+		Packages suitableImportPackage, ExportPackage exportPackage,
+		String currentSymbolicName) {
 
 		String declaredVersion = suitableImportPackage.getVersion();
 		String declaredBundles = suitableImportPackage.getBundles();
 
-		if (declaredVersion.equals(duplicatedPackage.getVersion()) &&
-			declaredBundles.contains(duplicatedPackage.getBundles())) {
+		if (declaredVersion.equals(exportPackage._version) &&
+			declaredBundles.contains(currentSymbolicName)) {
 
 			return true;
 		}
@@ -131,7 +134,7 @@ public class SplitPackagesTest {
 		return suitableImports;
 	}
 
-	private Map<String, Packages> _getBundleExportPackages(Bundle bundle) {
+	private Map<String, ExportPackage> _getBundleExportPackages(Bundle bundle) {
 		Dictionary<String, String> headers = bundle.getHeaders();
 
 		String exportPackage = headers.get(Constants.EXPORT_PACKAGE);
@@ -145,7 +148,7 @@ public class SplitPackagesTest {
 		Map<String, ? extends Map<String, String>> exportPackages =
 			parameters.asMapMap();
 
-		Map<String, Packages> bundleExportPackages = new HashMap<>();
+		Map<String, ExportPackage> bundleExportPackages = new HashMap<>();
 
 		for (Map.Entry<String, ? extends Map<String, String>> entry :
 				exportPackages.entrySet()) {
@@ -161,31 +164,27 @@ public class SplitPackagesTest {
 			}
 
 			bundleExportPackages.put(
-				packageName,
-				new Packages(packageName, version, bundle.getSymbolicName()));
+				packageName, new ExportPackage(packageName, version));
 		}
 
 		return bundleExportPackages;
 	}
 
 	private void _processDuplicatedPackages(
-		Bundle mapBundle, Collection<Packages> duplicatedPackages,
-		Map<String, Packages> currentBundlePackages,
+		Bundle mapBundle, Collection<ExportPackage> duplicatedExportPackages,
+		Map<String, ExportPackage> currentBundleExportPackages,
 		Map<String, Packages> suitableImportsMap, String currentSymbolicName) {
 
 		String symbolicName = mapBundle.getSymbolicName();
 
-		for (Packages duplicatedPackage : duplicatedPackages) {
-			String duplicatedPackageName = duplicatedPackage.getName();
+		for (ExportPackage duplicatedExportPackage : duplicatedExportPackages) {
+			String duplicatedPackageName = duplicatedExportPackage._name;
 
-			Packages currentBundlePackage = currentBundlePackages.get(
+			ExportPackage exportPackage = currentBundleExportPackages.get(
 				duplicatedPackageName);
 
-			String currentBundlePackageVersion =
-				currentBundlePackage.getVersion();
-
-			if (currentBundlePackageVersion.equals(
-					duplicatedPackage.getVersion())) {
+			if (Objects.equals(
+					exportPackage._version, duplicatedExportPackage._version)) {
 
 				Assert.assertTrue(
 					"Detected split packages in " + currentSymbolicName +
@@ -194,12 +193,45 @@ public class SplitPackagesTest {
 
 				Assert.assertTrue(
 					"Detected split packages in " + currentSymbolicName +
-						" and " + symbolicName + ": " + duplicatedPackages,
+						" and " + symbolicName + ": " +
+							duplicatedExportPackages,
 					_checkSuitableImportContains(
 						suitableImportsMap.get(duplicatedPackageName),
-						currentBundlePackage));
+						exportPackage, currentSymbolicName));
 			}
 		}
+	}
+
+	private class ExportPackage {
+
+		@Override
+		public boolean equals(Object obj) {
+			ExportPackage exportPackage = (ExportPackage)obj;
+
+			if (Objects.equals(_name, exportPackage._name) &&
+				Objects.equals(_version, exportPackage._version)) {
+
+				return true;
+			}
+
+			return false;
+		}
+
+		@Override
+		public int hashCode() {
+			int hashCode = HashUtil.hash(0, _name);
+
+			return HashUtil.hash(hashCode, _version);
+		}
+
+		private ExportPackage(String name, String version) {
+			_name = name;
+			_version = version;
+		}
+
+		private final String _name;
+		private final String _version;
+
 	}
 
 	private class Packages {
