@@ -19,6 +19,7 @@ import aQute.bnd.header.Parameters;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.portal.kernel.util.HashUtil;
+import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.module.framework.ModuleFrameworkUtilAdapter;
@@ -60,7 +61,8 @@ public class SplitPackagesTest {
 
 		Map<Bundle, Map<String, ExportPackage>> bundlesMap = new HashMap<>();
 
-		Map<String, Packages> suitableImportsMap = _createSuitableImportsMap();
+		Map<String, SplitPackages> allowedSplitPackagesMap =
+			_getAllowedSplitPackagesMap();
 
 		for (Bundle bundle : frameworkBundles) {
 			Map<String, ExportPackage> bundleExportPackages =
@@ -83,7 +85,7 @@ public class SplitPackagesTest {
 				if (!mapBundlePackages.isEmpty()) {
 					_processDuplicatedPackages(
 						entry.getKey(), mapBundlePackages.values(),
-						bundleExportPackages, suitableImportsMap,
+						bundleExportPackages, allowedSplitPackagesMap,
 						bundle.getSymbolicName());
 				}
 			}
@@ -92,15 +94,12 @@ public class SplitPackagesTest {
 		}
 	}
 
-	private boolean _checkSuitableImportContains(
-		Packages suitableImportPackage, ExportPackage exportPackage,
+	private boolean _checkAllowedSplitPackages(
+		SplitPackages allowedSplitPackages, ExportPackage exportPackage,
 		String currentSymbolicName) {
 
-		String declaredVersion = suitableImportPackage.getVersion();
-		String declaredBundles = suitableImportPackage.getBundles();
-
-		if (declaredVersion.equals(exportPackage._version) &&
-			declaredBundles.contains(currentSymbolicName)) {
+		if (exportPackage.equals(allowedSplitPackages.getExportPackage()) &&
+			allowedSplitPackages.hasBundle(currentSymbolicName)) {
 
 			return true;
 		}
@@ -108,14 +107,14 @@ public class SplitPackagesTest {
 		return false;
 	}
 
-	private Map<String, Packages> _createSuitableImportsMap()
+	private Map<String, SplitPackages> _getAllowedSplitPackagesMap()
 		throws IOException {
 
 		Class clazz = this.getClass();
 
 		ClassLoader classLoader = clazz.getClassLoader();
 
-		Map<String, Packages> suitableImports = new HashMap<>();
+		Map<String, SplitPackages> allowedSplitPackagesMap = new HashMap<>();
 
 		for (String packages :
 				StringUtil.split(
@@ -125,13 +124,14 @@ public class SplitPackagesTest {
 
 			String[] packageSplit = StringUtil.split(packages, ';');
 
-			suitableImports.put(
+			allowedSplitPackagesMap.put(
 				packageSplit[0],
-				new Packages(
-					packageSplit[0], packageSplit[1], packageSplit[2]));
+				new SplitPackages(
+					new ExportPackage(packageSplit[0], packageSplit[1]),
+					SetUtil.fromArray(StringUtil.split(packageSplit[2]))));
 		}
 
-		return suitableImports;
+		return allowedSplitPackagesMap;
 	}
 
 	private Map<String, ExportPackage> _getBundleExportPackages(Bundle bundle) {
@@ -173,7 +173,8 @@ public class SplitPackagesTest {
 	private void _processDuplicatedPackages(
 		Bundle mapBundle, Collection<ExportPackage> duplicatedExportPackages,
 		Map<String, ExportPackage> currentBundleExportPackages,
-		Map<String, Packages> suitableImportsMap, String currentSymbolicName) {
+		Map<String, SplitPackages> allowedSplitPackagesMap,
+		String currentSymbolicName) {
 
 		String symbolicName = mapBundle.getSymbolicName();
 
@@ -189,14 +190,14 @@ public class SplitPackagesTest {
 				Assert.assertTrue(
 					"Detected split packages in " + currentSymbolicName +
 						" and " + symbolicName + ": " + duplicatedPackageName,
-					suitableImportsMap.containsKey(duplicatedPackageName));
+					allowedSplitPackagesMap.containsKey(duplicatedPackageName));
 
 				Assert.assertTrue(
 					"Detected split packages in " + currentSymbolicName +
 						" and " + symbolicName + ": " +
 							duplicatedExportPackages,
-					_checkSuitableImportContains(
-						suitableImportsMap.get(duplicatedPackageName),
+					_checkAllowedSplitPackages(
+						allowedSplitPackagesMap.get(duplicatedPackageName),
 						exportPackage, currentSymbolicName));
 			}
 		}
@@ -234,29 +235,25 @@ public class SplitPackagesTest {
 
 	}
 
-	private class Packages {
+	private class SplitPackages {
 
-		public Packages(String name, String version, String bundles) {
-			_name = name;
-			_version = version;
-			_bundles = bundles;
+		public ExportPackage getExportPackage() {
+			return _exportPackage;
 		}
 
-		public String getBundles() {
-			return _bundles;
+		public boolean hasBundle(String symbolicName) {
+			return _symbolicNames.contains(symbolicName);
 		}
 
-		public String getName() {
-			return _name;
+		private SplitPackages(
+			ExportPackage exportPackage, Set<String> symbolicNames) {
+
+			_exportPackage = exportPackage;
+			_symbolicNames = symbolicNames;
 		}
 
-		public String getVersion() {
-			return _version;
-		}
-
-		private final String _bundles;
-		private final String _name;
-		private final String _version;
+		private final ExportPackage _exportPackage;
+		private final Set<String> _symbolicNames;
 
 	}
 
