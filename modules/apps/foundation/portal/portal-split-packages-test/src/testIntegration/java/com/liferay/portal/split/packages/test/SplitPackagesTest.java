@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.split.packages.test;
+package com.liferay.portal.split.packages.test;
 
 import aQute.bnd.header.OSGiHeader;
 import aQute.bnd.header.Parameters;
