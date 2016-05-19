@@ -61,36 +61,36 @@ public class SplitPackagesTest {
 
 			String exportPackages = headers.get("Export-Package");
 
-			if (exportPackages != null) {
-				exportPackages = exportPackages.replaceAll(
-					";uses:=\"[^\"]*\"", "");
-
-				String symbolicName = bundle.getSymbolicName();
-
-				Map<String, Packages> currentBundlePackages =
-					_createCurrentBundlePackagesMap(
-						symbolicName, exportPackages);
-
-				for (Map.Entry<Bundle, Map<String, Packages>> entry :
-						bundlesMap.entrySet()) {
-
-					Map<String, Packages> mapBundlePackages = new HashMap<>(
-						entry.getValue());
-
-					Set<String> keySet = mapBundlePackages.keySet();
-
-					keySet.retainAll(currentBundlePackages.keySet());
-
-					if (!mapBundlePackages.isEmpty()) {
-						_processDuplicatedPackages(
-							entry.getKey(), mapBundlePackages.values(),
-							currentBundlePackages, suitableImportsMap,
-							symbolicName);
-					}
-				}
-
-				bundlesMap.put(bundle, currentBundlePackages);
+			if (exportPackages == null) {
+				continue;
 			}
+
+			exportPackages = exportPackages.replaceAll(";uses:=\"[^\"]*\"", "");
+
+			String symbolicName = bundle.getSymbolicName();
+
+			Map<String, Packages> currentBundlePackages =
+				_createCurrentBundlePackagesMap(symbolicName, exportPackages);
+
+			for (Map.Entry<Bundle, Map<String, Packages>> entry :
+					bundlesMap.entrySet()) {
+
+				Map<String, Packages> mapBundlePackages = new HashMap<>(
+					entry.getValue());
+
+				Set<String> keySet = mapBundlePackages.keySet();
+
+				keySet.retainAll(currentBundlePackages.keySet());
+
+				if (!mapBundlePackages.isEmpty()) {
+					_processDuplicatedPackages(
+						entry.getKey(), mapBundlePackages.values(),
+						currentBundlePackages, suitableImportsMap,
+						symbolicName);
+				}
+			}
+
+			bundlesMap.put(bundle, currentBundlePackages);
 		}
 	}
 
