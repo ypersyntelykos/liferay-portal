@@ -63,7 +63,7 @@ public class SplitPackagesTest {
 		for (Bundle bundle : frameworkBundles) {
 			Dictionary<String, String> headers = bundle.getHeaders();
 
-			String exportPackage = headers.get("Export-Package");
+			String exportPackage = headers.get(Constants.EXPORT_PACKAGE);
 
 			if (exportPackage == null) {
 				continue;
