@@ -61,21 +61,12 @@ public class SplitPackagesTest {
 		Map<String, Packages> suitableImportsMap = _createSuitableImportsMap();
 
 		for (Bundle bundle : frameworkBundles) {
-			Dictionary<String, String> headers = bundle.getHeaders();
+			Map<String, Packages> bundleExportPackages =
+				_getBundleExportPackages(bundle);
 
-			String exportPackage = headers.get(Constants.EXPORT_PACKAGE);
-
-			if (exportPackage == null) {
+			if (bundleExportPackages == null) {
 				continue;
 			}
-
-			String symbolicName = bundle.getSymbolicName();
-
-			Parameters parameters = OSGiHeader.parseHeader(exportPackage);
-
-			Map<String, Packages> currentBundlePackages =
-				_createCurrentBundlePackagesMap(
-					symbolicName, parameters.asMapMap());
 
 			for (Map.Entry<Bundle, Map<String, Packages>> entry :
 					bundlesMap.entrySet()) {
@@ -85,17 +76,17 @@ public class SplitPackagesTest {
 
 				Set<String> keySet = mapBundlePackages.keySet();
 
-				keySet.retainAll(currentBundlePackages.keySet());
+				keySet.retainAll(bundleExportPackages.keySet());
 
 				if (!mapBundlePackages.isEmpty()) {
 					_processDuplicatedPackages(
 						entry.getKey(), mapBundlePackages.values(),
-						currentBundlePackages, suitableImportsMap,
-						symbolicName);
+						bundleExportPackages, suitableImportsMap,
+						bundle.getSymbolicName());
 				}
 			}
 
-			bundlesMap.put(bundle, currentBundlePackages);
+			bundlesMap.put(bundle, bundleExportPackages);
 		}
 	}
 
@@ -112,32 +103,6 @@ public class SplitPackagesTest {
 		}
 
 		return false;
-	}
-
-	private Map<String, Packages> _createCurrentBundlePackagesMap(
-		String symbolicName,
-		Map<String, ? extends Map<String, String>> exportPackages) {
-
-		Map<String, Packages> currentBundlePackages = new HashMap<>();
-
-		for (Map.Entry<String, ? extends Map<String, String>> entry :
-				exportPackages.entrySet()) {
-
-			String packageName = entry.getKey();
-
-			Map<String, String> attributes = entry.getValue();
-
-			String version = attributes.get(Constants.VERSION_ATTRIBUTE);
-
-			if (version == null) {
-				version = "0.0";
-			}
-
-			currentBundlePackages.put(
-				packageName, new Packages(packageName, version, symbolicName));
-		}
-
-		return currentBundlePackages;
 	}
 
 	private Map<String, Packages> _createSuitableImportsMap()
@@ -164,6 +129,43 @@ public class SplitPackagesTest {
 		}
 
 		return suitableImports;
+	}
+
+	private Map<String, Packages> _getBundleExportPackages(Bundle bundle) {
+		Dictionary<String, String> headers = bundle.getHeaders();
+
+		String exportPackage = headers.get(Constants.EXPORT_PACKAGE);
+
+		if (exportPackage == null) {
+			return null;
+		}
+
+		Parameters parameters = OSGiHeader.parseHeader(exportPackage);
+
+		Map<String, ? extends Map<String, String>> exportPackages =
+			parameters.asMapMap();
+
+		Map<String, Packages> bundleExportPackages = new HashMap<>();
+
+		for (Map.Entry<String, ? extends Map<String, String>> entry :
+				exportPackages.entrySet()) {
+
+			String packageName = entry.getKey();
+
+			Map<String, String> attributes = entry.getValue();
+
+			String version = attributes.get(Constants.VERSION_ATTRIBUTE);
+
+			if (version == null) {
+				version = "0.0";
+			}
+
+			bundleExportPackages.put(
+				packageName,
+				new Packages(packageName, version, bundle.getSymbolicName()));
+		}
+
+		return bundleExportPackages;
 	}
 
 	private void _processDuplicatedPackages(
