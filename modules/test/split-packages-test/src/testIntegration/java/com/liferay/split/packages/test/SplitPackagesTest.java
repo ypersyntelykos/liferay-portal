@@ -14,6 +14,9 @@
 
 package com.liferay.split.packages.test;
 
+import aQute.bnd.header.OSGiHeader;
+import aQute.bnd.header.Parameters;
+
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -35,6 +38,7 @@ import org.junit.runner.RunWith;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.Constants;
 
 /**
  * @author Tom Wang
@@ -59,18 +63,19 @@ public class SplitPackagesTest {
 		for (Bundle bundle : frameworkBundles) {
 			Dictionary<String, String> headers = bundle.getHeaders();
 
-			String exportPackages = headers.get("Export-Package");
+			String exportPackage = headers.get("Export-Package");
 
-			if (exportPackages == null) {
+			if (exportPackage == null) {
 				continue;
 			}
 
-			exportPackages = exportPackages.replaceAll(";uses:=\"[^\"]*\"", "");
-
 			String symbolicName = bundle.getSymbolicName();
 
+			Parameters parameters = OSGiHeader.parseHeader(exportPackage);
+
 			Map<String, Packages> currentBundlePackages =
-				_createCurrentBundlePackagesMap(symbolicName, exportPackages);
+				_createCurrentBundlePackagesMap(
+					symbolicName, parameters.asMapMap());
 
 			for (Map.Entry<Bundle, Map<String, Packages>> entry :
 					bundlesMap.entrySet()) {
@@ -110,27 +115,26 @@ public class SplitPackagesTest {
 	}
 
 	private Map<String, Packages> _createCurrentBundlePackagesMap(
-		String symbolicName, String exportPackages) {
+		String symbolicName,
+		Map<String, ? extends Map<String, String>> exportPackages) {
 
 		Map<String, Packages> currentBundlePackages = new HashMap<>();
 
-		for (String exportPackage : StringUtil.split(exportPackages, ',')) {
-			String[] exportPackageSplit = StringUtil.split(exportPackage, ';');
+		for (Map.Entry<String, ? extends Map<String, String>> entry :
+				exportPackages.entrySet()) {
 
-			if (exportPackageSplit.length > 1) {
-				String[] version = StringUtil.split(exportPackageSplit[1], '=');
+			String packageName = entry.getKey();
 
-				currentBundlePackages.put(
-					exportPackageSplit[0],
-					new Packages(
-						exportPackageSplit[0], StringUtil.unquote(version[1]),
-						symbolicName));
+			Map<String, String> attributes = entry.getValue();
+
+			String version = attributes.get(Constants.VERSION_ATTRIBUTE);
+
+			if (version == null) {
+				version = "0.0";
 			}
-			else {
-				currentBundlePackages.put(
-					exportPackageSplit[0],
-					new Packages(exportPackageSplit[0], "0.0", symbolicName));
-			}
+
+			currentBundlePackages.put(
+				packageName, new Packages(packageName, version, symbolicName));
 		}
 
 		return currentBundlePackages;
