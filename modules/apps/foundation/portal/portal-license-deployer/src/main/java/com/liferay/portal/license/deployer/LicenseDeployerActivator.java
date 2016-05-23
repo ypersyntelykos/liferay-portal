@@ -50,7 +50,7 @@ public class LicenseDeployerActivator {
 
 		Dictionary<String, Object> properties = new Hashtable<>();
 
-		properties.put("lpkg.deployer.artifact.installer.type", "license");
+		properties.put("installer.type", "license");
 
 		return bundleContext.registerService(
 			new String[] {
