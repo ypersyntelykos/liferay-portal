@@ -14,6 +14,7 @@
 
 package com.liferay.portal.license.deployer;
 
+import com.liferay.portal.kernel.module.framework.ModuleServiceLifecycle;
 import com.liferay.portal.license.deployer.installer.LicenseInstaller;
 
 import org.apache.felix.fileinstall.ArtifactInstaller;
@@ -25,6 +26,7 @@ import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
 import org.osgi.util.tracker.BundleTracker;
 
 /**
@@ -61,6 +63,11 @@ public class LicenseDeployerActivator {
 				ArtifactListener.class.getName()
 			},
 			artifactInstaller, null);
+	}
+
+	@Reference(target = ModuleServiceLifecycle.PORTAL_INITIALIZED, unbind = "-")
+	protected void setModuleServiceLifecycle(
+		ModuleServiceLifecycle moduleServiceLifecycle) {
 	}
 
 	private ServiceRegistration<?> _artifactListenerServiceRegistration;
