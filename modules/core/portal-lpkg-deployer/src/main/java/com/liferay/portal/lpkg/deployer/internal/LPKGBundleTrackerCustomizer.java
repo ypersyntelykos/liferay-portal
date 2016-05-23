@@ -30,9 +30,9 @@ import com.liferay.portal.lpkg.deployer.internal.wrapper.bundle.URLStreamHandler
 import com.liferay.portal.lpkg.deployer.internal.wrapper.bundle.WARBundleWrapperBundleActivator;
 import com.liferay.portal.util.PropsValues;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.File;
 
 import java.net.URL;
 
@@ -71,8 +71,8 @@ public class LPKGBundleTrackerCustomizer
 		ArtifactInstaller licenseArtifactInstaller) {
 
 		_bundleContext = bundleContext;
-		_urls = urls;
 		_licenseArtifactInstaller = licenseArtifactInstaller;
+		_urls = urls;
 	}
 
 	@Override

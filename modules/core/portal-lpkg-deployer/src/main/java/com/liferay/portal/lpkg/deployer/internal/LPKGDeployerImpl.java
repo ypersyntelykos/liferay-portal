@@ -297,9 +297,6 @@ public class LPKGDeployerImpl implements LPKGDeployer {
 	private static final Log _log = LogFactoryUtil.getLog(
 		LPKGDeployerImpl.class);
 
-	@Reference(target = "(lpkg.deployer.artifact.installer.type=license)")
-	private ArtifactInstaller _licenseArtifactInstaller;
-
 	private BundleTracker<List<Bundle>> _lpkgBundleTracker;
 
 	@Reference
@@ -307,6 +304,9 @@ public class LPKGDeployerImpl implements LPKGDeployer {
 
 	@Reference
 	private LPKGWARBundleRegistry _lpkgWarBundleRegistry;
+
+	@Reference(target = "(lpkg.deployer.artifact.installer.type=license)")
+	private ArtifactInstaller _licenseArtifactInstaller;
 
 	private final Map<String, URL> _urls = new ConcurrentHashMap<>();
 	private BundleTracker<Bundle> _warWrapperBundlerTracker;
