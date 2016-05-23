@@ -362,7 +362,7 @@ public class EditServerMVCActionCommand extends BaseMVCActionCommand {
 			return;
 		}
 
-		final String uuid = _portalUUID.generate();
+		final String jobName = "reindex-".concat(_portalUUID.generate());
 
 		final CountDownLatch countDownLatch = new CountDownLatch(1);
 
@@ -381,9 +381,7 @@ public class EditServerMVCActionCommand extends BaseMVCActionCommand {
 					return;
 				}
 
-				String name = message.getString("name");
-
-				if ((name == null) || !name.contains(uuid)) {
+				if (!jobName.equals(message.getString("name"))) {
 					return;
 				}
 
@@ -411,7 +409,7 @@ public class EditServerMVCActionCommand extends BaseMVCActionCommand {
 
 		try {
 			_indexWriterHelper.reindex(
-				themeDisplay.getUserId(), "reindex-".concat(uuid),
+				themeDisplay.getUserId(), jobName,
 				PortalInstances.getCompanyIds(), className, taskContextMap);
 
 			countDownLatch.await(
