@@ -305,7 +305,7 @@ public class LPKGDeployerImpl implements LPKGDeployer {
 	@Reference
 	private LPKGWARBundleRegistry _lpkgWarBundleRegistry;
 
-	@Reference(target = "(lpkg.deployer.artifact.installer.type=license)")
+	@Reference(target = "(installer.type=license)")
 	private ArtifactInstaller _licenseArtifactInstaller;
 
 	private final Map<String, URL> _urls = new ConcurrentHashMap<>();
