@@ -14,10 +14,10 @@
 
 package com.liferay.portal.license.deployer;
 
+import com.liferay.portal.kernel.util.HashMapDictionary;
 import com.liferay.portal.license.deployer.installer.LicenseInstaller;
 
 import java.util.Dictionary;
-import java.util.Hashtable;
 
 import org.apache.felix.fileinstall.ArtifactInstaller;
 import org.apache.felix.fileinstall.ArtifactListener;
@@ -48,7 +48,7 @@ public class LicenseDeployerActivator {
 	protected ServiceRegistration<?> registerArtifactListener(
 		BundleContext bundleContext) {
 
-		Dictionary<String, Object> properties = new Hashtable<>();
+		Dictionary<String, Object> properties = new HashMapDictionary<>();
 
 		properties.put("installer.type", "license");
 
