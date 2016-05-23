@@ -19,11 +19,13 @@ import com.liferay.portal.license.deployer.installer.LicenseInstaller;
 import org.apache.felix.fileinstall.ArtifactInstaller;
 import org.apache.felix.fileinstall.ArtifactListener;
 
+import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.util.tracker.BundleTracker;
 
 /**
  * @author Miguel Pastor
@@ -33,8 +35,16 @@ public class LicenseDeployerActivator {
 
 	@Activate
 	protected void activate(BundleContext bundleContext) {
+		ArtifactInstaller artifactInstaller = new LicenseInstaller();
+
 		_artifactListenerServiceRegistration = registerArtifactListener(
-			bundleContext);
+			bundleContext, artifactInstaller);
+
+		_lpkgLicensedBundleTracker = new BundleTracker<>(
+			bundleContext, ~Bundle.UNINSTALLED,
+			new LPKGLicensedBundleTrackerCustomizer(artifactInstaller));
+
+		_lpkgLicensedBundleTracker.open();
 	}
 
 	@Deactivate
@@ -43,16 +53,17 @@ public class LicenseDeployerActivator {
 	}
 
 	protected ServiceRegistration<?> registerArtifactListener(
-		BundleContext bundleContext) {
+		BundleContext bundleContext, ArtifactInstaller artifactInstaller) {
 
 		return bundleContext.registerService(
 			new String[] {
 				ArtifactInstaller.class.getName(),
 				ArtifactListener.class.getName()
 			},
-			new LicenseInstaller(), null);
+			artifactInstaller, null);
 	}
 
 	private ServiceRegistration<?> _artifactListenerServiceRegistration;
+	private BundleTracker<Bundle> _lpkgLicensedBundleTracker;
 
 }
