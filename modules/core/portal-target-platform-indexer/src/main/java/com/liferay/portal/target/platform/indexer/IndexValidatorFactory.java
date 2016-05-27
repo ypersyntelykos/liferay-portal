@@ -25,11 +25,11 @@ import org.osgi.service.component.annotations.Component;
 @Component(immediate = true, service = IndexValidatorFactory.class)
 public class IndexValidatorFactory {
 
-	public IndexValidator create() {
+	public IndexValidator create(boolean includeTargetPlatform) {
 		DefaultIndexValidator defaultIndexValidator =
 			new DefaultIndexValidator();
 
-		defaultIndexValidator.setIncludeTargetPlatform(true);
+		defaultIndexValidator.setIncludeTargetPlatform(includeTargetPlatform);
 		defaultIndexValidator.setModuleFrameworkBaseDirName(
 			PropsValues.MODULE_FRAMEWORK_BASE_DIR);
 

@@ -72,7 +72,7 @@ public class DefaultLPKGVerifier implements LPKGVerifier {
 				_log.info("Wrote index " + indexFile.getPath());
 			}
 
-			IndexValidator indexValidator = _indexValidatorFactory.create();
+			IndexValidator indexValidator = _indexValidatorFactory.create(true);
 
 			long start = System.currentTimeMillis();
 
