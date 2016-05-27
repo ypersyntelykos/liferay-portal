@@ -61,7 +61,7 @@ public class DefaultLPKGVerifier implements LPKGVerifier {
 	@Override
 	public List<Bundle> verify(File lpkgFile) {
 		try {
-			Indexer indexer = _indexerFactory.create(lpkgFile);
+			Indexer indexer = _indexerFactory.createLPKGIndexer(lpkgFile);
 
 			File indexFile = indexer.index(
 				new File(
