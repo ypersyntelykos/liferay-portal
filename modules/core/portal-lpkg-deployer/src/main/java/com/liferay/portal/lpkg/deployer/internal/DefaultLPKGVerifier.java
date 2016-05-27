@@ -95,7 +95,9 @@ public class DefaultLPKGVerifier implements LPKGVerifier {
 					iae);
 			}
 
-			_doIndexValidation(lpkgFile, symbolicName, version);
+			if (LPKGValidationThreadLocal.isEnabled()) {
+				_doIndexValidation(lpkgFile, symbolicName, version);
+			}
 
 			List<Bundle> oldBundles = new ArrayList<>();
 
