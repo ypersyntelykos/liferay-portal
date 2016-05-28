@@ -38,15 +38,11 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 
 import org.osgi.framework.Bundle;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.launch.Framework;
-import org.osgi.framework.launch.FrameworkFactory;
 import org.osgi.framework.namespace.BundleNamespace;
 import org.osgi.framework.namespace.HostNamespace;
 import org.osgi.framework.namespace.IdentityNamespace;
@@ -64,8 +60,11 @@ import org.osgi.service.repository.ContentNamespace;
 public class TargetPlatformIndexer implements Indexer {
 
 	public TargetPlatformIndexer(
-		String moduleFrameworkBaseDirName, String moduleFrameworkModulesDirName,
+		Bundle systemBundle, String moduleFrameworkBaseDirName,
+		String moduleFrameworkModulesDirName,
 		String moduleFrameworkPortalDirName) {
+
+		_systemBundle = systemBundle;
 
 		_moduleFrameworkBaseDirName = moduleFrameworkBaseDirName;
 		_moduleFrameworkModulesDirName = moduleFrameworkModulesDirName;
@@ -204,38 +203,18 @@ public class TargetPlatformIndexer implements Indexer {
 	private void _processSystemBundle(File tempDir, Set<File> jarFiles)
 		throws Exception {
 
-		Framework framework = null;
-
 		try (Jar jar = new Jar("system.bundle")) {
-			ServiceLoader<FrameworkFactory> serviceLoader = ServiceLoader.load(
-				FrameworkFactory.class);
-
-			FrameworkFactory frameworkFactory = serviceLoader.iterator().next();
-
-			Map<String, String> properties = new HashMap<>();
-
-			properties.put(
-				org.osgi.framework.Constants.FRAMEWORK_STORAGE,
-				tempDir.getAbsolutePath());
-
-			framework = frameworkFactory.newFramework(properties);
-
-			framework.init();
-
-			BundleContext bundleContext = framework.getBundleContext();
-
-			Bundle systemBundle = bundleContext.getBundle(0);
-
-			_processBundle(systemBundle);
+			_processBundle(_systemBundle);
 
 			Manifest manifest = new Manifest();
 
 			Attributes attributes = manifest.getMainAttributes();
 
 			attributes.putValue(
-				Constants.BUNDLE_SYMBOLICNAME, systemBundle.getSymbolicName());
+				Constants.BUNDLE_SYMBOLICNAME, _systemBundle.getSymbolicName());
 			attributes.putValue(
-				Constants.BUNDLE_VERSION, systemBundle.getVersion().toString());
+				Constants.BUNDLE_VERSION,
+				_systemBundle.getVersion().toString());
 
 			String exportPackage = _packagesParamters.toString();
 
@@ -260,15 +239,12 @@ public class TargetPlatformIndexer implements Indexer {
 
 			File jarFile = new File(
 				tempDir,
-				systemBundle.getSymbolicName() + "-" +
-					systemBundle.getVersion() + ".jar");
+				_systemBundle.getSymbolicName() + "-" +
+					_systemBundle.getVersion() + ".jar");
 
 			jar.write(jarFile);
 
 			jarFiles.add(jarFile);
-		}
-		finally {
-			framework.stop();
 		}
 	}
 
@@ -310,5 +286,6 @@ public class TargetPlatformIndexer implements Indexer {
 	private final String _moduleFrameworkPortalDirName;
 	private final Parameters _packagesParamters = new Parameters();
 	private final List<Parameters> _parametersList = new ArrayList<>();
+	private final Bundle _systemBundle;
 
 }
