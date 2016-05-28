@@ -26,7 +26,10 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
+
+import java.net.URL;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -251,12 +254,13 @@ public class TargetPlatformIndexer implements Indexer {
 	private void _processSystemPackagesExtra(File tempDir, Set<File> jarFiles)
 		throws Exception {
 
-		try (Jar jar = new Jar("system.packages.extra")) {
-			ClassLoader classLoader = _targetPlatformMainClass.getClassLoader();
+		URL url = _systemBundle.getResource(
+			"META-INF/system.packages.extra.mf");
 
-			Manifest manifest = new Manifest(
-				classLoader.getResourceAsStream(
-					"META-INF/system.packages.extra.mf"));
+		try (Jar jar = new Jar("system.packages.extra");
+			InputStream inputStream = url.openStream()) {
+
+			Manifest manifest = new Manifest(inputStream);
 
 			jar.setManifest(manifest);
 
