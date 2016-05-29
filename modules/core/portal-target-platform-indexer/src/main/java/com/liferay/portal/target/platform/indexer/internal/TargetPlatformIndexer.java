@@ -24,20 +24,22 @@ import com.liferay.portal.target.platform.indexer.Indexer;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
 import java.net.URL;
 
+import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -89,24 +91,14 @@ public class TargetPlatformIndexer implements Indexer {
 			_processSystemPackagesExtra(tempDir, jarFiles);
 
 			for (String dirName : _dirNames) {
-				File dir = new File(dirName);
+				try (DirectoryStream<Path> directoryStream =
+						Files.newDirectoryStream(Paths.get(dirName))) {
 
-				if (!dir.isDirectory() || !dir.canRead()) {
-					continue;
-				}
+					Iterator<Path> iterator = directoryStream.iterator();
 
-				File[] childFiles = dir.listFiles(
-					new FilenameFilter() {
-
-						@Override
-						public boolean accept(File dir, String name) {
-							return name.endsWith(".jar");
-						}
-
-					});
-
-				for (File childFile : childFiles) {
-					_addBundle(jarFiles, childFile, tempDir);
+					while (iterator.hasNext()) {
+						_addBundle(tempPath, iterator.next(), jarFiles);
+					}
 				}
 			}
 
@@ -133,17 +125,16 @@ public class TargetPlatformIndexer implements Indexer {
 		}
 	}
 
-	private void _addBundle(Set<File> jarFiles, File bundleFile, File tempDir)
+	private void _addBundle(Path tempPath, Path jarPath, Set<File> jarFiles)
 		throws IOException {
 
-		File jarFile = new File(tempDir, bundleFile.getName());
+		Path tempJarPath = tempPath.resolve(jarPath.getFileName());
 
 		Files.copy(
-			bundleFile.toPath(), jarFile.toPath(),
-			StandardCopyOption.COPY_ATTRIBUTES,
+			jarPath, tempJarPath, StandardCopyOption.COPY_ATTRIBUTES,
 			StandardCopyOption.REPLACE_EXISTING);
 
-		jarFiles.add(jarFile);
+		jarFiles.add(tempJarPath.toFile());
 	}
 
 	private void _processBundle(Bundle bundle) throws Exception {
