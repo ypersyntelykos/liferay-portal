@@ -101,7 +101,7 @@ public class TargetPlatformIndexerMain {
 
 			TargetPlatformIndexer targetPlatformIndexer =
 				new TargetPlatformIndexer(
-					systemBundle, moduleFrameworkBaseDirName,
+					systemBundle, moduleFrameworkBaseDirName + "/static",
 					moduleFrameworkModulesDirName,
 					moduleFrameworkPortalDirName);
 

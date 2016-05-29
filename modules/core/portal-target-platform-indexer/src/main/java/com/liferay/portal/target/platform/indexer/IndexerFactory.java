@@ -42,7 +42,7 @@ public class IndexerFactory {
 
 	public Indexer createTargetPlatformIndexer() {
 		return new TargetPlatformIndexer(
-			_systemBundle, PropsValues.MODULE_FRAMEWORK_BASE_DIR,
+			_systemBundle, PropsValues.MODULE_FRAMEWORK_BASE_DIR + "/static",
 			PropsValues.MODULE_FRAMEWORK_MODULES_DIR,
 			PropsValues.MODULE_FRAMEWORK_PORTAL_DIR);
 	}

@@ -62,16 +62,9 @@ import org.osgi.service.repository.ContentNamespace;
  */
 public class TargetPlatformIndexer implements Indexer {
 
-	public TargetPlatformIndexer(
-		Bundle systemBundle, String moduleFrameworkBaseDirName,
-		String moduleFrameworkModulesDirName,
-		String moduleFrameworkPortalDirName) {
-
+	public TargetPlatformIndexer(Bundle systemBundle, String... dirNames) {
 		_systemBundle = systemBundle;
-
-		_moduleFrameworkBaseDirName = moduleFrameworkBaseDirName;
-		_moduleFrameworkModulesDirName = moduleFrameworkModulesDirName;
-		_moduleFrameworkPortalDirName = moduleFrameworkPortalDirName;
+		_dirNames = dirNames;
 
 		_config.put("compressed", "false");
 		_config.put(
@@ -95,13 +88,8 @@ public class TargetPlatformIndexer implements Indexer {
 			_processSystemBundle(tempDir, jarFiles);
 			_processSystemPackagesExtra(tempDir, jarFiles);
 
-			String[] moduleDirNames = new String[] {
-				_moduleFrameworkBaseDirName + "/static/",
-				_moduleFrameworkModulesDirName, _moduleFrameworkPortalDirName
-			};
-
-			for (String moduleDirName : moduleDirNames) {
-				File dir = new File(moduleDirName);
+			for (String dirName : _dirNames) {
+				File dir = new File(dirName);
 
 				if (!dir.isDirectory() || !dir.canRead()) {
 					continue;
@@ -285,9 +273,7 @@ public class TargetPlatformIndexer implements Indexer {
 	}
 
 	private final Map<String, String> _config = new HashMap<>();
-	private final String _moduleFrameworkBaseDirName;
-	private final String _moduleFrameworkModulesDirName;
-	private final String _moduleFrameworkPortalDirName;
+	private final String[] _dirNames;
 	private final Parameters _packagesParamters = new Parameters();
 	private final List<Parameters> _parametersList = new ArrayList<>();
 	private final Bundle _systemBundle;
