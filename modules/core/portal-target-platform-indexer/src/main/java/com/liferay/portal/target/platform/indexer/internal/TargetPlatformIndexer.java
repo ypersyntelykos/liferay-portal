@@ -23,7 +23,6 @@ import aQute.bnd.osgi.resource.CapabilityBuilder;
 import com.liferay.portal.target.platform.indexer.Indexer;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -77,7 +76,7 @@ public class TargetPlatformIndexer implements Indexer {
 	}
 
 	@Override
-	public File index(File outputFile) throws Exception {
+	public void index(OutputStream outputStream) throws Exception {
 		Path tempPath = Files.createTempDirectory(null);
 
 		File tempDir = tempPath.toFile();
@@ -104,21 +103,7 @@ public class TargetPlatformIndexer implements Indexer {
 
 			ResourceIndexer resourceIndexer = new RepoIndex();
 
-			File tempIndexFile = new File(tempDir, "target.platform.index.xml");
-
-			try (OutputStream outputStream = new FileOutputStream(
-					tempIndexFile)) {
-
-				resourceIndexer.index(jarFiles, outputStream, _config);
-			}
-
-			File indexFile = new File(outputFile, tempIndexFile.getName());
-
-			Files.move(
-				tempIndexFile.toPath(), indexFile.toPath(),
-				StandardCopyOption.REPLACE_EXISTING);
-
-			return indexFile;
+			resourceIndexer.index(jarFiles, outputStream, _config);
 		}
 		finally {
 			PathUtil.deltree(tempPath);
