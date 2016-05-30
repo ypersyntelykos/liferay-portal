@@ -198,7 +198,7 @@ public class DefaultLPKGDeployer implements LPKGDeployer {
 	}
 
 	private void _doActivate(final BundleContext bundleContext)
-		throws IOException {
+		throws Exception {
 
 		Dictionary<String, Object> properties = new HashMapDictionary<>();
 
@@ -255,32 +255,46 @@ public class DefaultLPKGDeployer implements LPKGDeployer {
 
 			});
 
-		for (File lpkgFile : lpkgFiles) {
-			try {
-				List<Bundle> bundles = deploy(bundleContext, lpkgFile);
+		_lpkgIndexValidator.validate(lpkgFiles);
 
-				for (Bundle bundle : bundles) {
-					Dictionary<String, String> headers = bundle.getHeaders();
+		boolean enabled = LPKGValidationThreadLocal.isEnabled();
 
-					String fragmentHost = headers.get(Constants.FRAGMENT_HOST);
+		LPKGValidationThreadLocal.setEnabled(false);
 
-					if (fragmentHost != null) {
-						continue;
-					}
+		try {
+			for (File lpkgFile : lpkgFiles) {
+				try {
+					List<Bundle> bundles = deploy(bundleContext, lpkgFile);
 
-					try {
-						bundle.start();
-					}
-					catch (BundleException be) {
-						_log.error(
-							"Unable to start " + bundle + " for " + lpkgFile,
-							be);
+					for (Bundle bundle : bundles) {
+						Dictionary<String, String> headers =
+							bundle.getHeaders();
+
+						String fragmentHost = headers.get(
+							Constants.FRAGMENT_HOST);
+
+						if (fragmentHost != null) {
+							continue;
+						}
+
+						try {
+							bundle.start();
+						}
+						catch (BundleException be) {
+							_log.error(
+								"Unable to start " + bundle + " for " +
+									lpkgFile,
+								be);
+						}
 					}
 				}
+				catch (Exception e) {
+					_log.error("Unable to deploy LPKG file " + lpkgFile, e);
+				}
 			}
-			catch (Exception e) {
-				_log.error("Unable to deploy LPKG file " + lpkgFile, e);
-			}
+		}
+		finally {
+			LPKGValidationThreadLocal.setEnabled(enabled);
 		}
 	}
 
@@ -320,6 +334,9 @@ public class DefaultLPKGDeployer implements LPKGDeployer {
 
 	private Path _deploymentDirPath;
 	private BundleTracker<List<Bundle>> _lpkgBundleTracker;
+
+	@Reference
+	private LPKGIndexValidator _lpkgIndexValidator;
 
 	@Reference
 	private LPKGVerifier _lpkgVerifier;
