@@ -21,29 +21,24 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.Time;
+import com.liferay.portal.lpkg.deployer.LPKGDeployer;
 import com.liferay.portal.lpkg.deployer.LPKGVerifyException;
 import com.liferay.portal.target.platform.indexer.IndexValidator;
 import com.liferay.portal.target.platform.indexer.IndexValidatorFactory;
 import com.liferay.portal.target.platform.indexer.Indexer;
 import com.liferay.portal.target.platform.indexer.IndexerFactory;
-import com.liferay.portal.util.PropsValues;
 
 import java.io.File;
-import java.io.IOException;
 
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 
-import java.nio.file.DirectoryStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
+import org.osgi.framework.Bundle;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -53,16 +48,21 @@ import org.osgi.service.component.annotations.Reference;
 @Component(immediate = true, service = LPKGIndexValidator.class)
 public class LPKGIndexValidator {
 
+	public void setLpkgDeployer(LPKGDeployer lpkgDeployer) {
+		_lpkgDeployer = lpkgDeployer;
+	}
+
 	public void validate(List<File> lpkgFiles) throws Exception {
 		long start = System.currentTimeMillis();
 
-		List<URI> uris = _indexLPKGFiles(lpkgFiles);
+		List<URI> targetPlatformIndexURIs = _getTargetPlatformIndexURIs();
+		List<URI> lpkgIndexURIs = _indexLPKGFiles(lpkgFiles);
 
 		IndexValidator indexValidator = _indexValidatorFactory.create(
-			_getTargetPlatformIndexURIs());
+			targetPlatformIndexURIs);
 
 		try {
-			List<String> messages = indexValidator.validate(uris);
+			List<String> messages = indexValidator.validate(lpkgIndexURIs);
 
 			if (!messages.isEmpty()) {
 				StringBundler sb = new StringBundler((messages.size() * 3) + 1);
@@ -83,7 +83,8 @@ public class LPKGIndexValidator {
 			}
 		}
 		finally {
-			_cleanUp(uris);
+			_cleanUp(targetPlatformIndexURIs);
+			_cleanUp(lpkgIndexURIs);
 
 			if (_log.isInfoEnabled()) {
 				long duration = System.currentTimeMillis() - start;
@@ -103,23 +104,30 @@ public class LPKGIndexValidator {
 		}
 	}
 
-	private List<URI> _getTargetPlatformIndexURIs() throws IOException {
-		List<URI> uris = new ArrayList<>();
+	private List<URI> _getTargetPlatformIndexURIs() throws Exception {
+		List<File> files = new ArrayList<>();
 
-		try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(
-				Paths.get(
-					PropsValues.MODULE_FRAMEWORK_BASE_DIR,
-					Indexer.DIR_NAME_TARGET_PLATFORM),
-				"*.xml")) {
+		Map<Bundle, List<Bundle>> deployedLPKGBundles =
+			_lpkgDeployer.getDeployedLPKGBundles();
 
-			Iterator<Path> iterator = directoryStream.iterator();
-
-			while (iterator.hasNext()) {
-				Path path = iterator.next();
-
-				uris.add(path.toUri());
-			}
+		for (Bundle bundle : deployedLPKGBundles.keySet()) {
+			files.add(new File(bundle.getLocation()));
 		}
+
+		List<URI> uris = _indexLPKGFiles(files);
+
+		Indexer indexer = _indexerFactory.createTargetPlatformIndexer();
+
+		UnsyncByteArrayOutputStream unsyncByteArrayOutputStream =
+			new UnsyncByteArrayOutputStream();
+
+		indexer.index(unsyncByteArrayOutputStream);
+
+		URL url = _bytesURLProtocolSupport.putData(
+			"liferay-target-platform",
+			unsyncByteArrayOutputStream.toByteArray());
+
+		uris.add(url.toURI());
 
 		return uris;
 	}
@@ -167,5 +175,7 @@ public class LPKGIndexValidator {
 
 	@Reference
 	private IndexValidatorFactory _indexValidatorFactory;
+
+	private LPKGDeployer _lpkgDeployer;
 
 }
