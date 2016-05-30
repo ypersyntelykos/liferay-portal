@@ -16,6 +16,7 @@ package com.liferay.portal.lpkg.deployer.internal;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
+import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayOutputStream;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.StringBundler;
@@ -24,11 +25,15 @@ import com.liferay.portal.lpkg.deployer.LPKGVerifyException;
 import com.liferay.portal.target.platform.indexer.IndexValidator;
 import com.liferay.portal.target.platform.indexer.IndexValidatorFactory;
 import com.liferay.portal.target.platform.indexer.Indexer;
+import com.liferay.portal.target.platform.indexer.IndexerFactory;
 import com.liferay.portal.util.PropsValues;
 
+import java.io.File;
 import java.io.IOException;
 
+import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URL;
 
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
@@ -48,8 +53,10 @@ import org.osgi.service.component.annotations.Reference;
 @Component(immediate = true, service = LPKGIndexValidator.class)
 public class LPKGIndexValidator {
 
-	public void validate(List<URI> uris) throws Exception {
+	public void validate(List<File> lpkgFiles) throws Exception {
 		long start = System.currentTimeMillis();
+
+		List<URI> uris = _indexLPKGFiles(lpkgFiles);
 
 		IndexValidator indexValidator = _indexValidatorFactory.create(
 			_getTargetPlatformIndexURIs());
@@ -76,6 +83,8 @@ public class LPKGIndexValidator {
 			}
 		}
 		finally {
+			_cleanUp(uris);
+
 			if (_log.isInfoEnabled()) {
 				long duration = System.currentTimeMillis() - start;
 
@@ -85,6 +94,12 @@ public class LPKGIndexValidator {
 						MILLISECONDS.toMinutes(duration),
 						MILLISECONDS.toSeconds(duration % Time.MINUTE)));
 			}
+		}
+	}
+
+	private void _cleanUp(List<URI> uris) throws MalformedURLException {
+		for (URI uri : uris) {
+			_bytesURLProtocolSupport.removeData(uri.toURL());
 		}
 	}
 
@@ -109,8 +124,46 @@ public class LPKGIndexValidator {
 		return uris;
 	}
 
+	private List<URI> _indexLPKGFiles(List<File> lpkgFiles) throws Exception {
+		List<URI> uris = new ArrayList<>();
+
+		UnsyncByteArrayOutputStream unsyncByteArrayOutputStream =
+			new UnsyncByteArrayOutputStream();
+
+		try {
+			for (File lpkgFile : lpkgFiles) {
+				Indexer indexer = _indexerFactory.createLPKGIndexer(lpkgFile);
+
+				indexer.index(unsyncByteArrayOutputStream);
+
+				String name = lpkgFile.getName();
+
+				URL url = _bytesURLProtocolSupport.putData(
+					name.substring(0, name.length() - 5),
+					unsyncByteArrayOutputStream.toByteArray());
+
+				unsyncByteArrayOutputStream.reset();
+
+				uris.add(url.toURI());
+			}
+		}
+		catch (Exception e) {
+			_cleanUp(uris);
+
+			throw e;
+		}
+
+		return uris;
+	}
+
 	private static final Log _log = LogFactoryUtil.getLog(
 		LPKGIndexValidator.class);
+
+	@Reference
+	private BytesURLProtocolSupport _bytesURLProtocolSupport;
+
+	@Reference
+	private IndexerFactory _indexerFactory;
 
 	@Reference
 	private IndexValidatorFactory _indexValidatorFactory;

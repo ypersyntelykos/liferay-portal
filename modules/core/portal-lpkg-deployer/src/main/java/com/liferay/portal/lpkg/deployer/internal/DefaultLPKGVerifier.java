@@ -14,23 +14,14 @@
 
 package com.liferay.portal.lpkg.deployer.internal;
 
-import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayOutputStream;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.lpkg.deployer.LPKGVerifier;
 import com.liferay.portal.lpkg.deployer.LPKGVerifyException;
-import com.liferay.portal.target.platform.indexer.Indexer;
-import com.liferay.portal.target.platform.indexer.IndexerFactory;
-import com.liferay.portal.util.PropsValues;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
-
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -96,7 +87,8 @@ public class DefaultLPKGVerifier implements LPKGVerifier {
 			}
 
 			if (LPKGValidationThreadLocal.isEnabled()) {
-				_doIndexValidation(lpkgFile, symbolicName, version);
+				_lpkgIndexValidator.validate(
+					Collections.singletonList(lpkgFile));
 			}
 
 			List<Bundle> oldBundles = new ArrayList<>();
@@ -132,40 +124,6 @@ public class DefaultLPKGVerifier implements LPKGVerifier {
 
 			return oldBundles;
 		}
-		catch (IOException ioe) {
-			throw new LPKGVerifyException(ioe);
-		}
-	}
-
-	private void _doIndexValidation(
-		File lpkgFile, String symbolicName, Version version) {
-
-		try {
-			Indexer indexer = _indexerFactory.createLPKGIndexer(lpkgFile);
-
-			UnsyncByteArrayOutputStream unsyncByteArrayOutputStream =
-				new UnsyncByteArrayOutputStream();
-
-			indexer.index(unsyncByteArrayOutputStream);
-
-			Path indexFilePath = Paths.get(
-				PropsValues.MODULE_FRAMEWORK_BASE_DIR,
-				Indexer.DIR_NAME_TARGET_PLATFORM,
-				symbolicName + "-" + version + "-index.xml");
-
-			Files.write(
-				indexFilePath, unsyncByteArrayOutputStream.toByteArray());
-
-			if (_log.isInfoEnabled()) {
-				_log.info("Wrote index " + indexFilePath);
-			}
-
-			_lpkgIndexValidator.validate(
-				Collections.singletonList(indexFilePath.toUri()));
-		}
-		catch (LPKGVerifyException lpkgve) {
-			throw lpkgve;
-		}
 		catch (Exception e) {
 			throw new LPKGVerifyException(e);
 		}
@@ -175,9 +133,6 @@ public class DefaultLPKGVerifier implements LPKGVerifier {
 		DefaultLPKGVerifier.class);
 
 	private BundleContext _bundleContext;
-
-	@Reference
-	private IndexerFactory _indexerFactory;
 
 	@Reference
 	private LPKGIndexValidator _lpkgIndexValidator;
