@@ -7,7 +7,7 @@
 # Change these vars to reflect the environment.
 #
 
-module_framework_base_dir=/home/rotty/AS/liferay-portal/osgi
+module_framework_base_dir=/opt/liferay-portal-trunk/osgi
 
 #
 # This is the classpath common to all functions.
