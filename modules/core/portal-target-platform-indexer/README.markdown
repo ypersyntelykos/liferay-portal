@@ -14,8 +14,8 @@ module_framework_base_dir=/home/rotty/AS/liferay-portal/osgi
 #
 jars=(
 	${module_framework_base_dir}/core/com.liferay.portal.bootstrap.jar
-	${module_framework_base_dir}/core/org.eclipse.osgi.jar
 	${module_framework_base_dir}/static/com.liferay.portal.target.platform.indexer.jar
+	${module_framework_base_dir}/core/org.eclipse.osgi.jar
 )
 
 function classpathify { local IFS=":"; echo "$*"; }
