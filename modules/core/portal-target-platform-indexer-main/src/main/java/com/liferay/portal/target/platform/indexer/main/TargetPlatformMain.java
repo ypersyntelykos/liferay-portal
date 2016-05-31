@@ -266,8 +266,10 @@ public class TargetPlatformMain {
 
 		Files.createDirectories(path.getParent());
 
+		URI indexesFileURI = path.toUri();
+
 		try (FileSystem fileSystem = FileSystems.newFileSystem(
-				URI.create("jar:file:" + indexesFileName),
+				URI.create("jar:file:" + indexesFileURI.getPath()),
 				Collections.singletonMap("create", "true"))) {
 
 			for (URI uri : uris) {
