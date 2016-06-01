@@ -178,26 +178,23 @@ public class TargetPlatformMain {
 
 		Path tempPath = Files.createTempDirectory(null);
 
-		String systemPackagesExtra = "";
+		ClassLoader classLoader = TargetPlatformMain.class.getClassLoader();
 
-		URL url = _classLoader.getResource(
-			"META-INF/system.packages.extra.mf");
+		try (InputStream inputStream = classLoader.getResourceAsStream(
+				"META-INF/system.packages.extra.mf")) {
 
-		try (InputStream inputStream = url.openStream()) {
+			Map<String, String> properties = new HashMap<>();
+
+			properties.put(Constants.FRAMEWORK_STORAGE, tempPath.toString());
+
 			Manifest extraPackagesManifest = new Manifest(inputStream);
 
 			Attributes attributes = extraPackagesManifest.getMainAttributes();
 
-			systemPackagesExtra = attributes.getValue("Export-Package");
-		}
+			properties.put(
+				Constants.FRAMEWORK_SYSTEMPACKAGES_EXTRA,
+				attributes.getValue("Export-Package"));
 
-		Map<String, String> properties = new HashMap<>();
-
-		properties.put(Constants.FRAMEWORK_STORAGE, tempPath.toString());
-		properties.put(
-			Constants.FRAMEWORK_SYSTEMPACKAGES_EXTRA, systemPackagesExtra);
-
-		try {
 			ServiceLoader<FrameworkFactory> serviceLoader = ServiceLoader.load(
 				FrameworkFactory.class);
 
@@ -219,7 +216,7 @@ public class TargetPlatformMain {
 
 			targetPlatformIndexer.index(byteArrayOutputStream);
 
-			url = BytesURLSupport.putBytes(
+			URL url = BytesURLSupport.putBytes(
 				"liferay-target-platform", byteArrayOutputStream.toByteArray());
 
 			return url.toURI();
@@ -398,8 +395,5 @@ public class TargetPlatformMain {
 				StandardOpenOption.WRITE);
 		}
 	}
-
-	private static final ClassLoader _classLoader =
-		TargetPlatformMain.class.getClassLoader();
 
 }
