@@ -19,6 +19,7 @@ import com.liferay.portal.kernel.process.ProcessCallable;
 import com.liferay.portal.kernel.process.ProcessException;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 
 import java.lang.reflect.Constructor;
@@ -30,12 +31,16 @@ import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 
-import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.ServiceLoader;
+import java.util.jar.Attributes;
+import java.util.jar.Manifest;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
+import org.osgi.framework.Constants;
 import org.osgi.framework.launch.Framework;
 import org.osgi.framework.launch.FrameworkFactory;
 
@@ -106,25 +111,36 @@ public class TargetPlatformIndexerProcessCallable
 	private byte[] _indexTargetPlatform(Path tempPath) throws ProcessException {
 		Framework framework = null;
 
-		try {
+		ClassLoader classLoader =
+			TargetPlatformIndexerProcessCallable.class.getClassLoader();
+
+		try (InputStream inputStream = classLoader.getResourceAsStream(
+				"META-INF/system.packages.extra.mf")) {
+
+			Map<String, String> properties = new HashMap<>();
+
+			properties.put(Constants.FRAMEWORK_STORAGE, tempPath.toString());
+
+			Manifest extraPackagesManifest = new Manifest(inputStream);
+
+			Attributes attributes = extraPackagesManifest.getMainAttributes();
+
+			properties.put(
+				Constants.FRAMEWORK_SYSTEMPACKAGES_EXTRA,
+				attributes.getValue("Export-Package"));
+
 			ServiceLoader<FrameworkFactory> serviceLoader = ServiceLoader.load(
 				FrameworkFactory.class);
 
 			FrameworkFactory frameworkFactory = serviceLoader.iterator().next();
 
-			framework = frameworkFactory.newFramework(
-				Collections.singletonMap(
-					org.osgi.framework.Constants.FRAMEWORK_STORAGE,
-					tempPath.toString()));
+			framework = frameworkFactory.newFramework(properties);
 
 			framework.init();
 
 			BundleContext bundleContext = framework.getBundleContext();
 
 			Bundle systemBundle = bundleContext.getBundle(0);
-
-			ClassLoader classLoader =
-				TargetPlatformIndexerProcessCallable.class.getClassLoader();
 
 			Class<?> clazz = classLoader.loadClass(
 				"com.liferay.portal.target.platform.indexer.internal." +
