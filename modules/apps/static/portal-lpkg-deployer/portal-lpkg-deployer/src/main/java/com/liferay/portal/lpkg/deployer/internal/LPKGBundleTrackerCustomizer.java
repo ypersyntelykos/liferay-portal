@@ -78,13 +78,13 @@ public class LPKGBundleTrackerCustomizer
 			return null;
 		}
 
-		List<Bundle> bundles = new ArrayList<>();
-
 		String symbolicName = bundle.getSymbolicName();
 
 		if (symbolicName.equals("static")) {
-			return Collections.<Bundle>emptyList();
+			return Collections.emptyList();
 		}
+
+		List<Bundle> bundles = new ArrayList<>();
 
 		try {
 			Enumeration<URL> enumeration = bundle.findEntries(
