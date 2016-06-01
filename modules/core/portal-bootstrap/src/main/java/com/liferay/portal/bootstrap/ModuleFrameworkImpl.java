@@ -68,6 +68,8 @@ import java.security.CodeSource;
 import java.security.ProtectionDomain;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -1025,6 +1027,8 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 
 		final List<Bundle> bundles = new ArrayList<>();
 
+		final List<Path> lpkgPaths = new ArrayList<>();
+
 		Files.walkFileTree(
 			Paths.get(PropsValues.MODULE_FRAMEWORK_BASE_DIR, "/static/"),
 			new SimpleFileVisitor<Path>() {
@@ -1040,24 +1044,26 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 						fileNamePath.toString());
 
 					if (fileName.endsWith(".jar")) {
-						try (InputStream inputStream = Files.newInputStream(
-								filePath)) {
-
-							filePath = filePath.toAbsolutePath();
-
-							Bundle bundle = _installInitialBundle(
-								filePath.toString(), inputStream);
-
-							if (bundle != null) {
-								bundles.add(bundle);
-							}
-						}
+						lpkgPaths.add(filePath.toAbsolutePath());
 					}
 
 					return FileVisitResult.CONTINUE;
 				}
 
 			});
+
+		Collections.sort(lpkgPaths);
+
+		for (Path lpkgPath : lpkgPaths) {
+			try (InputStream inputStream = Files.newInputStream(lpkgPath)) {
+				Bundle bundle = _installInitialBundle(
+					lpkgPath.toString(), inputStream);
+
+				if (bundle != null) {
+					bundles.add(bundle);
+				}
+			}
+		}
 
 		File file = new File(
 			bundleContext.getProperty("lpkg.deployer.dir") + StringPool.SLASH +
@@ -1068,6 +1074,8 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 
 			Enumeration<? extends ZipEntry> enumeration = zipFile.entries();
 
+			List<ZipEntry> zipEntries = new ArrayList<>();
+
 			while (enumeration.hasMoreElements()) {
 				ZipEntry zipEntry = enumeration.nextElement();
 
@@ -1077,6 +1085,24 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 					continue;
 				}
 
+				zipEntries.add(zipEntry);
+			}
+
+			Collections.sort(
+				zipEntries,
+				new Comparator<ZipEntry>() {
+
+					@Override
+					public int compare(ZipEntry zipEntry1, ZipEntry zipEntry2) {
+						String name1 = zipEntry1.getName();
+						String name2 = zipEntry2.getName();
+
+						return name1.compareTo(name2);
+					}
+
+				});
+
+			for (ZipEntry zipEntry : zipEntries) {
 				try (InputStream inputStream = zipFile.getInputStream(
 						zipEntry)) {
 
