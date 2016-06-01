@@ -55,7 +55,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
-import java.net.URI;
 import java.net.URL;
 
 import java.nio.file.FileVisitResult;
@@ -1041,15 +1040,13 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 						fileNamePath.toString());
 
 					if (fileName.endsWith(".jar")) {
-						URI uri = filePath.toUri();
-
-						URL url = uri.toURL();
-
 						try (InputStream inputStream = Files.newInputStream(
 								filePath)) {
 
+							filePath = filePath.toAbsolutePath();
+
 							Bundle bundle = _installInitialBundle(
-								url.toString(), inputStream);
+								filePath.toString(), inputStream);
 
 							if (bundle != null) {
 								bundles.add(bundle);
