@@ -851,7 +851,7 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 				_log.debug("Adding initial bundle " + location.toString());
 			}
 
-			final Bundle bundle = _addBundle(
+			Bundle bundle = _addBundle(
 				"reference:" + location, inputStream, false);
 
 			if (_log.isDebugEnabled()) {
