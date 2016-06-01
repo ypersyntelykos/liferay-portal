@@ -38,7 +38,6 @@ import com.liferay.portal.kernel.util.ReflectionUtil;
 import com.liferay.portal.kernel.util.ReleaseInfo;
 import com.liferay.portal.kernel.util.ServiceLoader;
 import com.liferay.portal.kernel.util.ServiceLoaderCondition;
-import com.liferay.portal.kernel.util.StreamUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -893,9 +892,6 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 
 			return null;
 		}
-		finally {
-			StreamUtil.cleanUp(inputStream);
-		}
 	}
 
 	private boolean _isFragmentBundle(Bundle bundle) {
@@ -1049,11 +1045,15 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 
 						URL url = uri.toURL();
 
-						Bundle bundle = _installInitialBundle(
-							url.toString(), url.openStream());
+						try (InputStream inputStream = Files.newInputStream(
+								filePath)) {
 
-						if (bundle != null) {
-							bundles.add(bundle);
+							Bundle bundle = _installInitialBundle(
+								url.toString(), inputStream);
+
+							if (bundle != null) {
+								bundles.add(bundle);
+							}
 						}
 					}
 
@@ -1080,12 +1080,16 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 					continue;
 				}
 
-				Bundle bundle = _installInitialBundle(
-					StringPool.SLASH.concat(zipEntry.getName()),
-					zipFile.getInputStream(zipEntry));
+				try (InputStream inputStream = zipFile.getInputStream(
+						zipEntry)) {
 
-				if (bundle != null) {
-					bundles.add(bundle);
+					Bundle bundle = _installInitialBundle(
+						StringPool.SLASH.concat(zipEntry.getName()),
+						inputStream);
+
+					if (bundle != null) {
+						bundles.add(bundle);
+					}
 				}
 			}
 		}
