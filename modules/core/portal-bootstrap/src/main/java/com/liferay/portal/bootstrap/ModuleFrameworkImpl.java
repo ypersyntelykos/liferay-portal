@@ -20,6 +20,7 @@ import aQute.bnd.version.Version;
 
 import com.liferay.portal.kernel.concurrent.DefaultNoticeableFuture;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.io.unsync.UnsyncBufferedInputStream;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.framework.ThrowableCollector;
@@ -51,7 +52,6 @@ import com.liferay.registry.collections.ServiceTrackerMapFactoryUtil;
 import com.liferay.registry.internal.RegistryImpl;
 import com.liferay.registry.internal.ServiceTrackerMapFactoryImpl;
 
-import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -131,30 +131,14 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 		return bundle.getBundleId();
 	}
 
-	/**
-	 * @see com.liferay.modulesadmin.portlet.ModulesAdminPortlet#getBundle(
-	 *      BundleContext, InputStream)
-	 */
 	public Bundle getBundle(
 			BundleContext bundleContext, InputStream inputStream)
 		throws PortalException {
 
 		try {
-			if (inputStream.markSupported()) {
-
-				// 1 megabyte is more than enough for even the largest manifest
-				// file
-
-				inputStream.mark(1024 * 1000);
-			}
-
 			JarInputStream jarInputStream = new JarInputStream(inputStream);
 
 			Manifest manifest = jarInputStream.getManifest();
-
-			if (inputStream.markSupported()) {
-				inputStream.reset();
-			}
 
 			Attributes attributes = manifest.getMainAttributes();
 
@@ -615,11 +599,25 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 		BundleContext bundleContext = _framework.getBundleContext();
 
 		if (inputStream != null) {
-			Bundle bundle = getBundle(bundleContext, inputStream);
+			UnsyncBufferedInputStream unsyncBufferedInputStream =
+				new UnsyncBufferedInputStream(inputStream);
+
+			unsyncBufferedInputStream.mark(1024 * 1000);
+
+			Bundle bundle = getBundle(bundleContext, unsyncBufferedInputStream);
+
+			try {
+				unsyncBufferedInputStream.reset();
+			}
+			catch (IOException ioe) {
+				throw new PortalException(ioe);
+			}
 
 			if (bundle != null) {
 				return bundle;
 			}
+
+			inputStream = unsyncBufferedInputStream;
 		}
 
 		try {
@@ -1084,7 +1082,7 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 
 				Bundle bundle = _installInitialBundle(
 					StringPool.SLASH.concat(zipEntry.getName()),
-					new BufferedInputStream(zipFile.getInputStream(zipEntry)));
+					zipFile.getInputStream(zipEntry));
 
 				if (bundle != null) {
 					bundles.add(bundle);
