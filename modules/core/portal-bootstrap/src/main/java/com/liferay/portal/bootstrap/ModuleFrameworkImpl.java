@@ -1070,48 +1070,50 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 				"static.lpkg");
 
 		if (file.exists()) {
-			ZipFile zipFile = new ZipFile(file);
+			try (ZipFile zipFile = new ZipFile(file)) {
+				Enumeration<? extends ZipEntry> enumeration = zipFile.entries();
 
-			Enumeration<? extends ZipEntry> enumeration = zipFile.entries();
+				List<ZipEntry> zipEntries = new ArrayList<>();
 
-			List<ZipEntry> zipEntries = new ArrayList<>();
+				while (enumeration.hasMoreElements()) {
+					ZipEntry zipEntry = enumeration.nextElement();
 
-			while (enumeration.hasMoreElements()) {
-				ZipEntry zipEntry = enumeration.nextElement();
+					String name = StringUtil.toLowerCase(zipEntry.getName());
 
-				String name = StringUtil.toLowerCase(zipEntry.getName());
-
-				if (!name.endsWith(".jar")) {
-					continue;
-				}
-
-				zipEntries.add(zipEntry);
-			}
-
-			Collections.sort(
-				zipEntries,
-				new Comparator<ZipEntry>() {
-
-					@Override
-					public int compare(ZipEntry zipEntry1, ZipEntry zipEntry2) {
-						String name1 = zipEntry1.getName();
-						String name2 = zipEntry2.getName();
-
-						return name1.compareTo(name2);
+					if (!name.endsWith(".jar")) {
+						continue;
 					}
 
-				});
+					zipEntries.add(zipEntry);
+				}
 
-			for (ZipEntry zipEntry : zipEntries) {
-				try (InputStream inputStream = zipFile.getInputStream(
-						zipEntry)) {
+				Collections.sort(
+					zipEntries,
+					new Comparator<ZipEntry>() {
 
-					Bundle bundle = _installInitialBundle(
-						StringPool.SLASH.concat(zipEntry.getName()),
-						inputStream);
+						@Override
+						public int compare(
+							ZipEntry zipEntry1, ZipEntry zipEntry2) {
 
-					if (bundle != null) {
-						bundles.add(bundle);
+							String name1 = zipEntry1.getName();
+							String name2 = zipEntry2.getName();
+
+							return name1.compareTo(name2);
+						}
+
+					});
+
+				for (ZipEntry zipEntry : zipEntries) {
+					try (InputStream inputStream = zipFile.getInputStream(
+							zipEntry)) {
+
+						Bundle bundle = _installInitialBundle(
+							StringPool.SLASH.concat(zipEntry.getName()),
+							inputStream);
+
+						if (bundle != null) {
+							bundles.add(bundle);
+						}
 					}
 				}
 			}
