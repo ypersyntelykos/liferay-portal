@@ -17,32 +17,7 @@ package com.liferay.portal.lpkg.deployer.internal;
 import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayOutputStream;
 import com.liferay.portal.kernel.process.ProcessCallable;
 import com.liferay.portal.kernel.process.ProcessException;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
-
-import java.nio.file.FileVisitResult;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.SimpleFileVisitor;
-import java.nio.file.attribute.BasicFileAttributes;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.ServiceLoader;
-import java.util.jar.Attributes;
-import java.util.jar.Manifest;
-
-import org.osgi.framework.Bundle;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.BundleException;
-import org.osgi.framework.Constants;
-import org.osgi.framework.launch.Framework;
-import org.osgi.framework.launch.FrameworkFactory;
+import com.liferay.portal.target.platform.indexer.TargetPlatformIndexerUtil;
 
 /**
  * @author Shuyang Zhou
@@ -56,120 +31,17 @@ public class TargetPlatformIndexerProcessCallable
 
 	@Override
 	public byte[] call() throws ProcessException {
-		Path tempPath = null;
-
 		try {
-			tempPath = Files.createTempDirectory(null);
-
-			return _indexTargetPlatform(tempPath);
-		}
-		catch (IOException ioe) {
-			throw new ProcessException(ioe);
-		}
-		finally {
-			_delete(tempPath);
-		}
-	}
-
-	private void _delete(Path path) throws ProcessException {
-		if (path == null) {
-			return;
-		}
-
-		try {
-			Files.walkFileTree(
-				path,
-				new SimpleFileVisitor<Path>() {
-
-					@Override
-					public FileVisitResult postVisitDirectory(
-							Path dir, IOException exc)
-						throws IOException {
-
-						Files.delete(dir);
-
-						return FileVisitResult.CONTINUE;
-					}
-
-					@Override
-					public FileVisitResult visitFile(
-							Path file, BasicFileAttributes attrs)
-						throws IOException {
-
-						Files.delete(file);
-
-						return FileVisitResult.CONTINUE;
-					}
-
-				});
-		}
-		catch (IOException ioe) {
-			throw new ProcessException(ioe);
-		}
-	}
-
-	private byte[] _indexTargetPlatform(Path tempPath) throws ProcessException {
-		Framework framework = null;
-
-		ClassLoader classLoader =
-			TargetPlatformIndexerProcessCallable.class.getClassLoader();
-
-		try (InputStream inputStream = classLoader.getResourceAsStream(
-				"META-INF/system.packages.extra.mf")) {
-
-			Map<String, String> properties = new HashMap<>();
-
-			properties.put(Constants.FRAMEWORK_STORAGE, tempPath.toString());
-
-			Manifest extraPackagesManifest = new Manifest(inputStream);
-
-			Attributes attributes = extraPackagesManifest.getMainAttributes();
-
-			properties.put(
-				Constants.FRAMEWORK_SYSTEMPACKAGES_EXTRA,
-				attributes.getValue("Export-Package"));
-
-			ServiceLoader<FrameworkFactory> serviceLoader = ServiceLoader.load(
-				FrameworkFactory.class);
-
-			FrameworkFactory frameworkFactory = serviceLoader.iterator().next();
-
-			framework = frameworkFactory.newFramework(properties);
-
-			framework.init();
-
-			BundleContext bundleContext = framework.getBundleContext();
-
-			Bundle systemBundle = bundleContext.getBundle(0);
-
-			Class<?> clazz = classLoader.loadClass(
-				"com.liferay.portal.target.platform.indexer.internal." +
-					"TargetPlatformIndexer");
-
-			Constructor<?> constructor = clazz.getConstructor(
-				Bundle.class, String[].class);
-
-			Object indexer = constructor.newInstance(systemBundle, _dirNames);
-
-			Method method = clazz.getMethod("index", OutputStream.class);
-
 			UnsyncByteArrayOutputStream unsyncByteArrayOutputStream =
 				new UnsyncByteArrayOutputStream();
 
-			method.invoke(indexer, unsyncByteArrayOutputStream);
+			TargetPlatformIndexerUtil.indexTargetPlatform(
+				unsyncByteArrayOutputStream, _dirNames);
 
 			return unsyncByteArrayOutputStream.toByteArray();
 		}
 		catch (Exception e) {
 			throw new ProcessException(e);
-		}
-		finally {
-			try {
-				framework.stop();
-			}
-			catch (BundleException be) {
-				throw new ProcessException(be);
-			}
 		}
 	}
 

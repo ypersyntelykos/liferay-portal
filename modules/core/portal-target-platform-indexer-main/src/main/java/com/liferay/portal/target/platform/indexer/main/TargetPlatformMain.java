@@ -17,10 +17,9 @@ package com.liferay.portal.target.platform.indexer.main;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 import com.liferay.portal.target.platform.indexer.Indexer;
+import com.liferay.portal.target.platform.indexer.TargetPlatformIndexerUtil;
 import com.liferay.portal.target.platform.indexer.internal.DefaultIndexValidator;
 import com.liferay.portal.target.platform.indexer.internal.LPKGIndexer;
-import com.liferay.portal.target.platform.indexer.internal.PathUtil;
-import com.liferay.portal.target.platform.indexer.internal.TargetPlatformIndexer;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -45,18 +44,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.ServiceLoader;
-import java.util.jar.Attributes;
-import java.util.jar.Manifest;
-
-import org.osgi.framework.Bundle;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.Constants;
-import org.osgi.framework.launch.Framework;
-import org.osgi.framework.launch.FrameworkFactory;
 
 /**
  * @author Shuyang Zhou
@@ -174,58 +162,16 @@ public class TargetPlatformMain {
 	private static URI _indexTargetPlatform(String... dirNames)
 		throws Exception {
 
-		Framework framework = null;
+		ByteArrayOutputStream byteArrayOutputStream =
+			new ByteArrayOutputStream();
 
-		Path tempPath = Files.createTempDirectory(null);
+		TargetPlatformIndexerUtil.indexTargetPlatform(
+			byteArrayOutputStream, dirNames);
 
-		ClassLoader classLoader = TargetPlatformMain.class.getClassLoader();
+		URL url = BytesURLSupport.putBytes(
+			"liferay-target-platform", byteArrayOutputStream.toByteArray());
 
-		try (InputStream inputStream = classLoader.getResourceAsStream(
-				"META-INF/system.packages.extra.mf")) {
-
-			Map<String, String> properties = new HashMap<>();
-
-			properties.put(Constants.FRAMEWORK_STORAGE, tempPath.toString());
-
-			Manifest extraPackagesManifest = new Manifest(inputStream);
-
-			Attributes attributes = extraPackagesManifest.getMainAttributes();
-
-			properties.put(
-				Constants.FRAMEWORK_SYSTEMPACKAGES_EXTRA,
-				attributes.getValue("Export-Package"));
-
-			ServiceLoader<FrameworkFactory> serviceLoader = ServiceLoader.load(
-				FrameworkFactory.class);
-
-			FrameworkFactory frameworkFactory = serviceLoader.iterator().next();
-
-			framework = frameworkFactory.newFramework(properties);
-
-			framework.init();
-
-			BundleContext bundleContext = framework.getBundleContext();
-
-			Bundle systemBundle = bundleContext.getBundle(0);
-
-			TargetPlatformIndexer targetPlatformIndexer =
-				new TargetPlatformIndexer(systemBundle, dirNames);
-
-			ByteArrayOutputStream byteArrayOutputStream =
-				new ByteArrayOutputStream();
-
-			targetPlatformIndexer.index(byteArrayOutputStream);
-
-			URL url = BytesURLSupport.putBytes(
-				"liferay-target-platform", byteArrayOutputStream.toByteArray());
-
-			return url.toURI();
-		}
-		finally {
-			framework.stop();
-
-			PathUtil.deltree(tempPath);
-		}
+		return url.toURI();
 	}
 
 	private static List<URI> _loadIndexes(Path indexesFilePath)
