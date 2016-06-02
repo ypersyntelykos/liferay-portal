@@ -5891,9 +5891,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 			String key = entry.getKey();
 
 			if (key.equals("inherit")) {
-				Boolean inherit = (Boolean)entry.getValue();
-
-				if ((inherit != null) && inherit) {
+				if (Boolean.TRUE.equals(entry.getValue())) {
 					return true;
 				}
 			}
