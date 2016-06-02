@@ -107,6 +107,8 @@ public class DocumentLibraryConvertProcessTest {
 			ImageLocalServiceUtil.updateImage(
 				image.getImageId(), entry.getValue());
 		}
+
+		_imageMap.clear();
 	}
 
 	@Before
