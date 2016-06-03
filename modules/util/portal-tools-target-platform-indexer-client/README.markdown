@@ -43,4 +43,4 @@ JAVA_OPTS="-Dliferay.home=${liferay_home}"
 # 7. integrity.properties, optional, defaults to ${liferay.home}/osgi/target-platform/integrity.properties.
 
 java -classpath "$CLASSPATH" ${JAVA_OPTS} \
-	com.liferay.portal.target.platform.indexer.main.TargetPlatformMain
+	com.liferay.portal.tools.target.platform.indexer.client.TargetPlatformMain
