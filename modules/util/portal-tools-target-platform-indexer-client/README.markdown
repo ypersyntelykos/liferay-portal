@@ -15,7 +15,7 @@ liferay_home=/opt/liferay
 jars=(
 	${liferay_home}/osgi/core/com.liferay.portal.bootstrap.jar
 	${liferay_home}/osgi/static/com.liferay.portal.target.platform.indexer.jar
-	${liferay_home}/tools/portal-target-platform-indexer-main/com.liferay.portal.target.platform.indexer.main.jar
+	${liferay_home}/tools/portal-tools-target-platform-indexer-client/com.liferay.portal.tools.target.platform.indexer.client.jar
 	${liferay_home}/osgi/core/org.eclipse.osgi.jar
 )
 
