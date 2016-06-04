@@ -29,6 +29,7 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLDecoder;
 
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystem;
@@ -248,6 +249,8 @@ public class TargetPlatformIndexerClient {
 				if (index != -1) {
 					name = name.substring(0, index);
 				}
+
+				name = URLDecoder.decode(name, "UTF-8");
 
 				try (InputStream inputStream = url.openStream()) {
 					Files.copy(
