@@ -16,7 +16,6 @@ package com.liferay.portal.kernel.service.persistence.impl;
 
 import com.liferay.expando.kernel.model.ExpandoBridge;
 import com.liferay.portal.kernel.model.BaseModel;
-import com.liferay.portal.kernel.model.CacheModel;
 import com.liferay.portal.kernel.service.ServiceContext;
 
 import java.io.Serializable;
@@ -86,12 +85,6 @@ public abstract class BaseModelAdaptor<T> implements BaseModel<T> {
 	}
 
 	@Override
-	public abstract void resetOriginalValues();
-
-	@Override
-	public abstract void setCachedModel(boolean cachedModel);
-
-	@Override
 	public void setExpandoBridgeAttributes(BaseModel<?> baseModel) {
 		throw new UnsupportedOperationException();
 	}
@@ -120,9 +113,6 @@ public abstract class BaseModelAdaptor<T> implements BaseModel<T> {
 	public void setPrimaryKeyObj(Serializable primaryKeyObj) {
 		throw new UnsupportedOperationException();
 	}
-
-	@Override
-	public abstract CacheModel<T> toCacheModel();
 
 	@Override
 	public T toEscapedModel() {
