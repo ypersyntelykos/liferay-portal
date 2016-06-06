@@ -158,8 +158,6 @@ public class JspCompiler extends Jsr199JavaCompiler {
 		JspCompilationContext jspCompilationContext,
 		ErrorDispatcher errorDispatcher, boolean suppressLogging) {
 
-		Bundle jspBundle = _jspBundleWiring.getBundle();
-
 		ServletContext servletContext =
 			jspCompilationContext.getServletContext();
 
