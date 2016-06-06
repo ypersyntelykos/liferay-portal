@@ -935,9 +935,7 @@ public class ${entity.name}PersistenceImpl extends BasePersistenceImpl<${entity.
 				Serializable serializable = entityCache.getResult(${entity.name}ModelImpl.ENTITY_CACHE_ENABLED, ${entity.name}Impl.class, primaryKey);
 
 				if (serializable != nullModel) {
-					${entity.name} ${entity.varName} = (${entity.name})serializable;
-
-					if (${entity.varName} == null) {
+					if (serializable == null) {
 						if (uncachedPrimaryKeys == null) {
 							uncachedPrimaryKeys = new HashSet<Serializable>();
 						}
@@ -945,7 +943,7 @@ public class ${entity.name}PersistenceImpl extends BasePersistenceImpl<${entity.
 						uncachedPrimaryKeys.add(primaryKey);
 					}
 					else {
-						map.put(primaryKey, ${entity.varName});
+						map.put(primaryKey, (${entity.name})serializable);
 					}
 				}
 			}
