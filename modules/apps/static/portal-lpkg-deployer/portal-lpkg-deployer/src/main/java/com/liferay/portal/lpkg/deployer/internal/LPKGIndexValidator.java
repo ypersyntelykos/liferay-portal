@@ -138,7 +138,7 @@ public class LPKGIndexValidator {
 				Collections.sort(actualKeys);
 
 				_log.info(
-					"Failed integrity check because expected keys: " +
+					"Running validation because expected keys: " +
 						expectedKeys + " do not match actual keys: " +
 							actualKeys);
 			}
@@ -157,7 +157,7 @@ public class LPKGIndexValidator {
 				if (!Objects.equals(expectedChecksum, actualChecksum)) {
 					if (_log.isInfoEnabled()) {
 						_log.info(
-							"Failed integrity check because of mismatched " +
+							"Running validation because of mismatched " +
 								"checksum for " + integrityKey);
 					}
 
