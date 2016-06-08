@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 
 import java.util.Collections;
 import java.util.Iterator;
@@ -129,7 +130,9 @@ public class BundleManager {
 
 		File installFile = new File(getInstallDirName(), file.getName());
 
-		Files.move(file.toPath(), installFile.toPath());
+		Files.move(
+			file.toPath(), installFile.toPath(),
+			StandardCopyOption.REPLACE_EXISTING);
 
 		if (isRestartRequired(installFile)) {
 			ShutdownUtil.shutdown(0);
