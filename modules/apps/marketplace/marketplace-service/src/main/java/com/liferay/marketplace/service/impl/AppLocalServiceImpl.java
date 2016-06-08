@@ -292,7 +292,7 @@ public class AppLocalServiceImpl extends AppLocalServiceBaseImpl {
 			}
 		}
 		catch (IOException ioe) {
-			throw new PortalException(ioe.getMessage());
+			throw new PortalException(ioe);
 		}
 		catch (Exception e) {
 			_log.error(e, e);
