@@ -44,7 +44,7 @@ public class StaticLPKGResolver {
 				_STATIC_LPKG_BUNDLE_SYMBOLIC_NAME ="Liferay CE Static";
 			}
 			else {
-				_STATIC_LPKG_BUNDLE_SYMBOLIC_NAME = "Liferay DXP Static";
+				_STATIC_LPKG_BUNDLE_SYMBOLIC_NAME = "Liferay Static";
 			}
 		}
 		else {
