@@ -210,7 +210,20 @@ public class TargetPlatformIndexer implements Indexer {
 			StringBuilder sb = new StringBuilder();
 
 			for (Parameters parameter : _parametersList) {
-				sb.append(parameter.toString());
+				String parameterString = parameter.toString();
+
+				if (parameterString.startsWith("osgi.ee;osgi.ee=")) {
+					if (parameterString.startsWith("osgi.ee;osgi.ee=JavaSE")) {
+						parameterString = _JDK_VERSION;
+					}
+
+					continue;
+				}
+				else if (parameterString.startsWith("eclipse.platform;")) {
+					parameterString = _OS_VERSION;
+				}
+
+				sb.append(parameterString);
 				sb.append(",");
 			}
 
@@ -233,6 +246,14 @@ public class TargetPlatformIndexer implements Indexer {
 		}
 	}
 
+	private static final String _JDK_VERSION =
+		"osgi.ee;osgi.ee=JavaSE;version:List<Version>=\"1.0.0,1.1.0,1.2.0," +
+			"1.3.0,1.4.0,1.5.0,1.6.0,1.7.0,1.8.0\"";
+
+	private static final String _OS_VERSION =
+		"eclipse.platform;osgi.os=linux;osgi.arch=x86_64;osgi.ws=gtk;osgi.nl=" +
+			"en_US";
+
 	private static final Set<String> _ignoredNamespaces = new HashSet<>();
 
 	static {
@@ -240,6 +261,7 @@ public class TargetPlatformIndexer implements Indexer {
 		_ignoredNamespaces.add(ContentNamespace.CONTENT_NAMESPACE);
 		_ignoredNamespaces.add(HostNamespace.HOST_NAMESPACE);
 		_ignoredNamespaces.add(IdentityNamespace.IDENTITY_NAMESPACE);
+		_ignoredNamespaces.add(NativeNamespace.NATIVE_NAMESPACE);
 		_ignoredNamespaces.add(PackageNamespace.PACKAGE_NAMESPACE);
 	}
 
