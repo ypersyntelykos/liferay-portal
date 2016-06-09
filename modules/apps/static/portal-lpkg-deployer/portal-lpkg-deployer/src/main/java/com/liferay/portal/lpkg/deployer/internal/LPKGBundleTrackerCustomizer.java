@@ -167,9 +167,33 @@ public class LPKGBundleTrackerCustomizer
 			return;
 		}
 
+		String lpkgBundleSymbolicName = bundle.getSymbolicName();
+
+		String prefix = lpkgBundleSymbolicName.concat(StringPool.DASH);
+
 		for (Bundle newBundle : bundles) {
 			try {
 				newBundle.uninstall();
+
+				String symbolicName = newBundle.getSymbolicName();
+
+				if (symbolicName.startsWith(prefix) &&
+					symbolicName.endsWith("-wrapper")) {
+
+					String wrappedBundleSymbolicName = symbolicName.substring(
+						prefix.length(), symbolicName.length() - 8);
+
+					Version version = newBundle.getVersion();
+
+					for (Bundle curBundle : _bundleContext.getBundles()) {
+						if (wrappedBundleSymbolicName.equals(
+								curBundle.getSymbolicName()) &&
+							version.equals(curBundle.getVersion())) {
+
+							curBundle.uninstall();
+						}
+					}
+				}
 			}
 			catch (BundleException be) {
 				_log.error(
