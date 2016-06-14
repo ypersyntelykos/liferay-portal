@@ -58,8 +58,6 @@ public class IPGeocoderImpl implements IPGeocoder {
 	@Activate
 	public void activate(Map<String, String> properties) {
 		_properties = properties;
-
-		_requiresConfigure = true;
 	}
 
 	@Deactivate
@@ -71,19 +69,9 @@ public class IPGeocoderImpl implements IPGeocoder {
 
 	@Override
 	public IPInfo getIPInfo(String ipAddress) {
-		if (_requiresConfigure) {
-			configure();
+		LookupService lookupService = configure();
 
-			_requiresConfigure = false;
-		}
-
-		if (_lookupService == null) {
-			_logger.error("IP Geocoder is not configured properly");
-
-			return null;
-		}
-
-		Location location = _lookupService.getLocation(ipAddress);
+		Location location = lookupService.getLocation(ipAddress);
 
 		return new IPInfo(ipAddress, location);
 	}
@@ -93,11 +81,15 @@ public class IPGeocoderImpl implements IPGeocoder {
 		_lookupService = null;
 
 		_properties = properties;
-
-		_requiresConfigure = true;
 	}
 
-	protected void configure() {
+	protected LookupService configure() {
+		LookupService lookupService = _lookupService;
+
+		if (lookupService != null) {
+			return lookupService;
+		}
+
 		IPGeocoderConfiguration igGeocoderConfiguration =
 			ConfigurableUtil.createConfigurable(
 				IPGeocoderConfiguration.class, _properties);
@@ -114,8 +106,12 @@ public class IPGeocoderImpl implements IPGeocoder {
 			File ipGeocoderFile = getIPGeocoderFile(
 				filePath, igGeocoderConfiguration.fileURL(), false);
 
-			_lookupService = new LookupService(
+			lookupService = new LookupService(
 				ipGeocoderFile, LookupService.GEOIP_MEMORY_CACHE);
+
+			_lookupService = lookupService;
+
+			return lookupService;
 		}
 		catch (IOException ioe) {
 			_logger.error("Unable to activate Liferay IP Geocoder", ioe);
@@ -197,8 +193,7 @@ public class IPGeocoderImpl implements IPGeocoder {
 	private static final Logger _logger = Logger.getLogger(
 		IPGeocoderImpl.class);
 
-	private LookupService _lookupService;
+	private volatile LookupService _lookupService;
 	private Map<String, String> _properties;
-	private boolean _requiresConfigure = true;
 
 }
