@@ -320,17 +320,16 @@ public class PermissionCacheUtil {
 	private static void _sendClearCacheClusterMessage(
 		MethodKey methodKey, Object... arguments) {
 
-		if (ClusterInvokeThreadLocal.isEnabled()) {
-			MethodHandler methodHandler = new MethodHandler(
-				methodKey, arguments);
-
-			ClusterRequest clusterRequest =
-				ClusterRequest.createMulticastRequest(methodHandler, true);
-
-			clusterRequest.setFireAndForget(true);
-
-			ClusterExecutorUtil.execute(clusterRequest);
+		if (!ClusterInvokeThreadLocal.isEnabled()) {
+			return;
 		}
+
+		ClusterRequest clusterRequest = ClusterRequest.createMulticastRequest(
+			new MethodHandler(methodKey, arguments), true);
+
+		clusterRequest.setFireAndForget(true);
+
+		ClusterExecutorUtil.execute(clusterRequest);
 	}
 
 	private static final MethodKey _clearCacheMethodKey = new MethodKey(
