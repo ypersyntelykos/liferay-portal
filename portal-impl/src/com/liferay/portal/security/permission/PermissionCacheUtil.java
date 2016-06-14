@@ -341,7 +341,7 @@ public class PermissionCacheUtil {
 	private static final MethodKey _clearResourcePermissionCacheMethodKey =
 		new MethodKey(
 			PermissionCacheUtil.class, "clearResourcePermissionCache",
-			long.class, String.class, String.class);
+			int.class, String.class, String.class);
 	private static final PortalCache<PermissionKey, Boolean>
 		_permissionPortalCache = MultiVMPoolUtil.getPortalCache(
 			PERMISSION_CACHE_NAME,
