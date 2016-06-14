@@ -197,8 +197,7 @@ public class IPGeocoderImpl implements IPGeocoder {
 	private static final Logger _logger = Logger.getLogger(
 		IPGeocoderImpl.class);
 
-	private static LookupService _lookupService;
-
+	private LookupService _lookupService;
 	private Map<String, String> _properties;
 	private boolean _requiresConfigure = true;
 
