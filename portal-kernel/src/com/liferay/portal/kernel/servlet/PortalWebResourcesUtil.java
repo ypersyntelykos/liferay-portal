@@ -57,7 +57,7 @@ public class PortalWebResourcesUtil {
 
 	public static String getPathResourceType(String path) {
 		for (PortalWebResources portalWebResources :
-				_instance._getPortalWebResourcesList()) {
+				_getPortalWebResourcesList()) {
 
 			if (path.contains(portalWebResources.getContextPath())) {
 				return portalWebResources.getResourceType();
@@ -69,7 +69,7 @@ public class PortalWebResourcesUtil {
 
 	public static ServletContext getPathServletContext(String path) {
 		for (PortalWebResources portalWebResources :
-				_instance._getPortalWebResourcesList()) {
+				_getPortalWebResourcesList()) {
 
 			ServletContext servletContext =
 				portalWebResources.getServletContext();
@@ -88,7 +88,7 @@ public class PortalWebResourcesUtil {
 		String resourceType) {
 
 		for (PortalWebResources portalWebResources :
-				_instance._getPortalWebResourcesList()) {
+				_getPortalWebResourcesList()) {
 
 			if (resourceType.equals(portalWebResources.getResourceType())) {
 				return portalWebResources;
@@ -133,7 +133,7 @@ public class PortalWebResourcesUtil {
 
 	public static boolean hasContextPath(String requestURI) {
 		for (PortalWebResources portalWebResources :
-				_instance._getPortalWebResourcesList()) {
+				_getPortalWebResourcesList()) {
 
 			if (requestURI.startsWith(portalWebResources.getContextPath())) {
 				return true;
@@ -165,7 +165,17 @@ public class PortalWebResourcesUtil {
 		return path;
 	}
 
-	private PortalWebResourcesUtil() {
+	private static Collection<PortalWebResources> _getPortalWebResourcesList() {
+		return _portalWebResourcesMap.values();
+	}
+
+	private static final
+		Map<ServiceReference<PortalWebResources>, PortalWebResources>
+			_portalWebResourcesMap = new ConcurrentHashMap<>();
+	private static final ServiceTracker<PortalWebResources, PortalWebResources>
+		_serviceTracker;
+
+	static {
 		Registry registry = RegistryUtil.getRegistry();
 
 		_serviceTracker = registry.trackServices(
@@ -175,19 +185,7 @@ public class PortalWebResourcesUtil {
 		_serviceTracker.open();
 	}
 
-	private Collection<PortalWebResources> _getPortalWebResourcesList() {
-		return _portalWebResourcesMap.values();
-	}
-
-	private static final PortalWebResourcesUtil _instance =
-		new PortalWebResourcesUtil();
-
-	private final Map<ServiceReference<PortalWebResources>, PortalWebResources>
-		_portalWebResourcesMap = new ConcurrentHashMap<>();
-	private final ServiceTracker<PortalWebResources, PortalWebResources>
-		_serviceTracker;
-
-	private class PortalWebResourcesServiceTrackerCustomizer
+	private static class PortalWebResourcesServiceTrackerCustomizer
 		implements ServiceTrackerCustomizer
 			<PortalWebResources, PortalWebResources> {
 
