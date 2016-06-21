@@ -25,14 +25,20 @@ import com.liferay.registry.ServiceTrackerCustomizer;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-
 import java.util.Set;
+
 import javax.servlet.ServletContext;
 
 /**
  * @author Peter Fellwock
  */
 public class PortalWebResourcesUtil {
+
+	public static String getContextPath(PortalWebResources portalWebResources) {
+		String pathProxy = PortalUtil.getPathProxy();
+
+		return pathProxy.concat(portalWebResources.getContextPath());
+	}
 
 	public static String getContextPath(String resourceType) {
 		String pathProxy = PortalUtil.getPathProxy();
