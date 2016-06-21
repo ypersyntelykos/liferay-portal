@@ -24,7 +24,6 @@ import com.liferay.registry.ServiceTrackerCustomizer;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -57,7 +56,7 @@ public class PortalWebResourcesUtil {
 
 	public static String getPathResourceType(String path) {
 		for (PortalWebResources portalWebResources :
-				_getPortalWebResourcesList()) {
+				_portalWebResourcesMap.values()) {
 
 			if (path.contains(portalWebResources.getContextPath())) {
 				return portalWebResources.getResourceType();
@@ -69,7 +68,7 @@ public class PortalWebResourcesUtil {
 
 	public static ServletContext getPathServletContext(String path) {
 		for (PortalWebResources portalWebResources :
-				_getPortalWebResourcesList()) {
+				_portalWebResourcesMap.values()) {
 
 			ServletContext servletContext =
 				portalWebResources.getServletContext();
@@ -88,7 +87,7 @@ public class PortalWebResourcesUtil {
 		String resourceType) {
 
 		for (PortalWebResources portalWebResources :
-				_getPortalWebResourcesList()) {
+				_portalWebResourcesMap.values()) {
 
 			if (resourceType.equals(portalWebResources.getResourceType())) {
 				return portalWebResources;
@@ -133,7 +132,7 @@ public class PortalWebResourcesUtil {
 
 	public static boolean hasContextPath(String requestURI) {
 		for (PortalWebResources portalWebResources :
-				_getPortalWebResourcesList()) {
+				_portalWebResourcesMap.values()) {
 
 			if (requestURI.startsWith(portalWebResources.getContextPath())) {
 				return true;
@@ -163,10 +162,6 @@ public class PortalWebResourcesUtil {
 		}
 
 		return path;
-	}
-
-	private static Collection<PortalWebResources> _getPortalWebResourcesList() {
-		return _portalWebResourcesMap.values();
 	}
 
 	private static final
