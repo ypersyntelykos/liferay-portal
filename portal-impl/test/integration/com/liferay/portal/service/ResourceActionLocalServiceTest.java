@@ -14,6 +14,7 @@
 
 package com.liferay.portal.service;
 
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.model.ResourceAction;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
@@ -68,7 +69,7 @@ public class ResourceActionLocalServiceTest {
 	}
 
 	@Test(expected = SystemException.class)
-	public void testAddMoreThan64Actions() throws Exception {
+	public void testAddMoreThan64Actions() {
 		List<String> actionIds = new ArrayList<>(65);
 
 		actionIds.add(ActionKeys.VIEW);
@@ -81,7 +82,9 @@ public class ResourceActionLocalServiceTest {
 	}
 
 	@Test
-	public void testFirstAvailableBitwiseValueGetsGenerated() throws Exception {
+	public void testFirstAvailableBitwiseValueGetsGenerated()
+		throws PortalException {
+
 		ResourceAction resourceAction =
 			ResourceActionLocalServiceUtil.getResourceAction(
 				_NAME, ActionKeys.VIEW);
@@ -109,7 +112,7 @@ public class ResourceActionLocalServiceTest {
 	}
 
 	@Test
-	public void testViewActionBitwiseValue() throws Exception {
+	public void testViewActionBitwiseValue() throws PortalException {
 		ResourceAction viewResourceAction =
 			ResourceActionLocalServiceUtil.getResourceAction(
 				_NAME, ActionKeys.VIEW);
