@@ -40,7 +40,6 @@ import com.liferay.portal.security.permission.PermissionCacheUtil;
 import com.liferay.portal.service.base.ResourceActionLocalServiceBaseImpl;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -108,19 +107,12 @@ public class ResourceActionLocalServiceImpl
 		}
 
 		List<ResourceAction> resourceActions = getResourceActions(name);
-		LinkedList<Long> availableBitwiseValues = new LinkedList<>();
 
-		long bitwiseValue = 2;
-
-		for (int i = 0; i < Long.SIZE - 1; i++) {
-			availableBitwiseValues.add(bitwiseValue);
-
-			bitwiseValue = bitwiseValue << 1;
-		}
+		long availableBits = -2;
 
 		for (ResourceAction resourceAction : resourceActions) {
 			if (actionIds.contains(resourceAction.getActionId())) {
-				availableBitwiseValues.remove(resourceAction.getBitwiseValue());
+				availableBits &= ~resourceAction.getBitwiseValue();
 			}
 			else {
 				deleteResourceAction(resourceAction);
@@ -142,11 +134,12 @@ public class ResourceActionLocalServiceImpl
 				name, actionId);
 
 			if (resourceAction == null) {
-				if (actionId.equals(ActionKeys.VIEW)) {
-					bitwiseValue = 1;
-				}
-				else {
-					bitwiseValue = availableBitwiseValues.pop();
+				long bitwiseValue = 1;
+
+				if (!actionId.equals(ActionKeys.VIEW)) {
+					bitwiseValue = Long.lowestOneBit(availableBits);
+
+					availableBits ^= bitwiseValue;
 				}
 
 				try {
