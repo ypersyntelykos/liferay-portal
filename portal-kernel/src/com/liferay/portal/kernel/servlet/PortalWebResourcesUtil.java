@@ -91,6 +91,16 @@ public class PortalWebResourcesUtil {
 		return null;
 	}
 
+	public static PortalWebResources getPortalWebResourcesByPath(String path) {
+		for (PortalWebResources portalWebResources : _portalWebResources) {
+			if (path.contains(portalWebResources.getContextPath())) {
+				return portalWebResources;
+			}
+		}
+
+		return null;
+	}
+
 	public static URL getResource(ServletContext servletContext, String path) {
 		path = stripContextPath(servletContext, path);
 

@@ -139,6 +139,7 @@ import com.liferay.portal.kernel.servlet.NonSerializableObjectRequestWrapper;
 import com.liferay.portal.kernel.servlet.PersistentHttpServletRequestWrapper;
 import com.liferay.portal.kernel.servlet.PortalMessages;
 import com.liferay.portal.kernel.servlet.PortalSessionThreadLocal;
+import com.liferay.portal.kernel.servlet.PortalWebResources;
 import com.liferay.portal.kernel.servlet.PortalWebResourcesUtil;
 import com.liferay.portal.kernel.servlet.PortletServlet;
 import com.liferay.portal.kernel.servlet.ServletContextUtil;
@@ -5290,12 +5291,17 @@ public class PortalImpl implements Portal {
 					timestamp = ServletContextUtil.getLastModified(
 						servletContext, path, true);
 				}
-				else if (PortalWebResourcesUtil.hasContextPath(path)) {
-					timestamp = PortalWebResourcesUtil.getLastModified(
-						PortalWebResourcesUtil.getPathResourceType(path));
-				}
 				else {
-					timestamp = theme.getTimestamp();
+					PortalWebResources portalWebResources =
+						PortalWebResourcesUtil.getPortalWebResourcesByPath(
+							path);
+
+					if (portalWebResources == null) {
+						timestamp = theme.getTimestamp();
+					}
+					else {
+						timestamp = portalWebResources.getLastModified();
+					}
 				}
 			}
 
