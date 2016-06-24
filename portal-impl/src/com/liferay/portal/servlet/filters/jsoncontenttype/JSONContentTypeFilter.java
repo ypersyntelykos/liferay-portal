@@ -18,7 +18,6 @@ import com.liferay.portal.kernel.servlet.BrowserSnifferUtil;
 import com.liferay.portal.servlet.filters.BasePortalFilter;
 
 import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -26,11 +25,6 @@ import javax.servlet.http.HttpServletResponse;
  * @author Igor Spasic
  */
 public class JSONContentTypeFilter extends BasePortalFilter {
-
-	@Override
-	public void init(FilterConfig filterConfig) {
-		super.init(filterConfig);
-	}
 
 	@Override
 	public boolean isFilterEnabled(
