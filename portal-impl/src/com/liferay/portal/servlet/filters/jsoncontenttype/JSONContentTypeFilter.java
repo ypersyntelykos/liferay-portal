@@ -33,21 +33,21 @@ public class JSONContentTypeFilter extends BasePortalFilter {
 	}
 
 	@Override
+	public boolean isFilterEnabled(
+		HttpServletRequest request, HttpServletResponse response) {
+
+		return BrowserSnifferUtil.isIe(request);
+	}
+
+	@Override
 	protected void processFilter(
 			HttpServletRequest request, HttpServletResponse response,
 			FilterChain filterChain)
 		throws Exception {
 
-		if (!BrowserSnifferUtil.isIe(request)) {
-			processFilter(
-				JSONContentTypeFilter.class.getName(), request, response,
-				filterChain);
-		}
-		else {
-			processFilter(
-				JSONContentTypeFilter.class.getName(), request,
-				new JSONContentTypeResponse(response), filterChain);
-		}
+		processFilter(
+			JSONContentTypeFilter.class.getName(), request,
+			new JSONContentTypeResponse(response), filterChain);
 	}
 
 }
