@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.portal.compound.session.id;
+package com.liferay.portal.compound.session.id.internal;
 
 import com.liferay.portal.kernel.servlet.PersistentHttpServletRequestWrapper;
 import com.liferay.portal.kernel.servlet.filters.compoundsessionid.CompoundSessionIdHttpSession;

@@ -12,9 +12,8 @@
  * details.
  */
 
-package com.liferay.portal.compound.session.id;
+package com.liferay.portal.compound.session.id.internal;
 
-import com.liferay.portal.compound.session.id.filter.CompoundSessionIdFilter;
 import com.liferay.portal.kernel.servlet.filters.compoundsessionid.CompoundSessionIdSplitterUtil;
 
 import org.osgi.framework.BundleContext;

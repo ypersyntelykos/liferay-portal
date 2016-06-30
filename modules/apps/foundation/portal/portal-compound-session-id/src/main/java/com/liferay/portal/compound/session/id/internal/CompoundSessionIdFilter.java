@@ -12,9 +12,8 @@
  * details.
  */
 
-package com.liferay.portal.compound.session.id.filter;
+package com.liferay.portal.compound.session.id.internal;
 
-import com.liferay.portal.compound.session.id.CompoundSessionIdServletRequest;
 import com.liferay.portal.kernel.servlet.WrapHttpServletRequestFilter;
 import com.liferay.portal.servlet.filters.BasePortalFilter;
 
