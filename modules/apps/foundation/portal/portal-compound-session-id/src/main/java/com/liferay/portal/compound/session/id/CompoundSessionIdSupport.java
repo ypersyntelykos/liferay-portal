@@ -18,11 +18,9 @@ import com.liferay.portal.compound.session.id.filter.CompoundSessionIdFilter;
 import com.liferay.portal.kernel.servlet.filters.compoundsessionid.CompoundSessionIdSplitterUtil;
 
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Deactivate;
 
 /**
  * @author Shuyang Zhou
@@ -34,28 +32,10 @@ public class CompoundSessionIdSupport {
 	public void activate(
 		BundleContext bundleContext, ComponentContext componentContext) {
 
-		if (!CompoundSessionIdSplitterUtil.hasSessionDelimiter()) {
-			return;
+		if (CompoundSessionIdSplitterUtil.hasSessionDelimiter()) {
+			componentContext.enableComponent(
+				CompoundSessionIdFilter.class.getName());
 		}
-
-		_serviceRegistration = bundleContext.registerService(
-			CompoundSessionIdServletRequestFactory.class,
-			new CompoundSessionIdServletRequestFactoryImpl(), null);
-
-		componentContext.enableComponent(
-			CompoundSessionIdFilter.class.getName());
 	}
-
-	@Deactivate
-	public void deactivate() {
-		if (!CompoundSessionIdSplitterUtil.hasSessionDelimiter()) {
-			return;
-		}
-
-		_serviceRegistration.unregister();
-	}
-
-	private ServiceRegistration<CompoundSessionIdServletRequestFactory>
-		_serviceRegistration;
 
 }

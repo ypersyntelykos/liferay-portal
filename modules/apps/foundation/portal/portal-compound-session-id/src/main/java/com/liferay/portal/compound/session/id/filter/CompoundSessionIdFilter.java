@@ -14,16 +14,16 @@
 
 package com.liferay.portal.compound.session.id.filter;
 
-import com.liferay.portal.compound.session.id.CompoundSessionIdServletRequestFactory;
+import com.liferay.portal.compound.session.id.CompoundSessionIdServletRequest;
 import com.liferay.portal.kernel.servlet.WrapHttpServletRequestFilter;
 import com.liferay.portal.servlet.filters.BasePortalFilter;
 
 import javax.servlet.Filter;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * <p>
@@ -48,27 +48,21 @@ public class CompoundSessionIdFilter
 	public HttpServletRequest getWrappedHttpServletRequest(
 		HttpServletRequest request, HttpServletResponse response) {
 
-		CompoundSessionIdServletRequestFactory
-			compoundSessionIdServletRequestFactory =
-				_compoundSessionIdServletRequestFactory;
+		HttpServletRequest wrappedRequest = request;
 
-		if (compoundSessionIdServletRequestFactory != null) {
-			return compoundSessionIdServletRequestFactory.create(request);
+		while (wrappedRequest instanceof HttpServletRequestWrapper) {
+			if (wrappedRequest instanceof CompoundSessionIdServletRequest) {
+				return request;
+			}
+
+			HttpServletRequestWrapper httpServletRequestWrapper =
+				(HttpServletRequestWrapper)wrappedRequest;
+
+			wrappedRequest =
+				(HttpServletRequest)httpServletRequestWrapper.getRequest();
 		}
 
-		return request;
+		return new CompoundSessionIdServletRequest(request);
 	}
-
-	@Reference(unbind = "-")
-	protected void setCompoundSessionIdServletRequestFactory(
-		CompoundSessionIdServletRequestFactory
-			compoundSessionIdServletRequestFactory) {
-
-		_compoundSessionIdServletRequestFactory =
-			compoundSessionIdServletRequestFactory;
-	}
-
-	private CompoundSessionIdServletRequestFactory
-		_compoundSessionIdServletRequestFactory;
 
 }
