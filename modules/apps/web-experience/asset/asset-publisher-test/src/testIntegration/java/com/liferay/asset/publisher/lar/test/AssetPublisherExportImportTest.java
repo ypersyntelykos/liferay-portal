@@ -1091,6 +1091,16 @@ public class AssetPublisherExportImportTest
 		MockHttpServletRequest mockHttpServletRequest =
 			new MockHttpServletRequest();
 
+		String scopeId = AssetPublisherUtil.getScopeId(
+			group, group.getGroupId());
+
+		preferenceMap.put("scopeIds", new String[] {scopeId});
+
+		preferenceMap.put("selectionStyle", new String[] {"dynamic"});
+
+		PortletPreferences portletPreferences = getImportedPortletPreferences(
+			preferenceMap);
+
 		ThemeDisplay themeDisplay = new ThemeDisplay();
 
 		Company company = CompanyLocalServiceUtil.getCompany(
@@ -1107,16 +1117,6 @@ public class AssetPublisherExportImportTest
 
 		portletRequest.setAttribute(
 			PortletServlet.PORTLET_SERVLET_REQUEST, mockHttpServletRequest);
-
-		String scopeId = AssetPublisherUtil.getScopeId(
-			group, group.getGroupId());
-
-		preferenceMap.put("scopeIds", new String[] {scopeId});
-
-		preferenceMap.put("selectionStyle", new String[] {"dynamic"});
-
-		PortletPreferences portletPreferences = getImportedPortletPreferences(
-			preferenceMap);
 
 		AssetPublisherDisplayContext assetPublisherDisplayContext =
 			new AssetPublisherDisplayContext(
