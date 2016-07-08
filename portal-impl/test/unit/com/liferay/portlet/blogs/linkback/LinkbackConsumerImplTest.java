@@ -22,6 +22,8 @@ import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portlet.blogs.util.BlogsUtil;
+import com.liferay.registry.BasicRegistryImpl;
+import com.liferay.registry.RegistryUtil;
 
 import java.io.IOException;
 
@@ -51,6 +53,8 @@ public class LinkbackConsumerImplTest extends PowerMockito {
 
 		setUpBlogsUtil();
 		setUpHttpUtil();
+
+		RegistryUtil.setRegistry(new BasicRegistryImpl());
 
 		ReflectionTestUtil.setFieldValue(
 			CommentManagerUtil.class, "_commentManager", _commentManager);
