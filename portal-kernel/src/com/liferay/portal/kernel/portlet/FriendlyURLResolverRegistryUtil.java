@@ -40,42 +40,20 @@ public class FriendlyURLResolverRegistryUtil {
 	public static FriendlyURLResolver getFriendlyURLResolver(
 		String urlSeparator) {
 
-		return _getFriendlyURLResolver(urlSeparator);
-	}
-
-	public static List<FriendlyURLResolver> getFriendlyURLResolvers() {
-		return _getFriendlyURLResolvers();
-	}
-
-	public static String[] getURLSeparators() {
-		return _getURLSeparators();
-	}
-
-	public static void register(FriendlyURLResolver friendlyURLResolver) {
-		_register(friendlyURLResolver);
-	}
-
-	public static void unregister(FriendlyURLResolver friendlyURLResolver) {
-		_unregister(friendlyURLResolver);
-	}
-
-	private static FriendlyURLResolver _getFriendlyURLResolver(
-		String urlSeparator) {
-
 		return _friendlyURLResolvers.get(urlSeparator);
 	}
 
-	private static List<FriendlyURLResolver> _getFriendlyURLResolvers() {
+	public static List<FriendlyURLResolver> getFriendlyURLResolvers() {
 		return ListUtil.fromMapValues(_friendlyURLResolvers);
 	}
 
-	private static String[] _getURLSeparators() {
+	public static String[] getURLSeparators() {
 		Set<String> urlSeparators = _friendlyURLResolvers.keySet();
 
 		return urlSeparators.toArray(new String[urlSeparators.size()]);
 	}
 
-	private static void _register(FriendlyURLResolver friendlyURLResolver) {
+	public static void register(FriendlyURLResolver friendlyURLResolver) {
 		Registry registry = RegistryUtil.getRegistry();
 
 		ServiceRegistration<FriendlyURLResolver> serviceRegistration =
@@ -85,7 +63,7 @@ public class FriendlyURLResolverRegistryUtil {
 		_serviceRegistrations.put(friendlyURLResolver, serviceRegistration);
 	}
 
-	private static void _unregister(FriendlyURLResolver friendlyURLResolver) {
+	public static void unregister(FriendlyURLResolver friendlyURLResolver) {
 		ServiceRegistration<FriendlyURLResolver> serviceRegistration =
 			_serviceRegistrations.remove(friendlyURLResolver);
 
