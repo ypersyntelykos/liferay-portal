@@ -26,6 +26,7 @@ import com.liferay.registry.ServiceTrackerCustomizer;
 import com.liferay.registry.collections.ServiceRegistrationMap;
 import com.liferay.registry.collections.ServiceRegistrationMapImpl;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -43,8 +44,19 @@ public class FriendlyURLResolverRegistryUtil {
 		return _friendlyURLResolvers.get(urlSeparator);
 	}
 
+	/**
+	 * @deprecated As of 7.1.0, replaced by {@link
+	 *             #getFriendlyURLResolversAsCollection()}
+	 */
+	@Deprecated
 	public static List<FriendlyURLResolver> getFriendlyURLResolvers() {
 		return ListUtil.fromMapValues(_friendlyURLResolvers);
+	}
+
+	public static Collection<FriendlyURLResolver>
+		getFriendlyURLResolversAsCollection() {
+
+		return _friendlyURLResolvers.values();
 	}
 
 	public static String[] getURLSeparators() {
