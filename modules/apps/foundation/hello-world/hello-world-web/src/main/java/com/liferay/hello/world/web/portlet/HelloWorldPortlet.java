@@ -64,9 +64,9 @@ public class HelloWorldPortlet extends MVCPortlet {
 
 		renderResponse.setContentType(ContentTypes.TEXT_HTML_UTF8);
 
-		try (PrintWriter writer = renderResponse.getWriter()) {
-			writer.print("Welcome to " + ReleaseInfo.getReleaseInfo() + ".");
-		}
+		PrintWriter writer = renderResponse.getWriter();
+
+		writer.print("Welcome to " + ReleaseInfo.getReleaseInfo() + ".");
 	}
 
 }
