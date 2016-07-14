@@ -18,13 +18,13 @@ import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.util.PropsValues;
 
+import java.io.InputStream;
+
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -61,18 +61,15 @@ public class LPKGOverwriteVerifyTest {
 	}
 
 	private void _testOverWrittenLPKGs() throws Exception {
-		Bundle testBundle = FrameworkUtil.getBundle(
-			LPKGOverwriteVerifyTest.class);
-
-		BundleContext bundleContext = testBundle.getBundleContext();
-
-		Properties properties = new Properties();
-
 		Path path = Paths.get(PropsValues.LIFERAY_HOME, "/overwrites");
 
 		Assert.assertTrue(Files.exists(path));
 
-		properties.load(Files.newBufferedReader(path));
+		Properties properties = new Properties();
+
+		try (InputStream in = Files.newInputStream(path)) {
+			properties.load(in);
+		}
 
 		Map<String, String> jars = new HashMap<>();
 
@@ -94,6 +91,10 @@ public class LPKGOverwriteVerifyTest {
 			}
 		}
 
+		Bundle testBundle = FrameworkUtil.getBundle(getClass());
+
+		BundleContext bundleContext = testBundle.getBundleContext();
+
 		for (Bundle bundle : bundleContext.getBundles()) {
 			String symbolicName = bundle.getSymbolicName();
 
@@ -104,14 +105,16 @@ public class LPKGOverwriteVerifyTest {
 					"Jar not sucessfully overwritten: " + symbolicName,
 					new Version(version), bundle.getVersion());
 			}
-			else if (statics.remove(symbolicName)) {
+
+			if (statics.remove(symbolicName)) {
 				String location = bundle.getLocation();
 
 				Assert.assertTrue(
 					"Static jar not sucessfully overwritten: " + symbolicName,
 					location.contains("Static-Jar::"));
 			}
-			else if (wars.remove(symbolicName)) {
+
+			if (wars.remove(symbolicName)) {
 				String location = bundle.getLocation();
 
 				Assert.assertTrue(
@@ -119,29 +122,6 @@ public class LPKGOverwriteVerifyTest {
 					!location.contains("lpkg://"));
 			}
 		}
-
-		List<Entry> leftoverEntries = new ArrayList<>();
-
-		leftoverEntries.addAll(jars.entrySet());
-
-		for (Entry entry : leftoverEntries) {
-			if (entry.getValue() == null) {
-				leftoverEntries.remove(entry);
-			}
-		}
-
-		Collections.sort(
-			leftoverEntries,
-			new Comparator<Entry>() {
-
-				@Override
-				public int compare(Entry entry1, Entry entry2) {
-					String entrySymbolicname = (String)entry1.getKey();
-
-					return entrySymbolicname.compareTo((String)entry2.getKey());
-				}
-
-			});
 
 		Assert.assertTrue(
 			"Jars not overwritten: " + jars.entrySet(), jars.isEmpty());

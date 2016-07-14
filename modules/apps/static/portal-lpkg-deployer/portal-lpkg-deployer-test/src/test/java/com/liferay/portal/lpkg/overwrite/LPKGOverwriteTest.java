@@ -64,11 +64,7 @@ public class LPKGOverwriteTest {
 		File file = new File(liferayHome, "/osgi/marketplace/overwritten");
 
 		if (file.exists()) {
-			String[] files = file.list();
-
-			for (String childPath : files) {
-				File childFile = new File(file.getPath(), childPath);
-
+			for (File childFile : file.listFiles()) {
 				childFile.delete();
 			}
 		}
@@ -79,14 +75,10 @@ public class LPKGOverwriteTest {
 		Map<String, String> overwrites = new HashMap<>();
 
 		try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(
-				Paths.get(liferayHome, "/osgi/marketplace"))) {
+				Paths.get(liferayHome, "/osgi/marketplace"), "*.lpkg")) {
 
 			for (Path lpkgPath : directoryStream) {
 				String lpkgPathString = lpkgPath.toString();
-
-				if (lpkgPathString.endsWith("overwritten")) {
-					continue;
-				}
 
 				try (ZipFile zipFile = new ZipFile(lpkgPath.toFile())) {
 					Enumeration<? extends ZipEntry> zipEntries =
@@ -132,7 +124,7 @@ public class LPKGOverwriteTest {
 		}
 
 		try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(
-				Paths.get(file.toURI()))) {
+				file.toPath())) {
 
 			for (Path overwritePath : directoryStream) {
 				String overwriteString = overwritePath.toString();
@@ -208,9 +200,7 @@ public class LPKGOverwriteTest {
 
 			Files.write(
 				Paths.get(liferayHome, "/overwrites"),
-				Arrays.asList(sb.toString()), StandardCharsets.UTF_8,
-				StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING,
-				StandardOpenOption.WRITE);
+				Arrays.asList(sb.toString()), StandardCharsets.UTF_8);
 		}
 	}
 

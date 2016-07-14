@@ -18,13 +18,13 @@ import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.util.PropsValues;
 
+import java.io.InputStream;
+
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -61,18 +61,15 @@ public class LPKGRevertOverwriteVerifyTest {
 	}
 
 	private void _testRevertOverwrittenLPKGs() throws Exception {
-		Bundle testBundle = FrameworkUtil.getBundle(
-			LPKGRevertOverwriteVerifyTest.class);
-
-		BundleContext bundleContext = testBundle.getBundleContext();
-
-		Properties properties = new Properties();
-
 		Path path = Paths.get(PropsValues.LIFERAY_HOME, "/overwrites");
 
 		Assert.assertTrue(Files.exists(path));
 
-		properties.load(Files.newBufferedReader(path));
+		Properties properties = new Properties();
+
+		try (InputStream in = Files.newInputStream(path)) {
+			properties.load(in);
+		}
 
 		Map<String, String> jars = new HashMap<>();
 
@@ -93,6 +90,10 @@ public class LPKGRevertOverwriteVerifyTest {
 				jars.put((String)entry.getKey(), (String)entry.getValue());
 			}
 		}
+
+		Bundle testBundle = FrameworkUtil.getBundle(getClass());
+
+		BundleContext bundleContext = testBundle.getBundleContext();
 
 		for (Bundle bundle : bundleContext.getBundles()) {
 			String symbolicName = bundle.getSymbolicName();
@@ -124,29 +125,6 @@ public class LPKGRevertOverwriteVerifyTest {
 					location.contains("lpkg://"));
 			}
 		}
-
-		List<Entry> leftoverEntries = new ArrayList<>();
-
-		leftoverEntries.addAll(jars.entrySet());
-
-		for (Entry entry : leftoverEntries) {
-			if (entry.getValue() == null) {
-				leftoverEntries.remove(entry);
-			}
-		}
-
-		Collections.sort(
-			leftoverEntries,
-			new Comparator<Entry>() {
-
-				@Override
-				public int compare(Entry entry1, Entry entry2) {
-					String entrySymbolicname = (String)entry1.getKey();
-
-					return entrySymbolicname.compareTo((String)entry2.getKey());
-				}
-
-			});
 
 		Assert.assertTrue(
 			"Jars not reverted: " + jars.entrySet(), jars.isEmpty());
