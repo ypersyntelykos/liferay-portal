@@ -19,7 +19,7 @@ import aQute.bnd.header.Attrs;
 import aQute.bnd.make.metatype.MetatypePlugin;
 import aQute.bnd.metatype.MetatypeAnnotations;
 import aQute.bnd.osgi.Analyzer;
-import aQute.bnd.osgi.Descriptors;
+import aQute.bnd.osgi.Descriptors.PackageRef;
 import aQute.bnd.osgi.Jar;
 import aQute.bnd.osgi.JarResource;
 import aQute.bnd.osgi.Packages;
@@ -1251,17 +1251,15 @@ public class WabProcessor {
 
 			Packages packages = analyzer.getImports();
 
-			Set<Map.Entry<Descriptors.PackageRef, Attrs>> packageRefsSet =
-				packages.entrySet();
+			Set<Entry<PackageRef, Attrs>> packageRefsSet = packages.entrySet();
 
-			Iterator<Map.Entry<Descriptors.PackageRef, Attrs>> iterator =
+			Iterator<Entry<PackageRef, Attrs>> iterator =
 				packageRefsSet.iterator();
 
 			while (iterator.hasNext()) {
-				Map.Entry<Descriptors.PackageRef, Attrs> entry =
-					iterator.next();
+				Entry<PackageRef, Attrs> entry = iterator.next();
 
-				Descriptors.PackageRef packageRef = entry.getKey();
+				PackageRef packageRef = entry.getKey();
 
 				String fqn = packageRef.getFQN();
 
