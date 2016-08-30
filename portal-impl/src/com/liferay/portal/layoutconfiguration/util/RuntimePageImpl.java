@@ -54,6 +54,7 @@ import com.liferay.taglib.util.VelocityTaglib;
 
 import java.io.Closeable;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -69,9 +70,12 @@ import java.util.concurrent.TimeoutException;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.portlet.PortletResponse;
 import javax.portlet.RenderResponse;
 
+import javax.servlet.AsyncContext;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -337,7 +341,7 @@ public class RuntimePageImpl implements RuntimePage {
 	}
 
 	protected StringBundler doProcessTemplate(
-			HttpServletRequest request, HttpServletResponse response,
+			HttpServletRequest request, final HttpServletResponse response,
 			String portletId, TemplateResource templateResource,
 			boolean restricted)
 		throws Exception {
@@ -459,9 +463,9 @@ public class RuntimePageImpl implements RuntimePage {
 			}
 		}
 
-		if (portletParallelRender && (_waitTime == Integer.MAX_VALUE)) {
-			_waitTime = PropsValues.LAYOUT_PARALLEL_RENDER_TIMEOUT;
-		}
+//		if (portletParallelRender && (_waitTime == Integer.MAX_VALUE)) {
+//			_waitTime = PropsValues.LAYOUT_PARALLEL_RENDER_TIMEOUT;
+//		}
 
 		StringBundler sb = StringUtil.replaceWithStringBundler(
 			unsyncStringWriter.toString(), "[$TEMPLATE_PORTLET_", "$]",
@@ -516,9 +520,11 @@ public class RuntimePageImpl implements RuntimePage {
 			List<PortletRenderer> portletRenderers)
 		throws Exception {
 
-		ExecutorService executorService =
-			PortalExecutorManagerUtil.getPortalExecutor(
-				RuntimePageImpl.class.getName());
+		AsyncContext asyncContext = request.startAsync(request, response);
+
+//		ExecutorService executorService =
+//			PortalExecutorManagerUtil.getPortalExecutor(
+//				RuntimePageImpl.class.getName());
 
 		Map<Future<StringBundler>, PortletRenderer> futures = new HashMap<>(
 			portletRenderers.size());
@@ -535,28 +541,33 @@ public class RuntimePageImpl implements RuntimePage {
 			Callable<StringBundler> renderCallable =
 				portletRenderer.getCallable(request, response);
 
-			Future<StringBundler> future = null;
+//			Future<StringBundler> future = null;
+//
+//			try {
+//				future = executorService.submit(renderCallable);
+//			}
+//			catch (RejectedExecutionException ree) {
+//
+//				// This should only happen when user configures an AbortPolicy
+//				// (or some other customized RejectedExecutionHandler that
+//				// throws RejectedExecutionException) for this
+//				// ThreadPoolExecutor. AbortPolicy is not the recommended
+//				// setting, but to be more robust, we take care of this by
+//				// converting the rejection to a fallback action.
+//
+//				future = new FutureTask<>(renderCallable);
+//
+//				// Cancel immediately
+//
+//				future.cancel(true);
+//			}
 
-			try {
-				future = executorService.submit(renderCallable);
-			}
-			catch (RejectedExecutionException ree) {
+			FutureTask<StringBundler> futureTask = new FutureTask<>(
+				renderCallable);
 
-				// This should only happen when user configures an AbortPolicy
-				// (or some other customized RejectedExecutionHandler that
-				// throws RejectedExecutionException) for this
-				// ThreadPoolExecutor. AbortPolicy is not the recommended
-				// setting, but to be more robust, we take care of this by
-				// converting the rejection to a fallback action.
+			asyncContext.start(futureTask);
 
-				future = new FutureTask<>(renderCallable);
-
-				// Cancel immediately
-
-				future.cancel(true);
-			}
-
-			futures.put(future, portletRenderer);
+			futures.put(futureTask, portletRenderer);
 		}
 
 		long waitTime = _waitTime;
@@ -672,6 +683,8 @@ public class RuntimePageImpl implements RuntimePage {
 		for (PortletRenderer portletRender : portletRenderers) {
 			portletRender.finishParallelRender();
 		}
+
+		asyncContext.complete();
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
