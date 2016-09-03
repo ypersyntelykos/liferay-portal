@@ -1387,15 +1387,13 @@ public class ResourcePermissionLocalServiceImpl
 		try {
 			long[] roleIds = ArrayUtil.toLongArray(roleIdsToActionIds.keySet());
 
-			int size = roleIds.length;
-
 			List<ResourcePermission> resourcePermissions = new ArrayList<>(
-				size);
+				roleIds.length);
 
 			int batchSize = 1000;
 			int start = 0;
 
-			while (start < (size - batchSize)) {
+			while (start < (roleIds.length - batchSize)) {
 				resourcePermissions.addAll(
 					resourcePermissionPersistence.findByC_N_S_P_R(
 						companyId, name, scope, primKey,
