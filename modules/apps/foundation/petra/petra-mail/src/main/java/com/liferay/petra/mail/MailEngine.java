@@ -602,7 +602,8 @@ public class MailEngine {
 					_log.warn(
 						"Unable to connect to a valid mail server. Please " +
 							"make sure one is properly configured: " +
-								me.getMessage());
+								me.getMessage(),
+						me);
 				}
 			}
 			else {
