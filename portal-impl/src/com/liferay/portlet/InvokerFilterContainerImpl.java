@@ -54,9 +54,8 @@ import javax.portlet.filter.ResourceFilter;
 public class InvokerFilterContainerImpl
 	implements Closeable, InvokerFilterContainer {
 
-	public static final InvokerFilterContainer
-		UNDEPLOYED_INVOKER_FILTER_CONTAINER =
-			new UndeployedInvokerFilterContainerImpl();
+	public static final InvokerFilterContainer EMPTY_INVOKER_FILTER_CONTAINER =
+		new EmptyInvokerFilterContainer();
 
 	public InvokerFilterContainerImpl(
 			Portlet portlet, PortletContext portletContext)
@@ -195,33 +194,7 @@ public class InvokerFilterContainerImpl
 		new CopyOnWriteArrayList<>();
 	private final ServiceTracker<PortletFilter, PortletFilter> _serviceTracker;
 
-	private static class ServiceRegistrationTuple {
-
-		public ServiceRegistrationTuple(
-			com.liferay.portal.kernel.model.PortletFilter portletFilterModel,
-			ServiceRegistration<PortletFilter> serviceRegistration) {
-
-			_portletFilterModel = portletFilterModel;
-			_serviceRegistration = serviceRegistration;
-		}
-
-		public com.liferay.portal.kernel.model.PortletFilter
-			getPortletFilterModel() {
-
-			return _portletFilterModel;
-		}
-
-		public ServiceRegistration<PortletFilter> getServiceRegistration() {
-			return _serviceRegistration;
-		}
-
-		private final com.liferay.portal.kernel.model.PortletFilter
-			_portletFilterModel;
-		private final ServiceRegistration<PortletFilter> _serviceRegistration;
-
-	}
-
-	private static class UndeployedInvokerFilterContainerImpl
+	private static class EmptyInvokerFilterContainer
 		implements Closeable, InvokerFilterContainer {
 
 		@Override
@@ -247,6 +220,32 @@ public class InvokerFilterContainerImpl
 		public List<ResourceFilter> getResourceFilters() {
 			return Collections.emptyList();
 		}
+
+	}
+
+	private static class ServiceRegistrationTuple {
+
+		public ServiceRegistrationTuple(
+			com.liferay.portal.kernel.model.PortletFilter portletFilterModel,
+			ServiceRegistration<PortletFilter> serviceRegistration) {
+
+			_portletFilterModel = portletFilterModel;
+			_serviceRegistration = serviceRegistration;
+		}
+
+		public com.liferay.portal.kernel.model.PortletFilter
+			getPortletFilterModel() {
+
+			return _portletFilterModel;
+		}
+
+		public ServiceRegistration<PortletFilter> getServiceRegistration() {
+			return _serviceRegistration;
+		}
+
+		private final com.liferay.portal.kernel.model.PortletFilter
+			_portletFilterModel;
+		private final ServiceRegistration<PortletFilter> _serviceRegistration;
 
 	}
 
