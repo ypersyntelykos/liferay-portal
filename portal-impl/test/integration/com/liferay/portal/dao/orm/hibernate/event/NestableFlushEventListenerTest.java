@@ -92,7 +92,7 @@ public class NestableFlushEventListenerTest {
 		catch (ORMException orme) {
 			Assert.assertTrue(
 				orme.getMessage(),
-				_isCausedByException(orme, IndexOutOfBoundsException.class));
+				orme.getCause() instanceof IndexOutOfBoundsException);
 		}
 		finally {
 			eventListeners.setAutoFlushEventListeners(autoFlushEventListeners);
@@ -117,7 +117,7 @@ public class NestableFlushEventListenerTest {
 		catch (ORMException orme) {
 			Assert.assertTrue(
 				orme.getMessage(),
-				_isCausedByException(orme, IndexOutOfBoundsException.class));
+				orme.getCause() instanceof IndexOutOfBoundsException);
 		}
 		finally {
 			eventListeners.setFlushEventListeners(flushEventListeners);
@@ -202,24 +202,6 @@ public class NestableFlushEventListenerTest {
 		_className2.setMvccVersion(_className1.getMvccVersion() + 1);
 
 		TransactionInvokerUtil.invoke(_transactionConfig, callable);
-	}
-
-	private boolean _isCausedByException(Throwable t, Class expectedCause) {
-		while (true) {
-			if (expectedCause.isInstance(t)) {
-				return true;
-			}
-
-			Throwable cause = t.getCause();
-
-			if ((t == cause) || (cause == null)) {
-				break;
-			}
-
-			t = cause;
-		}
-
-		return false;
 	}
 
 	private static org.hibernate.impl.SessionFactoryImpl _sessionFactoryImpl;
