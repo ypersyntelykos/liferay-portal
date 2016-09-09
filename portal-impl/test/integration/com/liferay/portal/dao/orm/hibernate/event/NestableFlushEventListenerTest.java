@@ -85,7 +85,7 @@ public class NestableFlushEventListenerTest {
 			new AutoFlushEventListener[] {new DefaultAutoFlushEventListener()});
 
 		try {
-			_testAutoFlushEventListener();
+			testNestableAutoFlushEventListener();
 
 			Assert.fail();
 		}
@@ -110,7 +110,7 @@ public class NestableFlushEventListenerTest {
 			new FlushEventListener[] {new DefaultFlushEventListener()});
 
 		try {
-			_testFlushEventListener();
+			testNestableFlushEventListener();
 
 			Assert.fail();
 		}
@@ -126,12 +126,41 @@ public class NestableFlushEventListenerTest {
 
 	@Test
 	public void testNestableAutoFlushEventListener() throws Throwable {
-		_testAutoFlushEventListener();
+		_flushTest(
+			new Callable<Void>() {
+
+				@Override
+				public Void call() throws Exception {
+					_session.merge(_className1);
+					_session.merge(_className2);
+
+					SQLQuery query = _session.createSynchronizedSQLQuery(
+						"SELECT * FROM ClassName_");
+
+					query.list();
+
+					return null;
+				}
+
+		});
 	}
 
 	@Test
 	public void testNestableFlushEventListener() throws Throwable {
-		_testFlushEventListener();
+		_flushTest(
+			new Callable<Void>() {
+
+				@Override
+				public Void call() throws Exception {
+					_session.merge(_className1);
+					_session.merge(_className2);
+
+					_session.flush();
+
+					return null;
+				}
+
+		});
 	}
 
 	private void _flushTest(Callable<Void> callable) throws Throwable {
@@ -191,43 +220,6 @@ public class NestableFlushEventListenerTest {
 		}
 
 		return false;
-	}
-
-	private void _testAutoFlushEventListener() throws Throwable {
-		_flushTest(
-			new Callable<Void>() {
-
-				@Override
-				public Void call() throws Exception {
-					_session.merge(_className1);
-					_session.merge(_className2);
-
-					SQLQuery query = _session.createSynchronizedSQLQuery(
-						"SELECT * FROM ClassName_");
-
-					query.list();
-
-					return null;
-				}
-
-		});
-	}
-
-	private void _testFlushEventListener() throws Throwable {
-		_flushTest(
-			new Callable<Void>() {
-
-				@Override
-				public Void call() throws Exception {
-					_session.merge(_className1);
-					_session.merge(_className2);
-
-					_session.flush();
-
-					return null;
-				}
-
-		});
 	}
 
 	private static org.hibernate.impl.SessionFactoryImpl _sessionFactoryImpl;
