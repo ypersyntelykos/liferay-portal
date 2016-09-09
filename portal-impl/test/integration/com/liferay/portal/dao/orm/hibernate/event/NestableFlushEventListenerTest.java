@@ -31,10 +31,10 @@ import com.liferay.portal.kernel.transaction.TransactionInvokerUtil;
 import com.liferay.portal.model.impl.ClassNameImpl;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 
+import java.util.List;
 import java.util.concurrent.Callable;
 
 import org.hibernate.EmptyInterceptor;
-import org.hibernate.StaleStateException;
 import org.hibernate.event.AutoFlushEventListener;
 import org.hibernate.event.EventListeners;
 import org.hibernate.event.FlushEventListener;
@@ -248,16 +248,9 @@ public class NestableFlushEventListenerTest {
 				SQLQuery query = _session.createSynchronizedSQLQuery(
 					"SELECT * FROM Release_");
 
-				try {
-					query.list();
-				}
-				catch (ORMException orme) {
-					if (!_isCausedByException(
-							orme, StaleStateException.class)) {
+				List<?> results = query.list();
 
-						throw orme;
-					}
-				}
+				Assert.assertFalse(results.isEmpty());
 
 				return super.toCacheModel();
 			}
