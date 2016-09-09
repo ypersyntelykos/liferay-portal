@@ -36,7 +36,6 @@ import org.hibernate.event.FlushEventListener;
 import org.hibernate.event.def.DefaultAutoFlushEventListener;
 import org.hibernate.event.def.DefaultFlushEventListener;
 
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
@@ -62,11 +61,6 @@ public class NestableFlushEventListenerTest {
 		_sessionFactoryImpl =
 			(org.hibernate.impl.SessionFactoryImpl)
 				sessionFactoryImpl.getSessionFactoryImplementor();
-	}
-
-	@After
-	public void tearDown() {
-		_session.close();
 	}
 
 	@Test
@@ -115,43 +109,49 @@ public class NestableFlushEventListenerTest {
 
 	@Test
 	public void testNestableAutoFlushEventListener() throws Throwable {
-		_flushTest(
-			new Runnable() {
+		Session session = _prepareSession();
 
-				@Override
-				public void run() {
-					_session.merge(_className1);
-					_session.merge(_className2);
+		Transaction transaction = session.beginTransaction();
 
-					Query query = _session.createQuery(
-						"SELECT className FROM ClassName className");
+		try {
+			session.merge(_className1);
+			session.merge(_className2);
 
-					List<?> results = query.list();
+			Query query = session.createQuery(
+				"SELECT className FROM ClassName className");
 
-					Assert.assertFalse(results.isEmpty());
-				}
+			List<?> results = query.list();
 
-		});
+			Assert.assertFalse(results.isEmpty());
+		}
+		finally {
+			transaction.commit();
+		}
+
+		session.close();
 	}
 
 	@Test
 	public void testNestableFlushEventListener() throws Throwable {
-		_flushTest(
-			new Runnable() {
+		Session session = _prepareSession();
 
-				@Override
-				public void run() {
-					_session.merge(_className1);
-					_session.merge(_className2);
+		Transaction transaction = session.beginTransaction();
 
-					_session.flush();
-				}
+		try {
+			session.merge(_className1);
+			session.merge(_className2);
 
-		});
+			session.flush();
+		}
+		finally {
+			transaction.commit();
+		}
+
+		session.close();
 	}
 
-	private void _flushTest(Runnable runnable) throws Throwable {
-		_session = _sessionFactoryImpl.openSession(
+	private Session _prepareSession() throws Exception {
+		Session session = _sessionFactoryImpl.openSession(
 			new EmptyInterceptor() {
 
 				@Override
@@ -165,41 +165,34 @@ public class NestableFlushEventListenerTest {
 
 			});
 
-		Transaction transaction = _session.beginTransaction();
+		Transaction transaction = session.beginTransaction();
 
 		try {
-			_className1 = new TestClassNameImpl();
+			_className1 = new TestClassNameImpl(session);
 
 			_className1.setPrimaryKey(RandomTestUtil.nextLong());
 
-			_session.save(_className1);
+			session.save(_className1);
 
 			_className2 = new ClassNameImpl();
 
 			_className2.setPrimaryKey(RandomTestUtil.nextLong());
 
-			_session.save(_className2);
+			session.save(_className2);
 		}
 		finally {
 			transaction.commit();
 		}
 
-		transaction = _session.beginTransaction();
+		_className1.setValue(RandomTestUtil.randomString());
 
-		try {
-			_className1.setValue(RandomTestUtil.randomString());
+		_className1.setMvccVersion(_className1.getMvccVersion() + 1);
 
-			_className1.setMvccVersion(_className1.getMvccVersion() + 1);
+		_className2.setValue(RandomTestUtil.randomString());
 
-			_className2.setValue(RandomTestUtil.randomString());
+		_className2.setMvccVersion(_className1.getMvccVersion() + 1);
 
-			_className2.setMvccVersion(_className1.getMvccVersion() + 1);
-
-			runnable.run();
-		}
-		finally {
-			transaction.commit();
-		}
+		return session;
 	}
 
 	private static org.hibernate.impl.SessionFactoryImpl _sessionFactoryImpl;
@@ -210,21 +203,25 @@ public class NestableFlushEventListenerTest {
 	@DeleteAfterTestRun
 	private ClassName _className2;
 
-	private Session _session;
-
 	private class TestClassNameImpl extends ClassNameImpl {
 
 		@Override
-			public CacheModel<ClassName> toCacheModel() {
-				Query query = _session.createQuery(
-					"SELECT release FROM Release release");
+		public CacheModel<ClassName> toCacheModel() {
+			Query query = _session.createQuery(
+				"SELECT release FROM Release release");
 
-				List<?> results = query.list();
+			List<?> results = query.list();
 
-				Assert.assertFalse(results.isEmpty());
+			Assert.assertFalse(results.isEmpty());
 
-				return super.toCacheModel();
-			}
+			return super.toCacheModel();
+		}
+
+		private TestClassNameImpl(Session session) {
+			_session = session;
+		}
+
+		private final Session _session;
 
 	}
 
