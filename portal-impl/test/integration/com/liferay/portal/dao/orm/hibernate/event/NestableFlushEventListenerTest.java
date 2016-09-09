@@ -78,9 +78,11 @@ public class NestableFlushEventListenerTest {
 	public void testDefaultAutoFlushEventListener() throws Throwable {
 		EventListeners eventListeners = _sessionFactoryImpl.getEventListeners();
 
-		eventListeners.setAutoFlushEventListeners(new AutoFlushEventListener[] {
-			new DefaultAutoFlushEventListener()
-		});
+		AutoFlushEventListener[] autoFlushEventListeners =
+			eventListeners.getAutoFlushEventListeners();
+
+		eventListeners.setAutoFlushEventListeners(
+			new AutoFlushEventListener[] {new DefaultAutoFlushEventListener()});
 
 		try {
 			_testAutoFlushEventListener();
@@ -93,10 +95,7 @@ public class NestableFlushEventListenerTest {
 				_isCausedByException(orme, IndexOutOfBoundsException.class));
 		}
 		finally {
-			eventListeners.setAutoFlushEventListeners(
-				new AutoFlushEventListener[] {
-					NestableAutoFlushEventListener.INSTANCE
-			});
+			eventListeners.setAutoFlushEventListeners(autoFlushEventListeners);
 		}
 	}
 
@@ -104,9 +103,11 @@ public class NestableFlushEventListenerTest {
 	public void testDefaultFlushEventListener() throws Throwable {
 		EventListeners eventListeners = _sessionFactoryImpl.getEventListeners();
 
-		eventListeners.setFlushEventListeners(new FlushEventListener[] {
-			new DefaultFlushEventListener()
-		});
+		FlushEventListener[] flushEventListeners =
+			eventListeners.getFlushEventListeners();
+
+		eventListeners.setFlushEventListeners(
+			new FlushEventListener[] {new DefaultFlushEventListener()});
 
 		try {
 			_testFlushEventListener();
@@ -119,10 +120,7 @@ public class NestableFlushEventListenerTest {
 				_isCausedByException(orme, IndexOutOfBoundsException.class));
 		}
 		finally {
-			eventListeners.setFlushEventListeners(
-				new FlushEventListener[] {
-					NestableFlushEventListener.INSTANCE
-			});
+			eventListeners.setFlushEventListeners(flushEventListeners);
 		}
 	}
 
