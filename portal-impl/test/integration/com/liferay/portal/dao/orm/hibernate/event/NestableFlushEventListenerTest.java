@@ -18,7 +18,7 @@ import com.liferay.portal.dao.orm.hibernate.SessionFactoryImpl;
 import com.liferay.portal.dao.orm.hibernate.SessionImpl;
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
 import com.liferay.portal.kernel.dao.orm.ORMException;
-import com.liferay.portal.kernel.dao.orm.SQLQuery;
+import com.liferay.portal.kernel.dao.orm.Query;
 import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.model.CacheModel;
 import com.liferay.portal.kernel.model.ClassName;
@@ -134,8 +134,8 @@ public class NestableFlushEventListenerTest {
 					_session.merge(_className1);
 					_session.merge(_className2);
 
-					SQLQuery query = _session.createSynchronizedSQLQuery(
-						"SELECT * FROM ClassName_");
+					Query query = _session.createQuery(
+						"SELECT className FROM ClassName className");
 
 					query.list();
 
@@ -227,8 +227,8 @@ public class NestableFlushEventListenerTest {
 
 		@Override
 			public CacheModel<ClassName> toCacheModel() {
-				SQLQuery query = _session.createSynchronizedSQLQuery(
-					"SELECT * FROM Release_");
+				Query query = _session.createQuery(
+					"SELECT release FROM Release release");
 
 				List<?> results = query.list();
 
