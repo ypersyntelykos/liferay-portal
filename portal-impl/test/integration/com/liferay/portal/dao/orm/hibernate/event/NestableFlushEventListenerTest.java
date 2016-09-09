@@ -126,7 +126,9 @@ public class NestableFlushEventListenerTest {
 					Query query = _session.createQuery(
 						"SELECT className FROM ClassName className");
 
-					query.list();
+					List<?> results = query.list();
+
+					Assert.assertFalse(results.isEmpty());
 				}
 
 		});
