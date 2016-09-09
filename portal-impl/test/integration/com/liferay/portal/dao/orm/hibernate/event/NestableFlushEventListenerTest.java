@@ -64,7 +64,7 @@ public class NestableFlushEventListenerTest {
 	}
 
 	@Test
-	public void testDefaultAutoFlushEventListener() throws Throwable {
+	public void testDefaultAutoFlushEventListener() throws Exception {
 		EventListeners eventListeners = _sessionFactoryImpl.getEventListeners();
 
 		AutoFlushEventListener[] autoFlushEventListeners =
@@ -86,7 +86,7 @@ public class NestableFlushEventListenerTest {
 	}
 
 	@Test
-	public void testDefaultFlushEventListener() throws Throwable {
+	public void testDefaultFlushEventListener() throws Exception {
 		EventListeners eventListeners = _sessionFactoryImpl.getEventListeners();
 
 		FlushEventListener[] flushEventListeners =
@@ -108,7 +108,7 @@ public class NestableFlushEventListenerTest {
 	}
 
 	@Test
-	public void testNestableAutoFlushEventListener() throws Throwable {
+	public void testNestableAutoFlushEventListener() throws Exception {
 		Session session = _prepareSession();
 
 		Transaction transaction = session.beginTransaction();
@@ -132,7 +132,7 @@ public class NestableFlushEventListenerTest {
 	}
 
 	@Test
-	public void testNestableFlushEventListener() throws Throwable {
+	public void testNestableFlushEventListener() throws Exception {
 		Session session = _prepareSession();
 
 		Transaction transaction = session.beginTransaction();
