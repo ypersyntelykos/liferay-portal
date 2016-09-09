@@ -15,19 +15,12 @@
 package com.liferay.portal.dao.orm.hibernate.event;
 
 import com.liferay.portal.dao.orm.hibernate.SessionFactoryImpl;
-import com.liferay.portal.dao.orm.hibernate.SessionImpl;
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
-import com.liferay.portal.kernel.dao.orm.ORMException;
-import com.liferay.portal.kernel.dao.orm.Query;
-import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.model.CacheModel;
 import com.liferay.portal.kernel.model.ClassName;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
-import com.liferay.portal.kernel.transaction.Propagation;
-import com.liferay.portal.kernel.transaction.TransactionConfig;
-import com.liferay.portal.kernel.transaction.TransactionInvokerUtil;
 import com.liferay.portal.model.impl.ClassNameImpl;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 
@@ -35,6 +28,9 @@ import java.util.List;
 import java.util.concurrent.Callable;
 
 import org.hibernate.EmptyInterceptor;
+import org.hibernate.Query;
+import org.hibernate.Transaction;
+import org.hibernate.classic.Session;
 import org.hibernate.event.AutoFlushEventListener;
 import org.hibernate.event.EventListeners;
 import org.hibernate.event.FlushEventListener;
@@ -89,10 +85,7 @@ public class NestableFlushEventListenerTest {
 
 			Assert.fail();
 		}
-		catch (ORMException orme) {
-			Assert.assertTrue(
-				orme.getMessage(),
-				orme.getCause() instanceof IndexOutOfBoundsException);
+		catch (IndexOutOfBoundsException ioobe) {
 		}
 		finally {
 			eventListeners.setAutoFlushEventListeners(autoFlushEventListeners);
@@ -114,10 +107,7 @@ public class NestableFlushEventListenerTest {
 
 			Assert.fail();
 		}
-		catch (ORMException orme) {
-			Assert.assertTrue(
-				orme.getMessage(),
-				orme.getCause() instanceof IndexOutOfBoundsException);
+		catch (IndexOutOfBoundsException ioobe) {
 		}
 		finally {
 			eventListeners.setFlushEventListeners(flushEventListeners);
@@ -164,56 +154,58 @@ public class NestableFlushEventListenerTest {
 	}
 
 	private void _flushTest(Callable<Void> callable) throws Throwable {
-		_session = new SessionImpl(
-			_sessionFactoryImpl.openSession(
-				new EmptyInterceptor() {
+		_session = _sessionFactoryImpl.openSession(
+			new EmptyInterceptor() {
 
-					@Override
-					public String getEntityName(Object object) {
-						if (object instanceof TestClassNameImpl) {
-							return ClassNameImpl.class.getName();
-						}
-
-						return super.getEntityName(object);
+				@Override
+				public String getEntityName(Object object) {
+					if (object instanceof TestClassNameImpl) {
+						return ClassNameImpl.class.getName();
 					}
 
-		}));
+					return super.getEntityName(object);
+				}
 
-		_className1 = new TestClassNameImpl();
+			});
 
-		_className1.setPrimaryKey(RandomTestUtil.nextLong());
+		Transaction transaction = _session.beginTransaction();
 
-		_session.save(_className1);
+		try {
+			_className1 = new TestClassNameImpl();
 
-		_className2 = new ClassNameImpl();
+			_className1.setPrimaryKey(RandomTestUtil.nextLong());
 
-		_className2.setPrimaryKey(RandomTestUtil.nextLong());
+			_session.save(_className1);
 
-		_session.save(_className2);
+			_className2 = new ClassNameImpl();
 
-		_session.flush();
+			_className2.setPrimaryKey(RandomTestUtil.nextLong());
 
-		_className1.setValue(RandomTestUtil.randomString());
+			_session.save(_className2);
+		}
+		finally {
+			transaction.commit();
+		}
 
-		_className1.setMvccVersion(_className1.getMvccVersion() + 1);
+		transaction = _session.beginTransaction();
 
-		_className2.setValue(RandomTestUtil.randomString());
+		try {
+			_className1.setValue(RandomTestUtil.randomString());
 
-		_className2.setMvccVersion(_className1.getMvccVersion() + 1);
+			_className1.setMvccVersion(_className1.getMvccVersion() + 1);
 
-		TransactionInvokerUtil.invoke(_transactionConfig, callable);
+			_className2.setValue(RandomTestUtil.randomString());
+
+			_className2.setMvccVersion(_className1.getMvccVersion() + 1);
+
+			callable.call();
+		}
+		finally {
+			transaction.commit();
+		}
 	}
 
 	private static org.hibernate.impl.SessionFactoryImpl _sessionFactoryImpl;
-	private static final TransactionConfig _transactionConfig;
-
-	static {
-		TransactionConfig.Builder builder = new TransactionConfig.Builder();
-
-		builder.setPropagation(Propagation.REQUIRED);
-
-		_transactionConfig = builder.build();
-	}
 
 	@DeleteAfterTestRun
 	private ClassName _className1;
