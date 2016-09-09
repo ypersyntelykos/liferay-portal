@@ -25,7 +25,6 @@ import com.liferay.portal.model.impl.ClassNameImpl;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 
 import java.util.List;
-import java.util.concurrent.Callable;
 
 import org.hibernate.EmptyInterceptor;
 import org.hibernate.Query;
@@ -117,10 +116,10 @@ public class NestableFlushEventListenerTest {
 	@Test
 	public void testNestableAutoFlushEventListener() throws Throwable {
 		_flushTest(
-			new Callable<Void>() {
+			new Runnable() {
 
 				@Override
-				public Void call() throws Exception {
+				public void run() {
 					_session.merge(_className1);
 					_session.merge(_className2);
 
@@ -128,8 +127,6 @@ public class NestableFlushEventListenerTest {
 						"SELECT className FROM ClassName className");
 
 					query.list();
-
-					return null;
 				}
 
 		});
@@ -138,22 +135,20 @@ public class NestableFlushEventListenerTest {
 	@Test
 	public void testNestableFlushEventListener() throws Throwable {
 		_flushTest(
-			new Callable<Void>() {
+			new Runnable() {
 
 				@Override
-				public Void call() throws Exception {
+				public void run() {
 					_session.merge(_className1);
 					_session.merge(_className2);
 
 					_session.flush();
-
-					return null;
 				}
 
 		});
 	}
 
-	private void _flushTest(Callable<Void> callable) throws Throwable {
+	private void _flushTest(Runnable runnable) throws Throwable {
 		_session = _sessionFactoryImpl.openSession(
 			new EmptyInterceptor() {
 
@@ -198,7 +193,7 @@ public class NestableFlushEventListenerTest {
 
 			_className2.setMvccVersion(_className1.getMvccVersion() + 1);
 
-			callable.call();
+			runnable.run();
 		}
 		finally {
 			transaction.commit();
