@@ -55,14 +55,9 @@ public class NestableFlushEventListener extends DefaultFlushEventListener {
 
 		try {
 			flushEverythingToExecutions(event);
-		}
-		finally {
-			persistenceContext.setFlushing(flushing);
-		}
 
-		persistenceContext.setFlushing(true);
+			persistenceContext.setFlushing(true);
 
-		try {
 			performExecutions(eventSource);
 
 			postFlush(eventSource);
