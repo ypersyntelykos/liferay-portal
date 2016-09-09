@@ -35,7 +35,6 @@ import java.util.concurrent.Callable;
 
 import org.hibernate.EmptyInterceptor;
 import org.hibernate.StaleStateException;
-import org.hibernate.engine.SessionFactoryImplementor;
 import org.hibernate.event.AutoFlushEventListener;
 import org.hibernate.event.EventListeners;
 import org.hibernate.event.FlushEventListener;
@@ -65,8 +64,9 @@ public class NestableFlushEventListenerTest {
 			(SessionFactoryImpl)PortalBeanLocatorUtil.locate(
 				"liferaySessionFactory");
 
-		_sessionFactoryImplementor =
-			sessionFactoryImpl.getSessionFactoryImplementor();
+		_sessionFactoryImpl =
+			(org.hibernate.impl.SessionFactoryImpl)
+				sessionFactoryImpl.getSessionFactoryImplementor();
 	}
 
 	@After
@@ -76,10 +76,7 @@ public class NestableFlushEventListenerTest {
 
 	@Test
 	public void testDefaultAutoFlushEventListener() throws Throwable {
-		org.hibernate.impl.SessionFactoryImpl sessionFactoryImpl =
-			(org.hibernate.impl.SessionFactoryImpl)_sessionFactoryImplementor;
-
-		EventListeners eventListeners = sessionFactoryImpl.getEventListeners();
+		EventListeners eventListeners = _sessionFactoryImpl.getEventListeners();
 
 		eventListeners.setAutoFlushEventListeners(new AutoFlushEventListener[] {
 			new DefaultAutoFlushEventListener()
@@ -105,10 +102,7 @@ public class NestableFlushEventListenerTest {
 
 	@Test
 	public void testDefaultFlushEventListener() throws Throwable {
-		org.hibernate.impl.SessionFactoryImpl sessionFactoryImpl =
-			(org.hibernate.impl.SessionFactoryImpl)_sessionFactoryImplementor;
-
-		EventListeners eventListeners = sessionFactoryImpl.getEventListeners();
+		EventListeners eventListeners = _sessionFactoryImpl.getEventListeners();
 
 		eventListeners.setFlushEventListeners(new FlushEventListener[] {
 			new DefaultFlushEventListener()
@@ -144,7 +138,7 @@ public class NestableFlushEventListenerTest {
 
 	private void _flushTest(Callable<Void> callable) throws Throwable {
 		_session = new SessionImpl(
-			_sessionFactoryImplementor.openSession(
+			_sessionFactoryImpl.openSession(
 				new EmptyInterceptor() {
 
 					@Override
@@ -238,7 +232,7 @@ public class NestableFlushEventListenerTest {
 		});
 	}
 
-	private static SessionFactoryImplementor _sessionFactoryImplementor;
+	private static org.hibernate.impl.SessionFactoryImpl _sessionFactoryImpl;
 	private static final TransactionConfig _transactionConfig;
 
 	static {
