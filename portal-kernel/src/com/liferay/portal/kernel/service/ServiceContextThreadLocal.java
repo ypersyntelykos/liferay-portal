@@ -27,10 +27,6 @@ public class ServiceContextThreadLocal {
 		LinkedList<ServiceContext> serviceContextStack =
 			_serviceContextThreadLocal.get();
 
-		if (serviceContextStack.isEmpty()) {
-			return null;
-		}
-
 		return serviceContextStack.peek();
 	}
 
