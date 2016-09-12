@@ -15,7 +15,6 @@
 package com.liferay.push.notifications.sender.apple.internal.messaging;
 
 import com.liferay.portal.kernel.messaging.Destination;
-import com.liferay.portal.kernel.messaging.MessageBus;
 import com.liferay.portal.kernel.messaging.MessageListener;
 import com.liferay.push.notifications.constants.PushNotificationsDestinationNames;
 import com.liferay.push.notifications.service.PushNotificationsDeviceLocalService;
@@ -37,34 +36,24 @@ public class ApplePushNotificationsMessagingConfigurator {
 
 	@Activate
 	protected void activate(BundleContext bundleContext) {
-		Destination pushNotificationResponseDestination =
-			_messageBus.getDestination(
-				PushNotificationsDestinationNames.PUSH_NOTIFICATION_RESPONSE);
-
 		_applePushNotificationsResponseMessageListener =
 			new ApplePushNotificationsResponseMessageListener(
 				_pushNotificationsDeviceLocalService);
 
-		pushNotificationResponseDestination.register(
-			_applePushNotificationsResponseMessageListener);
+		_destination.register(_applePushNotificationsResponseMessageListener);
 	}
 
 	@Deactivate
 	protected void deactivate() {
-		Destination pushNotificationResponseDestination =
-			_messageBus.getDestination(
-				PushNotificationsDestinationNames.PUSH_NOTIFICATION_RESPONSE);
-
-		if (pushNotificationResponseDestination != null) {
-			pushNotificationResponseDestination.unregister(
-				_applePushNotificationsResponseMessageListener);
-		}
+		_destination.unregister(_applePushNotificationsResponseMessageListener);
 	}
 
 	private MessageListener _applePushNotificationsResponseMessageListener;
 
-	@Reference
-	private MessageBus _messageBus;
+	@Reference(
+		target = "(destination.name= " + PushNotificationsDestinationNames.PUSH_NOTIFICATION_RESPONSE + ")"
+	)
+	private Destination _destination;
 
 	@Reference
 	private PushNotificationsDeviceLocalService
