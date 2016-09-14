@@ -219,7 +219,7 @@ public class UnicodeProperties extends HashMap<String, String> {
 	}
 
 	private boolean _isComment(String line) {
-		if ((line.length() == 0) || (line.charAt(0) == CharPool.POUND)) {
+		if (line.isEmpty() || (line.charAt(0) == CharPool.POUND)) {
 			return true;
 		}
 
