@@ -44,17 +44,6 @@ public class LayoutSetLocalServiceStagingAdvice implements MethodInterceptor {
 		return methodInvocation.proceed();
 	}
 
-	protected LayoutSet unwrapLayoutSet(LayoutSet layoutSet) {
-		LayoutSetStagingHandler layoutSetStagingHandler =
-			LayoutStagingUtil.getLayoutSetStagingHandler(layoutSet);
-
-		if (layoutSetStagingHandler == null) {
-			return layoutSet;
-		}
-
-		return layoutSetStagingHandler.getLayoutSet();
-	}
-
 	protected LayoutSet wrapLayoutSet(LayoutSet layoutSet) {
 		LayoutSetStagingHandler layoutSetStagingHandler =
 			LayoutStagingUtil.getLayoutSetStagingHandler(layoutSet);
