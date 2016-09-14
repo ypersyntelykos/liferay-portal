@@ -108,22 +108,23 @@ public class UnicodeProperties extends HashMap<String, String> {
 	public void put(String line) {
 		line = line.trim();
 
-		if (!_isComment(line)) {
-			int pos = line.indexOf(CharPool.EQUAL);
+		if (_isComment(line)) {
+			return;
+		}
 
-			if (pos != -1) {
-				String key = line.substring(0, pos).trim();
-				String value = line.substring(pos + 1).trim();
+		int pos = line.indexOf(CharPool.EQUAL);
 
-				if (_safe) {
-					value = _decode(value);
-				}
+		if (pos == -1) {
+			_log.error("Invalid property on line " + line);
+		}
+		else {
+			String value = line.substring(pos + 1).trim();
 
-				setProperty(key, value);
+			if (_safe) {
+				value = _decode(value);
 			}
-			else {
-				_log.error("Invalid property on line " + line);
-			}
+
+			setProperty(line.substring(0, pos).trim(), value);
 		}
 	}
 
