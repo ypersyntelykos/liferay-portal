@@ -78,14 +78,15 @@ public class ThreadLocalCacheAdvice
 	}
 
 	private String _getCacheKey(Object[] arguments) {
-		StringBundler sb = new StringBundler(arguments.length * 2);
+		StringBundler sb = new StringBundler(arguments.length * 2 - 1);
 
-		for (Object argument : arguments) {
-			sb.append(StringUtil.toHexString(argument));
-			sb.append(StringPool.POUND);
+		for (int i = 0; i < arguments.length; i++) {
+			sb.append(StringUtil.toHexString(arguments[i]));
+
+			if ((i + 1) < arguments.length) {
+				sb.append(StringPool.POUND);
+			}
 		}
-
-		sb.setIndex(sb.index() - 1);
 
 		return sb.toString();
 	}
