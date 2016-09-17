@@ -61,8 +61,12 @@ public class ThreadLocalCacheAdvice
 
 		Object value = threadLocalCache.get(cacheKey);
 
-		if (value == nullResult) {
-			return null;
+		if (value != null) {
+			if (value == nullResult) {
+				return null;
+			}
+
+			return value;
 		}
 
 		Object result = methodInvocation.proceed();
