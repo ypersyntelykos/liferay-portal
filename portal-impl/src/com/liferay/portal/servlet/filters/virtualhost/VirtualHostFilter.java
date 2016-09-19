@@ -67,8 +67,17 @@ public class VirtualHostFilter extends BasePortalFilter {
 
 		_servletContext = filterConfig.getServletContext();
 
-		_contextPath = PortalUtil.getPathContext();
-		_proxyPath = PortalUtil.getPathProxy();
+		String contextPath = PortalUtil.getPathContext();
+
+		String proxyPath = PortalUtil.getPathProxy();
+
+		if (!contextPath.isEmpty() && !proxyPath.isEmpty() &&
+			contextPath.startsWith(proxyPath)) {
+
+			contextPath = contextPath.substring(proxyPath.length());
+		}
+
+		_contextPath = contextPath;
 	}
 
 	@Override
@@ -177,18 +186,12 @@ public class VirtualHostFilter extends BasePortalFilter {
 			friendlyURL, StringPool.DOUBLE_SLASH, StringPool.SLASH);
 
 		if (!friendlyURL.equals(StringPool.SLASH) && !_contextPath.isEmpty()) {
-			String contextPath = _contextPath;
-
-			if (!_proxyPath.isEmpty() && contextPath.startsWith(_proxyPath)) {
-				contextPath = contextPath.substring(_proxyPath.length());
-			}
-
-			if (friendlyURL.startsWith(contextPath) &&
+			if (friendlyURL.startsWith(_contextPath) &&
 				StringUtil.startsWith(
-					friendlyURL.substring(contextPath.length()),
+					friendlyURL.substring(_contextPath.length()),
 					StringPool.SLASH)) {
 
-				friendlyURL = friendlyURL.substring(contextPath.length());
+				friendlyURL = friendlyURL.substring(_contextPath.length());
 			}
 		}
 
@@ -393,7 +396,6 @@ public class VirtualHostFilter extends BasePortalFilter {
 		VirtualHostFilter.class);
 
 	private String _contextPath;
-	private String _proxyPath;
 	private ServletContext _servletContext;
 
 }
