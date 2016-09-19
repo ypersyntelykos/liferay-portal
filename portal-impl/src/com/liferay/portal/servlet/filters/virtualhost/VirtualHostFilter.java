@@ -169,8 +169,6 @@ public class VirtualHostFilter extends BasePortalFilter {
 
 		long companyId = PortalInstances.getCompanyId(request);
 
-		String contextPath = _contextPath;
-
 		String originalFriendlyURL = request.getRequestURI();
 
 		String friendlyURL = originalFriendlyURL;
@@ -178,8 +176,8 @@ public class VirtualHostFilter extends BasePortalFilter {
 		friendlyURL = StringUtil.replace(
 			friendlyURL, StringPool.DOUBLE_SLASH, StringPool.SLASH);
 
-		if (!friendlyURL.equals(StringPool.SLASH) &&
-			Validator.isNotNull(contextPath)) {
+		if (!friendlyURL.equals(StringPool.SLASH) && !_contextPath.isEmpty()) {
+			String contextPath = _contextPath;
 
 			if (!_proxyPath.isEmpty() && contextPath.startsWith(_proxyPath)) {
 				contextPath = contextPath.substring(_proxyPath.length());
