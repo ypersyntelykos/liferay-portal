@@ -40,7 +40,7 @@ import com.liferay.portal.util.PortalInstances;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.webserver.WebServerServlet;
 
-import java.util.Set;
+import java.util.Map;
 
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -199,39 +199,7 @@ public class VirtualHostFilter extends BasePortalFilter {
 			friendlyURL = friendlyURL.substring(0, pos);
 		}
 
-		String i18nLanguageId = null;
-		String i18nLanguageIdLowerCase = null;
-
-		Set<String> languageIds = I18nServlet.getLanguageIds();
-
-		for (String languageId : languageIds) {
-			if (StringUtil.startsWith(friendlyURL, languageId)) {
-				pos = friendlyURL.indexOf(CharPool.SLASH, 1);
-
-				if (((pos != -1) && (pos != languageId.length())) ||
-					((pos == -1) &&
-					 !StringUtil.equalsIgnoreCase(friendlyURL, languageId))) {
-
-					continue;
-				}
-
-				if (!friendlyURL.startsWith(languageId)) {
-					i18nLanguageIdLowerCase = StringUtil.toLowerCase(
-						languageId);
-				}
-
-				if (pos == -1) {
-					i18nLanguageId = languageId;
-					friendlyURL = StringPool.SLASH;
-				}
-				else {
-					i18nLanguageId = languageId.substring(0, pos);
-					friendlyURL = friendlyURL.substring(pos);
-				}
-
-				break;
-			}
-		}
+		String i18nLanguageId = _findLanguageId(friendlyURL);
 
 		friendlyURL = StringUtil.replace(
 			friendlyURL, PropsValues.WIDGET_SERVLET_MAPPING, StringPool.BLANK);
@@ -245,9 +213,9 @@ public class VirtualHostFilter extends BasePortalFilter {
 
 			_log.debug("Friendly URL is not valid");
 
-			if (Validator.isNotNull(i18nLanguageIdLowerCase)) {
+			if (i18nLanguageId != null) {
 				String forwardURL = StringUtil.replace(
-					originalFriendlyURL, i18nLanguageIdLowerCase,
+					originalFriendlyURL, StringUtil.toLowerCase(i18nLanguageId),
 					i18nLanguageId);
 
 				RequestDispatcher requestDispatcher =
@@ -365,6 +333,34 @@ public class VirtualHostFilter extends BasePortalFilter {
 				VirtualHostFilter.class.getName(), request, response,
 				filterChain);
 		}
+	}
+
+	private String _findLanguageId(String friendlyURL) {
+		if (friendlyURL.isEmpty() ||
+			(friendlyURL.charAt(0) != CharPool.SLASH)) {
+
+			return null;
+		}
+
+		String lowerCaseLanguageId = friendlyURL;
+
+		int index = friendlyURL.indexOf(CharPool.SLASH, 1);
+
+		if (index != -1) {
+			lowerCaseLanguageId = friendlyURL.substring(0, index);
+		}
+
+		lowerCaseLanguageId = StringUtil.toLowerCase(lowerCaseLanguageId);
+
+		Map<String, String> languageIds = I18nServlet.getLanguageIdsMap();
+
+		String languageId = languageIds.get(lowerCaseLanguageId);
+
+		if (languageId == null) {
+			return null;
+		}
+
+		return languageId;
 	}
 
 	private static final String _PATH_DOCUMENTS = "/documents/";
