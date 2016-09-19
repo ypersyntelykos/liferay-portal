@@ -301,10 +301,10 @@ public class VirtualHostFilter extends BasePortalFilter {
 					StringPool.BLANK);
 			}
 
-			long plid = PortalUtil.getPlidFromFriendlyURL(
-				companyId, friendlyURL);
+			if (friendlyURL.equals(StringPool.SLASH) ||
+				(PortalUtil.getPlidFromFriendlyURL(companyId, friendlyURL) <=
+					0)) {
 
-			if (plid <= 0) {
 				Group group = GroupLocalServiceUtil.getGroup(
 					layoutSet.getGroupId());
 
