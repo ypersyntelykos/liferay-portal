@@ -185,14 +185,12 @@ public class VirtualHostFilter extends BasePortalFilter {
 		friendlyURL = StringUtil.replace(
 			friendlyURL, StringPool.DOUBLE_SLASH, StringPool.SLASH);
 
-		if (!friendlyURL.equals(StringPool.SLASH) && !_contextPath.isEmpty()) {
-			if (friendlyURL.startsWith(_contextPath) &&
-				StringUtil.startsWith(
-					friendlyURL.substring(_contextPath.length()),
-					StringPool.SLASH)) {
+		if (!friendlyURL.equals(StringPool.SLASH) && !_contextPath.isEmpty() &&
+			(friendlyURL.length() > _contextPath.length()) &&
+			friendlyURL.startsWith(_contextPath) &&
+			friendlyURL.charAt(_contextPath.length()) == CharPool.SLASH) {
 
-				friendlyURL = friendlyURL.substring(_contextPath.length());
-			}
+			friendlyURL = friendlyURL.substring(_contextPath.length());
 		}
 
 		int pos = friendlyURL.indexOf(CharPool.SEMICOLON);
