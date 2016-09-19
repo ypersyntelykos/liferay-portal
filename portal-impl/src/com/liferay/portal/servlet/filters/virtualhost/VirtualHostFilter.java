@@ -21,7 +21,6 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.LayoutSet;
-import com.liferay.portal.kernel.service.GroupLocalServiceUtil;
 import com.liferay.portal.kernel.service.LayoutLocalServiceUtil;
 import com.liferay.portal.kernel.struts.LastPath;
 import com.liferay.portal.kernel.util.CharPool;
@@ -305,8 +304,7 @@ public class VirtualHostFilter extends BasePortalFilter {
 				(PortalUtil.getPlidFromFriendlyURL(companyId, friendlyURL) <=
 					0)) {
 
-				Group group = GroupLocalServiceUtil.getGroup(
-					layoutSet.getGroupId());
+				Group group = layoutSet.getGroup();
 
 				if (isDocumentFriendlyURL(
 						request, group.getGroupId(), friendlyURL)) {
