@@ -66,6 +66,9 @@ public class VirtualHostFilter extends BasePortalFilter {
 		super.init(filterConfig);
 
 		_servletContext = filterConfig.getServletContext();
+
+		_contextPath = PortalUtil.getPathContext();
+		_proxyPath = PortalUtil.getPathProxy();
 	}
 
 	@Override
@@ -166,9 +169,7 @@ public class VirtualHostFilter extends BasePortalFilter {
 
 		long companyId = PortalInstances.getCompanyId(request);
 
-		String originalContextPath = PortalUtil.getPathContext();
-
-		String contextPath = originalContextPath;
+		String contextPath = _contextPath;
 
 		String originalFriendlyURL = request.getRequestURI();
 
@@ -180,12 +181,8 @@ public class VirtualHostFilter extends BasePortalFilter {
 		if (!friendlyURL.equals(StringPool.SLASH) &&
 			Validator.isNotNull(contextPath)) {
 
-			String proxyPath = PortalUtil.getPathProxy();
-
-			if (Validator.isNotNull(proxyPath) &&
-				contextPath.startsWith(proxyPath)) {
-
-				contextPath = contextPath.substring(proxyPath.length());
+			if (!_proxyPath.isEmpty() && contextPath.startsWith(_proxyPath)) {
+				contextPath = contextPath.substring(_proxyPath.length());
 			}
 
 			if (friendlyURL.startsWith(contextPath) &&
@@ -287,7 +284,7 @@ public class VirtualHostFilter extends BasePortalFilter {
 
 		try {
 			LastPath lastPath = new LastPath(
-				originalContextPath, friendlyURL,
+				_contextPath, friendlyURL,
 				HttpUtil.parameterMapToString(request.getParameterMap()));
 
 			request.setAttribute(WebKeys.LAST_PATH, lastPath);
@@ -397,6 +394,8 @@ public class VirtualHostFilter extends BasePortalFilter {
 	private static final Log _log = LogFactoryUtil.getLog(
 		VirtualHostFilter.class);
 
+	private String _contextPath;
+	private String _proxyPath;
 	private ServletContext _servletContext;
 
 }
