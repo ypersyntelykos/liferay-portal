@@ -252,6 +252,8 @@ public class HttpImplTest extends PowerMockito {
 
 		try {
 			_httpImpl.removePathParameters(";x=y");
+
+			Assert.fail();
 		}
 		catch (IllegalArgumentException iae) {
 			Assert.assertEquals("Unable to handle uri :;x=y", iae.getMessage());
