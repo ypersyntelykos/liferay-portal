@@ -272,9 +272,16 @@ public class VirtualHostFilter extends BasePortalFilter {
 		}
 
 		try {
+			Map<String, String[]> parameterMap = request.getParameterMap();
+
+			String parameters = StringPool.BLANK;
+
+			if (!parameterMap.isEmpty()) {
+				parameters = HttpUtil.parameterMapToString(parameterMap);
+			}
+
 			LastPath lastPath = new LastPath(
-				_contextPath, friendlyURL,
-				HttpUtil.parameterMapToString(request.getParameterMap()));
+				_contextPath, friendlyURL, parameters);
 
 			request.setAttribute(WebKeys.LAST_PATH, lastPath);
 
