@@ -344,14 +344,20 @@ public class VirtualHostFilter extends BasePortalFilter {
 				}
 			}
 
-			forwardURL.append(friendlyURL);
+			String forwardURLString = friendlyURL;
+
+			if (forwardURL.index() > 0) {
+				forwardURL.append(friendlyURL);
+
+				forwardURLString = forwardURL.toString();
+			}
 
 			if (_log.isDebugEnabled()) {
-				_log.debug("Forward to " + forwardURL);
+				_log.debug("Forward to " + forwardURLString);
 			}
 
 			RequestDispatcher requestDispatcher =
-				_servletContext.getRequestDispatcher(forwardURL.toString());
+				_servletContext.getRequestDispatcher(forwardURLString);
 
 			requestDispatcher.forward(request, response);
 		}
