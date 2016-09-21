@@ -40,6 +40,7 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.test.util.RoleTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
+import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.LocaleThreadLocal;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.model.impl.PortletImpl;
@@ -267,12 +268,16 @@ public class ServiceTestUtil {
 
 		// Company
 
-		try {
-			CompanyLocalServiceUtil.checkCompany(
-				TestPropsValues.COMPANY_WEB_ID);
-		}
-		catch (Exception e) {
-			_log.error(e, e);
+		if (!ArrayUtil.contains(
+				PortalInstances.getWebIds(), TestPropsValues.COMPANY_WEB_ID)) {
+
+			try {
+				CompanyLocalServiceUtil.checkCompany(
+					TestPropsValues.COMPANY_WEB_ID);
+			}
+			catch (Exception e) {
+				_log.error(e, e);
+			}
 		}
 	}
 
