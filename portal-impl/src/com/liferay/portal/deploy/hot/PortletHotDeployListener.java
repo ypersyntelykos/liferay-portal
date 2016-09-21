@@ -293,11 +293,10 @@ public class PortletHotDeployListener extends BaseHotDeployListener {
 			}
 		}
 
-		for (Portlet portlet : portlets) {
-			boolean ready = GetterUtil.getBoolean(
-				servletContext.getInitParameter("portlets-ready-by-default"),
-				true);
+		boolean ready = GetterUtil.getBoolean(
+			servletContext.getInitParameter("portlets-ready-by-default"), true);
 
+		for (Portlet portlet : portlets) {
 			portlet.setReady(ready);
 		}
 
