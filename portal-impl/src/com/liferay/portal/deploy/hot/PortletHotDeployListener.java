@@ -263,7 +263,12 @@ public class PortletHotDeployListener extends BaseHotDeployListener {
 
 		processPortletProperties(servletContextName, classLoader);
 
+		boolean ready = GetterUtil.getBoolean(
+			servletContext.getInitParameter("portlets-ready-by-default"), true);
+
 		for (Portlet portlet : portlets) {
+			portlet.setReady(ready);
+
 			List<String> modelNames =
 				ResourceActionsUtil.getPortletModelResources(
 					portlet.getPortletId());
@@ -291,13 +296,6 @@ public class PortletHotDeployListener extends BaseHotDeployListener {
 
 				PortletLocalServiceUtil.checkPortlet(curPortlet);
 			}
-		}
-
-		boolean ready = GetterUtil.getBoolean(
-			servletContext.getInitParameter("portlets-ready-by-default"), true);
-
-		for (Portlet portlet : portlets) {
-			portlet.setReady(ready);
 		}
 
 		JavadocManagerUtil.load(servletContextName, classLoader);
