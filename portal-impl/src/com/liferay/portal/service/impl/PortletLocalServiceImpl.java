@@ -90,6 +90,8 @@ import com.liferay.portal.servlet.ComboServlet;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.util.WebAppPool;
 import com.liferay.portlet.PortletBagFactory;
+import com.liferay.portlet.PortletContextBag;
+import com.liferay.portlet.PortletContextBagPool;
 import com.liferay.portlet.UndeployedPortlet;
 import com.liferay.registry.Filter;
 import com.liferay.registry.Registry;
@@ -821,6 +823,9 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 	public List<Portlet> initWAR(
 		String servletContextName, ServletContext servletContext, String[] xmls,
 		PluginPackage pluginPackage) {
+
+		PortletContextBagPool.put(
+			servletContextName, new PortletContextBag(servletContextName));
 
 		Map<String, Portlet> portletsMap = null;
 
