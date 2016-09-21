@@ -27,18 +27,19 @@ import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.util.HtmlImpl;
 
+import java.io.Writer;
+
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import org.mockito.Matchers;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 
 import org.osgi.framework.Bundle;
 
@@ -106,7 +107,7 @@ public class SoyPortletHelperTest {
 
 		// Actual
 
-		Template template = createMockedTemplate();
+		Template template = new MockTemplate();
 
 		template.put(TemplateConstants.NAMESPACE, StringUtil.randomString());
 		template.put("element", StringPool.POUND.concat(portletComponentId));
@@ -132,67 +133,6 @@ public class SoyPortletHelperTest {
 			soyPortletHelper.getTemplateNamespace(path));
 	}
 
-	protected Template createMockedTemplate() {
-		Template template = mock(Template.class);
-
-		final Map<String, Object> context = new HashMap<>();
-
-		when(
-			template.put(Matchers.anyString(), Matchers.any())
-		).then(
-			new Answer<Void>() {
-
-				@Override
-				public Void answer(InvocationOnMock invocationOnMock)
-					throws Throwable {
-
-					Object[] args = invocationOnMock.getArguments();
-
-					context.put(String.valueOf(args[0]), args[1]);
-
-					return null;
-				}
-
-			}
-		);
-
-		when(
-			template.get(Matchers.anyString())
-		).then(
-			new Answer<Object>() {
-
-				@Override
-				public Object answer(InvocationOnMock invocationOnMock)
-					throws Throwable {
-
-					Object[] args = invocationOnMock.getArguments();
-
-					return context.get(String.valueOf(args[0]));
-				}
-
-			}
-		);
-
-		when(
-			template.getKeys()
-		).then(
-			new Answer<String[]>() {
-
-				@Override
-				public String[] answer(InvocationOnMock invocationOnMock)
-					throws Throwable {
-
-					Set<String> keySet = context.keySet();
-
-					return keySet.toArray(new String[keySet.size()]);
-				}
-
-			}
-		);
-
-		return template;
-	}
-
 	protected void setUpHtmlUtil() {
 		HtmlUtil htmlUtil = new HtmlUtil();
 
@@ -203,6 +143,35 @@ public class SoyPortletHelperTest {
 		JSONFactoryUtil jsonFactoryUtil = new JSONFactoryUtil();
 
 		jsonFactoryUtil.setJSONFactory(new JSONFactoryImpl());
+	}
+
+	private static class MockTemplate
+		extends HashMap<String, Object> implements Template {
+
+		@Override
+		public void doProcessTemplate(Writer writer) {
+		}
+
+		@Override
+		public Object get(String key) {
+			return super.get(key);
+		}
+
+		@Override
+		public String[] getKeys() {
+			Set<String> keys = keySet();
+
+			return keys.toArray(new String[keys.size()]);
+		}
+
+		@Override
+		public void prepare(HttpServletRequest request) {
+		}
+
+		@Override
+		public void processTemplate(Writer writer) {
+		}
+
 	}
 
 }
