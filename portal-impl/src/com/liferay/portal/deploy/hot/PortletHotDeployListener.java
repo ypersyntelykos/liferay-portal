@@ -63,7 +63,6 @@ import com.liferay.registry.ServiceRegistration;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -212,11 +211,7 @@ public class PortletHotDeployListener extends BaseHotDeployListener {
 
 		ClassLoader classLoader = hotDeployEvent.getContextClassLoader();
 
-		Iterator<Portlet> itr = portlets.iterator();
-
-		while (itr.hasNext()) {
-			Portlet portlet = itr.next();
-
+		for (Portlet portlet : portlets) {
 			PortletBag portletBag = PortletBagPool.get(
 				portlet.getRootPortletId());
 
