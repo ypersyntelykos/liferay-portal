@@ -888,16 +888,9 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 
 		try {
 			for (Map.Entry<String, Portlet> entry : portletsMap.entrySet()) {
-				Portlet portlet = _portletsMap.remove(entry.getKey());
+				_removePortlet(entry.getKey());
 
-				if (portlet != null) {
-					PortletInstanceFactoryUtil.clear(portlet);
-
-					PortletConfigFactoryUtil.destroy(portlet);
-					PortletContextFactoryUtil.destroy(portlet);
-				}
-
-				portlet = entry.getValue();
+				Portlet portlet = entry.getValue();
 
 				portletBagFactory.create(portlet, true);
 
@@ -918,14 +911,7 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 			// Clean up portlets added prior to error
 
 			for (Map.Entry<String, Portlet> entry : portletsMap.entrySet()) {
-				Portlet portlet = _portletsMap.remove(entry.getKey());
-
-				if (portlet != null) {
-					PortletInstanceFactoryUtil.clear(portlet);
-
-					PortletConfigFactoryUtil.destroy(portlet);
-					PortletContextFactoryUtil.destroy(portlet);
-				}
+				_removePortlet(entry.getKey());
 			}
 
 			return Collections.emptyList();
@@ -2598,6 +2584,17 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 			spriteFileName);
 
 		portletApp.setSpriteImages(spriteFileName, spriteProperties);
+	}
+
+	private void _removePortlet(String portletId) {
+		Portlet portlet = _portletsMap.remove(portletId);
+
+		if (portlet != null) {
+			PortletInstanceFactoryUtil.clear(portlet);
+
+			PortletConfigFactoryUtil.destroy(portlet);
+			PortletContextFactoryUtil.destroy(portlet);
+		}
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
