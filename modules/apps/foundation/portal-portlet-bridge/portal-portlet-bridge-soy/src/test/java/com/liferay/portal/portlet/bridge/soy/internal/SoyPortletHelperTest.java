@@ -95,6 +95,7 @@ public class SoyPortletHelperTest {
 
 		String portletComponentId = portletNamespace.concat("PortletComponent");
 
+		jsonObject.put(TemplateConstants.NAMESPACE, portletNamespace);
 		jsonObject.put("element", StringPool.POUND.concat(portletComponentId));
 		jsonObject.put("id", portletComponentId);
 
@@ -109,7 +110,7 @@ public class SoyPortletHelperTest {
 
 		Template template = new MockTemplate();
 
-		template.put(TemplateConstants.NAMESPACE, StringUtil.randomString());
+		template.put(TemplateConstants.NAMESPACE, portletNamespace);
 		template.put("element", StringPool.POUND.concat(portletComponentId));
 		template.put("id", portletComponentId);
 		template.put("key 1", "value 1");
