@@ -870,23 +870,16 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 								"not have matching entries in portlet.xml");
 				}
 			}
-		}
-		catch (Exception e) {
-			_log.error(e, e);
 
-			return Collections.emptyList();
-		}
+			PortletBagFactory portletBagFactory = new PortletBagFactory();
 
-		PortletBagFactory portletBagFactory = new PortletBagFactory();
+			portletBagFactory.setClassLoader(
+				ClassLoaderPool.getClassLoader(servletContextName));
+			portletBagFactory.setServletContext(servletContext);
+			portletBagFactory.setWARFile(true);
 
-		portletBagFactory.setClassLoader(
-			ClassLoaderPool.getClassLoader(servletContextName));
-		portletBagFactory.setServletContext(servletContext);
-		portletBagFactory.setWARFile(true);
+			// Return the new portlets
 
-		// Return the new portlets
-
-		try {
 			for (Map.Entry<String, Portlet> entry : portletsMap.entrySet()) {
 				_removePortlet(entry.getKey());
 
