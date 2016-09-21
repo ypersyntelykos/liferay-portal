@@ -14,20 +14,21 @@
 
 package com.liferay.portal.portlet.bridge.soy.internal;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 import com.liferay.portal.json.JSONFactoryImpl;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.template.Template;
 import com.liferay.portal.kernel.template.TemplateConstants;
 import com.liferay.portal.kernel.util.HtmlUtil;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.util.HtmlImpl;
 
 import java.io.Writer;
+
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -38,8 +39,6 @@ import javax.servlet.http.HttpServletRequest;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
-import org.mockito.Matchers;
 
 import org.osgi.framework.Bundle;
 
@@ -58,14 +57,10 @@ public class SoyPortletHelperTest {
 	public void testgetPortletJavaScriptWithBundleWithoutPackageFile()
 		throws Exception {
 
-		Bundle bundle = mock(Bundle.class);
-
-		SoyPortletHelper soyPortletHelper = new SoyPortletHelper(bundle);
-
-		Template template = mock(Template.class);
+		SoyPortletHelper soyPortletHelper = new SoyPortletHelper(_mockBundle);
 
 		String portletJavaScript = soyPortletHelper.getPortletJavaScript(
-			template, "View", StringUtil.randomString(),
+			_mockTemplate, "View", StringUtil.randomString(),
 			Collections.<String>emptySet());
 
 		Assert.assertEquals(StringPool.BLANK, portletJavaScript);
@@ -75,15 +70,26 @@ public class SoyPortletHelperTest {
 	public void testgetPortletJavaScriptWithBundleWithPackageFile()
 		throws Exception {
 
-		Bundle bundle = mock(Bundle.class);
+		Bundle bundle = (Bundle)ProxyUtil.newProxyInstance(
+			Bundle.class.getClassLoader(), new Class<?>[] {Bundle.class},
+			new InvocationHandler() {
 
-		Class<?> clazz = getClass();
+				@Override
+				public Object invoke(Object proxy, Method method, Object[] args)
+					throws NoSuchMethodException {
 
-		when(
-			bundle.getEntry(Matchers.eq("package.json"))
-		).thenReturn(
-			clazz.getResource("dependencies/package.json")
-		);
+					if (method.equals(
+							Bundle.class.getMethod("getEntry", String.class)) &&
+						"package.json".equals(args[0])) {
+
+						return SoyPortletHelperTest.class.getResource(
+							"dependencies/package.json");
+					}
+
+					return null;
+				}
+
+			});
 
 		SoyPortletHelper soyPortletHelper = new SoyPortletHelper(bundle);
 
@@ -123,11 +129,9 @@ public class SoyPortletHelperTest {
 
 	@Test
 	public void testTemplateNamespace() throws Exception {
-		Bundle bundle = mock(Bundle.class);
-
 		String path = "View";
 
-		SoyPortletHelper soyPortletHelper = new SoyPortletHelper(bundle);
+		SoyPortletHelper soyPortletHelper = new SoyPortletHelper(_mockBundle);
 
 		Assert.assertEquals(
 			path.concat(".render"),
@@ -145,6 +149,28 @@ public class SoyPortletHelperTest {
 
 		jsonFactoryUtil.setJSONFactory(new JSONFactoryImpl());
 	}
+
+	private final Bundle _mockBundle = (Bundle)ProxyUtil.newProxyInstance(
+		Bundle.class.getClassLoader(), new Class<?>[] {Bundle.class},
+		new InvocationHandler() {
+
+			@Override
+			public Object invoke(Object proxy, Method method, Object[] args) {
+				return null;
+			}
+
+		});
+
+	private final Template _mockTemplate = (Template)ProxyUtil.newProxyInstance(
+		Template.class.getClassLoader(), new Class<?>[] {Template.class},
+		new InvocationHandler() {
+
+			@Override
+			public Object invoke(Object proxy, Method method, Object[] args) {
+				return null;
+			}
+
+		});
 
 	private static class MockTemplate
 		extends HashMap<String, Object> implements Template {
