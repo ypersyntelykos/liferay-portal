@@ -844,29 +844,30 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 			Set<String> liferayPortletIds = readLiferayPortletXML(
 				servletContextName, servletContext, xmls[2], portletsMap);
 
-			// Check for missing entries in liferay-portlet.xml
+			if (_log.isWarnEnabled()) {
 
-			for (String portletId : portletsMap.keySet()) {
-				if (_log.isWarnEnabled() &&
-					!liferayPortletIds.contains(portletId)) {
+				// Check for missing entries in liferay-portlet.xml
 
+				Set<String> portletIds = new HashSet<>(portletsMap.keySet());
+
+				portletIds.removeAll(liferayPortletIds);
+
+				if (!portletIds.isEmpty()) {
 					_log.warn(
-						"Portlet with the name " + portletId +
-							" is described in portlet.xml but does not " +
-								"have a matching entry in liferay-portlet.xml");
+						"Portlets with the names " + portletIds +
+							" are described in portlet.xml but do not " +
+								"have matching entries in liferay-portlet.xml");
 				}
-			}
 
-			// Check for missing entries in portlet.xml
+				// Check for missing entries in portlet.xml
 
-			for (String portletId : liferayPortletIds) {
-				if (_log.isWarnEnabled() &&
-					!portletsMap.containsKey(portletId)) {
+				liferayPortletIds.removeAll(portletsMap.keySet());
 
+				if (!liferayPortletIds.isEmpty()) {
 					_log.warn(
-						"Portlet with the name " + portletId +
-							" is described in liferay-portlet.xml but does " +
-								"not have a matching entry in portlet.xml");
+						"Portlets with the names " + liferayPortletIds +
+							" are described in liferay-portlet.xml but do " +
+								"not have matching entries in portlet.xml");
 				}
 			}
 		}
