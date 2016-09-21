@@ -14,6 +14,8 @@
 
 package com.liferay.portal.deploy.hot;
 
+import aQute.bnd.annotation.ProviderType;
+
 import com.liferay.portal.apache.bridges.struts.LiferayServletContextProvider;
 import com.liferay.portal.kernel.configuration.Configuration;
 import com.liferay.portal.kernel.configuration.ConfigurationFactoryUtil;
@@ -84,6 +86,7 @@ import org.apache.portals.bridges.struts.StrutsPortlet;
  * @author Ivica Cardic
  * @author Raymond Augé
  */
+@ProviderType
 public class PortletHotDeployListener extends BaseHotDeployListener {
 
 	@Override
