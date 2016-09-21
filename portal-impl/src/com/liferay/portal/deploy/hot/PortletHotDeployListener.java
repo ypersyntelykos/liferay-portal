@@ -216,18 +216,20 @@ public class PortletHotDeployListener extends BaseHotDeployListener {
 		boolean strutsBridges = GetterUtil.getBoolean(
 			servletContext.getInitParameter("struts-bridges-context-provider"));
 
-		for (Portlet portlet : portlets) {
-			PortletBag portletBag = PortletBagPool.get(
-				portlet.getRootPortletId());
+		if (!strutsBridges) {
+			for (Portlet portlet : portlets) {
+				PortletBag portletBag = PortletBagPool.get(
+					portlet.getRootPortletId());
 
-			javax.portlet.Portlet portletInstance =
-				portletBag.getPortletInstance();
+				javax.portlet.Portlet portletInstance =
+					portletBag.getPortletInstance();
 
-			if (ClassUtil.isSubclass(
-					portletInstance.getClass(),
-					StrutsPortlet.class.getName())) {
+				if (ClassUtil.isSubclass(
+						portletInstance.getClass(),
+						StrutsPortlet.class.getName())) {
 
-				strutsBridges = true;
+					strutsBridges = true;
+				}
 			}
 		}
 
