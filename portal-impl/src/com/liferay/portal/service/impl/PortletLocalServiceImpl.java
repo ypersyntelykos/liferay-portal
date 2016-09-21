@@ -829,8 +829,6 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 
 		Map<String, Portlet> portletsMap = null;
 
-		Set<String> liferayPortletIds = null;
-
 		try {
 			Set<String> servletURLPatterns = readWebXML(xmls[3]);
 
@@ -843,37 +841,39 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 					servletContextName, servletContext, xmls[1],
 					servletURLPatterns, pluginPackage));
 
-			liferayPortletIds = readLiferayPortletXML(
+			Set<String> liferayPortletIds = readLiferayPortletXML(
 				servletContextName, servletContext, xmls[2], portletsMap);
+
+			// Check for missing entries in liferay-portlet.xml
+
+			for (String portletId : portletsMap.keySet()) {
+				if (_log.isWarnEnabled() &&
+					!liferayPortletIds.contains(portletId)) {
+
+					_log.warn(
+						"Portlet with the name " + portletId +
+							" is described in portlet.xml but does not " +
+								"have a matching entry in liferay-portlet.xml");
+				}
+			}
+
+			// Check for missing entries in portlet.xml
+
+			for (String portletId : liferayPortletIds) {
+				if (_log.isWarnEnabled() &&
+					!portletsMap.containsKey(portletId)) {
+
+					_log.warn(
+						"Portlet with the name " + portletId +
+							" is described in liferay-portlet.xml but does " +
+								"not have a matching entry in portlet.xml");
+				}
+			}
 		}
 		catch (Exception e) {
 			_log.error(e, e);
 
 			return Collections.emptyList();
-		}
-
-		// Check for missing entries in liferay-portlet.xml
-
-		for (String portletId : portletsMap.keySet()) {
-			if (_log.isWarnEnabled() &&
-				!liferayPortletIds.contains(portletId)) {
-
-				_log.warn(
-					"Portlet with the name " + portletId +
-						" is described in portlet.xml but does not " +
-							"have a matching entry in liferay-portlet.xml");
-			}
-		}
-
-		// Check for missing entries in portlet.xml
-
-		for (String portletId : liferayPortletIds) {
-			if (_log.isWarnEnabled() && !portletsMap.containsKey(portletId)) {
-				_log.warn(
-					"Portlet with the name " + portletId +
-						" is described in liferay-portlet.xml but does " +
-							"not have a matching entry in portlet.xml");
-			}
 		}
 
 		PortletBagFactory portletBagFactory = new PortletBagFactory();
