@@ -207,23 +207,18 @@ public class PortletHotDeployListener extends BaseHotDeployListener {
 			servletContextName, servletContext, xmls,
 			hotDeployEvent.getPluginPackage());
 
-		boolean portletAppInitialized = false;
+		ClassLoader classLoader = hotDeployEvent.getContextClassLoader();
+
+		if (!portlets.isEmpty()) {
+			initPortletApp(servletContextName, servletContext, classLoader);
+		}
 
 		boolean strutsBridges = GetterUtil.getBoolean(
 			servletContext.getInitParameter("struts-bridges-context-provider"));
 
-		ClassLoader classLoader = hotDeployEvent.getContextClassLoader();
-
 		for (Portlet portlet : portlets) {
 			PortletBag portletBag = PortletBagPool.get(
 				portlet.getRootPortletId());
-
-			if (!portletAppInitialized) {
-				initPortletApp(
-					servletContextName, servletContext, classLoader, portlet);
-
-				portletAppInitialized = true;
-			}
 
 			javax.portlet.Portlet portletInstance =
 				portletBag.getPortletInstance();
@@ -392,18 +387,19 @@ public class PortletHotDeployListener extends BaseHotDeployListener {
 
 	protected void initPortletApp(
 			String servletContextName, ServletContext servletContext,
-			ClassLoader classLoader, Portlet portlet)
+			ClassLoader classLoader)
 		throws Exception {
 
-		PortletContextBag portletContextBag = PortletContextBagPool.get(
+		PortletApp portletApp = PortletLocalServiceUtil.getPortletApp(
 			servletContextName);
-
-		PortletApp portletApp = portlet.getPortletApp();
 
 		servletContext.setAttribute(PortletServlet.PORTLET_APP, portletApp);
 
 		Map<String, String> customUserAttributes =
 			portletApp.getCustomUserAttributes();
+
+		PortletContextBag portletContextBag = PortletContextBagPool.get(
+			servletContextName);
 
 		for (Map.Entry<String, String> entry :
 				customUserAttributes.entrySet()) {
