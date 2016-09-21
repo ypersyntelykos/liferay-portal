@@ -333,7 +333,13 @@ public class StringBundler implements Serializable {
 
 		public void ensureCapacity(int newLength) {
 			if (_value.length < newLength) {
-				_value = new char[newLength];
+				int newCapacity = _value.length * 2 + 2;
+
+				if ((newCapacity - newLength) < 0) {
+					newCapacity = newLength;
+				}
+
+				_value = new char[newCapacity];
 			}
 		}
 
