@@ -207,7 +207,8 @@ public class PortletHotDeployListener extends BaseHotDeployListener {
 
 		boolean portletAppInitialized = false;
 
-		boolean strutsBridges = false;
+		boolean strutsBridges = GetterUtil.getBoolean(
+			servletContext.getInitParameter("struts-bridges-context-provider"));
 
 		ClassLoader classLoader = hotDeployEvent.getContextClassLoader();
 
@@ -231,12 +232,6 @@ public class PortletHotDeployListener extends BaseHotDeployListener {
 
 				strutsBridges = true;
 			}
-		}
-
-		if (!strutsBridges) {
-			strutsBridges = GetterUtil.getBoolean(
-				servletContext.getInitParameter(
-					"struts-bridges-context-provider"));
 		}
 
 		if (strutsBridges) {
