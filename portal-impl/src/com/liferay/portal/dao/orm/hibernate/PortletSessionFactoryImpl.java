@@ -19,6 +19,7 @@ import com.liferay.portal.kernel.dao.orm.ORMException;
 import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.util.BooleanWrapper;
 import com.liferay.portal.security.lang.DoPrivilegedUtil;
 import com.liferay.portal.spring.hibernate.PortletHibernateConfiguration;
 import com.liferay.portal.util.PropsValues;
@@ -28,6 +29,7 @@ import java.sql.Connection;
 import javax.sql.DataSource;
 
 import org.hibernate.SessionFactory;
+import org.hibernate.jdbc.Work;
 
 /**
  * @author Shuyang Zhou
@@ -53,14 +55,36 @@ public class PortletSessionFactoryImpl extends SessionFactoryImpl {
 		org.hibernate.Session session = null;
 
 		if (PropsValues.SPRING_HIBERNATE_SESSION_DELEGATED) {
-			Connection connection = CurrentConnectionUtil.getConnection(
+			final Connection connection = CurrentConnectionUtil.getConnection(
 				getDataSource());
 
 			if (connection == null) {
 				session = sessionFactory.getCurrentSession();
 			}
 			else {
-				session = sessionFactory.openSession(connection);
+				org.hibernate.Session currentSession =
+					sessionFactory.getCurrentSession();
+
+				final BooleanWrapper sameConnection = new BooleanWrapper();
+
+				currentSession.doWork(
+					new Work() {
+
+						@Override
+						public void execute(Connection currentConnection) {
+							if (currentConnection == connection) {
+								sameConnection.setValue(true);
+							}
+						}
+
+					});
+
+				if (sameConnection.getValue()) {
+					session = currentSession;
+				}
+				else {
+					session = sessionFactory.openSession(connection);
+				}
 			}
 		}
 		else {
