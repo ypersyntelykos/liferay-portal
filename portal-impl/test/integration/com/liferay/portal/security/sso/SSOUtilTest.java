@@ -22,6 +22,7 @@ import com.liferay.portal.util.PrefsPropsUtil;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.portlet.PortletPreferences;
 
@@ -46,14 +47,28 @@ public class SSOUtilTest {
 
 	@Before
 	public void setUp() throws Exception {
-		_setPortletPreferencesValue(1, true);
-		_setPortletPreferencesValue(2, false);
+		_setLoginDialogDisable(1, true);
+		_setLoginDialogDisable(2, false);
 	}
 
 	@After
 	public void tearDown() throws Exception {
-		_restorePortletPreferencesValue(1);
-		_restorePortletPreferencesValue(2);
+		for (Entry<Long, String> entry : _oldLoginDialogDisableds.entrySet()) {
+			PortletPreferences portletPreferences =
+				PrefsPropsUtil.getPreferences(entry.getKey());
+
+			String disabledString = entry.getValue();
+
+			if (disabledString == null) {
+				portletPreferences.reset(PropsKeys.LOGIN_DIALOG_DISABLED);
+			}
+			else {
+				portletPreferences.setValue(
+					PropsKeys.LOGIN_DIALOG_DISABLED, disabledString);
+			}
+
+			portletPreferences.store();
+		}
 	}
 
 	@Test
@@ -88,35 +103,22 @@ public class SSOUtilTest {
 		Assert.assertFalse(SSOUtil.isSessionRedirectOnExpire(2));
 	}
 
-	private void _restorePortletPreferencesValue(long companyID)
+	private void _setLoginDialogDisable(long companyId, boolean disabled)
 		throws Exception {
 
 		PortletPreferences portletPreferences = PrefsPropsUtil.getPreferences(
-			companyID);
+			companyId);
 
-		portletPreferences.setValue(
-			PropsKeys.LOGIN_DIALOG_DISABLED,
-			_oldLoginDialogDisabled.get(companyID));
-
-		portletPreferences.store();
-	}
-
-	private void _setPortletPreferencesValue(long companyID, boolean value)
-		throws Exception {
-
-		PortletPreferences portletPreferences = PrefsPropsUtil.getPreferences(
-			companyID);
-
-		_oldLoginDialogDisabled.put(
-			companyID,
+		_oldLoginDialogDisableds.put(
+			companyId,
 			portletPreferences.getValue(PropsKeys.LOGIN_DIALOG_DISABLED, null));
 
 		portletPreferences.setValue(
-			PropsKeys.LOGIN_DIALOG_DISABLED, String.valueOf(value));
+			PropsKeys.LOGIN_DIALOG_DISABLED, String.valueOf(disabled));
 
 		portletPreferences.store();
 	}
 
-	private final Map<Long, String> _oldLoginDialogDisabled = new HashMap<>();
+	private final Map<Long, String> _oldLoginDialogDisableds = new HashMap<>();
 
 }
