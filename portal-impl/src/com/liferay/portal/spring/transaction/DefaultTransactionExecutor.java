@@ -14,8 +14,6 @@
 
 package com.liferay.portal.spring.transaction;
 
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.transaction.TransactionLifecycleManager;
 
 import org.aopalliance.intercept.MethodInvocation;
@@ -41,23 +39,15 @@ public class DefaultTransactionExecutor
 			platformTransactionManager.commit(
 				transactionStatusAdapter.getTransactionStatus());
 		}
-		catch (RuntimeException re) {
-			_log.error(
-				"Application exception overridden by commit exception", re);
+		catch (Throwable t) {
+			throwable = t;
 
-			throwable = re;
-
-			throw re;
-		}
-		catch (Error e) {
-			_log.error("Application exception overridden by commit error", e);
-
-			throwable = e;
-
-			throw e;
+			throw t;
 		}
 		finally {
-			if (throwable != null) {
+			if ((throwable != null) &&
+				transactionAttributeAdapter.rollbackOn(throwable)) {
+
 				TransactionLifecycleManager.fireTransactionRollbackedEvent(
 					transactionAttributeAdapter, transactionStatusAdapter,
 					throwable);
@@ -110,22 +100,10 @@ public class DefaultTransactionExecutor
 				platformTransactionManager.rollback(
 					transactionStatusAdapter.getTransactionStatus());
 			}
-			catch (RuntimeException re) {
-				re.addSuppressed(throwable);
+			catch (Throwable t) {
+				t.addSuppressed(throwable);
 
-				_log.error(
-					"Application exception overridden by rollback exception",
-					re);
-
-				throw re;
-			}
-			catch (Error e) {
-				e.addSuppressed(throwable);
-
-				_log.error(
-					"Application exception overridden by rollback error", e);
-
-				throw e;
+				throw t;
 			}
 			finally {
 				TransactionLifecycleManager.fireTransactionRollbackedEvent(
@@ -157,8 +135,5 @@ public class DefaultTransactionExecutor
 
 		return transactionStatusAdapter;
 	}
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		DefaultTransactionExecutor.class);
 
 }
