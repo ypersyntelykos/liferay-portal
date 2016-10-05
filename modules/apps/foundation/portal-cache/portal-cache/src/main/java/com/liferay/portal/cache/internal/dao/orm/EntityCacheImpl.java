@@ -107,8 +107,10 @@ public class EntityCacheImpl
 
 		boolean mvcc = false;
 
-		if (MVCCModel.class.isAssignableFrom(clazz)) {
-			mvcc = _valueObjectMVCCEntityCacheEnabled;
+		if (_valueObjectMVCCEntityCacheEnabled &&
+			MVCCModel.class.isAssignableFrom(clazz)) {
+
+			mvcc = true;
 		}
 
 		portalCache =
