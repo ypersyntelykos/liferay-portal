@@ -35,4 +35,12 @@ public class LastSessionRecorderHibernateTransactionManager
 		return super.doGetTransaction();
 	}
 
+	static {
+		try {
+			Class.forName(SpringHibernateThreadLocalUtil.class.getName());
+		}
+		catch (ClassNotFoundException cnfe) {
+			throw new ExceptionInInitializerError(cnfe);
+		}
+	}
 }
