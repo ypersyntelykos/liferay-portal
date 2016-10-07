@@ -22,11 +22,8 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.messaging.BaseDestination;
 import com.liferay.portal.kernel.messaging.Destination;
 import com.liferay.portal.kernel.messaging.DestinationNames;
-import com.liferay.portal.kernel.messaging.Message;
 import com.liferay.portal.kernel.messaging.MessageBus;
-import com.liferay.portal.kernel.messaging.MessageBusEventListener;
 import com.liferay.portal.kernel.messaging.MessageBusUtil;
-import com.liferay.portal.kernel.messaging.MessageListener;
 import com.liferay.portal.kernel.messaging.SynchronousDestination;
 import com.liferay.portal.kernel.messaging.sender.SynchronousMessageSender;
 import com.liferay.portal.kernel.model.Portlet;
@@ -50,6 +47,7 @@ import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.LocaleThreadLocal;
 import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.ReflectionUtil;
 import com.liferay.portal.model.impl.PortletImpl;
 import com.liferay.portal.repository.liferayrepository.LiferayRepository;
@@ -61,8 +59,10 @@ import com.liferay.registry.RegistryUtil;
 import com.liferay.registry.dependency.ServiceDependencyListener;
 import com.liferay.registry.dependency.ServiceDependencyManager;
 
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
@@ -70,8 +70,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+
+import org.osgi.framework.Constants;
 
 /**
  * @author Brian Wing Shun Chan
@@ -265,36 +267,29 @@ public class ServiceTestUtil {
 
 		Registry registry = RegistryUtil.getRegistry();
 
-		MessageBusWrapper messageBusWrapper = new MessageBusWrapper(
-			registry.getService(MessageBus.class));
-
 		HashMap<String, Object> messageBusProperties = new HashMap<>();
 
-		messageBusProperties.put("service.ranking", Integer.MAX_VALUE);
+		messageBusProperties.put(Constants.SERVICE_RANKING, Integer.MAX_VALUE);
 
 		registry.registerService(
-			MessageBus.class, messageBusWrapper, messageBusProperties);
+			MessageBus.class, _messageBusWrapper, messageBusProperties);
 
-		if (MessageBusUtil.getMessageBus() != messageBusWrapper) {
+		if (MessageBusUtil.getMessageBus() != _messageBusWrapper) {
 			throw new IllegalStateException("MessageBus should be set");
 		}
-
-		PortalExecutorManagerWrapper portalExecutorManagerWrapper =
-			new PortalExecutorManagerWrapper(
-				registry.getService(PortalExecutorManager.class));
 
 		HashMap<String, Object> portalExecutorManagerProperties =
 			new HashMap<>();
 
 		portalExecutorManagerProperties.put(
-			"service.ranking", Integer.MAX_VALUE);
+			Constants.SERVICE_RANKING, Integer.MAX_VALUE);
 
 		registry.registerService(
-			PortalExecutorManager.class, portalExecutorManagerWrapper,
+			PortalExecutorManager.class, _portalExecutorManagerWrapper,
 			portalExecutorManagerProperties);
 
 		if (PortalExecutorManagerUtil.getPortalExecutorManager() !=
-				portalExecutorManagerWrapper) {
+				_portalExecutorManagerWrapper) {
 
 			throw new IllegalStateException(
 				"PortalExecutorManager should be set");
@@ -449,187 +444,80 @@ public class ServiceTestUtil {
 	private static final Log _log = LogFactoryUtil.getLog(
 		ServiceTestUtil.class);
 
-	private static class MessageBusWrapper implements MessageBus {
+	private static final MessageBus _messageBusWrapper =
+		(MessageBus)ProxyUtil.newProxyInstance(
+			MessageBus.class.getClassLoader(),
+			new Class<?>[] {MessageBus.class},
 
-		@Override
-		public void addDestination(Destination destination) {
-			_messageBus.addDestination(destination);
-		}
+			new InvocationHandler() {
 
-		@Override
-		public boolean addMessageBusEventListener(
-			MessageBusEventListener messageBusEventListener) {
+				@Override
+				public Object invoke(Object proxy, Method method, Object[] args)
+					throws Throwable {
 
-			return _messageBus.addMessageBusEventListener(
-				messageBusEventListener);
-		}
+					if ("shutdown".equals(method.getName()) &&
+						(args.length == 1)) {
 
-		@Override
-		public Destination getDestination(String destinationName) {
-			return _messageBus.getDestination(destinationName);
-		}
-
-		@Override
-		public int getDestinationCount() {
-			return _messageBus.getDestinationCount();
-		}
-
-		@Override
-		public Collection<String> getDestinationNames() {
-			return _messageBus.getDestinationNames();
-		}
-
-		@Override
-		public Collection<Destination> getDestinations() {
-			return _messageBus.getDestinations();
-		}
-
-		@Override
-		public boolean hasDestination(String destinationName) {
-			return _messageBus.hasDestination(destinationName);
-		}
-
-		@Override
-		public boolean hasMessageListener(String destinationName) {
-			return _messageBus.hasMessageListener(destinationName);
-		}
-
-		@Override
-		public boolean registerMessageListener(
-			String destinationName, MessageListener messageListener) {
-
-			return _messageBus.registerMessageListener(
-				destinationName, messageListener);
-		}
-
-		@Override
-		public Destination removeDestination(String destinationName) {
-			return _messageBus.removeDestination(destinationName);
-		}
-
-		@Override
-		public Destination removeDestination(
-			String destinationName, boolean closeOnRemove) {
-
-			return _messageBus.removeDestination(
-				destinationName, closeOnRemove);
-		}
-
-		@Override
-		public boolean removeMessageBusEventListener(
-			MessageBusEventListener messageBusEventListener) {
-
-			return _messageBus.removeMessageBusEventListener(
-				messageBusEventListener);
-		}
-
-		@Override
-		public void replace(Destination destination) {
-			_messageBus.replace(destination);
-		}
-
-		@Override
-		public void replace(Destination destination, boolean closeOnReplace) {
-			_messageBus.replace(destination, closeOnReplace);
-		}
-
-		@Override
-		public void sendMessage(String destinationName, Message message) {
-			_messageBus.sendMessage(destinationName, message);
-		}
-
-		@Override
-		public void shutdown() {
-			_messageBus.shutdown();
-		}
-
-		@Override
-		public void shutdown(boolean force) {
-			_messageBus.shutdown(false);
-		}
-
-		@Override
-		public boolean unregisterMessageListener(
-			String destinationName, MessageListener messageListener) {
-
-			return _messageBus.unregisterMessageListener(
-				destinationName, messageListener);
-		}
-
-		private MessageBusWrapper(MessageBus messageBus) {
-			_messageBus = messageBus;
-		}
-
-		private final MessageBus _messageBus;
-
-	}
-
-	private static class PortalExecutorManagerWrapper
-		implements PortalExecutorManager {
-
-		@Override
-		public ThreadPoolExecutor getPortalExecutor(String name) {
-			return _portalExecutorManager.getPortalExecutor(name);
-		}
-
-		@Override
-		public ThreadPoolExecutor getPortalExecutor(
-			String name, boolean createIfAbsent) {
-
-			return _portalExecutorManager.getPortalExecutor(
-				name, createIfAbsent);
-		}
-
-		@Override
-		public ThreadPoolExecutor registerPortalExecutor(
-			String name, ThreadPoolExecutor threadPoolExecutor) {
-
-			return _portalExecutorManager.registerPortalExecutor(
-				name, threadPoolExecutor);
-		}
-
-		@Override
-		public void shutdown() {
-			_portalExecutorManager.shutdown();
-		}
-
-		@Override
-		public void shutdown(boolean interrupt) {
-			ConcurrentMap<String, ThreadPoolExecutor> threadPoolExecutors =
-				ReflectionTestUtil.getFieldValue(
-					_portalExecutorManager, "_threadPoolExecutors");
-
-			for (Map.Entry<String, ThreadPoolExecutor> entry :
-					threadPoolExecutors.entrySet()) {
-
-				String name = entry.getKey();
-				ThreadPoolExecutor threadPoolExecutor = entry.getValue();
-
-				threadPoolExecutor.shutdown();
-
-				try {
-					if (!threadPoolExecutor.awaitTermination(
-							TestPropsValues.CI_TEST_TIMEOUT_TIME,
-							TimeUnit.MILLISECONDS)) {
-
-						throw new IllegalStateException(
-							"Failed to terminate thread pool executor " + name);
+						args[0] = Boolean.FALSE;
 					}
+
+					return method.invoke(_messageBus, args);
 				}
-				catch (InterruptedException ie) {
-					ReflectionUtil.throwException(ie);
+
+				private final MessageBus _messageBus =
+					MessageBusUtil.getMessageBus();
+
+			});
+
+	private static final PortalExecutorManager _portalExecutorManagerWrapper =
+		(PortalExecutorManager)ProxyUtil.newProxyInstance(
+			PortalExecutorManager.class.getClassLoader(),
+			new Class<?>[] {PortalExecutorManager.class},
+			new InvocationHandler() {
+
+				@Override
+				public Object invoke(Object proxy, Method method, Object[] args)
+					throws Throwable {
+
+					if (!"shutdown".equals(method.getName()) ||
+						(args.length != 1)) {
+
+						return method.invoke(_portalExecutorManager, args);
+					}
+
+					Map<String, ThreadPoolExecutor> threadPoolExecutors =
+						ReflectionTestUtil.getFieldValue(
+							_portalExecutorManager, "_threadPoolExecutors");
+
+					for (Map.Entry<String, ThreadPoolExecutor> entry :
+							threadPoolExecutors.entrySet()) {
+
+						ThreadPoolExecutor threadPoolExecutor =
+							entry.getValue();
+
+						threadPoolExecutor.shutdown();
+
+						try {
+							if (!threadPoolExecutor.awaitTermination(
+									TestPropsValues.CI_TEST_TIMEOUT_TIME,
+									TimeUnit.MILLISECONDS)) {
+
+								throw new TimeoutException(
+									"Thread pool executor " + entry.getKey() +
+										" termination waiting timeout");
+							}
+						}
+						catch (InterruptedException ie) {
+							ReflectionUtil.throwException(ie);
+						}
+					}
+
+					return null;
 				}
-			}
-		}
 
-		private PortalExecutorManagerWrapper(
-			PortalExecutorManager portalExecutorManager) {
+				private final PortalExecutorManager _portalExecutorManager =
+					PortalExecutorManagerUtil.getPortalExecutorManager();
 
-			_portalExecutorManager = portalExecutorManager;
-		}
-
-		private final PortalExecutorManager _portalExecutorManager;
-
-	}
+			});
 
 }
