@@ -757,7 +757,7 @@ public class CompanyLocalServiceTest {
 	static {
 		TransactionConfig.Builder builder = new TransactionConfig.Builder();
 
-		builder.setPropagation(Propagation.REQUIRES_NEW);
+		builder.setPropagation(Propagation.SUPPORTS);
 		builder.setReadOnly(true);
 		builder.setRollbackForClasses(Exception.class);
 
