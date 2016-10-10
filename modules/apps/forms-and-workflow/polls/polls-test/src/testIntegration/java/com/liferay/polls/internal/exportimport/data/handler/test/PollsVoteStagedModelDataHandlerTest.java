@@ -21,7 +21,6 @@ import com.liferay.polls.model.PollsVote;
 import com.liferay.polls.service.PollsChoiceLocalServiceUtil;
 import com.liferay.polls.service.PollsQuestionLocalServiceUtil;
 import com.liferay.polls.service.PollsVoteLocalServiceUtil;
-import com.liferay.polls.service.persistence.PollsChoiceUtil;
 import com.liferay.polls.util.test.PollsTestUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.StagedModel;
@@ -73,8 +72,6 @@ public class PollsVoteStagedModelDataHandlerTest
 
 		PollsChoice choice = PollsTestUtil.addChoice(
 			group.getGroupId(), question.getQuestionId());
-
-		PollsChoiceUtil.update(choice);
 
 		addDependentStagedModel(
 			dependentStagedModelsMap, PollsChoice.class, choice);
