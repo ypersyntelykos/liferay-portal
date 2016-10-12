@@ -16,7 +16,6 @@ package com.liferay.blogs.service;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.blogs.kernel.model.BlogsStatsUser;
 import com.liferay.blogs.model.BlogsStatsUser;
 
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
@@ -62,13 +61,6 @@ public interface BlogsStatsUserLocalService extends BaseLocalService,
 	 *
 	 * Never modify or reference this interface directly. Always use {@link BlogsStatsUserLocalServiceUtil} to access the blogs stats user local service. Add custom service methods to {@link com.liferay.blogs.service.impl.BlogsStatsUserLocalServiceImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public BlogsStatsUser getStatsUser(long groupId, long userId)
-		throws PortalException;
-
-	public BlogsStatsUser updateStatsUser(long groupId, long userId,
-		int ratingsTotalEntries, double ratingsTotalScore,
-		double ratingsAverageScore) throws PortalException;
 
 	/**
 	* Adds the blogs stats user to the database. Also notifies the appropriate model listeners.
@@ -121,6 +113,10 @@ public interface BlogsStatsUserLocalService extends BaseLocalService,
 	public BlogsStatsUser getBlogsStatsUser(long statsUserId)
 		throws PortalException;
 
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public BlogsStatsUser getStatsUser(long groupId, long userId)
+		throws PortalException;
+
 	/**
 	* Updates the blogs stats user in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
 	*
@@ -129,6 +125,10 @@ public interface BlogsStatsUserLocalService extends BaseLocalService,
 	*/
 	@Indexable(type = IndexableType.REINDEX)
 	public BlogsStatsUser updateBlogsStatsUser(BlogsStatsUser blogsStatsUser);
+
+	public BlogsStatsUser updateStatsUser(long groupId, long userId,
+		int ratingsTotalEntries, double ratingsTotalScore,
+		double ratingsAverageScore) throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public ActionableDynamicQuery getActionableDynamicQuery();

@@ -16,9 +16,11 @@ package com.liferay.blogs.service.base;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.blogs.kernel.service.persistence.BlogsEntryPersistence;
 import com.liferay.blogs.model.BlogsStatsUser;
 import com.liferay.blogs.service.BlogsStatsUserLocalService;
+import com.liferay.blogs.service.persistence.BlogsEntryFinder;
+import com.liferay.blogs.service.persistence.BlogsEntryPersistence;
+import com.liferay.blogs.service.persistence.BlogsStatsUserFinder;
 import com.liferay.blogs.service.persistence.BlogsStatsUserPersistence;
 
 import com.liferay.portal.kernel.bean.BeanReference;
@@ -352,6 +354,81 @@ public abstract class BlogsStatsUserLocalServiceBaseImpl
 	}
 
 	/**
+	 * Returns the blogs stats user finder.
+	 *
+	 * @return the blogs stats user finder
+	 */
+	public BlogsStatsUserFinder getBlogsStatsUserFinder() {
+		return blogsStatsUserFinder;
+	}
+
+	/**
+	 * Sets the blogs stats user finder.
+	 *
+	 * @param blogsStatsUserFinder the blogs stats user finder
+	 */
+	public void setBlogsStatsUserFinder(
+		BlogsStatsUserFinder blogsStatsUserFinder) {
+		this.blogsStatsUserFinder = blogsStatsUserFinder;
+	}
+
+	/**
+	 * Returns the blogs entry local service.
+	 *
+	 * @return the blogs entry local service
+	 */
+	public com.liferay.blogs.service.BlogsEntryLocalService getBlogsEntryLocalService() {
+		return blogsEntryLocalService;
+	}
+
+	/**
+	 * Sets the blogs entry local service.
+	 *
+	 * @param blogsEntryLocalService the blogs entry local service
+	 */
+	public void setBlogsEntryLocalService(
+		com.liferay.blogs.service.BlogsEntryLocalService blogsEntryLocalService) {
+		this.blogsEntryLocalService = blogsEntryLocalService;
+	}
+
+	/**
+	 * Returns the blogs entry persistence.
+	 *
+	 * @return the blogs entry persistence
+	 */
+	public BlogsEntryPersistence getBlogsEntryPersistence() {
+		return blogsEntryPersistence;
+	}
+
+	/**
+	 * Sets the blogs entry persistence.
+	 *
+	 * @param blogsEntryPersistence the blogs entry persistence
+	 */
+	public void setBlogsEntryPersistence(
+		BlogsEntryPersistence blogsEntryPersistence) {
+		this.blogsEntryPersistence = blogsEntryPersistence;
+	}
+
+	/**
+	 * Returns the blogs entry finder.
+	 *
+	 * @return the blogs entry finder
+	 */
+	public BlogsEntryFinder getBlogsEntryFinder() {
+		return blogsEntryFinder;
+	}
+
+	/**
+	 * Sets the blogs entry finder.
+	 *
+	 * @param blogsEntryFinder the blogs entry finder
+	 */
+	public void setBlogsEntryFinder(BlogsEntryFinder blogsEntryFinder) {
+		this.blogsEntryFinder = blogsEntryFinder;
+	}
+
+	/**
 	 * Returns the counter local service.
 	 *
 	 * @return the counter local service
@@ -405,44 +482,6 @@ public abstract class BlogsStatsUserLocalServiceBaseImpl
 	 */
 	public void setGroupPersistence(GroupPersistence groupPersistence) {
 		this.groupPersistence = groupPersistence;
-	}
-
-	/**
-	 * Returns the blogs entry local service.
-	 *
-	 * @return the blogs entry local service
-	 */
-	public com.liferay.blogs.kernel.service.BlogsEntryLocalService getBlogsEntryLocalService() {
-		return blogsEntryLocalService;
-	}
-
-	/**
-	 * Sets the blogs entry local service.
-	 *
-	 * @param blogsEntryLocalService the blogs entry local service
-	 */
-	public void setBlogsEntryLocalService(
-		com.liferay.blogs.kernel.service.BlogsEntryLocalService blogsEntryLocalService) {
-		this.blogsEntryLocalService = blogsEntryLocalService;
-	}
-
-	/**
-	 * Returns the blogs entry persistence.
-	 *
-	 * @return the blogs entry persistence
-	 */
-	public BlogsEntryPersistence getBlogsEntryPersistence() {
-		return blogsEntryPersistence;
-	}
-
-	/**
-	 * Sets the blogs entry persistence.
-	 *
-	 * @param blogsEntryPersistence the blogs entry persistence
-	 */
-	public void setBlogsEntryPersistence(
-		BlogsEntryPersistence blogsEntryPersistence) {
-		this.blogsEntryPersistence = blogsEntryPersistence;
 	}
 
 	public void afterPropertiesSet() {
@@ -501,16 +540,20 @@ public abstract class BlogsStatsUserLocalServiceBaseImpl
 	protected BlogsStatsUserLocalService blogsStatsUserLocalService;
 	@BeanReference(type = BlogsStatsUserPersistence.class)
 	protected BlogsStatsUserPersistence blogsStatsUserPersistence;
+	@BeanReference(type = BlogsStatsUserFinder.class)
+	protected BlogsStatsUserFinder blogsStatsUserFinder;
+	@BeanReference(type = com.liferay.blogs.service.BlogsEntryLocalService.class)
+	protected com.liferay.blogs.service.BlogsEntryLocalService blogsEntryLocalService;
+	@BeanReference(type = BlogsEntryPersistence.class)
+	protected BlogsEntryPersistence blogsEntryPersistence;
+	@BeanReference(type = BlogsEntryFinder.class)
+	protected BlogsEntryFinder blogsEntryFinder;
 	@ServiceReference(type = com.liferay.counter.kernel.service.CounterLocalService.class)
 	protected com.liferay.counter.kernel.service.CounterLocalService counterLocalService;
 	@ServiceReference(type = com.liferay.portal.kernel.service.GroupLocalService.class)
 	protected com.liferay.portal.kernel.service.GroupLocalService groupLocalService;
 	@ServiceReference(type = GroupPersistence.class)
 	protected GroupPersistence groupPersistence;
-	@ServiceReference(type = com.liferay.blogs.kernel.service.BlogsEntryLocalService.class)
-	protected com.liferay.blogs.kernel.service.BlogsEntryLocalService blogsEntryLocalService;
-	@ServiceReference(type = BlogsEntryPersistence.class)
-	protected BlogsEntryPersistence blogsEntryPersistence;
 	@ServiceReference(type = PersistedModelLocalServiceRegistry.class)
 	protected PersistedModelLocalServiceRegistry persistedModelLocalServiceRegistry;
 }

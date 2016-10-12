@@ -20,6 +20,7 @@ import com.liferay.asset.kernel.service.persistence.AssetLinkPersistence;
 import com.liferay.blogs.kernel.service.persistence.BlogsStatsUserPersistence;
 import com.liferay.blogs.model.BlogsEntry;
 import com.liferay.blogs.service.BlogsEntryService;
+import com.liferay.blogs.service.persistence.BlogsEntryFinder;
 import com.liferay.blogs.service.persistence.BlogsEntryPersistence;
 
 import com.liferay.expando.kernel.service.persistence.ExpandoRowPersistence;
@@ -123,6 +124,24 @@ public abstract class BlogsEntryServiceBaseImpl extends BaseServiceImpl
 	public void setBlogsEntryPersistence(
 		BlogsEntryPersistence blogsEntryPersistence) {
 		this.blogsEntryPersistence = blogsEntryPersistence;
+	}
+
+	/**
+	 * Returns the blogs entry finder.
+	 *
+	 * @return the blogs entry finder
+	 */
+	public BlogsEntryFinder getBlogsEntryFinder() {
+		return blogsEntryFinder;
+	}
+
+	/**
+	 * Sets the blogs entry finder.
+	 *
+	 * @param blogsEntryFinder the blogs entry finder
+	 */
+	public void setBlogsEntryFinder(BlogsEntryFinder blogsEntryFinder) {
+		this.blogsEntryFinder = blogsEntryFinder;
 	}
 
 	/**
@@ -897,6 +916,8 @@ public abstract class BlogsEntryServiceBaseImpl extends BaseServiceImpl
 	protected BlogsEntryService blogsEntryService;
 	@BeanReference(type = BlogsEntryPersistence.class)
 	protected BlogsEntryPersistence blogsEntryPersistence;
+	@BeanReference(type = BlogsEntryFinder.class)
+	protected BlogsEntryFinder blogsEntryFinder;
 	@ServiceReference(type = com.liferay.counter.kernel.service.CounterLocalService.class)
 	protected com.liferay.counter.kernel.service.CounterLocalService counterLocalService;
 	@ServiceReference(type = com.liferay.portal.kernel.service.CompanyLocalService.class)

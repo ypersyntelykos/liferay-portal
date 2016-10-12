@@ -27,11 +27,13 @@ import aQute.bnd.annotation.ProviderType;
  */
 @ProviderType
 public class BlogsStatsUserImpl extends BlogsStatsUserBaseImpl {
-	/*
+
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never reference this class directly. All methods that expect a blogs stats user model instance should use the {@link com.liferay.blogs.model.BlogsStatsUser} interface instead.
 	 */
 	public BlogsStatsUserImpl() {
 	}
+
 }

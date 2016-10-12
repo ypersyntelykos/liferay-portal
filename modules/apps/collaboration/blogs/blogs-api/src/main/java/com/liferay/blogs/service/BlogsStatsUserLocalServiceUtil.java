@@ -41,20 +41,6 @@ public class BlogsStatsUserLocalServiceUtil {
 	 *
 	 * Never modify this class directly. Add custom service methods to {@link com.liferay.blogs.service.impl.BlogsStatsUserLocalServiceImpl} and rerun ServiceBuilder to regenerate this class.
 	 */
-	public static com.liferay.blogs.kernel.model.BlogsStatsUser getStatsUser(
-		long groupId, long userId)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		return getService().getStatsUser(groupId, userId);
-	}
-
-	public static com.liferay.blogs.kernel.model.BlogsStatsUser updateStatsUser(
-		long groupId, long userId, int ratingsTotalEntries,
-		double ratingsTotalScore, double ratingsAverageScore)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		return getService()
-				   .updateStatsUser(groupId, userId, ratingsTotalEntries,
-			ratingsTotalScore, ratingsAverageScore);
-	}
 
 	/**
 	* Adds the blogs stats user to the database. Also notifies the appropriate model listeners.
@@ -62,8 +48,8 @@ public class BlogsStatsUserLocalServiceUtil {
 	* @param blogsStatsUser the blogs stats user
 	* @return the blogs stats user that was added
 	*/
-	public static com.liferay.blogs.kernel.model.BlogsStatsUser addBlogsStatsUser(
-		com.liferay.blogs.kernel.model.BlogsStatsUser blogsStatsUser) {
+	public static com.liferay.blogs.model.BlogsStatsUser addBlogsStatsUser(
+		com.liferay.blogs.model.BlogsStatsUser blogsStatsUser) {
 		return getService().addBlogsStatsUser(blogsStatsUser);
 	}
 
@@ -73,7 +59,7 @@ public class BlogsStatsUserLocalServiceUtil {
 	* @param statsUserId the primary key for the new blogs stats user
 	* @return the new blogs stats user
 	*/
-	public static com.liferay.blogs.kernel.model.BlogsStatsUser createBlogsStatsUser(
+	public static com.liferay.blogs.model.BlogsStatsUser createBlogsStatsUser(
 		long statsUserId) {
 		return getService().createBlogsStatsUser(statsUserId);
 	}
@@ -84,8 +70,8 @@ public class BlogsStatsUserLocalServiceUtil {
 	* @param blogsStatsUser the blogs stats user
 	* @return the blogs stats user that was removed
 	*/
-	public static com.liferay.blogs.kernel.model.BlogsStatsUser deleteBlogsStatsUser(
-		com.liferay.blogs.kernel.model.BlogsStatsUser blogsStatsUser) {
+	public static com.liferay.blogs.model.BlogsStatsUser deleteBlogsStatsUser(
+		com.liferay.blogs.model.BlogsStatsUser blogsStatsUser) {
 		return getService().deleteBlogsStatsUser(blogsStatsUser);
 	}
 
@@ -96,13 +82,13 @@ public class BlogsStatsUserLocalServiceUtil {
 	* @return the blogs stats user that was removed
 	* @throws PortalException if a blogs stats user with the primary key could not be found
 	*/
-	public static com.liferay.blogs.kernel.model.BlogsStatsUser deleteBlogsStatsUser(
+	public static com.liferay.blogs.model.BlogsStatsUser deleteBlogsStatsUser(
 		long statsUserId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().deleteBlogsStatsUser(statsUserId);
 	}
 
-	public static com.liferay.blogs.kernel.model.BlogsStatsUser fetchBlogsStatsUser(
+	public static com.liferay.blogs.model.BlogsStatsUser fetchBlogsStatsUser(
 		long statsUserId) {
 		return getService().fetchBlogsStatsUser(statsUserId);
 	}
@@ -114,10 +100,16 @@ public class BlogsStatsUserLocalServiceUtil {
 	* @return the blogs stats user
 	* @throws PortalException if a blogs stats user with the primary key could not be found
 	*/
-	public static com.liferay.blogs.kernel.model.BlogsStatsUser getBlogsStatsUser(
+	public static com.liferay.blogs.model.BlogsStatsUser getBlogsStatsUser(
 		long statsUserId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().getBlogsStatsUser(statsUserId);
+	}
+
+	public static com.liferay.blogs.model.BlogsStatsUser getStatsUser(
+		long groupId, long userId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService().getStatsUser(groupId, userId);
 	}
 
 	/**
@@ -126,9 +118,18 @@ public class BlogsStatsUserLocalServiceUtil {
 	* @param blogsStatsUser the blogs stats user
 	* @return the blogs stats user that was updated
 	*/
-	public static com.liferay.blogs.kernel.model.BlogsStatsUser updateBlogsStatsUser(
-		com.liferay.blogs.kernel.model.BlogsStatsUser blogsStatsUser) {
+	public static com.liferay.blogs.model.BlogsStatsUser updateBlogsStatsUser(
+		com.liferay.blogs.model.BlogsStatsUser blogsStatsUser) {
 		return getService().updateBlogsStatsUser(blogsStatsUser);
+	}
+
+	public static com.liferay.blogs.model.BlogsStatsUser updateStatsUser(
+		long groupId, long userId, int ratingsTotalEntries,
+		double ratingsTotalScore, double ratingsAverageScore)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService()
+				   .updateStatsUser(groupId, userId, ratingsTotalEntries,
+			ratingsTotalScore, ratingsAverageScore);
 	}
 
 	public static com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery getActionableDynamicQuery() {
@@ -249,46 +250,46 @@ public class BlogsStatsUserLocalServiceUtil {
 	* @param end the upper bound of the range of blogs stats users (not inclusive)
 	* @return the range of blogs stats users
 	*/
-	public static java.util.List<com.liferay.blogs.kernel.model.BlogsStatsUser> getBlogsStatsUsers(
+	public static java.util.List<com.liferay.blogs.model.BlogsStatsUser> getBlogsStatsUsers(
 		int start, int end) {
 		return getService().getBlogsStatsUsers(start, end);
 	}
 
-	public static java.util.List<com.liferay.blogs.kernel.model.BlogsStatsUser> getCompanyStatsUsers(
+	public static java.util.List<com.liferay.blogs.model.BlogsStatsUser> getCompanyStatsUsers(
 		long companyId, int start, int end) {
 		return getService().getCompanyStatsUsers(companyId, start, end);
 	}
 
-	public static java.util.List<com.liferay.blogs.kernel.model.BlogsStatsUser> getCompanyStatsUsers(
+	public static java.util.List<com.liferay.blogs.model.BlogsStatsUser> getCompanyStatsUsers(
 		long companyId, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.blogs.kernel.model.BlogsStatsUser> obc) {
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.blogs.model.BlogsStatsUser> obc) {
 		return getService().getCompanyStatsUsers(companyId, start, end, obc);
 	}
 
-	public static java.util.List<com.liferay.blogs.kernel.model.BlogsStatsUser> getGroupStatsUsers(
+	public static java.util.List<com.liferay.blogs.model.BlogsStatsUser> getGroupStatsUsers(
 		long groupId, int start, int end) {
 		return getService().getGroupStatsUsers(groupId, start, end);
 	}
 
-	public static java.util.List<com.liferay.blogs.kernel.model.BlogsStatsUser> getGroupStatsUsers(
+	public static java.util.List<com.liferay.blogs.model.BlogsStatsUser> getGroupStatsUsers(
 		long groupId, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.blogs.kernel.model.BlogsStatsUser> obc) {
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.blogs.model.BlogsStatsUser> obc) {
 		return getService().getGroupStatsUsers(groupId, start, end, obc);
 	}
 
-	public static java.util.List<com.liferay.blogs.kernel.model.BlogsStatsUser> getGroupsStatsUsers(
+	public static java.util.List<com.liferay.blogs.model.BlogsStatsUser> getGroupsStatsUsers(
 		long companyId, long groupId, int start, int end) {
 		return getService().getGroupsStatsUsers(companyId, groupId, start, end);
 	}
 
-	public static java.util.List<com.liferay.blogs.kernel.model.BlogsStatsUser> getOrganizationStatsUsers(
+	public static java.util.List<com.liferay.blogs.model.BlogsStatsUser> getOrganizationStatsUsers(
 		long organizationId, int start, int end) {
 		return getService().getOrganizationStatsUsers(organizationId, start, end);
 	}
 
-	public static java.util.List<com.liferay.blogs.kernel.model.BlogsStatsUser> getOrganizationStatsUsers(
+	public static java.util.List<com.liferay.blogs.model.BlogsStatsUser> getOrganizationStatsUsers(
 		long organizationId, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.blogs.kernel.model.BlogsStatsUser> obc) {
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.blogs.model.BlogsStatsUser> obc) {
 		return getService()
 				   .getOrganizationStatsUsers(organizationId, start, end, obc);
 	}
@@ -318,7 +319,7 @@ public class BlogsStatsUserLocalServiceUtil {
 	}
 
 	public static void deleteStatsUser(
-		com.liferay.blogs.kernel.model.BlogsStatsUser statsUsers) {
+		com.liferay.blogs.model.BlogsStatsUser statsUsers) {
 		getService().deleteStatsUser(statsUsers);
 	}
 

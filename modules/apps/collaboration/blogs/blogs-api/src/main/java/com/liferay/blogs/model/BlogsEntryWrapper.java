@@ -467,6 +467,11 @@ public class BlogsEntryWrapper implements BlogsEntry, ModelWrapper<BlogsEntry> {
 	}
 
 	@Override
+	public boolean isVisible() {
+		return _blogsEntry.isVisible();
+	}
+
+	@Override
 	public ExpandoBridge getExpandoBridge() {
 		return _blogsEntry.getExpandoBridge();
 	}
@@ -557,6 +562,13 @@ public class BlogsEntryWrapper implements BlogsEntry, ModelWrapper<BlogsEntry> {
 		return _blogsEntry.getCoverImageURL();
 	}
 
+	@Override
+	public java.lang.String getCoverImageURL(
+		com.liferay.portal.kernel.theme.ThemeDisplay themeDisplay)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _blogsEntry.getCoverImageURL(themeDisplay);
+	}
+
 	/**
 	* Returns the description of this blogs entry.
 	*
@@ -568,6 +580,23 @@ public class BlogsEntryWrapper implements BlogsEntry, ModelWrapper<BlogsEntry> {
 	}
 
 	/**
+	* @deprecated As of 1.1.0, replaced by {@link
+	#getSmallImageURL(ThemeDisplay)}
+	*/
+	@Deprecated
+	@Override
+	public java.lang.String getEntryImageURL(
+		com.liferay.portal.kernel.theme.ThemeDisplay themeDisplay) {
+		return _blogsEntry.getEntryImageURL(themeDisplay);
+	}
+
+	@Override
+	public java.lang.String getSmallImageType()
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _blogsEntry.getSmallImageType();
+	}
+
+	/**
 	* Returns the small image u r l of this blogs entry.
 	*
 	* @return the small image u r l of this blogs entry
@@ -575,6 +604,13 @@ public class BlogsEntryWrapper implements BlogsEntry, ModelWrapper<BlogsEntry> {
 	@Override
 	public java.lang.String getSmallImageURL() {
 		return _blogsEntry.getSmallImageURL();
+	}
+
+	@Override
+	public java.lang.String getSmallImageURL(
+		com.liferay.portal.kernel.theme.ThemeDisplay themeDisplay)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _blogsEntry.getSmallImageURL(themeDisplay);
 	}
 
 	/**
@@ -1041,6 +1077,11 @@ public class BlogsEntryWrapper implements BlogsEntry, ModelWrapper<BlogsEntry> {
 	@Override
 	public void setSmallImageId(long smallImageId) {
 		_blogsEntry.setSmallImageId(smallImageId);
+	}
+
+	@Override
+	public void setSmallImageType(java.lang.String smallImageType) {
+		_blogsEntry.setSmallImageType(smallImageType);
 	}
 
 	/**

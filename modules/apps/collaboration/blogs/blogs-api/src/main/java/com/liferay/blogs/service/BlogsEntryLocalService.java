@@ -16,7 +16,6 @@ package com.liferay.blogs.service;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.blogs.kernel.model.BlogsEntry;
 import com.liferay.blogs.model.BlogsEntry;
 
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
@@ -74,6 +73,16 @@ public interface BlogsEntryLocalService extends BaseLocalService,
 	 *
 	 * Never modify or reference this interface directly. Always use {@link BlogsEntryLocalServiceUtil} to access the blogs entry local service. Add custom service methods to {@link com.liferay.blogs.service.impl.BlogsEntryLocalServiceImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
+
+	/**
+	* Adds the blogs entry to the database. Also notifies the appropriate model listeners.
+	*
+	* @param blogsEntry the blogs entry
+	* @return the blogs entry that was added
+	*/
+	@Indexable(type = IndexableType.REINDEX)
+	public BlogsEntry addBlogsEntry(BlogsEntry blogsEntry);
+
 	public BlogsEntry addEntry(long userId, java.lang.String title,
 		java.lang.String content, ServiceContext serviceContext)
 		throws PortalException;
@@ -139,6 +148,33 @@ public interface BlogsEntryLocalService extends BaseLocalService,
 		ImageSelector smallImageImageSelector, ServiceContext serviceContext)
 		throws PortalException;
 
+	/**
+	* Creates a new blogs entry with the primary key. Does not add the blogs entry to the database.
+	*
+	* @param entryId the primary key for the new blogs entry
+	* @return the new blogs entry
+	*/
+	public BlogsEntry createBlogsEntry(long entryId);
+
+	/**
+	* Deletes the blogs entry from the database. Also notifies the appropriate model listeners.
+	*
+	* @param blogsEntry the blogs entry
+	* @return the blogs entry that was removed
+	*/
+	@Indexable(type = IndexableType.DELETE)
+	public BlogsEntry deleteBlogsEntry(BlogsEntry blogsEntry);
+
+	/**
+	* Deletes the blogs entry with the primary key from the database. Also notifies the appropriate model listeners.
+	*
+	* @param entryId the primary key of the blogs entry
+	* @return the blogs entry that was removed
+	* @throws PortalException if a blogs entry with the primary key could not be found
+	*/
+	@Indexable(type = IndexableType.DELETE)
+	public BlogsEntry deleteBlogsEntry(long entryId) throws PortalException;
+
 	@Indexable(type = IndexableType.DELETE)
 	@SystemEvent(type = SystemEventConstants.TYPE_DELETE)
 	public BlogsEntry deleteEntry(BlogsEntry entry) throws PortalException;
@@ -146,10 +182,35 @@ public interface BlogsEntryLocalService extends BaseLocalService,
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public BlogsEntry fetchBlogsEntry(long entryId);
 
+	/**
+	* Returns the blogs entry matching the UUID and group.
+	*
+	* @param uuid the blogs entry's UUID
+	* @param groupId the primary key of the group
+	* @return the matching blogs entry, or <code>null</code> if a matching blogs entry could not be found
+	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public BlogsEntry fetchBlogsEntryByUuidAndGroupId(java.lang.String uuid,
 		long groupId);
 
+	/**
+	* Returns the blogs entry with the primary key.
+	*
+	* @param entryId the primary key of the blogs entry
+	* @return the blogs entry
+	* @throws PortalException if a blogs entry with the primary key could not be found
+	*/
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public BlogsEntry getBlogsEntry(long entryId) throws PortalException;
+
+	/**
+	* Returns the blogs entry matching the UUID and group.
+	*
+	* @param uuid the blogs entry's UUID
+	* @param groupId the primary key of the group
+	* @return the matching blogs entry
+	* @throws PortalException if a matching blogs entry could not be found
+	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public BlogsEntry getBlogsEntryByUuidAndGroupId(java.lang.String uuid,
 		long groupId) throws PortalException;
@@ -195,6 +256,13 @@ public interface BlogsEntryLocalService extends BaseLocalService,
 	public BlogsEntry restoreEntryFromTrash(long userId, long entryId)
 		throws PortalException;
 
+	/**
+	* Updates the blogs entry in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
+	*
+	* @param blogsEntry the blogs entry
+	* @return the blogs entry that was updated
+	*/
+	@Indexable(type = IndexableType.REINDEX)
 	public BlogsEntry updateBlogsEntry(BlogsEntry blogsEntry);
 
 	public BlogsEntry updateEntry(long userId, long entryId,
@@ -278,87 +346,6 @@ public interface BlogsEntryLocalService extends BaseLocalService,
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public BlogsEntry[] getEntriesPrevAndNext(long entryId)
 		throws PortalException;
-
-	/**
-	* Adds the blogs entry to the database. Also notifies the appropriate model listeners.
-	*
-	* @param blogsEntry the blogs entry
-	* @return the blogs entry that was added
-	*/
-	@Indexable(type = IndexableType.REINDEX)
-	public BlogsEntry addBlogsEntry(BlogsEntry blogsEntry);
-
-	/**
-	* Creates a new blogs entry with the primary key. Does not add the blogs entry to the database.
-	*
-	* @param entryId the primary key for the new blogs entry
-	* @return the new blogs entry
-	*/
-	public BlogsEntry createBlogsEntry(long entryId);
-
-	/**
-	* Deletes the blogs entry from the database. Also notifies the appropriate model listeners.
-	*
-	* @param blogsEntry the blogs entry
-	* @return the blogs entry that was removed
-	*/
-	@Indexable(type = IndexableType.DELETE)
-	public BlogsEntry deleteBlogsEntry(BlogsEntry blogsEntry);
-
-	/**
-	* Deletes the blogs entry with the primary key from the database. Also notifies the appropriate model listeners.
-	*
-	* @param entryId the primary key of the blogs entry
-	* @return the blogs entry that was removed
-	* @throws PortalException if a blogs entry with the primary key could not be found
-	*/
-	@Indexable(type = IndexableType.DELETE)
-	public BlogsEntry deleteBlogsEntry(long entryId) throws PortalException;
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public BlogsEntry fetchBlogsEntry(long entryId);
-
-	/**
-	* Returns the blogs entry matching the UUID and group.
-	*
-	* @param uuid the blogs entry's UUID
-	* @param groupId the primary key of the group
-	* @return the matching blogs entry, or <code>null</code> if a matching blogs entry could not be found
-	*/
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public BlogsEntry fetchBlogsEntryByUuidAndGroupId(java.lang.String uuid,
-		long groupId);
-
-	/**
-	* Returns the blogs entry with the primary key.
-	*
-	* @param entryId the primary key of the blogs entry
-	* @return the blogs entry
-	* @throws PortalException if a blogs entry with the primary key could not be found
-	*/
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public BlogsEntry getBlogsEntry(long entryId) throws PortalException;
-
-	/**
-	* Returns the blogs entry matching the UUID and group.
-	*
-	* @param uuid the blogs entry's UUID
-	* @param groupId the primary key of the group
-	* @return the matching blogs entry
-	* @throws PortalException if a matching blogs entry could not be found
-	*/
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public BlogsEntry getBlogsEntryByUuidAndGroupId(java.lang.String uuid,
-		long groupId) throws PortalException;
-
-	/**
-	* Updates the blogs entry in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
-	*
-	* @param blogsEntry the blogs entry
-	* @return the blogs entry that was updated
-	*/
-	@Indexable(type = IndexableType.REINDEX)
-	public BlogsEntry updateBlogsEntry(BlogsEntry blogsEntry);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public ActionableDynamicQuery getActionableDynamicQuery();
@@ -488,11 +475,6 @@ public interface BlogsEntryLocalService extends BaseLocalService,
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<BlogsEntry> getBlogsEntriesByUuidAndCompanyId(
 		java.lang.String uuid, long companyId);
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public List<BlogsEntry> getBlogsEntriesByUuidAndCompanyId(
-		java.lang.String uuid, long companyId, int start, int end,
-		OrderByComparator<BlogsEntry> orderByComparator);
 
 	/**
 	* Returns a range of blogs entries matching the UUID and company.
