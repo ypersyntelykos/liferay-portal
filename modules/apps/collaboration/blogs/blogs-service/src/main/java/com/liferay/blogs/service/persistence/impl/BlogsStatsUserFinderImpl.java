@@ -66,7 +66,8 @@ public class BlogsStatsUserFinderImpl
 		try {
 			session = openSession();
 
-			String sql = CustomSQLUtil.get(COUNT_BY_ORGANIZATION_IDS);
+			String sql = CustomSQLUtil.get(
+				getClass(), COUNT_BY_ORGANIZATION_IDS);
 
 			sql = StringUtil.replace(
 				sql, "[$ORGANIZATION_ID$]",
@@ -113,7 +114,7 @@ public class BlogsStatsUserFinderImpl
 		try {
 			session = openSession();
 
-			String sql = CustomSQLUtil.get(FIND_BY_GROUP_IDS);
+			String sql = CustomSQLUtil.get(getClass(), FIND_BY_GROUP_IDS);
 
 			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
@@ -180,7 +181,8 @@ public class BlogsStatsUserFinderImpl
 		try {
 			session = openSession();
 
-			String sql = CustomSQLUtil.get(FIND_BY_ORGANIZATION_IDS);
+			String sql = CustomSQLUtil.get(
+				getClass(), FIND_BY_ORGANIZATION_IDS);
 
 			sql = StringUtil.replace(
 				sql, "[$ORGANIZATION_ID$]",
