@@ -238,8 +238,8 @@
 
 		<!-- References -->
 
+		<reference entity="BlogsEntry" package-path="com.liferay.blogs" />
 		<reference entity="Group" package-path="com.liferay.portal" />
-		<reference entity="BlogsEntry" package-path="com.liferay.portlet.blogs" />
 	</entity>
 	<exceptions>
 		<exception>EntryContent</exception>
