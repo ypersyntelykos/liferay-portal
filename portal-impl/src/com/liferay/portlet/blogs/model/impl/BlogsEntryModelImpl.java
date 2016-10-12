@@ -71,8 +71,10 @@ import java.util.Map;
  * @see BlogsEntryImpl
  * @see BlogsEntry
  * @see BlogsEntryModel
+ * @deprecated
  * @generated
  */
+@Deprecated
 @JSON(strict = true)
 @ProviderType
 public class BlogsEntryModelImpl extends BaseModelImpl<BlogsEntry>

@@ -66,8 +66,10 @@ import java.util.Set;
  * @author Brian Wing Shun Chan
  * @see BlogsStatsUserPersistence
  * @see com.liferay.blogs.kernel.service.persistence.BlogsStatsUserUtil
+ * @deprecated
  * @generated
  */
+@Deprecated
 @ProviderType
 public class BlogsStatsUserPersistenceImpl extends BasePersistenceImpl<BlogsStatsUser>
 	implements BlogsStatsUserPersistence {

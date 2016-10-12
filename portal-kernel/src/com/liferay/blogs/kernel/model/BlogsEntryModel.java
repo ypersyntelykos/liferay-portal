@@ -46,8 +46,10 @@ import java.util.Date;
  * @see BlogsEntry
  * @see com.liferay.portlet.blogs.model.impl.BlogsEntryImpl
  * @see com.liferay.portlet.blogs.model.impl.BlogsEntryModelImpl
+ * @deprecated
  * @generated
  */
+@Deprecated
 @ProviderType
 public interface BlogsEntryModel extends BaseModel<BlogsEntry>, ShardedModel,
 	StagedGroupedModel, TrashedModel, WorkflowedModel {

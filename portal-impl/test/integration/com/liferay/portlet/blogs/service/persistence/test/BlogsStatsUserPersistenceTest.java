@@ -56,8 +56,10 @@ import java.util.Map;
 import java.util.Set;
 
 /**
+ * @deprecated
  * @generated
  */
+@Deprecated
 public class BlogsStatsUserPersistenceTest {
 	@ClassRule
 	@Rule

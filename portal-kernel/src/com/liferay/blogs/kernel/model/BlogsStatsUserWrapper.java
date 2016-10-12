@@ -35,8 +35,10 @@ import java.util.Objects;
  *
  * @author Brian Wing Shun Chan
  * @see BlogsStatsUser
+ * @deprecated
  * @generated
  */
+@Deprecated
 @ProviderType
 public class BlogsStatsUserWrapper implements BlogsStatsUser,
 	ModelWrapper<BlogsStatsUser> {

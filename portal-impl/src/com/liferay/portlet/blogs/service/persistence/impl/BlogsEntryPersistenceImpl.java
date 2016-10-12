@@ -83,8 +83,10 @@ import java.util.Set;
  * @author Brian Wing Shun Chan
  * @see BlogsEntryPersistence
  * @see com.liferay.blogs.kernel.service.persistence.BlogsEntryUtil
+ * @deprecated
  * @generated
  */
+@Deprecated
 @ProviderType
 public class BlogsEntryPersistenceImpl extends BasePersistenceImpl<BlogsEntry>
 	implements BlogsEntryPersistence {

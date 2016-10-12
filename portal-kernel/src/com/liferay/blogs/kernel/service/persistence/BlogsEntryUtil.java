@@ -37,8 +37,10 @@ import java.util.List;
  * @author Brian Wing Shun Chan
  * @see BlogsEntryPersistence
  * @see com.liferay.portlet.blogs.service.persistence.impl.BlogsEntryPersistenceImpl
+ * @deprecated
  * @generated
  */
+@Deprecated
 @ProviderType
 public class BlogsEntryUtil {
 	/*

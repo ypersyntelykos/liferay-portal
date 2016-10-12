@@ -53,8 +53,10 @@ import java.util.Map;
  * @see BlogsStatsUserImpl
  * @see BlogsStatsUser
  * @see BlogsStatsUserModel
+ * @deprecated
  * @generated
  */
+@Deprecated
 @ProviderType
 public class BlogsStatsUserModelImpl extends BaseModelImpl<BlogsStatsUser>
 	implements BlogsStatsUserModel {

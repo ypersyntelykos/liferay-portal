@@ -37,8 +37,10 @@ import java.util.Objects;
  *
  * @author Brian Wing Shun Chan
  * @see BlogsEntry
+ * @deprecated
  * @generated
  */
+@Deprecated
 @ProviderType
 public class BlogsEntryWrapper implements BlogsEntry, ModelWrapper<BlogsEntry> {
 	public BlogsEntryWrapper(BlogsEntry blogsEntry) {

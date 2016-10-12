@@ -27,8 +27,10 @@ import com.liferay.portal.kernel.util.Accessor;
  * @see BlogsStatsUserModel
  * @see com.liferay.portlet.blogs.model.impl.BlogsStatsUserImpl
  * @see com.liferay.portlet.blogs.model.impl.BlogsStatsUserModelImpl
+ * @deprecated
  * @generated
  */
+@Deprecated
 @ImplementationClassName("com.liferay.portlet.blogs.model.impl.BlogsStatsUserImpl")
 @ProviderType
 public interface BlogsStatsUser extends BlogsStatsUserModel, PersistedModel {

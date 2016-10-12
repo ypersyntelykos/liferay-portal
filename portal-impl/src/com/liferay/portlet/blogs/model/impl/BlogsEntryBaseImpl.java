@@ -29,8 +29,10 @@ import com.liferay.blogs.kernel.service.BlogsEntryLocalServiceUtil;
  * @author Brian Wing Shun Chan
  * @see BlogsEntryImpl
  * @see BlogsEntry
+ * @deprecated
  * @generated
  */
+@Deprecated
 @ProviderType
 public abstract class BlogsEntryBaseImpl extends BlogsEntryModelImpl
 	implements BlogsEntry {

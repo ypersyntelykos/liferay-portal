@@ -34,8 +34,10 @@ import java.util.Date;
  *
  * @author Brian Wing Shun Chan
  * @see BlogsStatsUser
+ * @deprecated
  * @generated
  */
+@Deprecated
 @ProviderType
 public class BlogsStatsUserCacheModel implements CacheModel<BlogsStatsUser>,
 	Externalizable {

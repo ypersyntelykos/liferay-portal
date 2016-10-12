@@ -29,8 +29,10 @@ import com.liferay.blogs.kernel.service.BlogsStatsUserLocalServiceUtil;
  * @author Brian Wing Shun Chan
  * @see BlogsStatsUserImpl
  * @see BlogsStatsUser
+ * @deprecated
  * @generated
  */
+@Deprecated
 @ProviderType
 public abstract class BlogsStatsUserBaseImpl extends BlogsStatsUserModelImpl
 	implements BlogsStatsUser {

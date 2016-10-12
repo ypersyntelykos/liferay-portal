@@ -27,8 +27,10 @@ import java.util.List;
  *
  * @author Brian Wing Shun Chan
  * @see com.liferay.portlet.blogs.service.http.BlogsEntryServiceSoap
+ * @deprecated
  * @generated
  */
+@Deprecated
 @ProviderType
 public class BlogsEntrySoap implements Serializable {
 	public static BlogsEntrySoap toSoapModel(BlogsEntry model) {
