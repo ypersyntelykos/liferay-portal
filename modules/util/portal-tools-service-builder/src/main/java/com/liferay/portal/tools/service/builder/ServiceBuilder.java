@@ -2382,14 +2382,12 @@ public class ServiceBuilder {
 		List<Entity> entities = new ArrayList<>();
 
 		for (Entity entity : _ejbList) {
-			if (entity.hasColumns()) {
+			if (entity.hasColumns() && !entity.isDeprecated()) {
 				entities.add(entity);
 			}
 		}
 
 		if (entities.isEmpty()) {
-			xmlFile.delete();
-
 			return;
 		}
 
