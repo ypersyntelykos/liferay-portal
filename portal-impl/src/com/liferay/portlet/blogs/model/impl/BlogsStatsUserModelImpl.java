@@ -53,7 +53,8 @@ import java.util.Map;
  * @see BlogsStatsUserImpl
  * @see BlogsStatsUser
  * @see BlogsStatsUserModel
- * @deprecated
+ * @deprecated As of 7.0.0, replaced by {@link
+            com.liferay.blogs.model.impl.BlogsStatsUserImpl}
  * @generated
  */
 @Deprecated

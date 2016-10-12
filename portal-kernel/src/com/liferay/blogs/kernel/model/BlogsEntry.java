@@ -27,7 +27,8 @@ import com.liferay.portal.kernel.util.Accessor;
  * @see BlogsEntryModel
  * @see com.liferay.portlet.blogs.model.impl.BlogsEntryImpl
  * @see com.liferay.portlet.blogs.model.impl.BlogsEntryModelImpl
- * @deprecated
+ * @deprecated As of 7.0.0, replaced by {@link
+com.liferay.blogs.model.impl.BlogsEntryImpl}
  * @generated
  */
 @Deprecated

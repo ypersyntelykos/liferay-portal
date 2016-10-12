@@ -56,7 +56,8 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * @deprecated
+ * @deprecated As of 7.0.0, replaced by {@link
+            com.liferay.blogs.model.impl.BlogsStatsUserImpl}
  * @generated
  */
 @Deprecated

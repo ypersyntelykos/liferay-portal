@@ -35,7 +35,8 @@ import java.util.Objects;
  *
  * @author Brian Wing Shun Chan
  * @see BlogsStatsUser
- * @deprecated
+ * @deprecated As of 7.0.0, replaced by {@link
+com.liferay.blogs.model.impl.BlogsStatsUserImpl}
  * @generated
  */
 @Deprecated
