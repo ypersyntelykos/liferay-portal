@@ -94,12 +94,10 @@ public class WordsImpl implements Words {
 		private static final Set<String> _dictionarySet;
 
 		static {
-			ClassLoader classLoader = WordsImpl.class.getClassLoader();
-
 			List<String> dictionaryList = new ArrayList<>();
 
-			try (InputStream is = classLoader.getResourceAsStream(
-					"com/liferay/portal/words/dependencies/words.txt");
+			try (InputStream is = WordsImpl.class.getResourceAsStream(
+					"dependencies/words.txt");
 				UnsyncBufferedReader unsyncBufferedReader =
 					new UnsyncBufferedReader(new InputStreamReader(is))) {
 
@@ -124,8 +122,6 @@ public class WordsImpl implements Words {
 		private static final SpellDictionaryHashMap _spellDictionaryHashMap;
 
 		static {
-			ClassLoader classLoader = WordsImpl.class.getClassLoader();
-
 			SpellDictionaryHashMap spellDictionaryHashMap = null;
 
 			try {
@@ -139,8 +135,8 @@ public class WordsImpl implements Words {
 				};
 
 				for (String dic : dics) {
-					try (InputStream is = classLoader.getResourceAsStream(
-							"com/liferay/portal/words/dependencies/" + dic);
+					try (InputStream is = WordsImpl.class.getResourceAsStream(
+							"dependencies/" + dic);
 						UnsyncBufferedReader unsyncBufferedReader =
 							new UnsyncBufferedReader(
 								new InputStreamReader(is))) {
