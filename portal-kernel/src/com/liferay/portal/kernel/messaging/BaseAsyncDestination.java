@@ -64,15 +64,15 @@ public abstract class BaseAsyncDestination extends BaseDestination {
 
 	@Override
 	public void close(boolean force) {
-		if ((_threadPoolExecutor != null) &&
-			!_threadPoolExecutor.isShutdown()) {
+		if ((_threadPoolExecutor == null) || _threadPoolExecutor.isShutdown()) {
+			return;
+		}
 
-			if (force) {
-				_threadPoolExecutor.shutdownNow();
-			}
-			else {
-				_threadPoolExecutor.shutdown();
-			}
+		if (force) {
+			_threadPoolExecutor.shutdownNow();
+		}
+		else {
+			_threadPoolExecutor.shutdown();
 		}
 	}
 
