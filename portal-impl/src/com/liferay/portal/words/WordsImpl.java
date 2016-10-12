@@ -45,7 +45,7 @@ public class WordsImpl implements Words {
 	@Override
 	public List<InvalidWord> checkSpelling(String text) {
 		SpellChecker spellChecker = new SpellChecker(
-			getSpellDictionaryHashMap());
+			SpellDictionaryHashMapHolder._spellDictionaryHashMap);
 
 		BasicSpellCheckListener basicSpellCheckListener =
 			new BasicSpellCheckListener(text);
@@ -60,39 +60,12 @@ public class WordsImpl implements Words {
 
 	@Override
 	public List<String> getDictionaryList() {
-		if (_dictionaryList == null) {
-			ClassLoader classLoader = WordsImpl.class.getClassLoader();
-
-			List<String> dictionaryList = new ArrayList<>();
-
-			try (InputStream is = classLoader.getResourceAsStream(
-					"com/liferay/portal/words/dependencies/words.txt");
-				UnsyncBufferedReader unsyncBufferedReader =
-					new UnsyncBufferedReader(new InputStreamReader(is))) {
-
-				String line = null;
-
-				while ((line = unsyncBufferedReader.readLine()) != null) {
-					dictionaryList.add(line);
-				}
-			}
-			catch (IOException ioe) {
-				_log.error(ioe, ioe);
-			}
-
-			_dictionaryList = dictionaryList;
-		}
-
-		return _dictionaryList;
+		return DictionaryListSetHolder._dictionaryList;
 	}
 
 	@Override
 	public Set<String> getDictionarySet() {
-		if (_dictionarySet == null) {
-			_dictionarySet = new HashSet<>(getDictionaryList());
-		}
-
-		return _dictionarySet;
+		return DictionaryListSetHolder._dictionarySet;
 	}
 
 	@Override
@@ -113,49 +86,80 @@ public class WordsImpl implements Words {
 		return dictionarySet.contains(word);
 	}
 
-	protected SpellDictionaryHashMap getSpellDictionaryHashMap() {
-		if (_spellDictionaryHashMap != null) {
-			return _spellDictionaryHashMap;
-		}
+	private static final Log _log = LogFactoryUtil.getLog(WordsImpl.class);
 
-		try {
-			SpellDictionaryHashMap spellDictionaryHashMap =
-				new SpellDictionaryHashMap();
+	private static class DictionaryListSetHolder {
 
-			String[] dics = new String[] {
-				"center.dic", "centre.dic", "color.dic", "colour.dic",
-				"eng_com.dic", "english.0", "english.1", "ise.dic", "ize.dic",
-				"labeled.dic", "labelled.dic", "yse.dic", "yze.dic"
-			};
+		private static final List<String> _dictionaryList;
+		private static final Set<String> _dictionarySet;
 
+		static {
 			ClassLoader classLoader = WordsImpl.class.getClassLoader();
 
-			for (String dic : dics) {
-				try (InputStream is = classLoader.getResourceAsStream(
-						"com/liferay/portal/words/dependencies/" + dic);
-					UnsyncBufferedReader unsyncBufferedReader =
-						new UnsyncBufferedReader(new InputStreamReader(is))) {
+			List<String> dictionaryList = new ArrayList<>();
 
-					spellDictionaryHashMap.addDictionary(unsyncBufferedReader);
+			try (InputStream is = classLoader.getResourceAsStream(
+					"com/liferay/portal/words/dependencies/words.txt");
+				UnsyncBufferedReader unsyncBufferedReader =
+					new UnsyncBufferedReader(new InputStreamReader(is))) {
+
+				String line = null;
+
+				while ((line = unsyncBufferedReader.readLine()) != null) {
+					dictionaryList.add(line);
 				}
-				catch (IOException ioe) {
-					_log.error(ioe, ioe);
+			}
+			catch (IOException ioe) {
+				_log.error(ioe, ioe);
+			}
+
+			_dictionaryList = dictionaryList;
+			_dictionarySet = new HashSet<>(dictionaryList);
+		}
+
+	}
+
+	private static class SpellDictionaryHashMapHolder {
+
+		private static final SpellDictionaryHashMap _spellDictionaryHashMap;
+
+		static {
+			ClassLoader classLoader = WordsImpl.class.getClassLoader();
+
+			SpellDictionaryHashMap spellDictionaryHashMap = null;
+
+			try {
+				spellDictionaryHashMap = new SpellDictionaryHashMap();
+
+				String[] dics = new String[] {
+					"center.dic", "centre.dic", "color.dic", "colour.dic",
+					"eng_com.dic", "english.0", "english.1", "ise.dic",
+					"ize.dic", "labeled.dic", "labelled.dic", "yse.dic",
+					"yze.dic"
+				};
+
+				for (String dic : dics) {
+					try (InputStream is = classLoader.getResourceAsStream(
+							"com/liferay/portal/words/dependencies/" + dic);
+						UnsyncBufferedReader unsyncBufferedReader =
+							new UnsyncBufferedReader(
+								new InputStreamReader(is))) {
+
+						spellDictionaryHashMap.addDictionary(
+							unsyncBufferedReader);
+					}
+					catch (IOException ioe) {
+						_log.error(ioe, ioe);
+					}
 				}
+			}
+			catch (IOException ioe) {
+				_log.error(ioe);
 			}
 
 			_spellDictionaryHashMap = spellDictionaryHashMap;
 		}
-		catch (IOException ioe) {
-			_log.error(ioe);
-		}
 
-		return _spellDictionaryHashMap;
 	}
-
-	private static final Log _log = LogFactoryUtil.getLog(WordsImpl.class);
-
-	private volatile List<String> _dictionaryList;
-	private volatile Set<String> _dictionarySet;
-	private volatile SpellDictionaryHashMap _spellDictionaryHashMap;
 
 }
