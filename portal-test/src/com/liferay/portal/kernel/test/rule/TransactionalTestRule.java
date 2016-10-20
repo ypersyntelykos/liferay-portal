@@ -151,20 +151,11 @@ public class TransactionalTestRule implements TestRule {
 				continue;
 			}
 
-			Transactional transactional = frameworkMethod.getAnnotation(
-				Transactional.class);
-
-			if (transactional == null) {
-				newFrameworkMethods.add(
-					new TransactionalFrameworkMethod(
-						frameworkMethod.getMethod(), _transactionConfig));
-			}
-			else {
-				newFrameworkMethods.add(
-					new TransactionalFrameworkMethod(
-						frameworkMethod.getMethod(),
-						getTransactionConfig(transactional)));
-			}
+			newFrameworkMethods.add(
+				new TransactionalFrameworkMethod(
+					frameworkMethod.getMethod(),
+					getTransactionConfig(
+						frameworkMethod.getAnnotation(Transactional.class))));
 		}
 
 		ReflectionTestUtil.setFieldValue(statement, name, newFrameworkMethods);
