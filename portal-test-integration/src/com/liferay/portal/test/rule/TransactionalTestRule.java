@@ -44,11 +44,7 @@ import org.junit.runners.model.Statement;
 public class TransactionalTestRule implements TestRule {
 
 	public static final TransactionalTestRule INSTANCE =
-		new TransactionalTestRule();
-
-	public TransactionalTestRule() {
-		this(Propagation.SUPPORTS);
-	}
+		new TransactionalTestRule(Propagation.SUPPORTS);
 
 	public TransactionalTestRule(Propagation propagation) {
 		_transactionConfig = TransactionConfig.Factory.create(
