@@ -74,6 +74,8 @@ public class LogAssertionTestCallback
 		List<ExpectedLogs> expectedLogsList,
 		List<CaptureAppender> captureAppenders) {
 
+		StringBundler sb = new StringBundler();
+
 		for (CaptureAppender captureAppender : captureAppenders) {
 			try {
 				for (LoggingEvent loggingEvent :
@@ -82,7 +84,8 @@ public class LogAssertionTestCallback
 					String renderedMessage = loggingEvent.getRenderedMessage();
 
 					if (!isExpected(expectedLogsList, renderedMessage)) {
-						Assert.fail(renderedMessage);
+						sb.append(renderedMessage);
+						sb.append("\n");
 					}
 				}
 			}
@@ -91,14 +94,15 @@ public class LogAssertionTestCallback
 			}
 		}
 
+		if (sb.index() != 0) {
+			Assert.fail(sb.toString());
+		}
+
 		Thread.setDefaultUncaughtExceptionHandler(_uncaughtExceptionHandler);
 
 		_thread = null;
 
 		try {
-			StringBundler sb = new StringBundler(
-				6 * _concurrentFailures.size());
-
 			for (Map.Entry<Thread, Error> entry :
 					_concurrentFailures.entrySet()) {
 
