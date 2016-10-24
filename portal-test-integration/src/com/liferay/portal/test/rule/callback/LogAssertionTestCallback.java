@@ -85,7 +85,7 @@ public class LogAssertionTestCallback
 
 					if (!isExpected(expectedLogsList, renderedMessage)) {
 						sb.append(renderedMessage);
-						sb.append("\n");
+						sb.append("\n\n");
 					}
 				}
 			}
@@ -95,6 +95,8 @@ public class LogAssertionTestCallback
 		}
 
 		if (sb.index() != 0) {
+			sb.setIndex(sb.index() - 1);
+
 			Assert.fail(sb.toString());
 		}
 
@@ -121,9 +123,12 @@ public class LogAssertionTestCallback
 				sb.append(error);
 				sb.append("\n");
 				sb.append(unsyncStringWriter.toString());
+				sb.append("\n\n");
 			}
 
 			if (sb.index() != 0) {
+				sb.setIndex(sb.index() - 1);
+
 				Assert.fail(sb.toString());
 			}
 		}
