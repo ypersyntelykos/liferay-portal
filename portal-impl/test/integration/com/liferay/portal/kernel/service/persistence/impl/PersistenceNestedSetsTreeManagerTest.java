@@ -102,6 +102,10 @@ public class PersistenceNestedSetsTreeManagerTest {
 	public void tearDown() throws PortalException {
 		PropsValues.SPRING_HIBERNATE_SESSION_DELEGATED = true;
 
+		ReflectionTestUtil.setFieldValue(
+			_assetCategoryPersistence, "_sessionFactory",
+			_sessionFactoryInvocationHandler.getTarget());
+
 		GroupLocalServiceUtil.deleteGroup(_group);
 
 		_assetCategoryPersistence.setRebuildTreeEnabled(true);
@@ -701,6 +705,10 @@ public class PersistenceNestedSetsTreeManagerTest {
 
 	private static class SessionFactoryInvocationHandler
 		implements InvocationHandler {
+
+		public Object getTarget() {
+			return _target;
+		}
 
 		@Override
 		public Object invoke(Object proxy, Method method, Object[] args)
