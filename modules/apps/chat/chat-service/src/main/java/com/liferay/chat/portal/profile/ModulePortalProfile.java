@@ -42,13 +42,14 @@ public class ModulePortalProfile extends BaseDSModulePortalProfile {
 
 	@Activate
 	public void activate(ComponentContext componentContext) {
-		Set<String> profileNames = new HashSet<String>(
+		Set<String> supportedPortalProfileNames = new HashSet<String>(
 			Arrays.asList(
 				PortalProfile.PORTAL_PROFILE_NAME_CE,
 				PortalProfile.PORTAL_PROFILE_NAME_DXP));
 
 		init(
-			componentContext, profileNames, BuddyFinderUtil.class.getName(),
+			componentContext, supportedPortalProfileNames,
+			BuddyFinderUtil.class.getName(),
 			ChatGroupServiceConfigurationBeanDeclaration.class.getName(),
 			ChatPollerProcessor.class.getName(),
 			DefaultBuddyFinderImpl.class.getName(), JabberImpl.class.getName(),
