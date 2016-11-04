@@ -147,6 +147,7 @@ public class MBMessageStagedModelDataHandlerTest
 		addDependentStagedModel(
 			dependentStagedModelsMap, DLFileEntry.class,
 			attachmentsFileEntries.get(0));
+
 		Repository repository = RepositoryLocalServiceUtil.getRepository(
 			fileEntry.getRepositoryId());
 
