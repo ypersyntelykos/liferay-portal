@@ -126,6 +126,13 @@ public class PACLAggregateTest extends AutoBalanceTestCase {
 
 		arguments.add("-Dliferay.mode=test");
 
+		boolean junitDebug = Boolean.getBoolean("jvm.debug");
+
+		if (junitDebug) {
+			arguments.add(_JPDA_OPTIONS);
+			arguments.add("-Djvm.debug=true");
+		}
+
 		String aspectjAgent = System.getProperty("aspectj.agent");
 
 		if (aspectjAgent != null) {
@@ -140,13 +147,6 @@ public class PACLAggregateTest extends AutoBalanceTestCase {
 					"-Dorg.aspectj.weaver.loadtime.configuration=" +
 						aspectjConfiguration);
 			}
-		}
-
-		boolean junitDebug = Boolean.getBoolean("jvm.debug");
-
-		if (junitDebug) {
-			arguments.add(_JPDA_OPTIONS);
-			arguments.add("-Djvm.debug=true");
 		}
 
 		arguments.add(
