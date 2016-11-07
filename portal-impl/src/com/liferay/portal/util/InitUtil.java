@@ -81,8 +81,6 @@ public class InitUtil {
 				Field field = ReflectionUtil.getDeclaredField(
 					ZipFile.class, "usemmap");
 
-				field.setAccessible(true);
-
 				if ((boolean)field.get(null)) {
 					field.setBoolean(null, false);
 				}
