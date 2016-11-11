@@ -31,15 +31,15 @@ import org.aspectj.lang.annotation.SuppressAjWarnings;
 public class HibernateUnexpectedRowCountAspect {
 
 	@AfterThrowing(
-		throwing = "exception",
+		throwing = "re",
 		value = "execution(void org.hibernate.jdbc.BatchingBatcher.doExecuteBatch(java.sql.PreparedStatement)) && args(preparedStatement) && this(batchingBatcher)"
 	)
 	public void logUpdateSQL(
 			Object batchingBatcher, PreparedStatement preparedStatement,
-			Exception exception)
+			RuntimeException re)
 		throws Exception {
 
-		Class<?> clazz = exception.getClass();
+		Class<?> clazz = re.getClass();
 
 		if (_STALE_STATE_EXCEPTION_NAME.equals(clazz.getName())) {
 			Class<?> batchingBatcherClass = batchingBatcher.getClass();
