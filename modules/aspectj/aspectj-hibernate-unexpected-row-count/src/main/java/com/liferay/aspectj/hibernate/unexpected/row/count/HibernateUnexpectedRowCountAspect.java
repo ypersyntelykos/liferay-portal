@@ -37,44 +37,45 @@ public class HibernateUnexpectedRowCountAspect {
 	public void logUpdateSQL(
 			Object batchingBatcher, PreparedStatement preparedStatement,
 			RuntimeException re)
-		throws Exception {
+		throws ReflectiveOperationException {
 
 		Class<?> clazz = re.getClass();
 
-		if (_STALE_STATE_EXCEPTION_NAME.equals(clazz.getName())) {
-			Class<?> batchingBatcherClass = batchingBatcher.getClass();
-
-			Class<?> abstractBatcherClass =
-				batchingBatcherClass.getSuperclass();
-
-			Field batchUpdateSQLField = abstractBatcherClass.getDeclaredField(
-				"batchUpdateSQL");
-
-			batchUpdateSQLField.setAccessible(true);
-
-			String batchUpdateSQL = (String)batchUpdateSQLField.get(
-				batchingBatcher);
-
-			Field logField = abstractBatcherClass.getDeclaredField("log");
-
-			logField.setAccessible(true);
-
-			Class<?> logClass = logField.getType();
-
-			Method errorMethod = logClass.getMethod("error", String.class);
-
-			Object log = logField.get(batchingBatcher);
-
-			StringBuilder sb = new StringBuilder();
-
-			sb.append("{preparedStatement=");
-			sb.append(preparedStatement);
-			sb.append(", batchUpdateSQL=");
-			sb.append(batchUpdateSQL);
-			sb.append("}");
-
-			errorMethod.invoke(log, sb.toString());
+		if (!_STALE_STATE_EXCEPTION_NAME.equals(clazz.getName())) {
+			return;
 		}
+
+		Class<?> batchingBatcherClass = batchingBatcher.getClass();
+
+		Class<?> abstractBatcherClass = batchingBatcherClass.getSuperclass();
+
+		Field batchUpdateSQLField = abstractBatcherClass.getDeclaredField(
+			"batchUpdateSQL");
+
+		batchUpdateSQLField.setAccessible(true);
+
+		String batchUpdateSQL = (String)batchUpdateSQLField.get(
+			batchingBatcher);
+
+		Field logField = abstractBatcherClass.getDeclaredField("log");
+
+		logField.setAccessible(true);
+
+		Class<?> logClass = logField.getType();
+
+		Method errorMethod = logClass.getMethod("error", String.class);
+
+		Object log = logField.get(batchingBatcher);
+
+		StringBuilder sb = new StringBuilder();
+
+		sb.append("{preparedStatement=");
+		sb.append(preparedStatement);
+		sb.append(", batchUpdateSQL=");
+		sb.append(batchUpdateSQL);
+		sb.append("}");
+
+		errorMethod.invoke(log, sb.toString());
 	}
 
 	private static final String _STALE_STATE_EXCEPTION_NAME =
