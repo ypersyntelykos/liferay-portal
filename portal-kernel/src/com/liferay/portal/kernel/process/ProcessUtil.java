@@ -14,25 +14,22 @@
 
 package com.liferay.portal.kernel.process;
 
-import com.liferay.portal.kernel.concurrent.AbortPolicy;
 import com.liferay.portal.kernel.concurrent.BaseFutureListener;
 import com.liferay.portal.kernel.concurrent.DefaultNoticeableFuture;
 import com.liferay.portal.kernel.concurrent.FutureListener;
 import com.liferay.portal.kernel.concurrent.NoticeableFuture;
-import com.liferay.portal.kernel.concurrent.ThreadPoolExecutor;
-import com.liferay.portal.kernel.concurrent.ThreadPoolHandlerAdapter;
-import com.liferay.portal.kernel.util.NamedThreadFactory;
 import com.liferay.portal.kernel.util.ObjectValuePair;
-import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
 
+import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.portal.kernel.util.StringPool;
 import java.io.IOException;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Future;
-import java.util.concurrent.RejectedExecutionException;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicMarkableReference;
 
 /**
@@ -64,35 +61,75 @@ public class ProcessUtil {
 			throw new NullPointerException("Arguments is null");
 		}
 
+		if (arguments.isEmpty()) {
+			throw new IllegalArgumentException("Arguments is empty");
+		}
+
+		StringBundler sb = new StringBundler(arguments.size() * 2 - 1);
+
+		for (String argument : arguments) {
+			sb.append(argument);
+			sb.append(StringPool.SPACE);
+		}
+
+		sb.setIndex(sb.index() - 1);
+
+		String commandLine = sb.toString();
+
 		ProcessBuilder processBuilder = new ProcessBuilder(arguments);
 
 		try {
 			Process process = processBuilder.start();
 
-			ThreadPoolExecutor threadPoolExecutor = _getThreadPoolExecutor();
+			DefaultNoticeableFuture<O> stdOutNoticeableFuture =
+				new DefaultNoticeableFuture<>(
+					new ProcessStdOutCallable<O>(outputProcessor, process));
 
-			try {
-				NoticeableFuture<O> stdOutNoticeableFuture =
-					threadPoolExecutor.submit(
-						new ProcessStdOutCallable<O>(outputProcessor, process));
+			_runTask(
+				stdOutNoticeableFuture,
+				"Piper for [".concat(commandLine).concat("] stdout"));
 
-				NoticeableFuture<E> stdErrNoticeableFuture =
-					threadPoolExecutor.submit(
-						new ProcessStdErrCallable<E>(outputProcessor, process));
+			DefaultNoticeableFuture<E> stdErrNoticeableFuture =
+				new DefaultNoticeableFuture<>(
+					new ProcessStdErrCallable<E>(outputProcessor, process));
 
-				return _wrapNoticeableFuture(
+			_runTask(
+				stdErrNoticeableFuture,
+				"Piper for [".concat(commandLine).concat("] stderr"));
+
+			NoticeableFuture<ObjectValuePair<O, E>> noticeableFuture =
+				_wrapNoticeableFuture(
 					stdOutNoticeableFuture, stdErrNoticeableFuture, process);
-			}
-			catch (RejectedExecutionException ree) {
-				process.destroy();
 
-				throw new ProcessException(
-					"Cancelled execution because of a concurrent destroy", ree);
-			}
+			noticeableFuture.addFutureListener(
+				new FutureListener<ObjectValuePair<O, E>>() {
+
+					@Override
+					public void complete(
+						Future<ObjectValuePair<O, E>> future) {
+
+						_noticeableFutures.remove(noticeableFuture);
+					}
+
+				});
+
+			_noticeableFutures.add(noticeableFuture);
+
+			return noticeableFuture;
 		}
 		catch (IOException ioe) {
 			throw new ProcessException(ioe);
 		}
+	}
+
+	private static void _runTask(
+		DefaultNoticeableFuture<?> stdOutNoticeableFuture, String threadName) {
+
+		Thread thread = new Thread(stdOutNoticeableFuture, threadName);
+
+		thread.setDaemon(true);
+
+		thread.start();
 	}
 
 	public static <O, E> NoticeableFuture<ObjectValuePair<O, E>> execute(
@@ -102,38 +139,16 @@ public class ProcessUtil {
 		return execute(outputProcessor, Arrays.asList(arguments));
 	}
 
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link
+	 *             #getUnfinishedNoticeableFutures()}
+	 */
+	@Deprecated
 	public void destroy() {
-		if (_threadPoolExecutor == null) {
-			return;
-		}
-
-		synchronized (ProcessUtil.class) {
-			if (_threadPoolExecutor != null) {
-				_threadPoolExecutor.shutdownNow();
-
-				_threadPoolExecutor = null;
-			}
-		}
 	}
 
-	private static ThreadPoolExecutor _getThreadPoolExecutor() {
-		if (_threadPoolExecutor != null) {
-			return _threadPoolExecutor;
-		}
-
-		synchronized (ProcessUtil.class) {
-			if (_threadPoolExecutor == null) {
-				_threadPoolExecutor = new ThreadPoolExecutor(
-					0, Integer.MAX_VALUE, 60, TimeUnit.SECONDS, true,
-					Integer.MAX_VALUE, new AbortPolicy(),
-					new NamedThreadFactory(
-						ProcessUtil.class.getName(), Thread.MIN_PRIORITY,
-						PortalClassLoaderUtil.getClassLoader()),
-					new ThreadPoolHandlerAdapter());
-			}
-		}
-
-		return _threadPoolExecutor;
+	public static List<NoticeableFuture<?>>	getNoticeableFutures() {
+		return Collections.unmodifiableList(_noticeableFutures);
 	}
 
 	private static <O, E> NoticeableFuture<ObjectValuePair<O, E>>
@@ -234,7 +249,8 @@ public class ProcessUtil {
 		return defaultNoticeableFuture;
 	}
 
-	private static volatile ThreadPoolExecutor _threadPoolExecutor;
+	private static final List<NoticeableFuture<?>> _noticeableFutures =
+		new CopyOnWriteArrayList<>();
 
 	private static class ProcessStdErrCallable<T> implements Callable<T> {
 
