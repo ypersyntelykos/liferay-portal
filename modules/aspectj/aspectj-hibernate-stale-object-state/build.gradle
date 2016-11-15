@@ -30,7 +30,3 @@ dependencies {
 	provided group: "com.liferay.portal", name: "com.liferay.portal.kernel", version: "2.6.0"
 	provided group: "org.hibernate", name: "hibernate-core", version: "3.6.10.Final"
 }
-
-liferay {
-	deployDir = file("${appServerLib}/WEB-INF/lib")
-}
