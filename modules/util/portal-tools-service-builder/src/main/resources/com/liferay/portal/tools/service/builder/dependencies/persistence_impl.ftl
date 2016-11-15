@@ -304,51 +304,7 @@ public class ${entity.name}PersistenceImpl extends BasePersistenceImpl<${entity.
 	}
 
 	<#if entity.getUniqueFinderList()?size &gt; 0>
-		protected void cacheUniqueFindersCache(${entity.name}ModelImpl ${entity.varName}ModelImpl, boolean isNew) {
-			if (isNew) {
-				<#list entity.getUniqueFinderList() as finder>
-					<#assign finderColsList = finder.getColumns() />
-
-					<#if finder_index == 0>
-						Object[]
-					</#if>
-					args = new Object[] {
-						<#list finderColsList as finderCol>
-							${entity.varName}ModelImpl.get${finderCol.methodName}()
-
-							<#if finderCol_has_next>
-								,
-							</#if>
-						</#list>
-					};
-
-					finderCache.putResult(FINDER_PATH_COUNT_BY_${finder.name?upper_case}, args, Long.valueOf(1));
-					finderCache.putResult(FINDER_PATH_FETCH_BY_${finder.name?upper_case}, args, ${entity.varName}ModelImpl);
-				</#list>
-			}
-			else {
-				<#list entity.getUniqueFinderList() as finder>
-					<#assign finderColsList = finder.getColumns() />
-
-					if ((${entity.varName}ModelImpl.getColumnBitmask() & FINDER_PATH_FETCH_BY_${finder.name?upper_case}.getColumnBitmask()) != 0) {
-						Object[] args = new Object[] {
-							<#list finderColsList as finderCol>
-								${entity.varName}ModelImpl.get${finderCol.methodName}()
-
-								<#if finderCol_has_next>
-									,
-								</#if>
-							</#list>
-						};
-
-						finderCache.putResult(FINDER_PATH_COUNT_BY_${finder.name?upper_case}, args, Long.valueOf(1));
-						finderCache.putResult(FINDER_PATH_FETCH_BY_${finder.name?upper_case}, args, ${entity.varName}ModelImpl);
-					}
-				</#list>
-			}
-		}
-
-		protected void clearUniqueFindersCache(${entity.name}ModelImpl ${entity.varName}ModelImpl) {
+		protected void cacheUniqueFindersCache(${entity.name}ModelImpl ${entity.varName}ModelImpl) {
 			<#list entity.getUniqueFinderList() as finder>
 				<#assign finderColsList = finder.getColumns() />
 
@@ -365,11 +321,17 @@ public class ${entity.name}PersistenceImpl extends BasePersistenceImpl<${entity.
 					</#list>
 				};
 
-				finderCache.removeResult(FINDER_PATH_COUNT_BY_${finder.name?upper_case}, args);
-				finderCache.removeResult(FINDER_PATH_FETCH_BY_${finder.name?upper_case}, args);
+				finderCache.putResult(FINDER_PATH_COUNT_BY_${finder.name?upper_case}, args, Long.valueOf(1), false);
+				finderCache.putResult(FINDER_PATH_FETCH_BY_${finder.name?upper_case}, args, ${entity.varName}ModelImpl, false);
+			</#list>
+		}
 
+		protected void clearUniqueFindersCache(${entity.name}ModelImpl ${entity.varName}ModelImpl) {
+			<#list entity.getUniqueFinderList() as finder>
 				if ((${entity.varName}ModelImpl.getColumnBitmask() & FINDER_PATH_FETCH_BY_${finder.name?upper_case}.getColumnBitmask()) != 0) {
-					args = new Object[] {
+					Object[] args = new Object[] {
+						<#assign finderColsList = finder.getColumns() />
+
 						<#list finderColsList as finderCol>
 							${entity.varName}ModelImpl.getOriginal${finderCol.methodName}()
 
@@ -778,7 +740,7 @@ public class ${entity.name}PersistenceImpl extends BasePersistenceImpl<${entity.
 
 		<#if uniqueFinderList?size &gt; 0>
 			clearUniqueFindersCache(${entity.varName}ModelImpl);
-			cacheUniqueFindersCache(${entity.varName}ModelImpl, isNew);
+			cacheUniqueFindersCache(${entity.varName}ModelImpl);
 		</#if>
 
 		${entity.varName}.resetOriginalValues();
