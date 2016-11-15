@@ -3075,95 +3075,43 @@ public class KBFolderPersistenceImpl extends BasePersistenceImpl<KBFolder>
 		}
 	}
 
-	protected void cacheUniqueFindersCache(
-		KBFolderModelImpl kbFolderModelImpl, boolean isNew) {
-		if (isNew) {
-			Object[] args = new Object[] {
-					kbFolderModelImpl.getUuid(), kbFolderModelImpl.getGroupId()
-				};
-
-			finderCache.putResult(FINDER_PATH_COUNT_BY_UUID_G, args,
-				Long.valueOf(1));
-			finderCache.putResult(FINDER_PATH_FETCH_BY_UUID_G, args,
-				kbFolderModelImpl);
-
-			args = new Object[] {
-					kbFolderModelImpl.getGroupId(),
-					kbFolderModelImpl.getParentKBFolderId(),
-					kbFolderModelImpl.getName()
-				};
-
-			finderCache.putResult(FINDER_PATH_COUNT_BY_G_P_N, args,
-				Long.valueOf(1));
-			finderCache.putResult(FINDER_PATH_FETCH_BY_G_P_N, args,
-				kbFolderModelImpl);
-
-			args = new Object[] {
-					kbFolderModelImpl.getGroupId(),
-					kbFolderModelImpl.getParentKBFolderId(),
-					kbFolderModelImpl.getUrlTitle()
-				};
-
-			finderCache.putResult(FINDER_PATH_COUNT_BY_G_P_UT, args,
-				Long.valueOf(1));
-			finderCache.putResult(FINDER_PATH_FETCH_BY_G_P_UT, args,
-				kbFolderModelImpl);
-		}
-		else {
-			if ((kbFolderModelImpl.getColumnBitmask() &
-					FINDER_PATH_FETCH_BY_UUID_G.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						kbFolderModelImpl.getUuid(),
-						kbFolderModelImpl.getGroupId()
-					};
-
-				finderCache.putResult(FINDER_PATH_COUNT_BY_UUID_G, args,
-					Long.valueOf(1));
-				finderCache.putResult(FINDER_PATH_FETCH_BY_UUID_G, args,
-					kbFolderModelImpl);
-			}
-
-			if ((kbFolderModelImpl.getColumnBitmask() &
-					FINDER_PATH_FETCH_BY_G_P_N.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						kbFolderModelImpl.getGroupId(),
-						kbFolderModelImpl.getParentKBFolderId(),
-						kbFolderModelImpl.getName()
-					};
-
-				finderCache.putResult(FINDER_PATH_COUNT_BY_G_P_N, args,
-					Long.valueOf(1));
-				finderCache.putResult(FINDER_PATH_FETCH_BY_G_P_N, args,
-					kbFolderModelImpl);
-			}
-
-			if ((kbFolderModelImpl.getColumnBitmask() &
-					FINDER_PATH_FETCH_BY_G_P_UT.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						kbFolderModelImpl.getGroupId(),
-						kbFolderModelImpl.getParentKBFolderId(),
-						kbFolderModelImpl.getUrlTitle()
-					};
-
-				finderCache.putResult(FINDER_PATH_COUNT_BY_G_P_UT, args,
-					Long.valueOf(1));
-				finderCache.putResult(FINDER_PATH_FETCH_BY_G_P_UT, args,
-					kbFolderModelImpl);
-			}
-		}
-	}
-
-	protected void clearUniqueFindersCache(KBFolderModelImpl kbFolderModelImpl) {
+	protected void cacheUniqueFindersCache(KBFolderModelImpl kbFolderModelImpl) {
 		Object[] args = new Object[] {
 				kbFolderModelImpl.getUuid(), kbFolderModelImpl.getGroupId()
 			};
 
-		finderCache.removeResult(FINDER_PATH_COUNT_BY_UUID_G, args);
-		finderCache.removeResult(FINDER_PATH_FETCH_BY_UUID_G, args);
+		finderCache.putResult(FINDER_PATH_COUNT_BY_UUID_G, args,
+			Long.valueOf(1), false);
+		finderCache.putResult(FINDER_PATH_FETCH_BY_UUID_G, args,
+			kbFolderModelImpl, false);
 
+		args = new Object[] {
+				kbFolderModelImpl.getGroupId(),
+				kbFolderModelImpl.getParentKBFolderId(),
+				kbFolderModelImpl.getName()
+			};
+
+		finderCache.putResult(FINDER_PATH_COUNT_BY_G_P_N, args,
+			Long.valueOf(1), false);
+		finderCache.putResult(FINDER_PATH_FETCH_BY_G_P_N, args,
+			kbFolderModelImpl, false);
+
+		args = new Object[] {
+				kbFolderModelImpl.getGroupId(),
+				kbFolderModelImpl.getParentKBFolderId(),
+				kbFolderModelImpl.getUrlTitle()
+			};
+
+		finderCache.putResult(FINDER_PATH_COUNT_BY_G_P_UT, args,
+			Long.valueOf(1), false);
+		finderCache.putResult(FINDER_PATH_FETCH_BY_G_P_UT, args,
+			kbFolderModelImpl, false);
+	}
+
+	protected void clearUniqueFindersCache(KBFolderModelImpl kbFolderModelImpl) {
 		if ((kbFolderModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_UUID_G.getColumnBitmask()) != 0) {
-			args = new Object[] {
+			Object[] args = new Object[] {
 					kbFolderModelImpl.getOriginalUuid(),
 					kbFolderModelImpl.getOriginalGroupId()
 				};
@@ -3172,18 +3120,9 @@ public class KBFolderPersistenceImpl extends BasePersistenceImpl<KBFolder>
 			finderCache.removeResult(FINDER_PATH_FETCH_BY_UUID_G, args);
 		}
 
-		args = new Object[] {
-				kbFolderModelImpl.getGroupId(),
-				kbFolderModelImpl.getParentKBFolderId(),
-				kbFolderModelImpl.getName()
-			};
-
-		finderCache.removeResult(FINDER_PATH_COUNT_BY_G_P_N, args);
-		finderCache.removeResult(FINDER_PATH_FETCH_BY_G_P_N, args);
-
 		if ((kbFolderModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_G_P_N.getColumnBitmask()) != 0) {
-			args = new Object[] {
+			Object[] args = new Object[] {
 					kbFolderModelImpl.getOriginalGroupId(),
 					kbFolderModelImpl.getOriginalParentKBFolderId(),
 					kbFolderModelImpl.getOriginalName()
@@ -3193,18 +3132,9 @@ public class KBFolderPersistenceImpl extends BasePersistenceImpl<KBFolder>
 			finderCache.removeResult(FINDER_PATH_FETCH_BY_G_P_N, args);
 		}
 
-		args = new Object[] {
-				kbFolderModelImpl.getGroupId(),
-				kbFolderModelImpl.getParentKBFolderId(),
-				kbFolderModelImpl.getUrlTitle()
-			};
-
-		finderCache.removeResult(FINDER_PATH_COUNT_BY_G_P_UT, args);
-		finderCache.removeResult(FINDER_PATH_FETCH_BY_G_P_UT, args);
-
 		if ((kbFolderModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_G_P_UT.getColumnBitmask()) != 0) {
-			args = new Object[] {
+			Object[] args = new Object[] {
 					kbFolderModelImpl.getOriginalGroupId(),
 					kbFolderModelImpl.getOriginalParentKBFolderId(),
 					kbFolderModelImpl.getOriginalUrlTitle()
@@ -3447,7 +3377,7 @@ public class KBFolderPersistenceImpl extends BasePersistenceImpl<KBFolder>
 			KBFolderImpl.class, kbFolder.getPrimaryKey(), kbFolder, false);
 
 		clearUniqueFindersCache(kbFolderModelImpl);
-		cacheUniqueFindersCache(kbFolderModelImpl, isNew);
+		cacheUniqueFindersCache(kbFolderModelImpl);
 
 		kbFolder.resetOriginalValues();
 

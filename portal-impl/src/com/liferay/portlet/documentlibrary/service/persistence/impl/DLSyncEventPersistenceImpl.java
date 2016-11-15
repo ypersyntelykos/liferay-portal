@@ -871,38 +871,22 @@ public class DLSyncEventPersistenceImpl extends BasePersistenceImpl<DLSyncEvent>
 	}
 
 	protected void cacheUniqueFindersCache(
-		DLSyncEventModelImpl dlSyncEventModelImpl, boolean isNew) {
-		if (isNew) {
-			Object[] args = new Object[] { dlSyncEventModelImpl.getTypePK() };
+		DLSyncEventModelImpl dlSyncEventModelImpl) {
+		Object[] args = new Object[] { dlSyncEventModelImpl.getTypePK() };
 
-			finderCache.putResult(FINDER_PATH_COUNT_BY_TYPEPK, args,
-				Long.valueOf(1));
-			finderCache.putResult(FINDER_PATH_FETCH_BY_TYPEPK, args,
-				dlSyncEventModelImpl);
-		}
-		else {
-			if ((dlSyncEventModelImpl.getColumnBitmask() &
-					FINDER_PATH_FETCH_BY_TYPEPK.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] { dlSyncEventModelImpl.getTypePK() };
-
-				finderCache.putResult(FINDER_PATH_COUNT_BY_TYPEPK, args,
-					Long.valueOf(1));
-				finderCache.putResult(FINDER_PATH_FETCH_BY_TYPEPK, args,
-					dlSyncEventModelImpl);
-			}
-		}
+		finderCache.putResult(FINDER_PATH_COUNT_BY_TYPEPK, args,
+			Long.valueOf(1), false);
+		finderCache.putResult(FINDER_PATH_FETCH_BY_TYPEPK, args,
+			dlSyncEventModelImpl, false);
 	}
 
 	protected void clearUniqueFindersCache(
 		DLSyncEventModelImpl dlSyncEventModelImpl) {
-		Object[] args = new Object[] { dlSyncEventModelImpl.getTypePK() };
-
-		finderCache.removeResult(FINDER_PATH_COUNT_BY_TYPEPK, args);
-		finderCache.removeResult(FINDER_PATH_FETCH_BY_TYPEPK, args);
-
 		if ((dlSyncEventModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_TYPEPK.getColumnBitmask()) != 0) {
-			args = new Object[] { dlSyncEventModelImpl.getOriginalTypePK() };
+			Object[] args = new Object[] {
+					dlSyncEventModelImpl.getOriginalTypePK()
+				};
 
 			finderCache.removeResult(FINDER_PATH_COUNT_BY_TYPEPK, args);
 			finderCache.removeResult(FINDER_PATH_FETCH_BY_TYPEPK, args);
@@ -1051,7 +1035,7 @@ public class DLSyncEventPersistenceImpl extends BasePersistenceImpl<DLSyncEvent>
 			false);
 
 		clearUniqueFindersCache(dlSyncEventModelImpl);
-		cacheUniqueFindersCache(dlSyncEventModelImpl, isNew);
+		cacheUniqueFindersCache(dlSyncEventModelImpl);
 
 		dlSyncEvent.resetOriginalValues();
 

@@ -4946,123 +4946,26 @@ public class LayoutFriendlyURLPersistenceImpl extends BasePersistenceImpl<Layout
 	}
 
 	protected void cacheUniqueFindersCache(
-		LayoutFriendlyURLModelImpl layoutFriendlyURLModelImpl, boolean isNew) {
-		if (isNew) {
-			Object[] args = new Object[] {
-					layoutFriendlyURLModelImpl.getUuid(),
-					layoutFriendlyURLModelImpl.getGroupId()
-				};
-
-			finderCache.putResult(FINDER_PATH_COUNT_BY_UUID_G, args,
-				Long.valueOf(1));
-			finderCache.putResult(FINDER_PATH_FETCH_BY_UUID_G, args,
-				layoutFriendlyURLModelImpl);
-
-			args = new Object[] {
-					layoutFriendlyURLModelImpl.getPlid(),
-					layoutFriendlyURLModelImpl.getLanguageId()
-				};
-
-			finderCache.putResult(FINDER_PATH_COUNT_BY_P_L, args,
-				Long.valueOf(1));
-			finderCache.putResult(FINDER_PATH_FETCH_BY_P_L, args,
-				layoutFriendlyURLModelImpl);
-
-			args = new Object[] {
-					layoutFriendlyURLModelImpl.getGroupId(),
-					layoutFriendlyURLModelImpl.getPrivateLayout(),
-					layoutFriendlyURLModelImpl.getFriendlyURL(),
-					layoutFriendlyURLModelImpl.getLanguageId()
-				};
-
-			finderCache.putResult(FINDER_PATH_COUNT_BY_G_P_F_L, args,
-				Long.valueOf(1));
-			finderCache.putResult(FINDER_PATH_FETCH_BY_G_P_F_L, args,
-				layoutFriendlyURLModelImpl);
-		}
-		else {
-			if ((layoutFriendlyURLModelImpl.getColumnBitmask() &
-					FINDER_PATH_FETCH_BY_UUID_G.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						layoutFriendlyURLModelImpl.getUuid(),
-						layoutFriendlyURLModelImpl.getGroupId()
-					};
-
-				finderCache.putResult(FINDER_PATH_COUNT_BY_UUID_G, args,
-					Long.valueOf(1));
-				finderCache.putResult(FINDER_PATH_FETCH_BY_UUID_G, args,
-					layoutFriendlyURLModelImpl);
-			}
-
-			if ((layoutFriendlyURLModelImpl.getColumnBitmask() &
-					FINDER_PATH_FETCH_BY_P_L.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						layoutFriendlyURLModelImpl.getPlid(),
-						layoutFriendlyURLModelImpl.getLanguageId()
-					};
-
-				finderCache.putResult(FINDER_PATH_COUNT_BY_P_L, args,
-					Long.valueOf(1));
-				finderCache.putResult(FINDER_PATH_FETCH_BY_P_L, args,
-					layoutFriendlyURLModelImpl);
-			}
-
-			if ((layoutFriendlyURLModelImpl.getColumnBitmask() &
-					FINDER_PATH_FETCH_BY_G_P_F_L.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						layoutFriendlyURLModelImpl.getGroupId(),
-						layoutFriendlyURLModelImpl.getPrivateLayout(),
-						layoutFriendlyURLModelImpl.getFriendlyURL(),
-						layoutFriendlyURLModelImpl.getLanguageId()
-					};
-
-				finderCache.putResult(FINDER_PATH_COUNT_BY_G_P_F_L, args,
-					Long.valueOf(1));
-				finderCache.putResult(FINDER_PATH_FETCH_BY_G_P_F_L, args,
-					layoutFriendlyURLModelImpl);
-			}
-		}
-	}
-
-	protected void clearUniqueFindersCache(
 		LayoutFriendlyURLModelImpl layoutFriendlyURLModelImpl) {
 		Object[] args = new Object[] {
 				layoutFriendlyURLModelImpl.getUuid(),
 				layoutFriendlyURLModelImpl.getGroupId()
 			};
 
-		finderCache.removeResult(FINDER_PATH_COUNT_BY_UUID_G, args);
-		finderCache.removeResult(FINDER_PATH_FETCH_BY_UUID_G, args);
-
-		if ((layoutFriendlyURLModelImpl.getColumnBitmask() &
-				FINDER_PATH_FETCH_BY_UUID_G.getColumnBitmask()) != 0) {
-			args = new Object[] {
-					layoutFriendlyURLModelImpl.getOriginalUuid(),
-					layoutFriendlyURLModelImpl.getOriginalGroupId()
-				};
-
-			finderCache.removeResult(FINDER_PATH_COUNT_BY_UUID_G, args);
-			finderCache.removeResult(FINDER_PATH_FETCH_BY_UUID_G, args);
-		}
+		finderCache.putResult(FINDER_PATH_COUNT_BY_UUID_G, args,
+			Long.valueOf(1), false);
+		finderCache.putResult(FINDER_PATH_FETCH_BY_UUID_G, args,
+			layoutFriendlyURLModelImpl, false);
 
 		args = new Object[] {
 				layoutFriendlyURLModelImpl.getPlid(),
 				layoutFriendlyURLModelImpl.getLanguageId()
 			};
 
-		finderCache.removeResult(FINDER_PATH_COUNT_BY_P_L, args);
-		finderCache.removeResult(FINDER_PATH_FETCH_BY_P_L, args);
-
-		if ((layoutFriendlyURLModelImpl.getColumnBitmask() &
-				FINDER_PATH_FETCH_BY_P_L.getColumnBitmask()) != 0) {
-			args = new Object[] {
-					layoutFriendlyURLModelImpl.getOriginalPlid(),
-					layoutFriendlyURLModelImpl.getOriginalLanguageId()
-				};
-
-			finderCache.removeResult(FINDER_PATH_COUNT_BY_P_L, args);
-			finderCache.removeResult(FINDER_PATH_FETCH_BY_P_L, args);
-		}
+		finderCache.putResult(FINDER_PATH_COUNT_BY_P_L, args, Long.valueOf(1),
+			false);
+		finderCache.putResult(FINDER_PATH_FETCH_BY_P_L, args,
+			layoutFriendlyURLModelImpl, false);
 
 		args = new Object[] {
 				layoutFriendlyURLModelImpl.getGroupId(),
@@ -5071,12 +4974,39 @@ public class LayoutFriendlyURLPersistenceImpl extends BasePersistenceImpl<Layout
 				layoutFriendlyURLModelImpl.getLanguageId()
 			};
 
-		finderCache.removeResult(FINDER_PATH_COUNT_BY_G_P_F_L, args);
-		finderCache.removeResult(FINDER_PATH_FETCH_BY_G_P_F_L, args);
+		finderCache.putResult(FINDER_PATH_COUNT_BY_G_P_F_L, args,
+			Long.valueOf(1), false);
+		finderCache.putResult(FINDER_PATH_FETCH_BY_G_P_F_L, args,
+			layoutFriendlyURLModelImpl, false);
+	}
+
+	protected void clearUniqueFindersCache(
+		LayoutFriendlyURLModelImpl layoutFriendlyURLModelImpl) {
+		if ((layoutFriendlyURLModelImpl.getColumnBitmask() &
+				FINDER_PATH_FETCH_BY_UUID_G.getColumnBitmask()) != 0) {
+			Object[] args = new Object[] {
+					layoutFriendlyURLModelImpl.getOriginalUuid(),
+					layoutFriendlyURLModelImpl.getOriginalGroupId()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_UUID_G, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_UUID_G, args);
+		}
+
+		if ((layoutFriendlyURLModelImpl.getColumnBitmask() &
+				FINDER_PATH_FETCH_BY_P_L.getColumnBitmask()) != 0) {
+			Object[] args = new Object[] {
+					layoutFriendlyURLModelImpl.getOriginalPlid(),
+					layoutFriendlyURLModelImpl.getOriginalLanguageId()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_P_L, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_P_L, args);
+		}
 
 		if ((layoutFriendlyURLModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_G_P_F_L.getColumnBitmask()) != 0) {
-			args = new Object[] {
+			Object[] args = new Object[] {
 					layoutFriendlyURLModelImpl.getOriginalGroupId(),
 					layoutFriendlyURLModelImpl.getOriginalPrivateLayout(),
 					layoutFriendlyURLModelImpl.getOriginalFriendlyURL(),
@@ -5400,7 +5330,7 @@ public class LayoutFriendlyURLPersistenceImpl extends BasePersistenceImpl<Layout
 			layoutFriendlyURL, false);
 
 		clearUniqueFindersCache(layoutFriendlyURLModelImpl);
-		cacheUniqueFindersCache(layoutFriendlyURLModelImpl, isNew);
+		cacheUniqueFindersCache(layoutFriendlyURLModelImpl);
 
 		layoutFriendlyURL.resetOriginalValues();
 

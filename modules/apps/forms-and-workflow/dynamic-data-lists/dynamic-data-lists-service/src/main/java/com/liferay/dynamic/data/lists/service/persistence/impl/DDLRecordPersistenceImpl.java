@@ -3112,46 +3112,22 @@ public class DDLRecordPersistenceImpl extends BasePersistenceImpl<DDLRecord>
 	}
 
 	protected void cacheUniqueFindersCache(
-		DDLRecordModelImpl ddlRecordModelImpl, boolean isNew) {
-		if (isNew) {
-			Object[] args = new Object[] {
-					ddlRecordModelImpl.getUuid(),
-					ddlRecordModelImpl.getGroupId()
-				};
-
-			finderCache.putResult(FINDER_PATH_COUNT_BY_UUID_G, args,
-				Long.valueOf(1));
-			finderCache.putResult(FINDER_PATH_FETCH_BY_UUID_G, args,
-				ddlRecordModelImpl);
-		}
-		else {
-			if ((ddlRecordModelImpl.getColumnBitmask() &
-					FINDER_PATH_FETCH_BY_UUID_G.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						ddlRecordModelImpl.getUuid(),
-						ddlRecordModelImpl.getGroupId()
-					};
-
-				finderCache.putResult(FINDER_PATH_COUNT_BY_UUID_G, args,
-					Long.valueOf(1));
-				finderCache.putResult(FINDER_PATH_FETCH_BY_UUID_G, args,
-					ddlRecordModelImpl);
-			}
-		}
-	}
-
-	protected void clearUniqueFindersCache(
 		DDLRecordModelImpl ddlRecordModelImpl) {
 		Object[] args = new Object[] {
 				ddlRecordModelImpl.getUuid(), ddlRecordModelImpl.getGroupId()
 			};
 
-		finderCache.removeResult(FINDER_PATH_COUNT_BY_UUID_G, args);
-		finderCache.removeResult(FINDER_PATH_FETCH_BY_UUID_G, args);
+		finderCache.putResult(FINDER_PATH_COUNT_BY_UUID_G, args,
+			Long.valueOf(1), false);
+		finderCache.putResult(FINDER_PATH_FETCH_BY_UUID_G, args,
+			ddlRecordModelImpl, false);
+	}
 
+	protected void clearUniqueFindersCache(
+		DDLRecordModelImpl ddlRecordModelImpl) {
 		if ((ddlRecordModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_UUID_G.getColumnBitmask()) != 0) {
-			args = new Object[] {
+			Object[] args = new Object[] {
 					ddlRecordModelImpl.getOriginalUuid(),
 					ddlRecordModelImpl.getOriginalGroupId()
 				};
@@ -3429,7 +3405,7 @@ public class DDLRecordPersistenceImpl extends BasePersistenceImpl<DDLRecord>
 			DDLRecordImpl.class, ddlRecord.getPrimaryKey(), ddlRecord, false);
 
 		clearUniqueFindersCache(ddlRecordModelImpl);
-		cacheUniqueFindersCache(ddlRecordModelImpl, isNew);
+		cacheUniqueFindersCache(ddlRecordModelImpl);
 
 		ddlRecord.resetOriginalValues();
 

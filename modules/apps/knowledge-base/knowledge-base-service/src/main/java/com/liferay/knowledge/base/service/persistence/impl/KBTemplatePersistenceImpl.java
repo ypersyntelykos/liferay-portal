@@ -2424,46 +2424,22 @@ public class KBTemplatePersistenceImpl extends BasePersistenceImpl<KBTemplate>
 	}
 
 	protected void cacheUniqueFindersCache(
-		KBTemplateModelImpl kbTemplateModelImpl, boolean isNew) {
-		if (isNew) {
-			Object[] args = new Object[] {
-					kbTemplateModelImpl.getUuid(),
-					kbTemplateModelImpl.getGroupId()
-				};
-
-			finderCache.putResult(FINDER_PATH_COUNT_BY_UUID_G, args,
-				Long.valueOf(1));
-			finderCache.putResult(FINDER_PATH_FETCH_BY_UUID_G, args,
-				kbTemplateModelImpl);
-		}
-		else {
-			if ((kbTemplateModelImpl.getColumnBitmask() &
-					FINDER_PATH_FETCH_BY_UUID_G.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						kbTemplateModelImpl.getUuid(),
-						kbTemplateModelImpl.getGroupId()
-					};
-
-				finderCache.putResult(FINDER_PATH_COUNT_BY_UUID_G, args,
-					Long.valueOf(1));
-				finderCache.putResult(FINDER_PATH_FETCH_BY_UUID_G, args,
-					kbTemplateModelImpl);
-			}
-		}
-	}
-
-	protected void clearUniqueFindersCache(
 		KBTemplateModelImpl kbTemplateModelImpl) {
 		Object[] args = new Object[] {
 				kbTemplateModelImpl.getUuid(), kbTemplateModelImpl.getGroupId()
 			};
 
-		finderCache.removeResult(FINDER_PATH_COUNT_BY_UUID_G, args);
-		finderCache.removeResult(FINDER_PATH_FETCH_BY_UUID_G, args);
+		finderCache.putResult(FINDER_PATH_COUNT_BY_UUID_G, args,
+			Long.valueOf(1), false);
+		finderCache.putResult(FINDER_PATH_FETCH_BY_UUID_G, args,
+			kbTemplateModelImpl, false);
+	}
 
+	protected void clearUniqueFindersCache(
+		KBTemplateModelImpl kbTemplateModelImpl) {
 		if ((kbTemplateModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_UUID_G.getColumnBitmask()) != 0) {
-			args = new Object[] {
+			Object[] args = new Object[] {
 					kbTemplateModelImpl.getOriginalUuid(),
 					kbTemplateModelImpl.getOriginalGroupId()
 				};
@@ -2703,7 +2679,7 @@ public class KBTemplatePersistenceImpl extends BasePersistenceImpl<KBTemplate>
 			KBTemplateImpl.class, kbTemplate.getPrimaryKey(), kbTemplate, false);
 
 		clearUniqueFindersCache(kbTemplateModelImpl);
-		cacheUniqueFindersCache(kbTemplateModelImpl, isNew);
+		cacheUniqueFindersCache(kbTemplateModelImpl);
 
 		kbTemplate.resetOriginalValues();
 

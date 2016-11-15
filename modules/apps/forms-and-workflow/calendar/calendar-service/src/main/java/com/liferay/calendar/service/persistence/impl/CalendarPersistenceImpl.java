@@ -3866,45 +3866,21 @@ public class CalendarPersistenceImpl extends BasePersistenceImpl<Calendar>
 		}
 	}
 
-	protected void cacheUniqueFindersCache(
-		CalendarModelImpl calendarModelImpl, boolean isNew) {
-		if (isNew) {
-			Object[] args = new Object[] {
-					calendarModelImpl.getUuid(), calendarModelImpl.getGroupId()
-				};
-
-			finderCache.putResult(FINDER_PATH_COUNT_BY_UUID_G, args,
-				Long.valueOf(1));
-			finderCache.putResult(FINDER_PATH_FETCH_BY_UUID_G, args,
-				calendarModelImpl);
-		}
-		else {
-			if ((calendarModelImpl.getColumnBitmask() &
-					FINDER_PATH_FETCH_BY_UUID_G.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						calendarModelImpl.getUuid(),
-						calendarModelImpl.getGroupId()
-					};
-
-				finderCache.putResult(FINDER_PATH_COUNT_BY_UUID_G, args,
-					Long.valueOf(1));
-				finderCache.putResult(FINDER_PATH_FETCH_BY_UUID_G, args,
-					calendarModelImpl);
-			}
-		}
-	}
-
-	protected void clearUniqueFindersCache(CalendarModelImpl calendarModelImpl) {
+	protected void cacheUniqueFindersCache(CalendarModelImpl calendarModelImpl) {
 		Object[] args = new Object[] {
 				calendarModelImpl.getUuid(), calendarModelImpl.getGroupId()
 			};
 
-		finderCache.removeResult(FINDER_PATH_COUNT_BY_UUID_G, args);
-		finderCache.removeResult(FINDER_PATH_FETCH_BY_UUID_G, args);
+		finderCache.putResult(FINDER_PATH_COUNT_BY_UUID_G, args,
+			Long.valueOf(1), false);
+		finderCache.putResult(FINDER_PATH_FETCH_BY_UUID_G, args,
+			calendarModelImpl, false);
+	}
 
+	protected void clearUniqueFindersCache(CalendarModelImpl calendarModelImpl) {
 		if ((calendarModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_UUID_G.getColumnBitmask()) != 0) {
-			args = new Object[] {
+			Object[] args = new Object[] {
 					calendarModelImpl.getOriginalUuid(),
 					calendarModelImpl.getOriginalGroupId()
 				};
@@ -4188,7 +4164,7 @@ public class CalendarPersistenceImpl extends BasePersistenceImpl<Calendar>
 			CalendarImpl.class, calendar.getPrimaryKey(), calendar, false);
 
 		clearUniqueFindersCache(calendarModelImpl);
-		cacheUniqueFindersCache(calendarModelImpl, isNew);
+		cacheUniqueFindersCache(calendarModelImpl);
 
 		calendar.resetOriginalValues();
 

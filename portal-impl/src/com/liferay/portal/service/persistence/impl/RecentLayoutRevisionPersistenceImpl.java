@@ -1976,38 +1976,6 @@ public class RecentLayoutRevisionPersistenceImpl extends BasePersistenceImpl<Rec
 	}
 
 	protected void cacheUniqueFindersCache(
-		RecentLayoutRevisionModelImpl recentLayoutRevisionModelImpl,
-		boolean isNew) {
-		if (isNew) {
-			Object[] args = new Object[] {
-					recentLayoutRevisionModelImpl.getUserId(),
-					recentLayoutRevisionModelImpl.getLayoutSetBranchId(),
-					recentLayoutRevisionModelImpl.getPlid()
-				};
-
-			finderCache.putResult(FINDER_PATH_COUNT_BY_U_L_P, args,
-				Long.valueOf(1));
-			finderCache.putResult(FINDER_PATH_FETCH_BY_U_L_P, args,
-				recentLayoutRevisionModelImpl);
-		}
-		else {
-			if ((recentLayoutRevisionModelImpl.getColumnBitmask() &
-					FINDER_PATH_FETCH_BY_U_L_P.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						recentLayoutRevisionModelImpl.getUserId(),
-						recentLayoutRevisionModelImpl.getLayoutSetBranchId(),
-						recentLayoutRevisionModelImpl.getPlid()
-					};
-
-				finderCache.putResult(FINDER_PATH_COUNT_BY_U_L_P, args,
-					Long.valueOf(1));
-				finderCache.putResult(FINDER_PATH_FETCH_BY_U_L_P, args,
-					recentLayoutRevisionModelImpl);
-			}
-		}
-	}
-
-	protected void clearUniqueFindersCache(
 		RecentLayoutRevisionModelImpl recentLayoutRevisionModelImpl) {
 		Object[] args = new Object[] {
 				recentLayoutRevisionModelImpl.getUserId(),
@@ -2015,12 +1983,17 @@ public class RecentLayoutRevisionPersistenceImpl extends BasePersistenceImpl<Rec
 				recentLayoutRevisionModelImpl.getPlid()
 			};
 
-		finderCache.removeResult(FINDER_PATH_COUNT_BY_U_L_P, args);
-		finderCache.removeResult(FINDER_PATH_FETCH_BY_U_L_P, args);
+		finderCache.putResult(FINDER_PATH_COUNT_BY_U_L_P, args,
+			Long.valueOf(1), false);
+		finderCache.putResult(FINDER_PATH_FETCH_BY_U_L_P, args,
+			recentLayoutRevisionModelImpl, false);
+	}
 
+	protected void clearUniqueFindersCache(
+		RecentLayoutRevisionModelImpl recentLayoutRevisionModelImpl) {
 		if ((recentLayoutRevisionModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_U_L_P.getColumnBitmask()) != 0) {
-			args = new Object[] {
+			Object[] args = new Object[] {
 					recentLayoutRevisionModelImpl.getOriginalUserId(),
 					recentLayoutRevisionModelImpl.getOriginalLayoutSetBranchId(),
 					recentLayoutRevisionModelImpl.getOriginalPlid()
@@ -2233,7 +2206,7 @@ public class RecentLayoutRevisionPersistenceImpl extends BasePersistenceImpl<Rec
 			recentLayoutRevision.getPrimaryKey(), recentLayoutRevision, false);
 
 		clearUniqueFindersCache(recentLayoutRevisionModelImpl);
-		cacheUniqueFindersCache(recentLayoutRevisionModelImpl, isNew);
+		cacheUniqueFindersCache(recentLayoutRevisionModelImpl);
 
 		recentLayoutRevision.resetOriginalValues();
 

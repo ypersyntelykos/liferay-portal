@@ -411,47 +411,23 @@ public class PortalPreferencesPersistenceImpl extends BasePersistenceImpl<Portal
 	}
 
 	protected void cacheUniqueFindersCache(
-		PortalPreferencesModelImpl portalPreferencesModelImpl, boolean isNew) {
-		if (isNew) {
-			Object[] args = new Object[] {
-					portalPreferencesModelImpl.getOwnerId(),
-					portalPreferencesModelImpl.getOwnerType()
-				};
-
-			finderCache.putResult(FINDER_PATH_COUNT_BY_O_O, args,
-				Long.valueOf(1));
-			finderCache.putResult(FINDER_PATH_FETCH_BY_O_O, args,
-				portalPreferencesModelImpl);
-		}
-		else {
-			if ((portalPreferencesModelImpl.getColumnBitmask() &
-					FINDER_PATH_FETCH_BY_O_O.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						portalPreferencesModelImpl.getOwnerId(),
-						portalPreferencesModelImpl.getOwnerType()
-					};
-
-				finderCache.putResult(FINDER_PATH_COUNT_BY_O_O, args,
-					Long.valueOf(1));
-				finderCache.putResult(FINDER_PATH_FETCH_BY_O_O, args,
-					portalPreferencesModelImpl);
-			}
-		}
-	}
-
-	protected void clearUniqueFindersCache(
 		PortalPreferencesModelImpl portalPreferencesModelImpl) {
 		Object[] args = new Object[] {
 				portalPreferencesModelImpl.getOwnerId(),
 				portalPreferencesModelImpl.getOwnerType()
 			};
 
-		finderCache.removeResult(FINDER_PATH_COUNT_BY_O_O, args);
-		finderCache.removeResult(FINDER_PATH_FETCH_BY_O_O, args);
+		finderCache.putResult(FINDER_PATH_COUNT_BY_O_O, args, Long.valueOf(1),
+			false);
+		finderCache.putResult(FINDER_PATH_FETCH_BY_O_O, args,
+			portalPreferencesModelImpl, false);
+	}
 
+	protected void clearUniqueFindersCache(
+		PortalPreferencesModelImpl portalPreferencesModelImpl) {
 		if ((portalPreferencesModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_O_O.getColumnBitmask()) != 0) {
-			args = new Object[] {
+			Object[] args = new Object[] {
 					portalPreferencesModelImpl.getOriginalOwnerId(),
 					portalPreferencesModelImpl.getOriginalOwnerType()
 				};
@@ -602,7 +578,7 @@ public class PortalPreferencesPersistenceImpl extends BasePersistenceImpl<Portal
 			portalPreferences, false);
 
 		clearUniqueFindersCache(portalPreferencesModelImpl);
-		cacheUniqueFindersCache(portalPreferencesModelImpl, isNew);
+		cacheUniqueFindersCache(portalPreferencesModelImpl);
 
 		portalPreferences.resetOriginalValues();
 

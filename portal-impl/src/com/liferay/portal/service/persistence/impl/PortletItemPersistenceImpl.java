@@ -1699,39 +1699,6 @@ public class PortletItemPersistenceImpl extends BasePersistenceImpl<PortletItem>
 	}
 
 	protected void cacheUniqueFindersCache(
-		PortletItemModelImpl portletItemModelImpl, boolean isNew) {
-		if (isNew) {
-			Object[] args = new Object[] {
-					portletItemModelImpl.getGroupId(),
-					portletItemModelImpl.getName(),
-					portletItemModelImpl.getPortletId(),
-					portletItemModelImpl.getClassNameId()
-				};
-
-			finderCache.putResult(FINDER_PATH_COUNT_BY_G_N_P_C, args,
-				Long.valueOf(1));
-			finderCache.putResult(FINDER_PATH_FETCH_BY_G_N_P_C, args,
-				portletItemModelImpl);
-		}
-		else {
-			if ((portletItemModelImpl.getColumnBitmask() &
-					FINDER_PATH_FETCH_BY_G_N_P_C.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						portletItemModelImpl.getGroupId(),
-						portletItemModelImpl.getName(),
-						portletItemModelImpl.getPortletId(),
-						portletItemModelImpl.getClassNameId()
-					};
-
-				finderCache.putResult(FINDER_PATH_COUNT_BY_G_N_P_C, args,
-					Long.valueOf(1));
-				finderCache.putResult(FINDER_PATH_FETCH_BY_G_N_P_C, args,
-					portletItemModelImpl);
-			}
-		}
-	}
-
-	protected void clearUniqueFindersCache(
 		PortletItemModelImpl portletItemModelImpl) {
 		Object[] args = new Object[] {
 				portletItemModelImpl.getGroupId(),
@@ -1740,12 +1707,17 @@ public class PortletItemPersistenceImpl extends BasePersistenceImpl<PortletItem>
 				portletItemModelImpl.getClassNameId()
 			};
 
-		finderCache.removeResult(FINDER_PATH_COUNT_BY_G_N_P_C, args);
-		finderCache.removeResult(FINDER_PATH_FETCH_BY_G_N_P_C, args);
+		finderCache.putResult(FINDER_PATH_COUNT_BY_G_N_P_C, args,
+			Long.valueOf(1), false);
+		finderCache.putResult(FINDER_PATH_FETCH_BY_G_N_P_C, args,
+			portletItemModelImpl, false);
+	}
 
+	protected void clearUniqueFindersCache(
+		PortletItemModelImpl portletItemModelImpl) {
 		if ((portletItemModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_G_N_P_C.getColumnBitmask()) != 0) {
-			args = new Object[] {
+			Object[] args = new Object[] {
 					portletItemModelImpl.getOriginalGroupId(),
 					portletItemModelImpl.getOriginalName(),
 					portletItemModelImpl.getOriginalPortletId(),
@@ -1968,7 +1940,7 @@ public class PortletItemPersistenceImpl extends BasePersistenceImpl<PortletItem>
 			false);
 
 		clearUniqueFindersCache(portletItemModelImpl);
-		cacheUniqueFindersCache(portletItemModelImpl, isNew);
+		cacheUniqueFindersCache(portletItemModelImpl);
 
 		portletItem.resetOriginalValues();
 

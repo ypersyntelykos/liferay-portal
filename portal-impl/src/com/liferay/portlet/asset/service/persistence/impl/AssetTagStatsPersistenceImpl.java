@@ -1413,47 +1413,23 @@ public class AssetTagStatsPersistenceImpl extends BasePersistenceImpl<AssetTagSt
 	}
 
 	protected void cacheUniqueFindersCache(
-		AssetTagStatsModelImpl assetTagStatsModelImpl, boolean isNew) {
-		if (isNew) {
-			Object[] args = new Object[] {
-					assetTagStatsModelImpl.getTagId(),
-					assetTagStatsModelImpl.getClassNameId()
-				};
-
-			finderCache.putResult(FINDER_PATH_COUNT_BY_T_C, args,
-				Long.valueOf(1));
-			finderCache.putResult(FINDER_PATH_FETCH_BY_T_C, args,
-				assetTagStatsModelImpl);
-		}
-		else {
-			if ((assetTagStatsModelImpl.getColumnBitmask() &
-					FINDER_PATH_FETCH_BY_T_C.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						assetTagStatsModelImpl.getTagId(),
-						assetTagStatsModelImpl.getClassNameId()
-					};
-
-				finderCache.putResult(FINDER_PATH_COUNT_BY_T_C, args,
-					Long.valueOf(1));
-				finderCache.putResult(FINDER_PATH_FETCH_BY_T_C, args,
-					assetTagStatsModelImpl);
-			}
-		}
-	}
-
-	protected void clearUniqueFindersCache(
 		AssetTagStatsModelImpl assetTagStatsModelImpl) {
 		Object[] args = new Object[] {
 				assetTagStatsModelImpl.getTagId(),
 				assetTagStatsModelImpl.getClassNameId()
 			};
 
-		finderCache.removeResult(FINDER_PATH_COUNT_BY_T_C, args);
-		finderCache.removeResult(FINDER_PATH_FETCH_BY_T_C, args);
+		finderCache.putResult(FINDER_PATH_COUNT_BY_T_C, args, Long.valueOf(1),
+			false);
+		finderCache.putResult(FINDER_PATH_FETCH_BY_T_C, args,
+			assetTagStatsModelImpl, false);
+	}
 
+	protected void clearUniqueFindersCache(
+		AssetTagStatsModelImpl assetTagStatsModelImpl) {
 		if ((assetTagStatsModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_T_C.getColumnBitmask()) != 0) {
-			args = new Object[] {
+			Object[] args = new Object[] {
 					assetTagStatsModelImpl.getOriginalTagId(),
 					assetTagStatsModelImpl.getOriginalClassNameId()
 				};
@@ -1641,7 +1617,7 @@ public class AssetTagStatsPersistenceImpl extends BasePersistenceImpl<AssetTagSt
 			assetTagStats, false);
 
 		clearUniqueFindersCache(assetTagStatsModelImpl);
-		cacheUniqueFindersCache(assetTagStatsModelImpl, isNew);
+		cacheUniqueFindersCache(assetTagStatsModelImpl);
 
 		assetTagStats.resetOriginalValues();
 

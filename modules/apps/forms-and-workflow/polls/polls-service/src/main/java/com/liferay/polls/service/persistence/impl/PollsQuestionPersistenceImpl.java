@@ -2436,47 +2436,23 @@ public class PollsQuestionPersistenceImpl extends BasePersistenceImpl<PollsQuest
 	}
 
 	protected void cacheUniqueFindersCache(
-		PollsQuestionModelImpl pollsQuestionModelImpl, boolean isNew) {
-		if (isNew) {
-			Object[] args = new Object[] {
-					pollsQuestionModelImpl.getUuid(),
-					pollsQuestionModelImpl.getGroupId()
-				};
-
-			finderCache.putResult(FINDER_PATH_COUNT_BY_UUID_G, args,
-				Long.valueOf(1));
-			finderCache.putResult(FINDER_PATH_FETCH_BY_UUID_G, args,
-				pollsQuestionModelImpl);
-		}
-		else {
-			if ((pollsQuestionModelImpl.getColumnBitmask() &
-					FINDER_PATH_FETCH_BY_UUID_G.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						pollsQuestionModelImpl.getUuid(),
-						pollsQuestionModelImpl.getGroupId()
-					};
-
-				finderCache.putResult(FINDER_PATH_COUNT_BY_UUID_G, args,
-					Long.valueOf(1));
-				finderCache.putResult(FINDER_PATH_FETCH_BY_UUID_G, args,
-					pollsQuestionModelImpl);
-			}
-		}
-	}
-
-	protected void clearUniqueFindersCache(
 		PollsQuestionModelImpl pollsQuestionModelImpl) {
 		Object[] args = new Object[] {
 				pollsQuestionModelImpl.getUuid(),
 				pollsQuestionModelImpl.getGroupId()
 			};
 
-		finderCache.removeResult(FINDER_PATH_COUNT_BY_UUID_G, args);
-		finderCache.removeResult(FINDER_PATH_FETCH_BY_UUID_G, args);
+		finderCache.putResult(FINDER_PATH_COUNT_BY_UUID_G, args,
+			Long.valueOf(1), false);
+		finderCache.putResult(FINDER_PATH_FETCH_BY_UUID_G, args,
+			pollsQuestionModelImpl, false);
+	}
 
+	protected void clearUniqueFindersCache(
+		PollsQuestionModelImpl pollsQuestionModelImpl) {
 		if ((pollsQuestionModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_UUID_G.getColumnBitmask()) != 0) {
-			args = new Object[] {
+			Object[] args = new Object[] {
 					pollsQuestionModelImpl.getOriginalUuid(),
 					pollsQuestionModelImpl.getOriginalGroupId()
 				};
@@ -2718,7 +2694,7 @@ public class PollsQuestionPersistenceImpl extends BasePersistenceImpl<PollsQuest
 			pollsQuestion, false);
 
 		clearUniqueFindersCache(pollsQuestionModelImpl);
-		cacheUniqueFindersCache(pollsQuestionModelImpl, isNew);
+		cacheUniqueFindersCache(pollsQuestionModelImpl);
 
 		pollsQuestion.resetOriginalValues();
 

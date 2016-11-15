@@ -6673,47 +6673,23 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 	}
 
 	protected void cacheUniqueFindersCache(
-		OrganizationModelImpl organizationModelImpl, boolean isNew) {
-		if (isNew) {
-			Object[] args = new Object[] {
-					organizationModelImpl.getCompanyId(),
-					organizationModelImpl.getName()
-				};
-
-			finderCache.putResult(FINDER_PATH_COUNT_BY_C_N, args,
-				Long.valueOf(1));
-			finderCache.putResult(FINDER_PATH_FETCH_BY_C_N, args,
-				organizationModelImpl);
-		}
-		else {
-			if ((organizationModelImpl.getColumnBitmask() &
-					FINDER_PATH_FETCH_BY_C_N.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						organizationModelImpl.getCompanyId(),
-						organizationModelImpl.getName()
-					};
-
-				finderCache.putResult(FINDER_PATH_COUNT_BY_C_N, args,
-					Long.valueOf(1));
-				finderCache.putResult(FINDER_PATH_FETCH_BY_C_N, args,
-					organizationModelImpl);
-			}
-		}
-	}
-
-	protected void clearUniqueFindersCache(
 		OrganizationModelImpl organizationModelImpl) {
 		Object[] args = new Object[] {
 				organizationModelImpl.getCompanyId(),
 				organizationModelImpl.getName()
 			};
 
-		finderCache.removeResult(FINDER_PATH_COUNT_BY_C_N, args);
-		finderCache.removeResult(FINDER_PATH_FETCH_BY_C_N, args);
+		finderCache.putResult(FINDER_PATH_COUNT_BY_C_N, args, Long.valueOf(1),
+			false);
+		finderCache.putResult(FINDER_PATH_FETCH_BY_C_N, args,
+			organizationModelImpl, false);
+	}
 
+	protected void clearUniqueFindersCache(
+		OrganizationModelImpl organizationModelImpl) {
 		if ((organizationModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_C_N.getColumnBitmask()) != 0) {
-			args = new Object[] {
+			Object[] args = new Object[] {
 					organizationModelImpl.getOriginalCompanyId(),
 					organizationModelImpl.getOriginalName()
 				};
@@ -6997,7 +6973,7 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 			false);
 
 		clearUniqueFindersCache(organizationModelImpl);
-		cacheUniqueFindersCache(organizationModelImpl, isNew);
+		cacheUniqueFindersCache(organizationModelImpl);
 
 		organization.resetOriginalValues();
 

@@ -2114,43 +2114,6 @@ public class SocialActivityLimitPersistenceImpl extends BasePersistenceImpl<Soci
 	}
 
 	protected void cacheUniqueFindersCache(
-		SocialActivityLimitModelImpl socialActivityLimitModelImpl, boolean isNew) {
-		if (isNew) {
-			Object[] args = new Object[] {
-					socialActivityLimitModelImpl.getGroupId(),
-					socialActivityLimitModelImpl.getUserId(),
-					socialActivityLimitModelImpl.getClassNameId(),
-					socialActivityLimitModelImpl.getClassPK(),
-					socialActivityLimitModelImpl.getActivityType(),
-					socialActivityLimitModelImpl.getActivityCounterName()
-				};
-
-			finderCache.putResult(FINDER_PATH_COUNT_BY_G_U_C_C_A_A, args,
-				Long.valueOf(1));
-			finderCache.putResult(FINDER_PATH_FETCH_BY_G_U_C_C_A_A, args,
-				socialActivityLimitModelImpl);
-		}
-		else {
-			if ((socialActivityLimitModelImpl.getColumnBitmask() &
-					FINDER_PATH_FETCH_BY_G_U_C_C_A_A.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						socialActivityLimitModelImpl.getGroupId(),
-						socialActivityLimitModelImpl.getUserId(),
-						socialActivityLimitModelImpl.getClassNameId(),
-						socialActivityLimitModelImpl.getClassPK(),
-						socialActivityLimitModelImpl.getActivityType(),
-						socialActivityLimitModelImpl.getActivityCounterName()
-					};
-
-				finderCache.putResult(FINDER_PATH_COUNT_BY_G_U_C_C_A_A, args,
-					Long.valueOf(1));
-				finderCache.putResult(FINDER_PATH_FETCH_BY_G_U_C_C_A_A, args,
-					socialActivityLimitModelImpl);
-			}
-		}
-	}
-
-	protected void clearUniqueFindersCache(
 		SocialActivityLimitModelImpl socialActivityLimitModelImpl) {
 		Object[] args = new Object[] {
 				socialActivityLimitModelImpl.getGroupId(),
@@ -2161,12 +2124,17 @@ public class SocialActivityLimitPersistenceImpl extends BasePersistenceImpl<Soci
 				socialActivityLimitModelImpl.getActivityCounterName()
 			};
 
-		finderCache.removeResult(FINDER_PATH_COUNT_BY_G_U_C_C_A_A, args);
-		finderCache.removeResult(FINDER_PATH_FETCH_BY_G_U_C_C_A_A, args);
+		finderCache.putResult(FINDER_PATH_COUNT_BY_G_U_C_C_A_A, args,
+			Long.valueOf(1), false);
+		finderCache.putResult(FINDER_PATH_FETCH_BY_G_U_C_C_A_A, args,
+			socialActivityLimitModelImpl, false);
+	}
 
+	protected void clearUniqueFindersCache(
+		SocialActivityLimitModelImpl socialActivityLimitModelImpl) {
 		if ((socialActivityLimitModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_G_U_C_C_A_A.getColumnBitmask()) != 0) {
-			args = new Object[] {
+			Object[] args = new Object[] {
 					socialActivityLimitModelImpl.getOriginalGroupId(),
 					socialActivityLimitModelImpl.getOriginalUserId(),
 					socialActivityLimitModelImpl.getOriginalClassNameId(),
@@ -2382,7 +2350,7 @@ public class SocialActivityLimitPersistenceImpl extends BasePersistenceImpl<Soci
 			socialActivityLimit, false);
 
 		clearUniqueFindersCache(socialActivityLimitModelImpl);
-		cacheUniqueFindersCache(socialActivityLimitModelImpl, isNew);
+		cacheUniqueFindersCache(socialActivityLimitModelImpl);
 
 		socialActivityLimit.resetOriginalValues();
 

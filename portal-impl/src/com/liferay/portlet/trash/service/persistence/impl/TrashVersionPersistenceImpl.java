@@ -1442,47 +1442,23 @@ public class TrashVersionPersistenceImpl extends BasePersistenceImpl<TrashVersio
 	}
 
 	protected void cacheUniqueFindersCache(
-		TrashVersionModelImpl trashVersionModelImpl, boolean isNew) {
-		if (isNew) {
-			Object[] args = new Object[] {
-					trashVersionModelImpl.getClassNameId(),
-					trashVersionModelImpl.getClassPK()
-				};
-
-			finderCache.putResult(FINDER_PATH_COUNT_BY_C_C, args,
-				Long.valueOf(1));
-			finderCache.putResult(FINDER_PATH_FETCH_BY_C_C, args,
-				trashVersionModelImpl);
-		}
-		else {
-			if ((trashVersionModelImpl.getColumnBitmask() &
-					FINDER_PATH_FETCH_BY_C_C.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						trashVersionModelImpl.getClassNameId(),
-						trashVersionModelImpl.getClassPK()
-					};
-
-				finderCache.putResult(FINDER_PATH_COUNT_BY_C_C, args,
-					Long.valueOf(1));
-				finderCache.putResult(FINDER_PATH_FETCH_BY_C_C, args,
-					trashVersionModelImpl);
-			}
-		}
-	}
-
-	protected void clearUniqueFindersCache(
 		TrashVersionModelImpl trashVersionModelImpl) {
 		Object[] args = new Object[] {
 				trashVersionModelImpl.getClassNameId(),
 				trashVersionModelImpl.getClassPK()
 			};
 
-		finderCache.removeResult(FINDER_PATH_COUNT_BY_C_C, args);
-		finderCache.removeResult(FINDER_PATH_FETCH_BY_C_C, args);
+		finderCache.putResult(FINDER_PATH_COUNT_BY_C_C, args, Long.valueOf(1),
+			false);
+		finderCache.putResult(FINDER_PATH_FETCH_BY_C_C, args,
+			trashVersionModelImpl, false);
+	}
 
+	protected void clearUniqueFindersCache(
+		TrashVersionModelImpl trashVersionModelImpl) {
 		if ((trashVersionModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_C_C.getColumnBitmask()) != 0) {
-			args = new Object[] {
+			Object[] args = new Object[] {
 					trashVersionModelImpl.getOriginalClassNameId(),
 					trashVersionModelImpl.getOriginalClassPK()
 				};
@@ -1674,7 +1650,7 @@ public class TrashVersionPersistenceImpl extends BasePersistenceImpl<TrashVersio
 			false);
 
 		clearUniqueFindersCache(trashVersionModelImpl);
-		cacheUniqueFindersCache(trashVersionModelImpl, isNew);
+		cacheUniqueFindersCache(trashVersionModelImpl);
 
 		trashVersion.resetOriginalValues();
 

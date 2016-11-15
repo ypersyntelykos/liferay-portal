@@ -2608,68 +2608,39 @@ public class ShoppingOrderPersistenceImpl extends BasePersistenceImpl<ShoppingOr
 	}
 
 	protected void cacheUniqueFindersCache(
-		ShoppingOrderModelImpl shoppingOrderModelImpl, boolean isNew) {
-		if (isNew) {
-			Object[] args = new Object[] { shoppingOrderModelImpl.getNumber() };
+		ShoppingOrderModelImpl shoppingOrderModelImpl) {
+		Object[] args = new Object[] { shoppingOrderModelImpl.getNumber() };
 
-			finderCache.putResult(FINDER_PATH_COUNT_BY_NUMBER, args,
-				Long.valueOf(1));
-			finderCache.putResult(FINDER_PATH_FETCH_BY_NUMBER, args,
-				shoppingOrderModelImpl);
+		finderCache.putResult(FINDER_PATH_COUNT_BY_NUMBER, args,
+			Long.valueOf(1), false);
+		finderCache.putResult(FINDER_PATH_FETCH_BY_NUMBER, args,
+			shoppingOrderModelImpl, false);
 
-			args = new Object[] { shoppingOrderModelImpl.getPpTxnId() };
+		args = new Object[] { shoppingOrderModelImpl.getPpTxnId() };
 
-			finderCache.putResult(FINDER_PATH_COUNT_BY_PPTXNID, args,
-				Long.valueOf(1));
-			finderCache.putResult(FINDER_PATH_FETCH_BY_PPTXNID, args,
-				shoppingOrderModelImpl);
-		}
-		else {
-			if ((shoppingOrderModelImpl.getColumnBitmask() &
-					FINDER_PATH_FETCH_BY_NUMBER.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] { shoppingOrderModelImpl.getNumber() };
-
-				finderCache.putResult(FINDER_PATH_COUNT_BY_NUMBER, args,
-					Long.valueOf(1));
-				finderCache.putResult(FINDER_PATH_FETCH_BY_NUMBER, args,
-					shoppingOrderModelImpl);
-			}
-
-			if ((shoppingOrderModelImpl.getColumnBitmask() &
-					FINDER_PATH_FETCH_BY_PPTXNID.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] { shoppingOrderModelImpl.getPpTxnId() };
-
-				finderCache.putResult(FINDER_PATH_COUNT_BY_PPTXNID, args,
-					Long.valueOf(1));
-				finderCache.putResult(FINDER_PATH_FETCH_BY_PPTXNID, args,
-					shoppingOrderModelImpl);
-			}
-		}
+		finderCache.putResult(FINDER_PATH_COUNT_BY_PPTXNID, args,
+			Long.valueOf(1), false);
+		finderCache.putResult(FINDER_PATH_FETCH_BY_PPTXNID, args,
+			shoppingOrderModelImpl, false);
 	}
 
 	protected void clearUniqueFindersCache(
 		ShoppingOrderModelImpl shoppingOrderModelImpl) {
-		Object[] args = new Object[] { shoppingOrderModelImpl.getNumber() };
-
-		finderCache.removeResult(FINDER_PATH_COUNT_BY_NUMBER, args);
-		finderCache.removeResult(FINDER_PATH_FETCH_BY_NUMBER, args);
-
 		if ((shoppingOrderModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_NUMBER.getColumnBitmask()) != 0) {
-			args = new Object[] { shoppingOrderModelImpl.getOriginalNumber() };
+			Object[] args = new Object[] {
+					shoppingOrderModelImpl.getOriginalNumber()
+				};
 
 			finderCache.removeResult(FINDER_PATH_COUNT_BY_NUMBER, args);
 			finderCache.removeResult(FINDER_PATH_FETCH_BY_NUMBER, args);
 		}
 
-		args = new Object[] { shoppingOrderModelImpl.getPpTxnId() };
-
-		finderCache.removeResult(FINDER_PATH_COUNT_BY_PPTXNID, args);
-		finderCache.removeResult(FINDER_PATH_FETCH_BY_PPTXNID, args);
-
 		if ((shoppingOrderModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_PPTXNID.getColumnBitmask()) != 0) {
-			args = new Object[] { shoppingOrderModelImpl.getOriginalPpTxnId() };
+			Object[] args = new Object[] {
+					shoppingOrderModelImpl.getOriginalPpTxnId()
+				};
 
 			finderCache.removeResult(FINDER_PATH_COUNT_BY_PPTXNID, args);
 			finderCache.removeResult(FINDER_PATH_FETCH_BY_PPTXNID, args);
@@ -2883,7 +2854,7 @@ public class ShoppingOrderPersistenceImpl extends BasePersistenceImpl<ShoppingOr
 			shoppingOrder, false);
 
 		clearUniqueFindersCache(shoppingOrderModelImpl);
-		cacheUniqueFindersCache(shoppingOrderModelImpl, isNew);
+		cacheUniqueFindersCache(shoppingOrderModelImpl);
 
 		shoppingOrder.resetOriginalValues();
 

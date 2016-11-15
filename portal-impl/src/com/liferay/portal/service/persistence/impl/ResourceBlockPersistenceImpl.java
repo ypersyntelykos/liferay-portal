@@ -1741,39 +1741,6 @@ public class ResourceBlockPersistenceImpl extends BasePersistenceImpl<ResourceBl
 	}
 
 	protected void cacheUniqueFindersCache(
-		ResourceBlockModelImpl resourceBlockModelImpl, boolean isNew) {
-		if (isNew) {
-			Object[] args = new Object[] {
-					resourceBlockModelImpl.getCompanyId(),
-					resourceBlockModelImpl.getGroupId(),
-					resourceBlockModelImpl.getName(),
-					resourceBlockModelImpl.getPermissionsHash()
-				};
-
-			finderCache.putResult(FINDER_PATH_COUNT_BY_C_G_N_P, args,
-				Long.valueOf(1));
-			finderCache.putResult(FINDER_PATH_FETCH_BY_C_G_N_P, args,
-				resourceBlockModelImpl);
-		}
-		else {
-			if ((resourceBlockModelImpl.getColumnBitmask() &
-					FINDER_PATH_FETCH_BY_C_G_N_P.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						resourceBlockModelImpl.getCompanyId(),
-						resourceBlockModelImpl.getGroupId(),
-						resourceBlockModelImpl.getName(),
-						resourceBlockModelImpl.getPermissionsHash()
-					};
-
-				finderCache.putResult(FINDER_PATH_COUNT_BY_C_G_N_P, args,
-					Long.valueOf(1));
-				finderCache.putResult(FINDER_PATH_FETCH_BY_C_G_N_P, args,
-					resourceBlockModelImpl);
-			}
-		}
-	}
-
-	protected void clearUniqueFindersCache(
 		ResourceBlockModelImpl resourceBlockModelImpl) {
 		Object[] args = new Object[] {
 				resourceBlockModelImpl.getCompanyId(),
@@ -1782,12 +1749,17 @@ public class ResourceBlockPersistenceImpl extends BasePersistenceImpl<ResourceBl
 				resourceBlockModelImpl.getPermissionsHash()
 			};
 
-		finderCache.removeResult(FINDER_PATH_COUNT_BY_C_G_N_P, args);
-		finderCache.removeResult(FINDER_PATH_FETCH_BY_C_G_N_P, args);
+		finderCache.putResult(FINDER_PATH_COUNT_BY_C_G_N_P, args,
+			Long.valueOf(1), false);
+		finderCache.putResult(FINDER_PATH_FETCH_BY_C_G_N_P, args,
+			resourceBlockModelImpl, false);
+	}
 
+	protected void clearUniqueFindersCache(
+		ResourceBlockModelImpl resourceBlockModelImpl) {
 		if ((resourceBlockModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_C_G_N_P.getColumnBitmask()) != 0) {
-			args = new Object[] {
+			Object[] args = new Object[] {
 					resourceBlockModelImpl.getOriginalCompanyId(),
 					resourceBlockModelImpl.getOriginalGroupId(),
 					resourceBlockModelImpl.getOriginalName(),
@@ -1988,7 +1960,7 @@ public class ResourceBlockPersistenceImpl extends BasePersistenceImpl<ResourceBl
 			resourceBlock, false);
 
 		clearUniqueFindersCache(resourceBlockModelImpl);
-		cacheUniqueFindersCache(resourceBlockModelImpl, isNew);
+		cacheUniqueFindersCache(resourceBlockModelImpl);
 
 		resourceBlock.resetOriginalValues();
 

@@ -2330,70 +2330,33 @@ public class PollsChoicePersistenceImpl extends BasePersistenceImpl<PollsChoice>
 	}
 
 	protected void cacheUniqueFindersCache(
-		PollsChoiceModelImpl pollsChoiceModelImpl, boolean isNew) {
-		if (isNew) {
-			Object[] args = new Object[] {
-					pollsChoiceModelImpl.getUuid(),
-					pollsChoiceModelImpl.getGroupId()
-				};
-
-			finderCache.putResult(FINDER_PATH_COUNT_BY_UUID_G, args,
-				Long.valueOf(1));
-			finderCache.putResult(FINDER_PATH_FETCH_BY_UUID_G, args,
-				pollsChoiceModelImpl);
-
-			args = new Object[] {
-					pollsChoiceModelImpl.getQuestionId(),
-					pollsChoiceModelImpl.getName()
-				};
-
-			finderCache.putResult(FINDER_PATH_COUNT_BY_Q_N, args,
-				Long.valueOf(1));
-			finderCache.putResult(FINDER_PATH_FETCH_BY_Q_N, args,
-				pollsChoiceModelImpl);
-		}
-		else {
-			if ((pollsChoiceModelImpl.getColumnBitmask() &
-					FINDER_PATH_FETCH_BY_UUID_G.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						pollsChoiceModelImpl.getUuid(),
-						pollsChoiceModelImpl.getGroupId()
-					};
-
-				finderCache.putResult(FINDER_PATH_COUNT_BY_UUID_G, args,
-					Long.valueOf(1));
-				finderCache.putResult(FINDER_PATH_FETCH_BY_UUID_G, args,
-					pollsChoiceModelImpl);
-			}
-
-			if ((pollsChoiceModelImpl.getColumnBitmask() &
-					FINDER_PATH_FETCH_BY_Q_N.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						pollsChoiceModelImpl.getQuestionId(),
-						pollsChoiceModelImpl.getName()
-					};
-
-				finderCache.putResult(FINDER_PATH_COUNT_BY_Q_N, args,
-					Long.valueOf(1));
-				finderCache.putResult(FINDER_PATH_FETCH_BY_Q_N, args,
-					pollsChoiceModelImpl);
-			}
-		}
-	}
-
-	protected void clearUniqueFindersCache(
 		PollsChoiceModelImpl pollsChoiceModelImpl) {
 		Object[] args = new Object[] {
 				pollsChoiceModelImpl.getUuid(),
 				pollsChoiceModelImpl.getGroupId()
 			};
 
-		finderCache.removeResult(FINDER_PATH_COUNT_BY_UUID_G, args);
-		finderCache.removeResult(FINDER_PATH_FETCH_BY_UUID_G, args);
+		finderCache.putResult(FINDER_PATH_COUNT_BY_UUID_G, args,
+			Long.valueOf(1), false);
+		finderCache.putResult(FINDER_PATH_FETCH_BY_UUID_G, args,
+			pollsChoiceModelImpl, false);
 
+		args = new Object[] {
+				pollsChoiceModelImpl.getQuestionId(),
+				pollsChoiceModelImpl.getName()
+			};
+
+		finderCache.putResult(FINDER_PATH_COUNT_BY_Q_N, args, Long.valueOf(1),
+			false);
+		finderCache.putResult(FINDER_PATH_FETCH_BY_Q_N, args,
+			pollsChoiceModelImpl, false);
+	}
+
+	protected void clearUniqueFindersCache(
+		PollsChoiceModelImpl pollsChoiceModelImpl) {
 		if ((pollsChoiceModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_UUID_G.getColumnBitmask()) != 0) {
-			args = new Object[] {
+			Object[] args = new Object[] {
 					pollsChoiceModelImpl.getOriginalUuid(),
 					pollsChoiceModelImpl.getOriginalGroupId()
 				};
@@ -2402,17 +2365,9 @@ public class PollsChoicePersistenceImpl extends BasePersistenceImpl<PollsChoice>
 			finderCache.removeResult(FINDER_PATH_FETCH_BY_UUID_G, args);
 		}
 
-		args = new Object[] {
-				pollsChoiceModelImpl.getQuestionId(),
-				pollsChoiceModelImpl.getName()
-			};
-
-		finderCache.removeResult(FINDER_PATH_COUNT_BY_Q_N, args);
-		finderCache.removeResult(FINDER_PATH_FETCH_BY_Q_N, args);
-
 		if ((pollsChoiceModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_Q_N.getColumnBitmask()) != 0) {
-			args = new Object[] {
+			Object[] args = new Object[] {
 					pollsChoiceModelImpl.getOriginalQuestionId(),
 					pollsChoiceModelImpl.getOriginalName()
 				};
@@ -2653,7 +2608,7 @@ public class PollsChoicePersistenceImpl extends BasePersistenceImpl<PollsChoice>
 			false);
 
 		clearUniqueFindersCache(pollsChoiceModelImpl);
-		cacheUniqueFindersCache(pollsChoiceModelImpl, isNew);
+		cacheUniqueFindersCache(pollsChoiceModelImpl);
 
 		pollsChoice.resetOriginalValues();
 

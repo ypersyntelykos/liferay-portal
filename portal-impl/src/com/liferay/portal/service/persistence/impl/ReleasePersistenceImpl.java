@@ -413,42 +413,21 @@ public class ReleasePersistenceImpl extends BasePersistenceImpl<Release>
 		}
 	}
 
-	protected void cacheUniqueFindersCache(ReleaseModelImpl releaseModelImpl,
-		boolean isNew) {
-		if (isNew) {
-			Object[] args = new Object[] {
-					releaseModelImpl.getServletContextName()
-				};
+	protected void cacheUniqueFindersCache(ReleaseModelImpl releaseModelImpl) {
+		Object[] args = new Object[] { releaseModelImpl.getServletContextName() };
 
-			finderCache.putResult(FINDER_PATH_COUNT_BY_SERVLETCONTEXTNAME,
-				args, Long.valueOf(1));
-			finderCache.putResult(FINDER_PATH_FETCH_BY_SERVLETCONTEXTNAME,
-				args, releaseModelImpl);
-		}
-		else {
-			if ((releaseModelImpl.getColumnBitmask() &
-					FINDER_PATH_FETCH_BY_SERVLETCONTEXTNAME.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						releaseModelImpl.getServletContextName()
-					};
-
-				finderCache.putResult(FINDER_PATH_COUNT_BY_SERVLETCONTEXTNAME,
-					args, Long.valueOf(1));
-				finderCache.putResult(FINDER_PATH_FETCH_BY_SERVLETCONTEXTNAME,
-					args, releaseModelImpl);
-			}
-		}
+		finderCache.putResult(FINDER_PATH_COUNT_BY_SERVLETCONTEXTNAME, args,
+			Long.valueOf(1), false);
+		finderCache.putResult(FINDER_PATH_FETCH_BY_SERVLETCONTEXTNAME, args,
+			releaseModelImpl, false);
 	}
 
 	protected void clearUniqueFindersCache(ReleaseModelImpl releaseModelImpl) {
-		Object[] args = new Object[] { releaseModelImpl.getServletContextName() };
-
-		finderCache.removeResult(FINDER_PATH_COUNT_BY_SERVLETCONTEXTNAME, args);
-		finderCache.removeResult(FINDER_PATH_FETCH_BY_SERVLETCONTEXTNAME, args);
-
 		if ((releaseModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_SERVLETCONTEXTNAME.getColumnBitmask()) != 0) {
-			args = new Object[] { releaseModelImpl.getOriginalServletContextName() };
+			Object[] args = new Object[] {
+					releaseModelImpl.getOriginalServletContextName()
+				};
 
 			finderCache.removeResult(FINDER_PATH_COUNT_BY_SERVLETCONTEXTNAME,
 				args);
@@ -617,7 +596,7 @@ public class ReleasePersistenceImpl extends BasePersistenceImpl<Release>
 			ReleaseImpl.class, release.getPrimaryKey(), release, false);
 
 		clearUniqueFindersCache(releaseModelImpl);
-		cacheUniqueFindersCache(releaseModelImpl, isNew);
+		cacheUniqueFindersCache(releaseModelImpl);
 
 		release.resetOriginalValues();
 

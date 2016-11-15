@@ -1330,43 +1330,20 @@ public class PushNotificationsDevicePersistenceImpl extends BasePersistenceImpl<
 	}
 
 	protected void cacheUniqueFindersCache(
-		PushNotificationsDeviceModelImpl pushNotificationsDeviceModelImpl,
-		boolean isNew) {
-		if (isNew) {
-			Object[] args = new Object[] {
-					pushNotificationsDeviceModelImpl.getToken()
-				};
+		PushNotificationsDeviceModelImpl pushNotificationsDeviceModelImpl) {
+		Object[] args = new Object[] { pushNotificationsDeviceModelImpl.getToken() };
 
-			finderCache.putResult(FINDER_PATH_COUNT_BY_TOKEN, args,
-				Long.valueOf(1));
-			finderCache.putResult(FINDER_PATH_FETCH_BY_TOKEN, args,
-				pushNotificationsDeviceModelImpl);
-		}
-		else {
-			if ((pushNotificationsDeviceModelImpl.getColumnBitmask() &
-					FINDER_PATH_FETCH_BY_TOKEN.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						pushNotificationsDeviceModelImpl.getToken()
-					};
-
-				finderCache.putResult(FINDER_PATH_COUNT_BY_TOKEN, args,
-					Long.valueOf(1));
-				finderCache.putResult(FINDER_PATH_FETCH_BY_TOKEN, args,
-					pushNotificationsDeviceModelImpl);
-			}
-		}
+		finderCache.putResult(FINDER_PATH_COUNT_BY_TOKEN, args,
+			Long.valueOf(1), false);
+		finderCache.putResult(FINDER_PATH_FETCH_BY_TOKEN, args,
+			pushNotificationsDeviceModelImpl, false);
 	}
 
 	protected void clearUniqueFindersCache(
 		PushNotificationsDeviceModelImpl pushNotificationsDeviceModelImpl) {
-		Object[] args = new Object[] { pushNotificationsDeviceModelImpl.getToken() };
-
-		finderCache.removeResult(FINDER_PATH_COUNT_BY_TOKEN, args);
-		finderCache.removeResult(FINDER_PATH_FETCH_BY_TOKEN, args);
-
 		if ((pushNotificationsDeviceModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_TOKEN.getColumnBitmask()) != 0) {
-			args = new Object[] {
+			Object[] args = new Object[] {
 					pushNotificationsDeviceModelImpl.getOriginalToken()
 				};
 
@@ -1544,7 +1521,7 @@ public class PushNotificationsDevicePersistenceImpl extends BasePersistenceImpl<
 			false);
 
 		clearUniqueFindersCache(pushNotificationsDeviceModelImpl);
-		cacheUniqueFindersCache(pushNotificationsDeviceModelImpl, isNew);
+		cacheUniqueFindersCache(pushNotificationsDeviceModelImpl);
 
 		pushNotificationsDevice.resetOriginalValues();
 

@@ -1418,47 +1418,23 @@ public class DDMTemplateLinkPersistenceImpl extends BasePersistenceImpl<DDMTempl
 	}
 
 	protected void cacheUniqueFindersCache(
-		DDMTemplateLinkModelImpl ddmTemplateLinkModelImpl, boolean isNew) {
-		if (isNew) {
-			Object[] args = new Object[] {
-					ddmTemplateLinkModelImpl.getClassNameId(),
-					ddmTemplateLinkModelImpl.getClassPK()
-				};
-
-			finderCache.putResult(FINDER_PATH_COUNT_BY_C_C, args,
-				Long.valueOf(1));
-			finderCache.putResult(FINDER_PATH_FETCH_BY_C_C, args,
-				ddmTemplateLinkModelImpl);
-		}
-		else {
-			if ((ddmTemplateLinkModelImpl.getColumnBitmask() &
-					FINDER_PATH_FETCH_BY_C_C.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						ddmTemplateLinkModelImpl.getClassNameId(),
-						ddmTemplateLinkModelImpl.getClassPK()
-					};
-
-				finderCache.putResult(FINDER_PATH_COUNT_BY_C_C, args,
-					Long.valueOf(1));
-				finderCache.putResult(FINDER_PATH_FETCH_BY_C_C, args,
-					ddmTemplateLinkModelImpl);
-			}
-		}
-	}
-
-	protected void clearUniqueFindersCache(
 		DDMTemplateLinkModelImpl ddmTemplateLinkModelImpl) {
 		Object[] args = new Object[] {
 				ddmTemplateLinkModelImpl.getClassNameId(),
 				ddmTemplateLinkModelImpl.getClassPK()
 			};
 
-		finderCache.removeResult(FINDER_PATH_COUNT_BY_C_C, args);
-		finderCache.removeResult(FINDER_PATH_FETCH_BY_C_C, args);
+		finderCache.putResult(FINDER_PATH_COUNT_BY_C_C, args, Long.valueOf(1),
+			false);
+		finderCache.putResult(FINDER_PATH_FETCH_BY_C_C, args,
+			ddmTemplateLinkModelImpl, false);
+	}
 
+	protected void clearUniqueFindersCache(
+		DDMTemplateLinkModelImpl ddmTemplateLinkModelImpl) {
 		if ((ddmTemplateLinkModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_C_C.getColumnBitmask()) != 0) {
-			args = new Object[] {
+			Object[] args = new Object[] {
 					ddmTemplateLinkModelImpl.getOriginalClassNameId(),
 					ddmTemplateLinkModelImpl.getOriginalClassPK()
 				};
@@ -1647,7 +1623,7 @@ public class DDMTemplateLinkPersistenceImpl extends BasePersistenceImpl<DDMTempl
 			ddmTemplateLink, false);
 
 		clearUniqueFindersCache(ddmTemplateLinkModelImpl);
-		cacheUniqueFindersCache(ddmTemplateLinkModelImpl, isNew);
+		cacheUniqueFindersCache(ddmTemplateLinkModelImpl);
 
 		ddmTemplateLink.resetOriginalValues();
 

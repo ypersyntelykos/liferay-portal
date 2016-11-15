@@ -3280,38 +3280,6 @@ public class SocialActivityAchievementPersistenceImpl
 	}
 
 	protected void cacheUniqueFindersCache(
-		SocialActivityAchievementModelImpl socialActivityAchievementModelImpl,
-		boolean isNew) {
-		if (isNew) {
-			Object[] args = new Object[] {
-					socialActivityAchievementModelImpl.getGroupId(),
-					socialActivityAchievementModelImpl.getUserId(),
-					socialActivityAchievementModelImpl.getName()
-				};
-
-			finderCache.putResult(FINDER_PATH_COUNT_BY_G_U_N, args,
-				Long.valueOf(1));
-			finderCache.putResult(FINDER_PATH_FETCH_BY_G_U_N, args,
-				socialActivityAchievementModelImpl);
-		}
-		else {
-			if ((socialActivityAchievementModelImpl.getColumnBitmask() &
-					FINDER_PATH_FETCH_BY_G_U_N.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						socialActivityAchievementModelImpl.getGroupId(),
-						socialActivityAchievementModelImpl.getUserId(),
-						socialActivityAchievementModelImpl.getName()
-					};
-
-				finderCache.putResult(FINDER_PATH_COUNT_BY_G_U_N, args,
-					Long.valueOf(1));
-				finderCache.putResult(FINDER_PATH_FETCH_BY_G_U_N, args,
-					socialActivityAchievementModelImpl);
-			}
-		}
-	}
-
-	protected void clearUniqueFindersCache(
 		SocialActivityAchievementModelImpl socialActivityAchievementModelImpl) {
 		Object[] args = new Object[] {
 				socialActivityAchievementModelImpl.getGroupId(),
@@ -3319,12 +3287,17 @@ public class SocialActivityAchievementPersistenceImpl
 				socialActivityAchievementModelImpl.getName()
 			};
 
-		finderCache.removeResult(FINDER_PATH_COUNT_BY_G_U_N, args);
-		finderCache.removeResult(FINDER_PATH_FETCH_BY_G_U_N, args);
+		finderCache.putResult(FINDER_PATH_COUNT_BY_G_U_N, args,
+			Long.valueOf(1), false);
+		finderCache.putResult(FINDER_PATH_FETCH_BY_G_U_N, args,
+			socialActivityAchievementModelImpl, false);
+	}
 
+	protected void clearUniqueFindersCache(
+		SocialActivityAchievementModelImpl socialActivityAchievementModelImpl) {
 		if ((socialActivityAchievementModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_G_U_N.getColumnBitmask()) != 0) {
-			args = new Object[] {
+			Object[] args = new Object[] {
 					socialActivityAchievementModelImpl.getOriginalGroupId(),
 					socialActivityAchievementModelImpl.getOriginalUserId(),
 					socialActivityAchievementModelImpl.getOriginalName()
@@ -3589,7 +3562,7 @@ public class SocialActivityAchievementPersistenceImpl
 			socialActivityAchievement, false);
 
 		clearUniqueFindersCache(socialActivityAchievementModelImpl);
-		cacheUniqueFindersCache(socialActivityAchievementModelImpl, isNew);
+		cacheUniqueFindersCache(socialActivityAchievementModelImpl);
 
 		socialActivityAchievement.resetOriginalValues();
 

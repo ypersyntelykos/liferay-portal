@@ -2062,48 +2062,23 @@ public class AssetCategoryPropertyPersistenceImpl extends BasePersistenceImpl<As
 	}
 
 	protected void cacheUniqueFindersCache(
-		AssetCategoryPropertyModelImpl assetCategoryPropertyModelImpl,
-		boolean isNew) {
-		if (isNew) {
-			Object[] args = new Object[] {
-					assetCategoryPropertyModelImpl.getCategoryId(),
-					assetCategoryPropertyModelImpl.getKey()
-				};
-
-			finderCache.putResult(FINDER_PATH_COUNT_BY_CA_K, args,
-				Long.valueOf(1));
-			finderCache.putResult(FINDER_PATH_FETCH_BY_CA_K, args,
-				assetCategoryPropertyModelImpl);
-		}
-		else {
-			if ((assetCategoryPropertyModelImpl.getColumnBitmask() &
-					FINDER_PATH_FETCH_BY_CA_K.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						assetCategoryPropertyModelImpl.getCategoryId(),
-						assetCategoryPropertyModelImpl.getKey()
-					};
-
-				finderCache.putResult(FINDER_PATH_COUNT_BY_CA_K, args,
-					Long.valueOf(1));
-				finderCache.putResult(FINDER_PATH_FETCH_BY_CA_K, args,
-					assetCategoryPropertyModelImpl);
-			}
-		}
-	}
-
-	protected void clearUniqueFindersCache(
 		AssetCategoryPropertyModelImpl assetCategoryPropertyModelImpl) {
 		Object[] args = new Object[] {
 				assetCategoryPropertyModelImpl.getCategoryId(),
 				assetCategoryPropertyModelImpl.getKey()
 			};
 
-		finderCache.removeResult(FINDER_PATH_COUNT_BY_CA_K, args);
-		finderCache.removeResult(FINDER_PATH_FETCH_BY_CA_K, args);
+		finderCache.putResult(FINDER_PATH_COUNT_BY_CA_K, args, Long.valueOf(1),
+			false);
+		finderCache.putResult(FINDER_PATH_FETCH_BY_CA_K, args,
+			assetCategoryPropertyModelImpl, false);
+	}
 
+	protected void clearUniqueFindersCache(
+		AssetCategoryPropertyModelImpl assetCategoryPropertyModelImpl) {
 		if ((assetCategoryPropertyModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_CA_K.getColumnBitmask()) != 0) {
-			args = new Object[] {
+			Object[] args = new Object[] {
 					assetCategoryPropertyModelImpl.getOriginalCategoryId(),
 					assetCategoryPropertyModelImpl.getOriginalKey()
 				};
@@ -2343,7 +2318,7 @@ public class AssetCategoryPropertyPersistenceImpl extends BasePersistenceImpl<As
 			assetCategoryProperty.getPrimaryKey(), assetCategoryProperty, false);
 
 		clearUniqueFindersCache(assetCategoryPropertyModelImpl);
-		cacheUniqueFindersCache(assetCategoryPropertyModelImpl, isNew);
+		cacheUniqueFindersCache(assetCategoryPropertyModelImpl);
 
 		assetCategoryProperty.resetOriginalValues();
 

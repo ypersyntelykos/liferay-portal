@@ -1965,37 +1965,6 @@ public class RecentLayoutBranchPersistenceImpl extends BasePersistenceImpl<Recen
 	}
 
 	protected void cacheUniqueFindersCache(
-		RecentLayoutBranchModelImpl recentLayoutBranchModelImpl, boolean isNew) {
-		if (isNew) {
-			Object[] args = new Object[] {
-					recentLayoutBranchModelImpl.getUserId(),
-					recentLayoutBranchModelImpl.getLayoutSetBranchId(),
-					recentLayoutBranchModelImpl.getPlid()
-				};
-
-			finderCache.putResult(FINDER_PATH_COUNT_BY_U_L_P, args,
-				Long.valueOf(1));
-			finderCache.putResult(FINDER_PATH_FETCH_BY_U_L_P, args,
-				recentLayoutBranchModelImpl);
-		}
-		else {
-			if ((recentLayoutBranchModelImpl.getColumnBitmask() &
-					FINDER_PATH_FETCH_BY_U_L_P.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						recentLayoutBranchModelImpl.getUserId(),
-						recentLayoutBranchModelImpl.getLayoutSetBranchId(),
-						recentLayoutBranchModelImpl.getPlid()
-					};
-
-				finderCache.putResult(FINDER_PATH_COUNT_BY_U_L_P, args,
-					Long.valueOf(1));
-				finderCache.putResult(FINDER_PATH_FETCH_BY_U_L_P, args,
-					recentLayoutBranchModelImpl);
-			}
-		}
-	}
-
-	protected void clearUniqueFindersCache(
 		RecentLayoutBranchModelImpl recentLayoutBranchModelImpl) {
 		Object[] args = new Object[] {
 				recentLayoutBranchModelImpl.getUserId(),
@@ -2003,12 +1972,17 @@ public class RecentLayoutBranchPersistenceImpl extends BasePersistenceImpl<Recen
 				recentLayoutBranchModelImpl.getPlid()
 			};
 
-		finderCache.removeResult(FINDER_PATH_COUNT_BY_U_L_P, args);
-		finderCache.removeResult(FINDER_PATH_FETCH_BY_U_L_P, args);
+		finderCache.putResult(FINDER_PATH_COUNT_BY_U_L_P, args,
+			Long.valueOf(1), false);
+		finderCache.putResult(FINDER_PATH_FETCH_BY_U_L_P, args,
+			recentLayoutBranchModelImpl, false);
+	}
 
+	protected void clearUniqueFindersCache(
+		RecentLayoutBranchModelImpl recentLayoutBranchModelImpl) {
 		if ((recentLayoutBranchModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_U_L_P.getColumnBitmask()) != 0) {
-			args = new Object[] {
+			Object[] args = new Object[] {
 					recentLayoutBranchModelImpl.getOriginalUserId(),
 					recentLayoutBranchModelImpl.getOriginalLayoutSetBranchId(),
 					recentLayoutBranchModelImpl.getOriginalPlid()
@@ -2220,7 +2194,7 @@ public class RecentLayoutBranchPersistenceImpl extends BasePersistenceImpl<Recen
 			recentLayoutBranch, false);
 
 		clearUniqueFindersCache(recentLayoutBranchModelImpl);
-		cacheUniqueFindersCache(recentLayoutBranchModelImpl, isNew);
+		cacheUniqueFindersCache(recentLayoutBranchModelImpl);
 
 		recentLayoutBranch.resetOriginalValues();
 

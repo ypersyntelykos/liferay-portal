@@ -2232,70 +2232,33 @@ public class KaleoTransitionPersistenceImpl extends BasePersistenceImpl<KaleoTra
 	}
 
 	protected void cacheUniqueFindersCache(
-		KaleoTransitionModelImpl kaleoTransitionModelImpl, boolean isNew) {
-		if (isNew) {
-			Object[] args = new Object[] {
-					kaleoTransitionModelImpl.getKaleoNodeId(),
-					kaleoTransitionModelImpl.getName()
-				};
-
-			finderCache.putResult(FINDER_PATH_COUNT_BY_KNI_N, args,
-				Long.valueOf(1));
-			finderCache.putResult(FINDER_PATH_FETCH_BY_KNI_N, args,
-				kaleoTransitionModelImpl);
-
-			args = new Object[] {
-					kaleoTransitionModelImpl.getKaleoNodeId(),
-					kaleoTransitionModelImpl.getDefaultTransition()
-				};
-
-			finderCache.putResult(FINDER_PATH_COUNT_BY_KNI_DT, args,
-				Long.valueOf(1));
-			finderCache.putResult(FINDER_PATH_FETCH_BY_KNI_DT, args,
-				kaleoTransitionModelImpl);
-		}
-		else {
-			if ((kaleoTransitionModelImpl.getColumnBitmask() &
-					FINDER_PATH_FETCH_BY_KNI_N.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						kaleoTransitionModelImpl.getKaleoNodeId(),
-						kaleoTransitionModelImpl.getName()
-					};
-
-				finderCache.putResult(FINDER_PATH_COUNT_BY_KNI_N, args,
-					Long.valueOf(1));
-				finderCache.putResult(FINDER_PATH_FETCH_BY_KNI_N, args,
-					kaleoTransitionModelImpl);
-			}
-
-			if ((kaleoTransitionModelImpl.getColumnBitmask() &
-					FINDER_PATH_FETCH_BY_KNI_DT.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						kaleoTransitionModelImpl.getKaleoNodeId(),
-						kaleoTransitionModelImpl.getDefaultTransition()
-					};
-
-				finderCache.putResult(FINDER_PATH_COUNT_BY_KNI_DT, args,
-					Long.valueOf(1));
-				finderCache.putResult(FINDER_PATH_FETCH_BY_KNI_DT, args,
-					kaleoTransitionModelImpl);
-			}
-		}
-	}
-
-	protected void clearUniqueFindersCache(
 		KaleoTransitionModelImpl kaleoTransitionModelImpl) {
 		Object[] args = new Object[] {
 				kaleoTransitionModelImpl.getKaleoNodeId(),
 				kaleoTransitionModelImpl.getName()
 			};
 
-		finderCache.removeResult(FINDER_PATH_COUNT_BY_KNI_N, args);
-		finderCache.removeResult(FINDER_PATH_FETCH_BY_KNI_N, args);
+		finderCache.putResult(FINDER_PATH_COUNT_BY_KNI_N, args,
+			Long.valueOf(1), false);
+		finderCache.putResult(FINDER_PATH_FETCH_BY_KNI_N, args,
+			kaleoTransitionModelImpl, false);
 
+		args = new Object[] {
+				kaleoTransitionModelImpl.getKaleoNodeId(),
+				kaleoTransitionModelImpl.getDefaultTransition()
+			};
+
+		finderCache.putResult(FINDER_PATH_COUNT_BY_KNI_DT, args,
+			Long.valueOf(1), false);
+		finderCache.putResult(FINDER_PATH_FETCH_BY_KNI_DT, args,
+			kaleoTransitionModelImpl, false);
+	}
+
+	protected void clearUniqueFindersCache(
+		KaleoTransitionModelImpl kaleoTransitionModelImpl) {
 		if ((kaleoTransitionModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_KNI_N.getColumnBitmask()) != 0) {
-			args = new Object[] {
+			Object[] args = new Object[] {
 					kaleoTransitionModelImpl.getOriginalKaleoNodeId(),
 					kaleoTransitionModelImpl.getOriginalName()
 				};
@@ -2304,17 +2267,9 @@ public class KaleoTransitionPersistenceImpl extends BasePersistenceImpl<KaleoTra
 			finderCache.removeResult(FINDER_PATH_FETCH_BY_KNI_N, args);
 		}
 
-		args = new Object[] {
-				kaleoTransitionModelImpl.getKaleoNodeId(),
-				kaleoTransitionModelImpl.getDefaultTransition()
-			};
-
-		finderCache.removeResult(FINDER_PATH_COUNT_BY_KNI_DT, args);
-		finderCache.removeResult(FINDER_PATH_FETCH_BY_KNI_DT, args);
-
 		if ((kaleoTransitionModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_KNI_DT.getColumnBitmask()) != 0) {
-			args = new Object[] {
+			Object[] args = new Object[] {
 					kaleoTransitionModelImpl.getOriginalKaleoNodeId(),
 					kaleoTransitionModelImpl.getOriginalDefaultTransition()
 				};
@@ -2547,7 +2502,7 @@ public class KaleoTransitionPersistenceImpl extends BasePersistenceImpl<KaleoTra
 			kaleoTransition, false);
 
 		clearUniqueFindersCache(kaleoTransitionModelImpl);
-		cacheUniqueFindersCache(kaleoTransitionModelImpl, isNew);
+		cacheUniqueFindersCache(kaleoTransitionModelImpl);
 
 		kaleoTransition.resetOriginalValues();
 

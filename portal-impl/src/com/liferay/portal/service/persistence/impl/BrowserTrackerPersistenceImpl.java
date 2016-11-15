@@ -377,38 +377,22 @@ public class BrowserTrackerPersistenceImpl extends BasePersistenceImpl<BrowserTr
 	}
 
 	protected void cacheUniqueFindersCache(
-		BrowserTrackerModelImpl browserTrackerModelImpl, boolean isNew) {
-		if (isNew) {
-			Object[] args = new Object[] { browserTrackerModelImpl.getUserId() };
+		BrowserTrackerModelImpl browserTrackerModelImpl) {
+		Object[] args = new Object[] { browserTrackerModelImpl.getUserId() };
 
-			finderCache.putResult(FINDER_PATH_COUNT_BY_USERID, args,
-				Long.valueOf(1));
-			finderCache.putResult(FINDER_PATH_FETCH_BY_USERID, args,
-				browserTrackerModelImpl);
-		}
-		else {
-			if ((browserTrackerModelImpl.getColumnBitmask() &
-					FINDER_PATH_FETCH_BY_USERID.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] { browserTrackerModelImpl.getUserId() };
-
-				finderCache.putResult(FINDER_PATH_COUNT_BY_USERID, args,
-					Long.valueOf(1));
-				finderCache.putResult(FINDER_PATH_FETCH_BY_USERID, args,
-					browserTrackerModelImpl);
-			}
-		}
+		finderCache.putResult(FINDER_PATH_COUNT_BY_USERID, args,
+			Long.valueOf(1), false);
+		finderCache.putResult(FINDER_PATH_FETCH_BY_USERID, args,
+			browserTrackerModelImpl, false);
 	}
 
 	protected void clearUniqueFindersCache(
 		BrowserTrackerModelImpl browserTrackerModelImpl) {
-		Object[] args = new Object[] { browserTrackerModelImpl.getUserId() };
-
-		finderCache.removeResult(FINDER_PATH_COUNT_BY_USERID, args);
-		finderCache.removeResult(FINDER_PATH_FETCH_BY_USERID, args);
-
 		if ((browserTrackerModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_USERID.getColumnBitmask()) != 0) {
-			args = new Object[] { browserTrackerModelImpl.getOriginalUserId() };
+			Object[] args = new Object[] {
+					browserTrackerModelImpl.getOriginalUserId()
+				};
 
 			finderCache.removeResult(FINDER_PATH_COUNT_BY_USERID, args);
 			finderCache.removeResult(FINDER_PATH_FETCH_BY_USERID, args);
@@ -558,7 +542,7 @@ public class BrowserTrackerPersistenceImpl extends BasePersistenceImpl<BrowserTr
 			browserTracker, false);
 
 		clearUniqueFindersCache(browserTrackerModelImpl);
-		cacheUniqueFindersCache(browserTrackerModelImpl, isNew);
+		cacheUniqueFindersCache(browserTrackerModelImpl);
 
 		browserTracker.resetOriginalValues();
 

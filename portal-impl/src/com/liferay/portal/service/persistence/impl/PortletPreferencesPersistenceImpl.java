@@ -4595,39 +4595,6 @@ public class PortletPreferencesPersistenceImpl extends BasePersistenceImpl<Portl
 	}
 
 	protected void cacheUniqueFindersCache(
-		PortletPreferencesModelImpl portletPreferencesModelImpl, boolean isNew) {
-		if (isNew) {
-			Object[] args = new Object[] {
-					portletPreferencesModelImpl.getOwnerId(),
-					portletPreferencesModelImpl.getOwnerType(),
-					portletPreferencesModelImpl.getPlid(),
-					portletPreferencesModelImpl.getPortletId()
-				};
-
-			finderCache.putResult(FINDER_PATH_COUNT_BY_O_O_P_P, args,
-				Long.valueOf(1));
-			finderCache.putResult(FINDER_PATH_FETCH_BY_O_O_P_P, args,
-				portletPreferencesModelImpl);
-		}
-		else {
-			if ((portletPreferencesModelImpl.getColumnBitmask() &
-					FINDER_PATH_FETCH_BY_O_O_P_P.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						portletPreferencesModelImpl.getOwnerId(),
-						portletPreferencesModelImpl.getOwnerType(),
-						portletPreferencesModelImpl.getPlid(),
-						portletPreferencesModelImpl.getPortletId()
-					};
-
-				finderCache.putResult(FINDER_PATH_COUNT_BY_O_O_P_P, args,
-					Long.valueOf(1));
-				finderCache.putResult(FINDER_PATH_FETCH_BY_O_O_P_P, args,
-					portletPreferencesModelImpl);
-			}
-		}
-	}
-
-	protected void clearUniqueFindersCache(
 		PortletPreferencesModelImpl portletPreferencesModelImpl) {
 		Object[] args = new Object[] {
 				portletPreferencesModelImpl.getOwnerId(),
@@ -4636,12 +4603,17 @@ public class PortletPreferencesPersistenceImpl extends BasePersistenceImpl<Portl
 				portletPreferencesModelImpl.getPortletId()
 			};
 
-		finderCache.removeResult(FINDER_PATH_COUNT_BY_O_O_P_P, args);
-		finderCache.removeResult(FINDER_PATH_FETCH_BY_O_O_P_P, args);
+		finderCache.putResult(FINDER_PATH_COUNT_BY_O_O_P_P, args,
+			Long.valueOf(1), false);
+		finderCache.putResult(FINDER_PATH_FETCH_BY_O_O_P_P, args,
+			portletPreferencesModelImpl, false);
+	}
 
+	protected void clearUniqueFindersCache(
+		PortletPreferencesModelImpl portletPreferencesModelImpl) {
 		if ((portletPreferencesModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_O_O_P_P.getColumnBitmask()) != 0) {
-			args = new Object[] {
+			Object[] args = new Object[] {
 					portletPreferencesModelImpl.getOriginalOwnerId(),
 					portletPreferencesModelImpl.getOriginalOwnerType(),
 					portletPreferencesModelImpl.getOriginalPlid(),
@@ -4944,7 +4916,7 @@ public class PortletPreferencesPersistenceImpl extends BasePersistenceImpl<Portl
 			portletPreferences, false);
 
 		clearUniqueFindersCache(portletPreferencesModelImpl);
-		cacheUniqueFindersCache(portletPreferencesModelImpl, isNew);
+		cacheUniqueFindersCache(portletPreferencesModelImpl);
 
 		portletPreferences.resetOriginalValues();
 

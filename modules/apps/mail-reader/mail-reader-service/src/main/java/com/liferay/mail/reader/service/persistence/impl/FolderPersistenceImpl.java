@@ -941,46 +941,21 @@ public class FolderPersistenceImpl extends BasePersistenceImpl<Folder>
 		}
 	}
 
-	protected void cacheUniqueFindersCache(FolderModelImpl folderModelImpl,
-		boolean isNew) {
-		if (isNew) {
-			Object[] args = new Object[] {
-					folderModelImpl.getAccountId(),
-					folderModelImpl.getFullName()
-				};
-
-			finderCache.putResult(FINDER_PATH_COUNT_BY_A_F, args,
-				Long.valueOf(1));
-			finderCache.putResult(FINDER_PATH_FETCH_BY_A_F, args,
-				folderModelImpl);
-		}
-		else {
-			if ((folderModelImpl.getColumnBitmask() &
-					FINDER_PATH_FETCH_BY_A_F.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						folderModelImpl.getAccountId(),
-						folderModelImpl.getFullName()
-					};
-
-				finderCache.putResult(FINDER_PATH_COUNT_BY_A_F, args,
-					Long.valueOf(1));
-				finderCache.putResult(FINDER_PATH_FETCH_BY_A_F, args,
-					folderModelImpl);
-			}
-		}
-	}
-
-	protected void clearUniqueFindersCache(FolderModelImpl folderModelImpl) {
+	protected void cacheUniqueFindersCache(FolderModelImpl folderModelImpl) {
 		Object[] args = new Object[] {
 				folderModelImpl.getAccountId(), folderModelImpl.getFullName()
 			};
 
-		finderCache.removeResult(FINDER_PATH_COUNT_BY_A_F, args);
-		finderCache.removeResult(FINDER_PATH_FETCH_BY_A_F, args);
+		finderCache.putResult(FINDER_PATH_COUNT_BY_A_F, args, Long.valueOf(1),
+			false);
+		finderCache.putResult(FINDER_PATH_FETCH_BY_A_F, args, folderModelImpl,
+			false);
+	}
 
+	protected void clearUniqueFindersCache(FolderModelImpl folderModelImpl) {
 		if ((folderModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_A_F.getColumnBitmask()) != 0) {
-			args = new Object[] {
+			Object[] args = new Object[] {
 					folderModelImpl.getOriginalAccountId(),
 					folderModelImpl.getOriginalFullName()
 				};
@@ -1170,7 +1145,7 @@ public class FolderPersistenceImpl extends BasePersistenceImpl<Folder>
 			FolderImpl.class, folder.getPrimaryKey(), folder, false);
 
 		clearUniqueFindersCache(folderModelImpl);
-		cacheUniqueFindersCache(folderModelImpl, isNew);
+		cacheUniqueFindersCache(folderModelImpl);
 
 		folder.resetOriginalValues();
 

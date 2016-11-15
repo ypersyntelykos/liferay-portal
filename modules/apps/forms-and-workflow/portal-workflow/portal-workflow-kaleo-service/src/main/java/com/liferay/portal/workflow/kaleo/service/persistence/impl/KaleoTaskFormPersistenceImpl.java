@@ -2489,47 +2489,23 @@ public class KaleoTaskFormPersistenceImpl extends BasePersistenceImpl<KaleoTaskF
 	}
 
 	protected void cacheUniqueFindersCache(
-		KaleoTaskFormModelImpl kaleoTaskFormModelImpl, boolean isNew) {
-		if (isNew) {
-			Object[] args = new Object[] {
-					kaleoTaskFormModelImpl.getKaleoTaskId(),
-					kaleoTaskFormModelImpl.getFormUuid()
-				};
-
-			finderCache.putResult(FINDER_PATH_COUNT_BY_FORMUUID_KTI, args,
-				Long.valueOf(1));
-			finderCache.putResult(FINDER_PATH_FETCH_BY_FORMUUID_KTI, args,
-				kaleoTaskFormModelImpl);
-		}
-		else {
-			if ((kaleoTaskFormModelImpl.getColumnBitmask() &
-					FINDER_PATH_FETCH_BY_FORMUUID_KTI.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						kaleoTaskFormModelImpl.getKaleoTaskId(),
-						kaleoTaskFormModelImpl.getFormUuid()
-					};
-
-				finderCache.putResult(FINDER_PATH_COUNT_BY_FORMUUID_KTI, args,
-					Long.valueOf(1));
-				finderCache.putResult(FINDER_PATH_FETCH_BY_FORMUUID_KTI, args,
-					kaleoTaskFormModelImpl);
-			}
-		}
-	}
-
-	protected void clearUniqueFindersCache(
 		KaleoTaskFormModelImpl kaleoTaskFormModelImpl) {
 		Object[] args = new Object[] {
 				kaleoTaskFormModelImpl.getKaleoTaskId(),
 				kaleoTaskFormModelImpl.getFormUuid()
 			};
 
-		finderCache.removeResult(FINDER_PATH_COUNT_BY_FORMUUID_KTI, args);
-		finderCache.removeResult(FINDER_PATH_FETCH_BY_FORMUUID_KTI, args);
+		finderCache.putResult(FINDER_PATH_COUNT_BY_FORMUUID_KTI, args,
+			Long.valueOf(1), false);
+		finderCache.putResult(FINDER_PATH_FETCH_BY_FORMUUID_KTI, args,
+			kaleoTaskFormModelImpl, false);
+	}
 
+	protected void clearUniqueFindersCache(
+		KaleoTaskFormModelImpl kaleoTaskFormModelImpl) {
 		if ((kaleoTaskFormModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_FORMUUID_KTI.getColumnBitmask()) != 0) {
-			args = new Object[] {
+			Object[] args = new Object[] {
 					kaleoTaskFormModelImpl.getOriginalKaleoTaskId(),
 					kaleoTaskFormModelImpl.getOriginalFormUuid()
 				};
@@ -2779,7 +2755,7 @@ public class KaleoTaskFormPersistenceImpl extends BasePersistenceImpl<KaleoTaskF
 			kaleoTaskForm, false);
 
 		clearUniqueFindersCache(kaleoTaskFormModelImpl);
-		cacheUniqueFindersCache(kaleoTaskFormModelImpl, isNew);
+		cacheUniqueFindersCache(kaleoTaskFormModelImpl);
 
 		kaleoTaskForm.resetOriginalValues();
 

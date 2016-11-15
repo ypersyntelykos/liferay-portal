@@ -6376,47 +6376,23 @@ public class SyncDLObjectPersistenceImpl extends BasePersistenceImpl<SyncDLObjec
 	}
 
 	protected void cacheUniqueFindersCache(
-		SyncDLObjectModelImpl syncDLObjectModelImpl, boolean isNew) {
-		if (isNew) {
-			Object[] args = new Object[] {
-					syncDLObjectModelImpl.getType(),
-					syncDLObjectModelImpl.getTypePK()
-				};
-
-			finderCache.putResult(FINDER_PATH_COUNT_BY_T_T, args,
-				Long.valueOf(1));
-			finderCache.putResult(FINDER_PATH_FETCH_BY_T_T, args,
-				syncDLObjectModelImpl);
-		}
-		else {
-			if ((syncDLObjectModelImpl.getColumnBitmask() &
-					FINDER_PATH_FETCH_BY_T_T.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						syncDLObjectModelImpl.getType(),
-						syncDLObjectModelImpl.getTypePK()
-					};
-
-				finderCache.putResult(FINDER_PATH_COUNT_BY_T_T, args,
-					Long.valueOf(1));
-				finderCache.putResult(FINDER_PATH_FETCH_BY_T_T, args,
-					syncDLObjectModelImpl);
-			}
-		}
-	}
-
-	protected void clearUniqueFindersCache(
 		SyncDLObjectModelImpl syncDLObjectModelImpl) {
 		Object[] args = new Object[] {
 				syncDLObjectModelImpl.getType(),
 				syncDLObjectModelImpl.getTypePK()
 			};
 
-		finderCache.removeResult(FINDER_PATH_COUNT_BY_T_T, args);
-		finderCache.removeResult(FINDER_PATH_FETCH_BY_T_T, args);
+		finderCache.putResult(FINDER_PATH_COUNT_BY_T_T, args, Long.valueOf(1),
+			false);
+		finderCache.putResult(FINDER_PATH_FETCH_BY_T_T, args,
+			syncDLObjectModelImpl, false);
+	}
 
+	protected void clearUniqueFindersCache(
+		SyncDLObjectModelImpl syncDLObjectModelImpl) {
 		if ((syncDLObjectModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_T_T.getColumnBitmask()) != 0) {
-			args = new Object[] {
+			Object[] args = new Object[] {
 					syncDLObjectModelImpl.getOriginalType(),
 					syncDLObjectModelImpl.getOriginalTypePK()
 				};
@@ -6657,7 +6633,7 @@ public class SyncDLObjectPersistenceImpl extends BasePersistenceImpl<SyncDLObjec
 			false);
 
 		clearUniqueFindersCache(syncDLObjectModelImpl);
-		cacheUniqueFindersCache(syncDLObjectModelImpl, isNew);
+		cacheUniqueFindersCache(syncDLObjectModelImpl);
 
 		syncDLObject.resetOriginalValues();
 

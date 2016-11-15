@@ -2302,70 +2302,33 @@ public class MBMailingListPersistenceImpl extends BasePersistenceImpl<MBMailingL
 	}
 
 	protected void cacheUniqueFindersCache(
-		MBMailingListModelImpl mbMailingListModelImpl, boolean isNew) {
-		if (isNew) {
-			Object[] args = new Object[] {
-					mbMailingListModelImpl.getUuid(),
-					mbMailingListModelImpl.getGroupId()
-				};
-
-			finderCache.putResult(FINDER_PATH_COUNT_BY_UUID_G, args,
-				Long.valueOf(1));
-			finderCache.putResult(FINDER_PATH_FETCH_BY_UUID_G, args,
-				mbMailingListModelImpl);
-
-			args = new Object[] {
-					mbMailingListModelImpl.getGroupId(),
-					mbMailingListModelImpl.getCategoryId()
-				};
-
-			finderCache.putResult(FINDER_PATH_COUNT_BY_G_C, args,
-				Long.valueOf(1));
-			finderCache.putResult(FINDER_PATH_FETCH_BY_G_C, args,
-				mbMailingListModelImpl);
-		}
-		else {
-			if ((mbMailingListModelImpl.getColumnBitmask() &
-					FINDER_PATH_FETCH_BY_UUID_G.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						mbMailingListModelImpl.getUuid(),
-						mbMailingListModelImpl.getGroupId()
-					};
-
-				finderCache.putResult(FINDER_PATH_COUNT_BY_UUID_G, args,
-					Long.valueOf(1));
-				finderCache.putResult(FINDER_PATH_FETCH_BY_UUID_G, args,
-					mbMailingListModelImpl);
-			}
-
-			if ((mbMailingListModelImpl.getColumnBitmask() &
-					FINDER_PATH_FETCH_BY_G_C.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						mbMailingListModelImpl.getGroupId(),
-						mbMailingListModelImpl.getCategoryId()
-					};
-
-				finderCache.putResult(FINDER_PATH_COUNT_BY_G_C, args,
-					Long.valueOf(1));
-				finderCache.putResult(FINDER_PATH_FETCH_BY_G_C, args,
-					mbMailingListModelImpl);
-			}
-		}
-	}
-
-	protected void clearUniqueFindersCache(
 		MBMailingListModelImpl mbMailingListModelImpl) {
 		Object[] args = new Object[] {
 				mbMailingListModelImpl.getUuid(),
 				mbMailingListModelImpl.getGroupId()
 			};
 
-		finderCache.removeResult(FINDER_PATH_COUNT_BY_UUID_G, args);
-		finderCache.removeResult(FINDER_PATH_FETCH_BY_UUID_G, args);
+		finderCache.putResult(FINDER_PATH_COUNT_BY_UUID_G, args,
+			Long.valueOf(1), false);
+		finderCache.putResult(FINDER_PATH_FETCH_BY_UUID_G, args,
+			mbMailingListModelImpl, false);
 
+		args = new Object[] {
+				mbMailingListModelImpl.getGroupId(),
+				mbMailingListModelImpl.getCategoryId()
+			};
+
+		finderCache.putResult(FINDER_PATH_COUNT_BY_G_C, args, Long.valueOf(1),
+			false);
+		finderCache.putResult(FINDER_PATH_FETCH_BY_G_C, args,
+			mbMailingListModelImpl, false);
+	}
+
+	protected void clearUniqueFindersCache(
+		MBMailingListModelImpl mbMailingListModelImpl) {
 		if ((mbMailingListModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_UUID_G.getColumnBitmask()) != 0) {
-			args = new Object[] {
+			Object[] args = new Object[] {
 					mbMailingListModelImpl.getOriginalUuid(),
 					mbMailingListModelImpl.getOriginalGroupId()
 				};
@@ -2374,17 +2337,9 @@ public class MBMailingListPersistenceImpl extends BasePersistenceImpl<MBMailingL
 			finderCache.removeResult(FINDER_PATH_FETCH_BY_UUID_G, args);
 		}
 
-		args = new Object[] {
-				mbMailingListModelImpl.getGroupId(),
-				mbMailingListModelImpl.getCategoryId()
-			};
-
-		finderCache.removeResult(FINDER_PATH_COUNT_BY_G_C, args);
-		finderCache.removeResult(FINDER_PATH_FETCH_BY_G_C, args);
-
 		if ((mbMailingListModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_G_C.getColumnBitmask()) != 0) {
-			args = new Object[] {
+			Object[] args = new Object[] {
 					mbMailingListModelImpl.getOriginalGroupId(),
 					mbMailingListModelImpl.getOriginalCategoryId()
 				};
@@ -2627,7 +2582,7 @@ public class MBMailingListPersistenceImpl extends BasePersistenceImpl<MBMailingL
 			mbMailingList, false);
 
 		clearUniqueFindersCache(mbMailingListModelImpl);
-		cacheUniqueFindersCache(mbMailingListModelImpl, isNew);
+		cacheUniqueFindersCache(mbMailingListModelImpl);
 
 		mbMailingList.resetOriginalValues();
 

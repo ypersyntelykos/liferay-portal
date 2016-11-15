@@ -3149,70 +3149,33 @@ public class DDLRecordSetPersistenceImpl extends BasePersistenceImpl<DDLRecordSe
 	}
 
 	protected void cacheUniqueFindersCache(
-		DDLRecordSetModelImpl ddlRecordSetModelImpl, boolean isNew) {
-		if (isNew) {
-			Object[] args = new Object[] {
-					ddlRecordSetModelImpl.getUuid(),
-					ddlRecordSetModelImpl.getGroupId()
-				};
-
-			finderCache.putResult(FINDER_PATH_COUNT_BY_UUID_G, args,
-				Long.valueOf(1));
-			finderCache.putResult(FINDER_PATH_FETCH_BY_UUID_G, args,
-				ddlRecordSetModelImpl);
-
-			args = new Object[] {
-					ddlRecordSetModelImpl.getGroupId(),
-					ddlRecordSetModelImpl.getRecordSetKey()
-				};
-
-			finderCache.putResult(FINDER_PATH_COUNT_BY_G_R, args,
-				Long.valueOf(1));
-			finderCache.putResult(FINDER_PATH_FETCH_BY_G_R, args,
-				ddlRecordSetModelImpl);
-		}
-		else {
-			if ((ddlRecordSetModelImpl.getColumnBitmask() &
-					FINDER_PATH_FETCH_BY_UUID_G.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						ddlRecordSetModelImpl.getUuid(),
-						ddlRecordSetModelImpl.getGroupId()
-					};
-
-				finderCache.putResult(FINDER_PATH_COUNT_BY_UUID_G, args,
-					Long.valueOf(1));
-				finderCache.putResult(FINDER_PATH_FETCH_BY_UUID_G, args,
-					ddlRecordSetModelImpl);
-			}
-
-			if ((ddlRecordSetModelImpl.getColumnBitmask() &
-					FINDER_PATH_FETCH_BY_G_R.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						ddlRecordSetModelImpl.getGroupId(),
-						ddlRecordSetModelImpl.getRecordSetKey()
-					};
-
-				finderCache.putResult(FINDER_PATH_COUNT_BY_G_R, args,
-					Long.valueOf(1));
-				finderCache.putResult(FINDER_PATH_FETCH_BY_G_R, args,
-					ddlRecordSetModelImpl);
-			}
-		}
-	}
-
-	protected void clearUniqueFindersCache(
 		DDLRecordSetModelImpl ddlRecordSetModelImpl) {
 		Object[] args = new Object[] {
 				ddlRecordSetModelImpl.getUuid(),
 				ddlRecordSetModelImpl.getGroupId()
 			};
 
-		finderCache.removeResult(FINDER_PATH_COUNT_BY_UUID_G, args);
-		finderCache.removeResult(FINDER_PATH_FETCH_BY_UUID_G, args);
+		finderCache.putResult(FINDER_PATH_COUNT_BY_UUID_G, args,
+			Long.valueOf(1), false);
+		finderCache.putResult(FINDER_PATH_FETCH_BY_UUID_G, args,
+			ddlRecordSetModelImpl, false);
 
+		args = new Object[] {
+				ddlRecordSetModelImpl.getGroupId(),
+				ddlRecordSetModelImpl.getRecordSetKey()
+			};
+
+		finderCache.putResult(FINDER_PATH_COUNT_BY_G_R, args, Long.valueOf(1),
+			false);
+		finderCache.putResult(FINDER_PATH_FETCH_BY_G_R, args,
+			ddlRecordSetModelImpl, false);
+	}
+
+	protected void clearUniqueFindersCache(
+		DDLRecordSetModelImpl ddlRecordSetModelImpl) {
 		if ((ddlRecordSetModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_UUID_G.getColumnBitmask()) != 0) {
-			args = new Object[] {
+			Object[] args = new Object[] {
 					ddlRecordSetModelImpl.getOriginalUuid(),
 					ddlRecordSetModelImpl.getOriginalGroupId()
 				};
@@ -3221,17 +3184,9 @@ public class DDLRecordSetPersistenceImpl extends BasePersistenceImpl<DDLRecordSe
 			finderCache.removeResult(FINDER_PATH_FETCH_BY_UUID_G, args);
 		}
 
-		args = new Object[] {
-				ddlRecordSetModelImpl.getGroupId(),
-				ddlRecordSetModelImpl.getRecordSetKey()
-			};
-
-		finderCache.removeResult(FINDER_PATH_COUNT_BY_G_R, args);
-		finderCache.removeResult(FINDER_PATH_FETCH_BY_G_R, args);
-
 		if ((ddlRecordSetModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_G_R.getColumnBitmask()) != 0) {
-			args = new Object[] {
+			Object[] args = new Object[] {
 					ddlRecordSetModelImpl.getOriginalGroupId(),
 					ddlRecordSetModelImpl.getOriginalRecordSetKey()
 				};
@@ -3473,7 +3428,7 @@ public class DDLRecordSetPersistenceImpl extends BasePersistenceImpl<DDLRecordSe
 			false);
 
 		clearUniqueFindersCache(ddlRecordSetModelImpl);
-		cacheUniqueFindersCache(ddlRecordSetModelImpl, isNew);
+		cacheUniqueFindersCache(ddlRecordSetModelImpl);
 
 		ddlRecordSet.resetOriginalValues();
 

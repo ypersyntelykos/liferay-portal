@@ -1420,42 +1420,22 @@ public class KaleoConditionPersistenceImpl extends BasePersistenceImpl<KaleoCond
 	}
 
 	protected void cacheUniqueFindersCache(
-		KaleoConditionModelImpl kaleoConditionModelImpl, boolean isNew) {
-		if (isNew) {
-			Object[] args = new Object[] {
-					kaleoConditionModelImpl.getKaleoNodeId()
-				};
+		KaleoConditionModelImpl kaleoConditionModelImpl) {
+		Object[] args = new Object[] { kaleoConditionModelImpl.getKaleoNodeId() };
 
-			finderCache.putResult(FINDER_PATH_COUNT_BY_KALEONODEID, args,
-				Long.valueOf(1));
-			finderCache.putResult(FINDER_PATH_FETCH_BY_KALEONODEID, args,
-				kaleoConditionModelImpl);
-		}
-		else {
-			if ((kaleoConditionModelImpl.getColumnBitmask() &
-					FINDER_PATH_FETCH_BY_KALEONODEID.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						kaleoConditionModelImpl.getKaleoNodeId()
-					};
-
-				finderCache.putResult(FINDER_PATH_COUNT_BY_KALEONODEID, args,
-					Long.valueOf(1));
-				finderCache.putResult(FINDER_PATH_FETCH_BY_KALEONODEID, args,
-					kaleoConditionModelImpl);
-			}
-		}
+		finderCache.putResult(FINDER_PATH_COUNT_BY_KALEONODEID, args,
+			Long.valueOf(1), false);
+		finderCache.putResult(FINDER_PATH_FETCH_BY_KALEONODEID, args,
+			kaleoConditionModelImpl, false);
 	}
 
 	protected void clearUniqueFindersCache(
 		KaleoConditionModelImpl kaleoConditionModelImpl) {
-		Object[] args = new Object[] { kaleoConditionModelImpl.getKaleoNodeId() };
-
-		finderCache.removeResult(FINDER_PATH_COUNT_BY_KALEONODEID, args);
-		finderCache.removeResult(FINDER_PATH_FETCH_BY_KALEONODEID, args);
-
 		if ((kaleoConditionModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_KALEONODEID.getColumnBitmask()) != 0) {
-			args = new Object[] { kaleoConditionModelImpl.getOriginalKaleoNodeId() };
+			Object[] args = new Object[] {
+					kaleoConditionModelImpl.getOriginalKaleoNodeId()
+				};
 
 			finderCache.removeResult(FINDER_PATH_COUNT_BY_KALEONODEID, args);
 			finderCache.removeResult(FINDER_PATH_FETCH_BY_KALEONODEID, args);
@@ -1668,7 +1648,7 @@ public class KaleoConditionPersistenceImpl extends BasePersistenceImpl<KaleoCond
 			kaleoCondition, false);
 
 		clearUniqueFindersCache(kaleoConditionModelImpl);
-		cacheUniqueFindersCache(kaleoConditionModelImpl, isNew);
+		cacheUniqueFindersCache(kaleoConditionModelImpl);
 
 		kaleoCondition.resetOriginalValues();
 

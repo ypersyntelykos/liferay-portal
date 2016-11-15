@@ -2685,37 +2685,6 @@ public class RatingsEntryPersistenceImpl extends BasePersistenceImpl<RatingsEntr
 	}
 
 	protected void cacheUniqueFindersCache(
-		RatingsEntryModelImpl ratingsEntryModelImpl, boolean isNew) {
-		if (isNew) {
-			Object[] args = new Object[] {
-					ratingsEntryModelImpl.getUserId(),
-					ratingsEntryModelImpl.getClassNameId(),
-					ratingsEntryModelImpl.getClassPK()
-				};
-
-			finderCache.putResult(FINDER_PATH_COUNT_BY_U_C_C, args,
-				Long.valueOf(1));
-			finderCache.putResult(FINDER_PATH_FETCH_BY_U_C_C, args,
-				ratingsEntryModelImpl);
-		}
-		else {
-			if ((ratingsEntryModelImpl.getColumnBitmask() &
-					FINDER_PATH_FETCH_BY_U_C_C.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						ratingsEntryModelImpl.getUserId(),
-						ratingsEntryModelImpl.getClassNameId(),
-						ratingsEntryModelImpl.getClassPK()
-					};
-
-				finderCache.putResult(FINDER_PATH_COUNT_BY_U_C_C, args,
-					Long.valueOf(1));
-				finderCache.putResult(FINDER_PATH_FETCH_BY_U_C_C, args,
-					ratingsEntryModelImpl);
-			}
-		}
-	}
-
-	protected void clearUniqueFindersCache(
 		RatingsEntryModelImpl ratingsEntryModelImpl) {
 		Object[] args = new Object[] {
 				ratingsEntryModelImpl.getUserId(),
@@ -2723,12 +2692,17 @@ public class RatingsEntryPersistenceImpl extends BasePersistenceImpl<RatingsEntr
 				ratingsEntryModelImpl.getClassPK()
 			};
 
-		finderCache.removeResult(FINDER_PATH_COUNT_BY_U_C_C, args);
-		finderCache.removeResult(FINDER_PATH_FETCH_BY_U_C_C, args);
+		finderCache.putResult(FINDER_PATH_COUNT_BY_U_C_C, args,
+			Long.valueOf(1), false);
+		finderCache.putResult(FINDER_PATH_FETCH_BY_U_C_C, args,
+			ratingsEntryModelImpl, false);
+	}
 
+	protected void clearUniqueFindersCache(
+		RatingsEntryModelImpl ratingsEntryModelImpl) {
 		if ((ratingsEntryModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_U_C_C.getColumnBitmask()) != 0) {
-			args = new Object[] {
+			Object[] args = new Object[] {
 					ratingsEntryModelImpl.getOriginalUserId(),
 					ratingsEntryModelImpl.getOriginalClassNameId(),
 					ratingsEntryModelImpl.getOriginalClassPK()
@@ -2997,7 +2971,7 @@ public class RatingsEntryPersistenceImpl extends BasePersistenceImpl<RatingsEntr
 			false);
 
 		clearUniqueFindersCache(ratingsEntryModelImpl);
-		cacheUniqueFindersCache(ratingsEntryModelImpl, isNew);
+		cacheUniqueFindersCache(ratingsEntryModelImpl);
 
 		ratingsEntry.resetOriginalValues();
 

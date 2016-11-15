@@ -2063,45 +2063,21 @@ public class MDRRulePersistenceImpl extends BasePersistenceImpl<MDRRule>
 		}
 	}
 
-	protected void cacheUniqueFindersCache(MDRRuleModelImpl mdrRuleModelImpl,
-		boolean isNew) {
-		if (isNew) {
-			Object[] args = new Object[] {
-					mdrRuleModelImpl.getUuid(), mdrRuleModelImpl.getGroupId()
-				};
-
-			finderCache.putResult(FINDER_PATH_COUNT_BY_UUID_G, args,
-				Long.valueOf(1));
-			finderCache.putResult(FINDER_PATH_FETCH_BY_UUID_G, args,
-				mdrRuleModelImpl);
-		}
-		else {
-			if ((mdrRuleModelImpl.getColumnBitmask() &
-					FINDER_PATH_FETCH_BY_UUID_G.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						mdrRuleModelImpl.getUuid(),
-						mdrRuleModelImpl.getGroupId()
-					};
-
-				finderCache.putResult(FINDER_PATH_COUNT_BY_UUID_G, args,
-					Long.valueOf(1));
-				finderCache.putResult(FINDER_PATH_FETCH_BY_UUID_G, args,
-					mdrRuleModelImpl);
-			}
-		}
-	}
-
-	protected void clearUniqueFindersCache(MDRRuleModelImpl mdrRuleModelImpl) {
+	protected void cacheUniqueFindersCache(MDRRuleModelImpl mdrRuleModelImpl) {
 		Object[] args = new Object[] {
 				mdrRuleModelImpl.getUuid(), mdrRuleModelImpl.getGroupId()
 			};
 
-		finderCache.removeResult(FINDER_PATH_COUNT_BY_UUID_G, args);
-		finderCache.removeResult(FINDER_PATH_FETCH_BY_UUID_G, args);
+		finderCache.putResult(FINDER_PATH_COUNT_BY_UUID_G, args,
+			Long.valueOf(1), false);
+		finderCache.putResult(FINDER_PATH_FETCH_BY_UUID_G, args,
+			mdrRuleModelImpl, false);
+	}
 
+	protected void clearUniqueFindersCache(MDRRuleModelImpl mdrRuleModelImpl) {
 		if ((mdrRuleModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_UUID_G.getColumnBitmask()) != 0) {
-			args = new Object[] {
+			Object[] args = new Object[] {
 					mdrRuleModelImpl.getOriginalUuid(),
 					mdrRuleModelImpl.getOriginalGroupId()
 				};
@@ -2337,7 +2313,7 @@ public class MDRRulePersistenceImpl extends BasePersistenceImpl<MDRRule>
 			MDRRuleImpl.class, mdrRule.getPrimaryKey(), mdrRule, false);
 
 		clearUniqueFindersCache(mdrRuleModelImpl);
-		cacheUniqueFindersCache(mdrRuleModelImpl, isNew);
+		cacheUniqueFindersCache(mdrRuleModelImpl);
 
 		mdrRule.resetOriginalValues();
 

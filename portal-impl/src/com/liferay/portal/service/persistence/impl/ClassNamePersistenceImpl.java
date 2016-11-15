@@ -401,38 +401,20 @@ public class ClassNamePersistenceImpl extends BasePersistenceImpl<ClassName>
 	}
 
 	protected void cacheUniqueFindersCache(
-		ClassNameModelImpl classNameModelImpl, boolean isNew) {
-		if (isNew) {
-			Object[] args = new Object[] { classNameModelImpl.getValue() };
+		ClassNameModelImpl classNameModelImpl) {
+		Object[] args = new Object[] { classNameModelImpl.getValue() };
 
-			finderCache.putResult(FINDER_PATH_COUNT_BY_VALUE, args,
-				Long.valueOf(1));
-			finderCache.putResult(FINDER_PATH_FETCH_BY_VALUE, args,
-				classNameModelImpl);
-		}
-		else {
-			if ((classNameModelImpl.getColumnBitmask() &
-					FINDER_PATH_FETCH_BY_VALUE.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] { classNameModelImpl.getValue() };
-
-				finderCache.putResult(FINDER_PATH_COUNT_BY_VALUE, args,
-					Long.valueOf(1));
-				finderCache.putResult(FINDER_PATH_FETCH_BY_VALUE, args,
-					classNameModelImpl);
-			}
-		}
+		finderCache.putResult(FINDER_PATH_COUNT_BY_VALUE, args,
+			Long.valueOf(1), false);
+		finderCache.putResult(FINDER_PATH_FETCH_BY_VALUE, args,
+			classNameModelImpl, false);
 	}
 
 	protected void clearUniqueFindersCache(
 		ClassNameModelImpl classNameModelImpl) {
-		Object[] args = new Object[] { classNameModelImpl.getValue() };
-
-		finderCache.removeResult(FINDER_PATH_COUNT_BY_VALUE, args);
-		finderCache.removeResult(FINDER_PATH_FETCH_BY_VALUE, args);
-
 		if ((classNameModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_VALUE.getColumnBitmask()) != 0) {
-			args = new Object[] { classNameModelImpl.getOriginalValue() };
+			Object[] args = new Object[] { classNameModelImpl.getOriginalValue() };
 
 			finderCache.removeResult(FINDER_PATH_COUNT_BY_VALUE, args);
 			finderCache.removeResult(FINDER_PATH_FETCH_BY_VALUE, args);
@@ -578,7 +560,7 @@ public class ClassNamePersistenceImpl extends BasePersistenceImpl<ClassName>
 			ClassNameImpl.class, className.getPrimaryKey(), className, false);
 
 		clearUniqueFindersCache(classNameModelImpl);
-		cacheUniqueFindersCache(classNameModelImpl, isNew);
+		cacheUniqueFindersCache(classNameModelImpl);
 
 		className.resetOriginalValues();
 

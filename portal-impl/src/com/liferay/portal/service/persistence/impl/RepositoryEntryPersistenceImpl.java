@@ -2349,70 +2349,33 @@ public class RepositoryEntryPersistenceImpl extends BasePersistenceImpl<Reposito
 	}
 
 	protected void cacheUniqueFindersCache(
-		RepositoryEntryModelImpl repositoryEntryModelImpl, boolean isNew) {
-		if (isNew) {
-			Object[] args = new Object[] {
-					repositoryEntryModelImpl.getUuid(),
-					repositoryEntryModelImpl.getGroupId()
-				};
-
-			finderCache.putResult(FINDER_PATH_COUNT_BY_UUID_G, args,
-				Long.valueOf(1));
-			finderCache.putResult(FINDER_PATH_FETCH_BY_UUID_G, args,
-				repositoryEntryModelImpl);
-
-			args = new Object[] {
-					repositoryEntryModelImpl.getRepositoryId(),
-					repositoryEntryModelImpl.getMappedId()
-				};
-
-			finderCache.putResult(FINDER_PATH_COUNT_BY_R_M, args,
-				Long.valueOf(1));
-			finderCache.putResult(FINDER_PATH_FETCH_BY_R_M, args,
-				repositoryEntryModelImpl);
-		}
-		else {
-			if ((repositoryEntryModelImpl.getColumnBitmask() &
-					FINDER_PATH_FETCH_BY_UUID_G.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						repositoryEntryModelImpl.getUuid(),
-						repositoryEntryModelImpl.getGroupId()
-					};
-
-				finderCache.putResult(FINDER_PATH_COUNT_BY_UUID_G, args,
-					Long.valueOf(1));
-				finderCache.putResult(FINDER_PATH_FETCH_BY_UUID_G, args,
-					repositoryEntryModelImpl);
-			}
-
-			if ((repositoryEntryModelImpl.getColumnBitmask() &
-					FINDER_PATH_FETCH_BY_R_M.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						repositoryEntryModelImpl.getRepositoryId(),
-						repositoryEntryModelImpl.getMappedId()
-					};
-
-				finderCache.putResult(FINDER_PATH_COUNT_BY_R_M, args,
-					Long.valueOf(1));
-				finderCache.putResult(FINDER_PATH_FETCH_BY_R_M, args,
-					repositoryEntryModelImpl);
-			}
-		}
-	}
-
-	protected void clearUniqueFindersCache(
 		RepositoryEntryModelImpl repositoryEntryModelImpl) {
 		Object[] args = new Object[] {
 				repositoryEntryModelImpl.getUuid(),
 				repositoryEntryModelImpl.getGroupId()
 			};
 
-		finderCache.removeResult(FINDER_PATH_COUNT_BY_UUID_G, args);
-		finderCache.removeResult(FINDER_PATH_FETCH_BY_UUID_G, args);
+		finderCache.putResult(FINDER_PATH_COUNT_BY_UUID_G, args,
+			Long.valueOf(1), false);
+		finderCache.putResult(FINDER_PATH_FETCH_BY_UUID_G, args,
+			repositoryEntryModelImpl, false);
 
+		args = new Object[] {
+				repositoryEntryModelImpl.getRepositoryId(),
+				repositoryEntryModelImpl.getMappedId()
+			};
+
+		finderCache.putResult(FINDER_PATH_COUNT_BY_R_M, args, Long.valueOf(1),
+			false);
+		finderCache.putResult(FINDER_PATH_FETCH_BY_R_M, args,
+			repositoryEntryModelImpl, false);
+	}
+
+	protected void clearUniqueFindersCache(
+		RepositoryEntryModelImpl repositoryEntryModelImpl) {
 		if ((repositoryEntryModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_UUID_G.getColumnBitmask()) != 0) {
-			args = new Object[] {
+			Object[] args = new Object[] {
 					repositoryEntryModelImpl.getOriginalUuid(),
 					repositoryEntryModelImpl.getOriginalGroupId()
 				};
@@ -2421,17 +2384,9 @@ public class RepositoryEntryPersistenceImpl extends BasePersistenceImpl<Reposito
 			finderCache.removeResult(FINDER_PATH_FETCH_BY_UUID_G, args);
 		}
 
-		args = new Object[] {
-				repositoryEntryModelImpl.getRepositoryId(),
-				repositoryEntryModelImpl.getMappedId()
-			};
-
-		finderCache.removeResult(FINDER_PATH_COUNT_BY_R_M, args);
-		finderCache.removeResult(FINDER_PATH_FETCH_BY_R_M, args);
-
 		if ((repositoryEntryModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_R_M.getColumnBitmask()) != 0) {
-			args = new Object[] {
+			Object[] args = new Object[] {
 					repositoryEntryModelImpl.getOriginalRepositoryId(),
 					repositoryEntryModelImpl.getOriginalMappedId()
 				};
@@ -2674,7 +2629,7 @@ public class RepositoryEntryPersistenceImpl extends BasePersistenceImpl<Reposito
 			repositoryEntry, false);
 
 		clearUniqueFindersCache(repositoryEntryModelImpl);
-		cacheUniqueFindersCache(repositoryEntryModelImpl, isNew);
+		cacheUniqueFindersCache(repositoryEntryModelImpl);
 
 		repositoryEntry.resetOriginalValues();
 

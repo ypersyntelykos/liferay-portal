@@ -1009,44 +1009,21 @@ public class ListTypePersistenceImpl extends BasePersistenceImpl<ListType>
 		}
 	}
 
-	protected void cacheUniqueFindersCache(
-		ListTypeModelImpl listTypeModelImpl, boolean isNew) {
-		if (isNew) {
-			Object[] args = new Object[] {
-					listTypeModelImpl.getName(), listTypeModelImpl.getType()
-				};
-
-			finderCache.putResult(FINDER_PATH_COUNT_BY_N_T, args,
-				Long.valueOf(1));
-			finderCache.putResult(FINDER_PATH_FETCH_BY_N_T, args,
-				listTypeModelImpl);
-		}
-		else {
-			if ((listTypeModelImpl.getColumnBitmask() &
-					FINDER_PATH_FETCH_BY_N_T.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						listTypeModelImpl.getName(), listTypeModelImpl.getType()
-					};
-
-				finderCache.putResult(FINDER_PATH_COUNT_BY_N_T, args,
-					Long.valueOf(1));
-				finderCache.putResult(FINDER_PATH_FETCH_BY_N_T, args,
-					listTypeModelImpl);
-			}
-		}
-	}
-
-	protected void clearUniqueFindersCache(ListTypeModelImpl listTypeModelImpl) {
+	protected void cacheUniqueFindersCache(ListTypeModelImpl listTypeModelImpl) {
 		Object[] args = new Object[] {
 				listTypeModelImpl.getName(), listTypeModelImpl.getType()
 			};
 
-		finderCache.removeResult(FINDER_PATH_COUNT_BY_N_T, args);
-		finderCache.removeResult(FINDER_PATH_FETCH_BY_N_T, args);
+		finderCache.putResult(FINDER_PATH_COUNT_BY_N_T, args, Long.valueOf(1),
+			false);
+		finderCache.putResult(FINDER_PATH_FETCH_BY_N_T, args,
+			listTypeModelImpl, false);
+	}
 
+	protected void clearUniqueFindersCache(ListTypeModelImpl listTypeModelImpl) {
 		if ((listTypeModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_N_T.getColumnBitmask()) != 0) {
-			args = new Object[] {
+			Object[] args = new Object[] {
 					listTypeModelImpl.getOriginalName(),
 					listTypeModelImpl.getOriginalType()
 				};
@@ -1212,7 +1189,7 @@ public class ListTypePersistenceImpl extends BasePersistenceImpl<ListType>
 			ListTypeImpl.class, listType.getPrimaryKey(), listType, false);
 
 		clearUniqueFindersCache(listTypeModelImpl);
-		cacheUniqueFindersCache(listTypeModelImpl, isNew);
+		cacheUniqueFindersCache(listTypeModelImpl);
 
 		listType.resetOriginalValues();
 

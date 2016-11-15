@@ -2572,37 +2572,6 @@ public class DLFileRankPersistenceImpl extends BasePersistenceImpl<DLFileRank>
 	}
 
 	protected void cacheUniqueFindersCache(
-		DLFileRankModelImpl dlFileRankModelImpl, boolean isNew) {
-		if (isNew) {
-			Object[] args = new Object[] {
-					dlFileRankModelImpl.getCompanyId(),
-					dlFileRankModelImpl.getUserId(),
-					dlFileRankModelImpl.getFileEntryId()
-				};
-
-			finderCache.putResult(FINDER_PATH_COUNT_BY_C_U_F, args,
-				Long.valueOf(1));
-			finderCache.putResult(FINDER_PATH_FETCH_BY_C_U_F, args,
-				dlFileRankModelImpl);
-		}
-		else {
-			if ((dlFileRankModelImpl.getColumnBitmask() &
-					FINDER_PATH_FETCH_BY_C_U_F.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						dlFileRankModelImpl.getCompanyId(),
-						dlFileRankModelImpl.getUserId(),
-						dlFileRankModelImpl.getFileEntryId()
-					};
-
-				finderCache.putResult(FINDER_PATH_COUNT_BY_C_U_F, args,
-					Long.valueOf(1));
-				finderCache.putResult(FINDER_PATH_FETCH_BY_C_U_F, args,
-					dlFileRankModelImpl);
-			}
-		}
-	}
-
-	protected void clearUniqueFindersCache(
 		DLFileRankModelImpl dlFileRankModelImpl) {
 		Object[] args = new Object[] {
 				dlFileRankModelImpl.getCompanyId(),
@@ -2610,12 +2579,17 @@ public class DLFileRankPersistenceImpl extends BasePersistenceImpl<DLFileRank>
 				dlFileRankModelImpl.getFileEntryId()
 			};
 
-		finderCache.removeResult(FINDER_PATH_COUNT_BY_C_U_F, args);
-		finderCache.removeResult(FINDER_PATH_FETCH_BY_C_U_F, args);
+		finderCache.putResult(FINDER_PATH_COUNT_BY_C_U_F, args,
+			Long.valueOf(1), false);
+		finderCache.putResult(FINDER_PATH_FETCH_BY_C_U_F, args,
+			dlFileRankModelImpl, false);
+	}
 
+	protected void clearUniqueFindersCache(
+		DLFileRankModelImpl dlFileRankModelImpl) {
 		if ((dlFileRankModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_C_U_F.getColumnBitmask()) != 0) {
-			args = new Object[] {
+			Object[] args = new Object[] {
 					dlFileRankModelImpl.getOriginalCompanyId(),
 					dlFileRankModelImpl.getOriginalUserId(),
 					dlFileRankModelImpl.getOriginalFileEntryId()
@@ -2847,7 +2821,7 @@ public class DLFileRankPersistenceImpl extends BasePersistenceImpl<DLFileRank>
 			DLFileRankImpl.class, dlFileRank.getPrimaryKey(), dlFileRank, false);
 
 		clearUniqueFindersCache(dlFileRankModelImpl);
-		cacheUniqueFindersCache(dlFileRankModelImpl, isNew);
+		cacheUniqueFindersCache(dlFileRankModelImpl);
 
 		dlFileRank.resetOriginalValues();
 

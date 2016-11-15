@@ -1222,70 +1222,33 @@ public class UserIdMapperPersistenceImpl extends BasePersistenceImpl<UserIdMappe
 	}
 
 	protected void cacheUniqueFindersCache(
-		UserIdMapperModelImpl userIdMapperModelImpl, boolean isNew) {
-		if (isNew) {
-			Object[] args = new Object[] {
-					userIdMapperModelImpl.getUserId(),
-					userIdMapperModelImpl.getType()
-				};
-
-			finderCache.putResult(FINDER_PATH_COUNT_BY_U_T, args,
-				Long.valueOf(1));
-			finderCache.putResult(FINDER_PATH_FETCH_BY_U_T, args,
-				userIdMapperModelImpl);
-
-			args = new Object[] {
-					userIdMapperModelImpl.getType(),
-					userIdMapperModelImpl.getExternalUserId()
-				};
-
-			finderCache.putResult(FINDER_PATH_COUNT_BY_T_E, args,
-				Long.valueOf(1));
-			finderCache.putResult(FINDER_PATH_FETCH_BY_T_E, args,
-				userIdMapperModelImpl);
-		}
-		else {
-			if ((userIdMapperModelImpl.getColumnBitmask() &
-					FINDER_PATH_FETCH_BY_U_T.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						userIdMapperModelImpl.getUserId(),
-						userIdMapperModelImpl.getType()
-					};
-
-				finderCache.putResult(FINDER_PATH_COUNT_BY_U_T, args,
-					Long.valueOf(1));
-				finderCache.putResult(FINDER_PATH_FETCH_BY_U_T, args,
-					userIdMapperModelImpl);
-			}
-
-			if ((userIdMapperModelImpl.getColumnBitmask() &
-					FINDER_PATH_FETCH_BY_T_E.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						userIdMapperModelImpl.getType(),
-						userIdMapperModelImpl.getExternalUserId()
-					};
-
-				finderCache.putResult(FINDER_PATH_COUNT_BY_T_E, args,
-					Long.valueOf(1));
-				finderCache.putResult(FINDER_PATH_FETCH_BY_T_E, args,
-					userIdMapperModelImpl);
-			}
-		}
-	}
-
-	protected void clearUniqueFindersCache(
 		UserIdMapperModelImpl userIdMapperModelImpl) {
 		Object[] args = new Object[] {
 				userIdMapperModelImpl.getUserId(),
 				userIdMapperModelImpl.getType()
 			};
 
-		finderCache.removeResult(FINDER_PATH_COUNT_BY_U_T, args);
-		finderCache.removeResult(FINDER_PATH_FETCH_BY_U_T, args);
+		finderCache.putResult(FINDER_PATH_COUNT_BY_U_T, args, Long.valueOf(1),
+			false);
+		finderCache.putResult(FINDER_PATH_FETCH_BY_U_T, args,
+			userIdMapperModelImpl, false);
 
+		args = new Object[] {
+				userIdMapperModelImpl.getType(),
+				userIdMapperModelImpl.getExternalUserId()
+			};
+
+		finderCache.putResult(FINDER_PATH_COUNT_BY_T_E, args, Long.valueOf(1),
+			false);
+		finderCache.putResult(FINDER_PATH_FETCH_BY_T_E, args,
+			userIdMapperModelImpl, false);
+	}
+
+	protected void clearUniqueFindersCache(
+		UserIdMapperModelImpl userIdMapperModelImpl) {
 		if ((userIdMapperModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_U_T.getColumnBitmask()) != 0) {
-			args = new Object[] {
+			Object[] args = new Object[] {
 					userIdMapperModelImpl.getOriginalUserId(),
 					userIdMapperModelImpl.getOriginalType()
 				};
@@ -1294,17 +1257,9 @@ public class UserIdMapperPersistenceImpl extends BasePersistenceImpl<UserIdMappe
 			finderCache.removeResult(FINDER_PATH_FETCH_BY_U_T, args);
 		}
 
-		args = new Object[] {
-				userIdMapperModelImpl.getType(),
-				userIdMapperModelImpl.getExternalUserId()
-			};
-
-		finderCache.removeResult(FINDER_PATH_COUNT_BY_T_E, args);
-		finderCache.removeResult(FINDER_PATH_FETCH_BY_T_E, args);
-
 		if ((userIdMapperModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_T_E.getColumnBitmask()) != 0) {
-			args = new Object[] {
+			Object[] args = new Object[] {
 					userIdMapperModelImpl.getOriginalType(),
 					userIdMapperModelImpl.getOriginalExternalUserId()
 				};
@@ -1476,7 +1431,7 @@ public class UserIdMapperPersistenceImpl extends BasePersistenceImpl<UserIdMappe
 			false);
 
 		clearUniqueFindersCache(userIdMapperModelImpl);
-		cacheUniqueFindersCache(userIdMapperModelImpl, isNew);
+		cacheUniqueFindersCache(userIdMapperModelImpl);
 
 		userIdMapper.resetOriginalValues();
 

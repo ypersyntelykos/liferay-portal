@@ -1006,47 +1006,23 @@ public class ResourceActionPersistenceImpl extends BasePersistenceImpl<ResourceA
 	}
 
 	protected void cacheUniqueFindersCache(
-		ResourceActionModelImpl resourceActionModelImpl, boolean isNew) {
-		if (isNew) {
-			Object[] args = new Object[] {
-					resourceActionModelImpl.getName(),
-					resourceActionModelImpl.getActionId()
-				};
-
-			finderCache.putResult(FINDER_PATH_COUNT_BY_N_A, args,
-				Long.valueOf(1));
-			finderCache.putResult(FINDER_PATH_FETCH_BY_N_A, args,
-				resourceActionModelImpl);
-		}
-		else {
-			if ((resourceActionModelImpl.getColumnBitmask() &
-					FINDER_PATH_FETCH_BY_N_A.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						resourceActionModelImpl.getName(),
-						resourceActionModelImpl.getActionId()
-					};
-
-				finderCache.putResult(FINDER_PATH_COUNT_BY_N_A, args,
-					Long.valueOf(1));
-				finderCache.putResult(FINDER_PATH_FETCH_BY_N_A, args,
-					resourceActionModelImpl);
-			}
-		}
-	}
-
-	protected void clearUniqueFindersCache(
 		ResourceActionModelImpl resourceActionModelImpl) {
 		Object[] args = new Object[] {
 				resourceActionModelImpl.getName(),
 				resourceActionModelImpl.getActionId()
 			};
 
-		finderCache.removeResult(FINDER_PATH_COUNT_BY_N_A, args);
-		finderCache.removeResult(FINDER_PATH_FETCH_BY_N_A, args);
+		finderCache.putResult(FINDER_PATH_COUNT_BY_N_A, args, Long.valueOf(1),
+			false);
+		finderCache.putResult(FINDER_PATH_FETCH_BY_N_A, args,
+			resourceActionModelImpl, false);
+	}
 
+	protected void clearUniqueFindersCache(
+		ResourceActionModelImpl resourceActionModelImpl) {
 		if ((resourceActionModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_N_A.getColumnBitmask()) != 0) {
-			args = new Object[] {
+			Object[] args = new Object[] {
 					resourceActionModelImpl.getOriginalName(),
 					resourceActionModelImpl.getOriginalActionId()
 				};
@@ -1216,7 +1192,7 @@ public class ResourceActionPersistenceImpl extends BasePersistenceImpl<ResourceA
 			resourceAction, false);
 
 		clearUniqueFindersCache(resourceActionModelImpl);
-		cacheUniqueFindersCache(resourceActionModelImpl, isNew);
+		cacheUniqueFindersCache(resourceActionModelImpl);
 
 		resourceAction.resetOriginalValues();
 

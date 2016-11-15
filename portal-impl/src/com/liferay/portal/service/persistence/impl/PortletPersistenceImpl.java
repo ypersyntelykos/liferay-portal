@@ -928,46 +928,21 @@ public class PortletPersistenceImpl extends BasePersistenceImpl<Portlet>
 		}
 	}
 
-	protected void cacheUniqueFindersCache(PortletModelImpl portletModelImpl,
-		boolean isNew) {
-		if (isNew) {
-			Object[] args = new Object[] {
-					portletModelImpl.getCompanyId(),
-					portletModelImpl.getPortletId()
-				};
-
-			finderCache.putResult(FINDER_PATH_COUNT_BY_C_P, args,
-				Long.valueOf(1));
-			finderCache.putResult(FINDER_PATH_FETCH_BY_C_P, args,
-				portletModelImpl);
-		}
-		else {
-			if ((portletModelImpl.getColumnBitmask() &
-					FINDER_PATH_FETCH_BY_C_P.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						portletModelImpl.getCompanyId(),
-						portletModelImpl.getPortletId()
-					};
-
-				finderCache.putResult(FINDER_PATH_COUNT_BY_C_P, args,
-					Long.valueOf(1));
-				finderCache.putResult(FINDER_PATH_FETCH_BY_C_P, args,
-					portletModelImpl);
-			}
-		}
-	}
-
-	protected void clearUniqueFindersCache(PortletModelImpl portletModelImpl) {
+	protected void cacheUniqueFindersCache(PortletModelImpl portletModelImpl) {
 		Object[] args = new Object[] {
 				portletModelImpl.getCompanyId(), portletModelImpl.getPortletId()
 			};
 
-		finderCache.removeResult(FINDER_PATH_COUNT_BY_C_P, args);
-		finderCache.removeResult(FINDER_PATH_FETCH_BY_C_P, args);
+		finderCache.putResult(FINDER_PATH_COUNT_BY_C_P, args, Long.valueOf(1),
+			false);
+		finderCache.putResult(FINDER_PATH_FETCH_BY_C_P, args, portletModelImpl,
+			false);
+	}
 
+	protected void clearUniqueFindersCache(PortletModelImpl portletModelImpl) {
 		if ((portletModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_C_P.getColumnBitmask()) != 0) {
-			args = new Object[] {
+			Object[] args = new Object[] {
 					portletModelImpl.getOriginalCompanyId(),
 					portletModelImpl.getOriginalPortletId()
 				};
@@ -1136,7 +1111,7 @@ public class PortletPersistenceImpl extends BasePersistenceImpl<Portlet>
 			PortletImpl.class, portlet.getPrimaryKey(), portlet, false);
 
 		clearUniqueFindersCache(portletModelImpl);
-		cacheUniqueFindersCache(portletModelImpl, isNew);
+		cacheUniqueFindersCache(portletModelImpl);
 
 		portlet.resetOriginalValues();
 

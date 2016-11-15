@@ -443,46 +443,21 @@ public class FeedPersistenceImpl extends BasePersistenceImpl<Feed>
 		}
 	}
 
-	protected void cacheUniqueFindersCache(FeedModelImpl feedModelImpl,
-		boolean isNew) {
-		if (isNew) {
-			Object[] args = new Object[] {
-					feedModelImpl.getUserId(),
-					feedModelImpl.getTwitterScreenName()
-				};
-
-			finderCache.putResult(FINDER_PATH_COUNT_BY_U_TSN, args,
-				Long.valueOf(1));
-			finderCache.putResult(FINDER_PATH_FETCH_BY_U_TSN, args,
-				feedModelImpl);
-		}
-		else {
-			if ((feedModelImpl.getColumnBitmask() &
-					FINDER_PATH_FETCH_BY_U_TSN.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						feedModelImpl.getUserId(),
-						feedModelImpl.getTwitterScreenName()
-					};
-
-				finderCache.putResult(FINDER_PATH_COUNT_BY_U_TSN, args,
-					Long.valueOf(1));
-				finderCache.putResult(FINDER_PATH_FETCH_BY_U_TSN, args,
-					feedModelImpl);
-			}
-		}
-	}
-
-	protected void clearUniqueFindersCache(FeedModelImpl feedModelImpl) {
+	protected void cacheUniqueFindersCache(FeedModelImpl feedModelImpl) {
 		Object[] args = new Object[] {
 				feedModelImpl.getUserId(), feedModelImpl.getTwitterScreenName()
 			};
 
-		finderCache.removeResult(FINDER_PATH_COUNT_BY_U_TSN, args);
-		finderCache.removeResult(FINDER_PATH_FETCH_BY_U_TSN, args);
+		finderCache.putResult(FINDER_PATH_COUNT_BY_U_TSN, args,
+			Long.valueOf(1), false);
+		finderCache.putResult(FINDER_PATH_FETCH_BY_U_TSN, args, feedModelImpl,
+			false);
+	}
 
+	protected void clearUniqueFindersCache(FeedModelImpl feedModelImpl) {
 		if ((feedModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_U_TSN.getColumnBitmask()) != 0) {
-			args = new Object[] {
+			Object[] args = new Object[] {
 					feedModelImpl.getOriginalUserId(),
 					feedModelImpl.getOriginalTwitterScreenName()
 				};
@@ -652,7 +627,7 @@ public class FeedPersistenceImpl extends BasePersistenceImpl<Feed>
 			FeedImpl.class, feed.getPrimaryKey(), feed, false);
 
 		clearUniqueFindersCache(feedModelImpl);
-		cacheUniqueFindersCache(feedModelImpl, isNew);
+		cacheUniqueFindersCache(feedModelImpl);
 
 		feed.resetOriginalValues();
 

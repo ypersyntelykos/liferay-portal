@@ -1443,48 +1443,23 @@ public class ResourceBlockPermissionPersistenceImpl extends BasePersistenceImpl<
 	}
 
 	protected void cacheUniqueFindersCache(
-		ResourceBlockPermissionModelImpl resourceBlockPermissionModelImpl,
-		boolean isNew) {
-		if (isNew) {
-			Object[] args = new Object[] {
-					resourceBlockPermissionModelImpl.getResourceBlockId(),
-					resourceBlockPermissionModelImpl.getRoleId()
-				};
-
-			finderCache.putResult(FINDER_PATH_COUNT_BY_R_R, args,
-				Long.valueOf(1));
-			finderCache.putResult(FINDER_PATH_FETCH_BY_R_R, args,
-				resourceBlockPermissionModelImpl);
-		}
-		else {
-			if ((resourceBlockPermissionModelImpl.getColumnBitmask() &
-					FINDER_PATH_FETCH_BY_R_R.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						resourceBlockPermissionModelImpl.getResourceBlockId(),
-						resourceBlockPermissionModelImpl.getRoleId()
-					};
-
-				finderCache.putResult(FINDER_PATH_COUNT_BY_R_R, args,
-					Long.valueOf(1));
-				finderCache.putResult(FINDER_PATH_FETCH_BY_R_R, args,
-					resourceBlockPermissionModelImpl);
-			}
-		}
-	}
-
-	protected void clearUniqueFindersCache(
 		ResourceBlockPermissionModelImpl resourceBlockPermissionModelImpl) {
 		Object[] args = new Object[] {
 				resourceBlockPermissionModelImpl.getResourceBlockId(),
 				resourceBlockPermissionModelImpl.getRoleId()
 			};
 
-		finderCache.removeResult(FINDER_PATH_COUNT_BY_R_R, args);
-		finderCache.removeResult(FINDER_PATH_FETCH_BY_R_R, args);
+		finderCache.putResult(FINDER_PATH_COUNT_BY_R_R, args, Long.valueOf(1),
+			false);
+		finderCache.putResult(FINDER_PATH_FETCH_BY_R_R, args,
+			resourceBlockPermissionModelImpl, false);
+	}
 
+	protected void clearUniqueFindersCache(
+		ResourceBlockPermissionModelImpl resourceBlockPermissionModelImpl) {
 		if ((resourceBlockPermissionModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_R_R.getColumnBitmask()) != 0) {
-			args = new Object[] {
+			Object[] args = new Object[] {
 					resourceBlockPermissionModelImpl.getOriginalResourceBlockId(),
 					resourceBlockPermissionModelImpl.getOriginalRoleId()
 				};
@@ -1680,7 +1655,7 @@ public class ResourceBlockPermissionPersistenceImpl extends BasePersistenceImpl<
 			false);
 
 		clearUniqueFindersCache(resourceBlockPermissionModelImpl);
-		cacheUniqueFindersCache(resourceBlockPermissionModelImpl, isNew);
+		cacheUniqueFindersCache(resourceBlockPermissionModelImpl);
 
 		resourceBlockPermission.resetOriginalValues();
 

@@ -4159,46 +4159,21 @@ public class SAPEntryPersistenceImpl extends BasePersistenceImpl<SAPEntry>
 		}
 	}
 
-	protected void cacheUniqueFindersCache(
-		SAPEntryModelImpl sapEntryModelImpl, boolean isNew) {
-		if (isNew) {
-			Object[] args = new Object[] {
-					sapEntryModelImpl.getCompanyId(),
-					sapEntryModelImpl.getName()
-				};
-
-			finderCache.putResult(FINDER_PATH_COUNT_BY_C_N, args,
-				Long.valueOf(1));
-			finderCache.putResult(FINDER_PATH_FETCH_BY_C_N, args,
-				sapEntryModelImpl);
-		}
-		else {
-			if ((sapEntryModelImpl.getColumnBitmask() &
-					FINDER_PATH_FETCH_BY_C_N.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						sapEntryModelImpl.getCompanyId(),
-						sapEntryModelImpl.getName()
-					};
-
-				finderCache.putResult(FINDER_PATH_COUNT_BY_C_N, args,
-					Long.valueOf(1));
-				finderCache.putResult(FINDER_PATH_FETCH_BY_C_N, args,
-					sapEntryModelImpl);
-			}
-		}
-	}
-
-	protected void clearUniqueFindersCache(SAPEntryModelImpl sapEntryModelImpl) {
+	protected void cacheUniqueFindersCache(SAPEntryModelImpl sapEntryModelImpl) {
 		Object[] args = new Object[] {
 				sapEntryModelImpl.getCompanyId(), sapEntryModelImpl.getName()
 			};
 
-		finderCache.removeResult(FINDER_PATH_COUNT_BY_C_N, args);
-		finderCache.removeResult(FINDER_PATH_FETCH_BY_C_N, args);
+		finderCache.putResult(FINDER_PATH_COUNT_BY_C_N, args, Long.valueOf(1),
+			false);
+		finderCache.putResult(FINDER_PATH_FETCH_BY_C_N, args,
+			sapEntryModelImpl, false);
+	}
 
+	protected void clearUniqueFindersCache(SAPEntryModelImpl sapEntryModelImpl) {
 		if ((sapEntryModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_C_N.getColumnBitmask()) != 0) {
-			args = new Object[] {
+			Object[] args = new Object[] {
 					sapEntryModelImpl.getOriginalCompanyId(),
 					sapEntryModelImpl.getOriginalName()
 				};
@@ -4456,7 +4431,7 @@ public class SAPEntryPersistenceImpl extends BasePersistenceImpl<SAPEntry>
 			SAPEntryImpl.class, sapEntry.getPrimaryKey(), sapEntry, false);
 
 		clearUniqueFindersCache(sapEntryModelImpl);
-		cacheUniqueFindersCache(sapEntryModelImpl, isNew);
+		cacheUniqueFindersCache(sapEntryModelImpl);
 
 		sapEntry.resetOriginalValues();
 

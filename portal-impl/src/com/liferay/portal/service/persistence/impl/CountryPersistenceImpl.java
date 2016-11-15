@@ -1368,96 +1368,49 @@ public class CountryPersistenceImpl extends BasePersistenceImpl<Country>
 		}
 	}
 
-	protected void cacheUniqueFindersCache(CountryModelImpl countryModelImpl,
-		boolean isNew) {
-		if (isNew) {
-			Object[] args = new Object[] { countryModelImpl.getName() };
+	protected void cacheUniqueFindersCache(CountryModelImpl countryModelImpl) {
+		Object[] args = new Object[] { countryModelImpl.getName() };
 
-			finderCache.putResult(FINDER_PATH_COUNT_BY_NAME, args,
-				Long.valueOf(1));
-			finderCache.putResult(FINDER_PATH_FETCH_BY_NAME, args,
-				countryModelImpl);
+		finderCache.putResult(FINDER_PATH_COUNT_BY_NAME, args, Long.valueOf(1),
+			false);
+		finderCache.putResult(FINDER_PATH_FETCH_BY_NAME, args,
+			countryModelImpl, false);
 
-			args = new Object[] { countryModelImpl.getA2() };
+		args = new Object[] { countryModelImpl.getA2() };
 
-			finderCache.putResult(FINDER_PATH_COUNT_BY_A2, args, Long.valueOf(1));
-			finderCache.putResult(FINDER_PATH_FETCH_BY_A2, args,
-				countryModelImpl);
+		finderCache.putResult(FINDER_PATH_COUNT_BY_A2, args, Long.valueOf(1),
+			false);
+		finderCache.putResult(FINDER_PATH_FETCH_BY_A2, args, countryModelImpl,
+			false);
 
-			args = new Object[] { countryModelImpl.getA3() };
+		args = new Object[] { countryModelImpl.getA3() };
 
-			finderCache.putResult(FINDER_PATH_COUNT_BY_A3, args, Long.valueOf(1));
-			finderCache.putResult(FINDER_PATH_FETCH_BY_A3, args,
-				countryModelImpl);
-		}
-		else {
-			if ((countryModelImpl.getColumnBitmask() &
-					FINDER_PATH_FETCH_BY_NAME.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] { countryModelImpl.getName() };
-
-				finderCache.putResult(FINDER_PATH_COUNT_BY_NAME, args,
-					Long.valueOf(1));
-				finderCache.putResult(FINDER_PATH_FETCH_BY_NAME, args,
-					countryModelImpl);
-			}
-
-			if ((countryModelImpl.getColumnBitmask() &
-					FINDER_PATH_FETCH_BY_A2.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] { countryModelImpl.getA2() };
-
-				finderCache.putResult(FINDER_PATH_COUNT_BY_A2, args,
-					Long.valueOf(1));
-				finderCache.putResult(FINDER_PATH_FETCH_BY_A2, args,
-					countryModelImpl);
-			}
-
-			if ((countryModelImpl.getColumnBitmask() &
-					FINDER_PATH_FETCH_BY_A3.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] { countryModelImpl.getA3() };
-
-				finderCache.putResult(FINDER_PATH_COUNT_BY_A3, args,
-					Long.valueOf(1));
-				finderCache.putResult(FINDER_PATH_FETCH_BY_A3, args,
-					countryModelImpl);
-			}
-		}
+		finderCache.putResult(FINDER_PATH_COUNT_BY_A3, args, Long.valueOf(1),
+			false);
+		finderCache.putResult(FINDER_PATH_FETCH_BY_A3, args, countryModelImpl,
+			false);
 	}
 
 	protected void clearUniqueFindersCache(CountryModelImpl countryModelImpl) {
-		Object[] args = new Object[] { countryModelImpl.getName() };
-
-		finderCache.removeResult(FINDER_PATH_COUNT_BY_NAME, args);
-		finderCache.removeResult(FINDER_PATH_FETCH_BY_NAME, args);
-
 		if ((countryModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_NAME.getColumnBitmask()) != 0) {
-			args = new Object[] { countryModelImpl.getOriginalName() };
+			Object[] args = new Object[] { countryModelImpl.getOriginalName() };
 
 			finderCache.removeResult(FINDER_PATH_COUNT_BY_NAME, args);
 			finderCache.removeResult(FINDER_PATH_FETCH_BY_NAME, args);
 		}
 
-		args = new Object[] { countryModelImpl.getA2() };
-
-		finderCache.removeResult(FINDER_PATH_COUNT_BY_A2, args);
-		finderCache.removeResult(FINDER_PATH_FETCH_BY_A2, args);
-
 		if ((countryModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_A2.getColumnBitmask()) != 0) {
-			args = new Object[] { countryModelImpl.getOriginalA2() };
+			Object[] args = new Object[] { countryModelImpl.getOriginalA2() };
 
 			finderCache.removeResult(FINDER_PATH_COUNT_BY_A2, args);
 			finderCache.removeResult(FINDER_PATH_FETCH_BY_A2, args);
 		}
 
-		args = new Object[] { countryModelImpl.getA3() };
-
-		finderCache.removeResult(FINDER_PATH_COUNT_BY_A3, args);
-		finderCache.removeResult(FINDER_PATH_FETCH_BY_A3, args);
-
 		if ((countryModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_A3.getColumnBitmask()) != 0) {
-			args = new Object[] { countryModelImpl.getOriginalA3() };
+			Object[] args = new Object[] { countryModelImpl.getOriginalA3() };
 
 			finderCache.removeResult(FINDER_PATH_COUNT_BY_A3, args);
 			finderCache.removeResult(FINDER_PATH_FETCH_BY_A3, args);
@@ -1621,7 +1574,7 @@ public class CountryPersistenceImpl extends BasePersistenceImpl<Country>
 			CountryImpl.class, country.getPrimaryKey(), country, false);
 
 		clearUniqueFindersCache(countryModelImpl);
-		cacheUniqueFindersCache(countryModelImpl, isNew);
+		cacheUniqueFindersCache(countryModelImpl);
 
 		country.resetOriginalValues();
 

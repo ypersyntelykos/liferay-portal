@@ -399,47 +399,23 @@ public class WebDAVPropsPersistenceImpl extends BasePersistenceImpl<WebDAVProps>
 	}
 
 	protected void cacheUniqueFindersCache(
-		WebDAVPropsModelImpl webDAVPropsModelImpl, boolean isNew) {
-		if (isNew) {
-			Object[] args = new Object[] {
-					webDAVPropsModelImpl.getClassNameId(),
-					webDAVPropsModelImpl.getClassPK()
-				};
-
-			finderCache.putResult(FINDER_PATH_COUNT_BY_C_C, args,
-				Long.valueOf(1));
-			finderCache.putResult(FINDER_PATH_FETCH_BY_C_C, args,
-				webDAVPropsModelImpl);
-		}
-		else {
-			if ((webDAVPropsModelImpl.getColumnBitmask() &
-					FINDER_PATH_FETCH_BY_C_C.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						webDAVPropsModelImpl.getClassNameId(),
-						webDAVPropsModelImpl.getClassPK()
-					};
-
-				finderCache.putResult(FINDER_PATH_COUNT_BY_C_C, args,
-					Long.valueOf(1));
-				finderCache.putResult(FINDER_PATH_FETCH_BY_C_C, args,
-					webDAVPropsModelImpl);
-			}
-		}
-	}
-
-	protected void clearUniqueFindersCache(
 		WebDAVPropsModelImpl webDAVPropsModelImpl) {
 		Object[] args = new Object[] {
 				webDAVPropsModelImpl.getClassNameId(),
 				webDAVPropsModelImpl.getClassPK()
 			};
 
-		finderCache.removeResult(FINDER_PATH_COUNT_BY_C_C, args);
-		finderCache.removeResult(FINDER_PATH_FETCH_BY_C_C, args);
+		finderCache.putResult(FINDER_PATH_COUNT_BY_C_C, args, Long.valueOf(1),
+			false);
+		finderCache.putResult(FINDER_PATH_FETCH_BY_C_C, args,
+			webDAVPropsModelImpl, false);
+	}
 
+	protected void clearUniqueFindersCache(
+		WebDAVPropsModelImpl webDAVPropsModelImpl) {
 		if ((webDAVPropsModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_C_C.getColumnBitmask()) != 0) {
-			args = new Object[] {
+			Object[] args = new Object[] {
 					webDAVPropsModelImpl.getOriginalClassNameId(),
 					webDAVPropsModelImpl.getOriginalClassPK()
 				};
@@ -614,7 +590,7 @@ public class WebDAVPropsPersistenceImpl extends BasePersistenceImpl<WebDAVProps>
 			false);
 
 		clearUniqueFindersCache(webDAVPropsModelImpl);
-		cacheUniqueFindersCache(webDAVPropsModelImpl, isNew);
+		cacheUniqueFindersCache(webDAVPropsModelImpl);
 
 		webDAVProps.resetOriginalValues();
 

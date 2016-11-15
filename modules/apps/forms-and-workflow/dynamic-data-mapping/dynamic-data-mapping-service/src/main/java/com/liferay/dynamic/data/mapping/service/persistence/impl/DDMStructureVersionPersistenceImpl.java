@@ -1498,47 +1498,23 @@ public class DDMStructureVersionPersistenceImpl extends BasePersistenceImpl<DDMS
 	}
 
 	protected void cacheUniqueFindersCache(
-		DDMStructureVersionModelImpl ddmStructureVersionModelImpl, boolean isNew) {
-		if (isNew) {
-			Object[] args = new Object[] {
-					ddmStructureVersionModelImpl.getStructureId(),
-					ddmStructureVersionModelImpl.getVersion()
-				};
-
-			finderCache.putResult(FINDER_PATH_COUNT_BY_S_V, args,
-				Long.valueOf(1));
-			finderCache.putResult(FINDER_PATH_FETCH_BY_S_V, args,
-				ddmStructureVersionModelImpl);
-		}
-		else {
-			if ((ddmStructureVersionModelImpl.getColumnBitmask() &
-					FINDER_PATH_FETCH_BY_S_V.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						ddmStructureVersionModelImpl.getStructureId(),
-						ddmStructureVersionModelImpl.getVersion()
-					};
-
-				finderCache.putResult(FINDER_PATH_COUNT_BY_S_V, args,
-					Long.valueOf(1));
-				finderCache.putResult(FINDER_PATH_FETCH_BY_S_V, args,
-					ddmStructureVersionModelImpl);
-			}
-		}
-	}
-
-	protected void clearUniqueFindersCache(
 		DDMStructureVersionModelImpl ddmStructureVersionModelImpl) {
 		Object[] args = new Object[] {
 				ddmStructureVersionModelImpl.getStructureId(),
 				ddmStructureVersionModelImpl.getVersion()
 			};
 
-		finderCache.removeResult(FINDER_PATH_COUNT_BY_S_V, args);
-		finderCache.removeResult(FINDER_PATH_FETCH_BY_S_V, args);
+		finderCache.putResult(FINDER_PATH_COUNT_BY_S_V, args, Long.valueOf(1),
+			false);
+		finderCache.putResult(FINDER_PATH_FETCH_BY_S_V, args,
+			ddmStructureVersionModelImpl, false);
+	}
 
+	protected void clearUniqueFindersCache(
+		DDMStructureVersionModelImpl ddmStructureVersionModelImpl) {
 		if ((ddmStructureVersionModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_S_V.getColumnBitmask()) != 0) {
-			args = new Object[] {
+			Object[] args = new Object[] {
 					ddmStructureVersionModelImpl.getOriginalStructureId(),
 					ddmStructureVersionModelImpl.getOriginalVersion()
 				};
@@ -1735,7 +1711,7 @@ public class DDMStructureVersionPersistenceImpl extends BasePersistenceImpl<DDMS
 			ddmStructureVersion, false);
 
 		clearUniqueFindersCache(ddmStructureVersionModelImpl);
-		cacheUniqueFindersCache(ddmStructureVersionModelImpl, isNew);
+		cacheUniqueFindersCache(ddmStructureVersionModelImpl);
 
 		ddmStructureVersion.resetOriginalValues();
 

@@ -926,47 +926,23 @@ public class PasswordPolicyRelPersistenceImpl extends BasePersistenceImpl<Passwo
 	}
 
 	protected void cacheUniqueFindersCache(
-		PasswordPolicyRelModelImpl passwordPolicyRelModelImpl, boolean isNew) {
-		if (isNew) {
-			Object[] args = new Object[] {
-					passwordPolicyRelModelImpl.getClassNameId(),
-					passwordPolicyRelModelImpl.getClassPK()
-				};
-
-			finderCache.putResult(FINDER_PATH_COUNT_BY_C_C, args,
-				Long.valueOf(1));
-			finderCache.putResult(FINDER_PATH_FETCH_BY_C_C, args,
-				passwordPolicyRelModelImpl);
-		}
-		else {
-			if ((passwordPolicyRelModelImpl.getColumnBitmask() &
-					FINDER_PATH_FETCH_BY_C_C.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						passwordPolicyRelModelImpl.getClassNameId(),
-						passwordPolicyRelModelImpl.getClassPK()
-					};
-
-				finderCache.putResult(FINDER_PATH_COUNT_BY_C_C, args,
-					Long.valueOf(1));
-				finderCache.putResult(FINDER_PATH_FETCH_BY_C_C, args,
-					passwordPolicyRelModelImpl);
-			}
-		}
-	}
-
-	protected void clearUniqueFindersCache(
 		PasswordPolicyRelModelImpl passwordPolicyRelModelImpl) {
 		Object[] args = new Object[] {
 				passwordPolicyRelModelImpl.getClassNameId(),
 				passwordPolicyRelModelImpl.getClassPK()
 			};
 
-		finderCache.removeResult(FINDER_PATH_COUNT_BY_C_C, args);
-		finderCache.removeResult(FINDER_PATH_FETCH_BY_C_C, args);
+		finderCache.putResult(FINDER_PATH_COUNT_BY_C_C, args, Long.valueOf(1),
+			false);
+		finderCache.putResult(FINDER_PATH_FETCH_BY_C_C, args,
+			passwordPolicyRelModelImpl, false);
+	}
 
+	protected void clearUniqueFindersCache(
+		PasswordPolicyRelModelImpl passwordPolicyRelModelImpl) {
 		if ((passwordPolicyRelModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_C_C.getColumnBitmask()) != 0) {
-			args = new Object[] {
+			Object[] args = new Object[] {
 					passwordPolicyRelModelImpl.getOriginalClassNameId(),
 					passwordPolicyRelModelImpl.getOriginalClassPK()
 				};
@@ -1142,7 +1118,7 @@ public class PasswordPolicyRelPersistenceImpl extends BasePersistenceImpl<Passwo
 			passwordPolicyRel, false);
 
 		clearUniqueFindersCache(passwordPolicyRelModelImpl);
-		cacheUniqueFindersCache(passwordPolicyRelModelImpl, isNew);
+		cacheUniqueFindersCache(passwordPolicyRelModelImpl);
 
 		passwordPolicyRel.resetOriginalValues();
 

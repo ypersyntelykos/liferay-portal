@@ -2113,48 +2113,23 @@ public class KaleoTimerInstanceTokenPersistenceImpl extends BasePersistenceImpl<
 	}
 
 	protected void cacheUniqueFindersCache(
-		KaleoTimerInstanceTokenModelImpl kaleoTimerInstanceTokenModelImpl,
-		boolean isNew) {
-		if (isNew) {
-			Object[] args = new Object[] {
-					kaleoTimerInstanceTokenModelImpl.getKaleoInstanceTokenId(),
-					kaleoTimerInstanceTokenModelImpl.getKaleoTimerId()
-				};
-
-			finderCache.putResult(FINDER_PATH_COUNT_BY_KITI_KTI, args,
-				Long.valueOf(1));
-			finderCache.putResult(FINDER_PATH_FETCH_BY_KITI_KTI, args,
-				kaleoTimerInstanceTokenModelImpl);
-		}
-		else {
-			if ((kaleoTimerInstanceTokenModelImpl.getColumnBitmask() &
-					FINDER_PATH_FETCH_BY_KITI_KTI.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						kaleoTimerInstanceTokenModelImpl.getKaleoInstanceTokenId(),
-						kaleoTimerInstanceTokenModelImpl.getKaleoTimerId()
-					};
-
-				finderCache.putResult(FINDER_PATH_COUNT_BY_KITI_KTI, args,
-					Long.valueOf(1));
-				finderCache.putResult(FINDER_PATH_FETCH_BY_KITI_KTI, args,
-					kaleoTimerInstanceTokenModelImpl);
-			}
-		}
-	}
-
-	protected void clearUniqueFindersCache(
 		KaleoTimerInstanceTokenModelImpl kaleoTimerInstanceTokenModelImpl) {
 		Object[] args = new Object[] {
 				kaleoTimerInstanceTokenModelImpl.getKaleoInstanceTokenId(),
 				kaleoTimerInstanceTokenModelImpl.getKaleoTimerId()
 			};
 
-		finderCache.removeResult(FINDER_PATH_COUNT_BY_KITI_KTI, args);
-		finderCache.removeResult(FINDER_PATH_FETCH_BY_KITI_KTI, args);
+		finderCache.putResult(FINDER_PATH_COUNT_BY_KITI_KTI, args,
+			Long.valueOf(1), false);
+		finderCache.putResult(FINDER_PATH_FETCH_BY_KITI_KTI, args,
+			kaleoTimerInstanceTokenModelImpl, false);
+	}
 
+	protected void clearUniqueFindersCache(
+		KaleoTimerInstanceTokenModelImpl kaleoTimerInstanceTokenModelImpl) {
 		if ((kaleoTimerInstanceTokenModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_KITI_KTI.getColumnBitmask()) != 0) {
-			args = new Object[] {
+			Object[] args = new Object[] {
 					kaleoTimerInstanceTokenModelImpl.getOriginalKaleoInstanceTokenId(),
 					kaleoTimerInstanceTokenModelImpl.getOriginalKaleoTimerId()
 				};
@@ -2401,7 +2376,7 @@ public class KaleoTimerInstanceTokenPersistenceImpl extends BasePersistenceImpl<
 			false);
 
 		clearUniqueFindersCache(kaleoTimerInstanceTokenModelImpl);
-		cacheUniqueFindersCache(kaleoTimerInstanceTokenModelImpl, isNew);
+		cacheUniqueFindersCache(kaleoTimerInstanceTokenModelImpl);
 
 		kaleoTimerInstanceToken.resetOriginalValues();
 

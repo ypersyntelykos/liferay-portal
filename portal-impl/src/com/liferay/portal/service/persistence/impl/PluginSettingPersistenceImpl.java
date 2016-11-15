@@ -1001,37 +1001,6 @@ public class PluginSettingPersistenceImpl extends BasePersistenceImpl<PluginSett
 	}
 
 	protected void cacheUniqueFindersCache(
-		PluginSettingModelImpl pluginSettingModelImpl, boolean isNew) {
-		if (isNew) {
-			Object[] args = new Object[] {
-					pluginSettingModelImpl.getCompanyId(),
-					pluginSettingModelImpl.getPluginId(),
-					pluginSettingModelImpl.getPluginType()
-				};
-
-			finderCache.putResult(FINDER_PATH_COUNT_BY_C_I_T, args,
-				Long.valueOf(1));
-			finderCache.putResult(FINDER_PATH_FETCH_BY_C_I_T, args,
-				pluginSettingModelImpl);
-		}
-		else {
-			if ((pluginSettingModelImpl.getColumnBitmask() &
-					FINDER_PATH_FETCH_BY_C_I_T.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						pluginSettingModelImpl.getCompanyId(),
-						pluginSettingModelImpl.getPluginId(),
-						pluginSettingModelImpl.getPluginType()
-					};
-
-				finderCache.putResult(FINDER_PATH_COUNT_BY_C_I_T, args,
-					Long.valueOf(1));
-				finderCache.putResult(FINDER_PATH_FETCH_BY_C_I_T, args,
-					pluginSettingModelImpl);
-			}
-		}
-	}
-
-	protected void clearUniqueFindersCache(
 		PluginSettingModelImpl pluginSettingModelImpl) {
 		Object[] args = new Object[] {
 				pluginSettingModelImpl.getCompanyId(),
@@ -1039,12 +1008,17 @@ public class PluginSettingPersistenceImpl extends BasePersistenceImpl<PluginSett
 				pluginSettingModelImpl.getPluginType()
 			};
 
-		finderCache.removeResult(FINDER_PATH_COUNT_BY_C_I_T, args);
-		finderCache.removeResult(FINDER_PATH_FETCH_BY_C_I_T, args);
+		finderCache.putResult(FINDER_PATH_COUNT_BY_C_I_T, args,
+			Long.valueOf(1), false);
+		finderCache.putResult(FINDER_PATH_FETCH_BY_C_I_T, args,
+			pluginSettingModelImpl, false);
+	}
 
+	protected void clearUniqueFindersCache(
+		PluginSettingModelImpl pluginSettingModelImpl) {
 		if ((pluginSettingModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_C_I_T.getColumnBitmask()) != 0) {
-			args = new Object[] {
+			Object[] args = new Object[] {
 					pluginSettingModelImpl.getOriginalCompanyId(),
 					pluginSettingModelImpl.getOriginalPluginId(),
 					pluginSettingModelImpl.getOriginalPluginType()
@@ -1217,7 +1191,7 @@ public class PluginSettingPersistenceImpl extends BasePersistenceImpl<PluginSett
 			pluginSetting, false);
 
 		clearUniqueFindersCache(pluginSettingModelImpl);
-		cacheUniqueFindersCache(pluginSettingModelImpl, isNew);
+		cacheUniqueFindersCache(pluginSettingModelImpl);
 
 		pluginSetting.resetOriginalValues();
 

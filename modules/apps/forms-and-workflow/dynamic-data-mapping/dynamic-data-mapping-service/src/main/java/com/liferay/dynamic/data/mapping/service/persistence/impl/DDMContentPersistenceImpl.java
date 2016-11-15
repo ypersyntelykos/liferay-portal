@@ -2566,46 +2566,22 @@ public class DDMContentPersistenceImpl extends BasePersistenceImpl<DDMContent>
 	}
 
 	protected void cacheUniqueFindersCache(
-		DDMContentModelImpl ddmContentModelImpl, boolean isNew) {
-		if (isNew) {
-			Object[] args = new Object[] {
-					ddmContentModelImpl.getUuid(),
-					ddmContentModelImpl.getGroupId()
-				};
-
-			finderCache.putResult(FINDER_PATH_COUNT_BY_UUID_G, args,
-				Long.valueOf(1));
-			finderCache.putResult(FINDER_PATH_FETCH_BY_UUID_G, args,
-				ddmContentModelImpl);
-		}
-		else {
-			if ((ddmContentModelImpl.getColumnBitmask() &
-					FINDER_PATH_FETCH_BY_UUID_G.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						ddmContentModelImpl.getUuid(),
-						ddmContentModelImpl.getGroupId()
-					};
-
-				finderCache.putResult(FINDER_PATH_COUNT_BY_UUID_G, args,
-					Long.valueOf(1));
-				finderCache.putResult(FINDER_PATH_FETCH_BY_UUID_G, args,
-					ddmContentModelImpl);
-			}
-		}
-	}
-
-	protected void clearUniqueFindersCache(
 		DDMContentModelImpl ddmContentModelImpl) {
 		Object[] args = new Object[] {
 				ddmContentModelImpl.getUuid(), ddmContentModelImpl.getGroupId()
 			};
 
-		finderCache.removeResult(FINDER_PATH_COUNT_BY_UUID_G, args);
-		finderCache.removeResult(FINDER_PATH_FETCH_BY_UUID_G, args);
+		finderCache.putResult(FINDER_PATH_COUNT_BY_UUID_G, args,
+			Long.valueOf(1), false);
+		finderCache.putResult(FINDER_PATH_FETCH_BY_UUID_G, args,
+			ddmContentModelImpl, false);
+	}
 
+	protected void clearUniqueFindersCache(
+		DDMContentModelImpl ddmContentModelImpl) {
 		if ((ddmContentModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_UUID_G.getColumnBitmask()) != 0) {
-			args = new Object[] {
+			Object[] args = new Object[] {
 					ddmContentModelImpl.getOriginalUuid(),
 					ddmContentModelImpl.getOriginalGroupId()
 				};
@@ -2862,7 +2838,7 @@ public class DDMContentPersistenceImpl extends BasePersistenceImpl<DDMContent>
 			DDMContentImpl.class, ddmContent.getPrimaryKey(), ddmContent, false);
 
 		clearUniqueFindersCache(ddmContentModelImpl);
-		cacheUniqueFindersCache(ddmContentModelImpl, isNew);
+		cacheUniqueFindersCache(ddmContentModelImpl);
 
 		ddmContent.resetOriginalValues();
 

@@ -936,45 +936,21 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 		}
 	}
 
-	protected void cacheUniqueFindersCache(EntryModelImpl entryModelImpl,
-		boolean isNew) {
-		if (isNew) {
-			Object[] args = new Object[] {
-					entryModelImpl.getUserId(), entryModelImpl.getEmailAddress()
-				};
-
-			finderCache.putResult(FINDER_PATH_COUNT_BY_U_EA, args,
-				Long.valueOf(1));
-			finderCache.putResult(FINDER_PATH_FETCH_BY_U_EA, args,
-				entryModelImpl);
-		}
-		else {
-			if ((entryModelImpl.getColumnBitmask() &
-					FINDER_PATH_FETCH_BY_U_EA.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						entryModelImpl.getUserId(),
-						entryModelImpl.getEmailAddress()
-					};
-
-				finderCache.putResult(FINDER_PATH_COUNT_BY_U_EA, args,
-					Long.valueOf(1));
-				finderCache.putResult(FINDER_PATH_FETCH_BY_U_EA, args,
-					entryModelImpl);
-			}
-		}
-	}
-
-	protected void clearUniqueFindersCache(EntryModelImpl entryModelImpl) {
+	protected void cacheUniqueFindersCache(EntryModelImpl entryModelImpl) {
 		Object[] args = new Object[] {
 				entryModelImpl.getUserId(), entryModelImpl.getEmailAddress()
 			};
 
-		finderCache.removeResult(FINDER_PATH_COUNT_BY_U_EA, args);
-		finderCache.removeResult(FINDER_PATH_FETCH_BY_U_EA, args);
+		finderCache.putResult(FINDER_PATH_COUNT_BY_U_EA, args, Long.valueOf(1),
+			false);
+		finderCache.putResult(FINDER_PATH_FETCH_BY_U_EA, args, entryModelImpl,
+			false);
+	}
 
+	protected void clearUniqueFindersCache(EntryModelImpl entryModelImpl) {
 		if ((entryModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_U_EA.getColumnBitmask()) != 0) {
-			args = new Object[] {
+			Object[] args = new Object[] {
 					entryModelImpl.getOriginalUserId(),
 					entryModelImpl.getOriginalEmailAddress()
 				};
@@ -1162,7 +1138,7 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 			EntryImpl.class, entry.getPrimaryKey(), entry, false);
 
 		clearUniqueFindersCache(entryModelImpl);
-		cacheUniqueFindersCache(entryModelImpl, isNew);
+		cacheUniqueFindersCache(entryModelImpl);
 
 		entry.resetOriginalValues();
 

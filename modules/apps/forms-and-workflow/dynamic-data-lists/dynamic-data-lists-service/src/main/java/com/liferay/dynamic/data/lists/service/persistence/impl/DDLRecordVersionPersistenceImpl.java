@@ -1484,47 +1484,23 @@ public class DDLRecordVersionPersistenceImpl extends BasePersistenceImpl<DDLReco
 	}
 
 	protected void cacheUniqueFindersCache(
-		DDLRecordVersionModelImpl ddlRecordVersionModelImpl, boolean isNew) {
-		if (isNew) {
-			Object[] args = new Object[] {
-					ddlRecordVersionModelImpl.getRecordId(),
-					ddlRecordVersionModelImpl.getVersion()
-				};
-
-			finderCache.putResult(FINDER_PATH_COUNT_BY_R_V, args,
-				Long.valueOf(1));
-			finderCache.putResult(FINDER_PATH_FETCH_BY_R_V, args,
-				ddlRecordVersionModelImpl);
-		}
-		else {
-			if ((ddlRecordVersionModelImpl.getColumnBitmask() &
-					FINDER_PATH_FETCH_BY_R_V.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						ddlRecordVersionModelImpl.getRecordId(),
-						ddlRecordVersionModelImpl.getVersion()
-					};
-
-				finderCache.putResult(FINDER_PATH_COUNT_BY_R_V, args,
-					Long.valueOf(1));
-				finderCache.putResult(FINDER_PATH_FETCH_BY_R_V, args,
-					ddlRecordVersionModelImpl);
-			}
-		}
-	}
-
-	protected void clearUniqueFindersCache(
 		DDLRecordVersionModelImpl ddlRecordVersionModelImpl) {
 		Object[] args = new Object[] {
 				ddlRecordVersionModelImpl.getRecordId(),
 				ddlRecordVersionModelImpl.getVersion()
 			};
 
-		finderCache.removeResult(FINDER_PATH_COUNT_BY_R_V, args);
-		finderCache.removeResult(FINDER_PATH_FETCH_BY_R_V, args);
+		finderCache.putResult(FINDER_PATH_COUNT_BY_R_V, args, Long.valueOf(1),
+			false);
+		finderCache.putResult(FINDER_PATH_FETCH_BY_R_V, args,
+			ddlRecordVersionModelImpl, false);
+	}
 
+	protected void clearUniqueFindersCache(
+		DDLRecordVersionModelImpl ddlRecordVersionModelImpl) {
 		if ((ddlRecordVersionModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_R_V.getColumnBitmask()) != 0) {
-			args = new Object[] {
+			Object[] args = new Object[] {
 					ddlRecordVersionModelImpl.getOriginalRecordId(),
 					ddlRecordVersionModelImpl.getOriginalVersion()
 				};
@@ -1717,7 +1693,7 @@ public class DDLRecordVersionPersistenceImpl extends BasePersistenceImpl<DDLReco
 			ddlRecordVersion, false);
 
 		clearUniqueFindersCache(ddlRecordVersionModelImpl);
-		cacheUniqueFindersCache(ddlRecordVersionModelImpl, isNew);
+		cacheUniqueFindersCache(ddlRecordVersionModelImpl);
 
 		ddlRecordVersion.resetOriginalValues();
 

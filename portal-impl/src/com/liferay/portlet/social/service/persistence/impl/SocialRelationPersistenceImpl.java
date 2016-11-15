@@ -5763,37 +5763,6 @@ public class SocialRelationPersistenceImpl extends BasePersistenceImpl<SocialRel
 	}
 
 	protected void cacheUniqueFindersCache(
-		SocialRelationModelImpl socialRelationModelImpl, boolean isNew) {
-		if (isNew) {
-			Object[] args = new Object[] {
-					socialRelationModelImpl.getUserId1(),
-					socialRelationModelImpl.getUserId2(),
-					socialRelationModelImpl.getType()
-				};
-
-			finderCache.putResult(FINDER_PATH_COUNT_BY_U1_U2_T, args,
-				Long.valueOf(1));
-			finderCache.putResult(FINDER_PATH_FETCH_BY_U1_U2_T, args,
-				socialRelationModelImpl);
-		}
-		else {
-			if ((socialRelationModelImpl.getColumnBitmask() &
-					FINDER_PATH_FETCH_BY_U1_U2_T.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						socialRelationModelImpl.getUserId1(),
-						socialRelationModelImpl.getUserId2(),
-						socialRelationModelImpl.getType()
-					};
-
-				finderCache.putResult(FINDER_PATH_COUNT_BY_U1_U2_T, args,
-					Long.valueOf(1));
-				finderCache.putResult(FINDER_PATH_FETCH_BY_U1_U2_T, args,
-					socialRelationModelImpl);
-			}
-		}
-	}
-
-	protected void clearUniqueFindersCache(
 		SocialRelationModelImpl socialRelationModelImpl) {
 		Object[] args = new Object[] {
 				socialRelationModelImpl.getUserId1(),
@@ -5801,12 +5770,17 @@ public class SocialRelationPersistenceImpl extends BasePersistenceImpl<SocialRel
 				socialRelationModelImpl.getType()
 			};
 
-		finderCache.removeResult(FINDER_PATH_COUNT_BY_U1_U2_T, args);
-		finderCache.removeResult(FINDER_PATH_FETCH_BY_U1_U2_T, args);
+		finderCache.putResult(FINDER_PATH_COUNT_BY_U1_U2_T, args,
+			Long.valueOf(1), false);
+		finderCache.putResult(FINDER_PATH_FETCH_BY_U1_U2_T, args,
+			socialRelationModelImpl, false);
+	}
 
+	protected void clearUniqueFindersCache(
+		SocialRelationModelImpl socialRelationModelImpl) {
 		if ((socialRelationModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_U1_U2_T.getColumnBitmask()) != 0) {
-			args = new Object[] {
+			Object[] args = new Object[] {
 					socialRelationModelImpl.getOriginalUserId1(),
 					socialRelationModelImpl.getOriginalUserId2(),
 					socialRelationModelImpl.getOriginalType()
@@ -6162,7 +6136,7 @@ public class SocialRelationPersistenceImpl extends BasePersistenceImpl<SocialRel
 			socialRelation, false);
 
 		clearUniqueFindersCache(socialRelationModelImpl);
-		cacheUniqueFindersCache(socialRelationModelImpl, isNew);
+		cacheUniqueFindersCache(socialRelationModelImpl);
 
 		socialRelation.resetOriginalValues();
 

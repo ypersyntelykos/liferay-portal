@@ -3008,45 +3008,22 @@ public class KaleoTaskFormInstancePersistenceImpl extends BasePersistenceImpl<Ka
 	}
 
 	protected void cacheUniqueFindersCache(
-		KaleoTaskFormInstanceModelImpl kaleoTaskFormInstanceModelImpl,
-		boolean isNew) {
-		if (isNew) {
-			Object[] args = new Object[] {
-					kaleoTaskFormInstanceModelImpl.getKaleoTaskFormId()
-				};
-
-			finderCache.putResult(FINDER_PATH_COUNT_BY_KALEOTASKFORMID, args,
-				Long.valueOf(1));
-			finderCache.putResult(FINDER_PATH_FETCH_BY_KALEOTASKFORMID, args,
-				kaleoTaskFormInstanceModelImpl);
-		}
-		else {
-			if ((kaleoTaskFormInstanceModelImpl.getColumnBitmask() &
-					FINDER_PATH_FETCH_BY_KALEOTASKFORMID.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						kaleoTaskFormInstanceModelImpl.getKaleoTaskFormId()
-					};
-
-				finderCache.putResult(FINDER_PATH_COUNT_BY_KALEOTASKFORMID,
-					args, Long.valueOf(1));
-				finderCache.putResult(FINDER_PATH_FETCH_BY_KALEOTASKFORMID,
-					args, kaleoTaskFormInstanceModelImpl);
-			}
-		}
-	}
-
-	protected void clearUniqueFindersCache(
 		KaleoTaskFormInstanceModelImpl kaleoTaskFormInstanceModelImpl) {
 		Object[] args = new Object[] {
 				kaleoTaskFormInstanceModelImpl.getKaleoTaskFormId()
 			};
 
-		finderCache.removeResult(FINDER_PATH_COUNT_BY_KALEOTASKFORMID, args);
-		finderCache.removeResult(FINDER_PATH_FETCH_BY_KALEOTASKFORMID, args);
+		finderCache.putResult(FINDER_PATH_COUNT_BY_KALEOTASKFORMID, args,
+			Long.valueOf(1), false);
+		finderCache.putResult(FINDER_PATH_FETCH_BY_KALEOTASKFORMID, args,
+			kaleoTaskFormInstanceModelImpl, false);
+	}
 
+	protected void clearUniqueFindersCache(
+		KaleoTaskFormInstanceModelImpl kaleoTaskFormInstanceModelImpl) {
 		if ((kaleoTaskFormInstanceModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_KALEOTASKFORMID.getColumnBitmask()) != 0) {
-			args = new Object[] {
+			Object[] args = new Object[] {
 					kaleoTaskFormInstanceModelImpl.getOriginalKaleoTaskFormId()
 				};
 
@@ -3327,7 +3304,7 @@ public class KaleoTaskFormInstancePersistenceImpl extends BasePersistenceImpl<Ka
 			kaleoTaskFormInstance.getPrimaryKey(), kaleoTaskFormInstance, false);
 
 		clearUniqueFindersCache(kaleoTaskFormInstanceModelImpl);
-		cacheUniqueFindersCache(kaleoTaskFormInstanceModelImpl, isNew);
+		cacheUniqueFindersCache(kaleoTaskFormInstanceModelImpl);
 
 		kaleoTaskFormInstance.resetOriginalValues();
 

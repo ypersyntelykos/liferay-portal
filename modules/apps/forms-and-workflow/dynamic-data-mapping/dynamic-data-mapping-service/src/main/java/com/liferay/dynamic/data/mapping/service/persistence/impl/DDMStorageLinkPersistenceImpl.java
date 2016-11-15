@@ -2025,40 +2025,22 @@ public class DDMStorageLinkPersistenceImpl extends BasePersistenceImpl<DDMStorag
 	}
 
 	protected void cacheUniqueFindersCache(
-		DDMStorageLinkModelImpl ddmStorageLinkModelImpl, boolean isNew) {
-		if (isNew) {
-			Object[] args = new Object[] { ddmStorageLinkModelImpl.getClassPK() };
+		DDMStorageLinkModelImpl ddmStorageLinkModelImpl) {
+		Object[] args = new Object[] { ddmStorageLinkModelImpl.getClassPK() };
 
-			finderCache.putResult(FINDER_PATH_COUNT_BY_CLASSPK, args,
-				Long.valueOf(1));
-			finderCache.putResult(FINDER_PATH_FETCH_BY_CLASSPK, args,
-				ddmStorageLinkModelImpl);
-		}
-		else {
-			if ((ddmStorageLinkModelImpl.getColumnBitmask() &
-					FINDER_PATH_FETCH_BY_CLASSPK.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						ddmStorageLinkModelImpl.getClassPK()
-					};
-
-				finderCache.putResult(FINDER_PATH_COUNT_BY_CLASSPK, args,
-					Long.valueOf(1));
-				finderCache.putResult(FINDER_PATH_FETCH_BY_CLASSPK, args,
-					ddmStorageLinkModelImpl);
-			}
-		}
+		finderCache.putResult(FINDER_PATH_COUNT_BY_CLASSPK, args,
+			Long.valueOf(1), false);
+		finderCache.putResult(FINDER_PATH_FETCH_BY_CLASSPK, args,
+			ddmStorageLinkModelImpl, false);
 	}
 
 	protected void clearUniqueFindersCache(
 		DDMStorageLinkModelImpl ddmStorageLinkModelImpl) {
-		Object[] args = new Object[] { ddmStorageLinkModelImpl.getClassPK() };
-
-		finderCache.removeResult(FINDER_PATH_COUNT_BY_CLASSPK, args);
-		finderCache.removeResult(FINDER_PATH_FETCH_BY_CLASSPK, args);
-
 		if ((ddmStorageLinkModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_CLASSPK.getColumnBitmask()) != 0) {
-			args = new Object[] { ddmStorageLinkModelImpl.getOriginalClassPK() };
+			Object[] args = new Object[] {
+					ddmStorageLinkModelImpl.getOriginalClassPK()
+				};
 
 			finderCache.removeResult(FINDER_PATH_COUNT_BY_CLASSPK, args);
 			finderCache.removeResult(FINDER_PATH_FETCH_BY_CLASSPK, args);
@@ -2275,7 +2257,7 @@ public class DDMStorageLinkPersistenceImpl extends BasePersistenceImpl<DDMStorag
 			ddmStorageLink, false);
 
 		clearUniqueFindersCache(ddmStorageLinkModelImpl);
-		cacheUniqueFindersCache(ddmStorageLinkModelImpl, isNew);
+		cacheUniqueFindersCache(ddmStorageLinkModelImpl);
 
 		ddmStorageLink.resetOriginalValues();
 

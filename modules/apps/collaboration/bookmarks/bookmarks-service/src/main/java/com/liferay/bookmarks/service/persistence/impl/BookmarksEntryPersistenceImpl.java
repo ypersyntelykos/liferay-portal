@@ -12396,47 +12396,23 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	}
 
 	protected void cacheUniqueFindersCache(
-		BookmarksEntryModelImpl bookmarksEntryModelImpl, boolean isNew) {
-		if (isNew) {
-			Object[] args = new Object[] {
-					bookmarksEntryModelImpl.getUuid(),
-					bookmarksEntryModelImpl.getGroupId()
-				};
-
-			finderCache.putResult(FINDER_PATH_COUNT_BY_UUID_G, args,
-				Long.valueOf(1));
-			finderCache.putResult(FINDER_PATH_FETCH_BY_UUID_G, args,
-				bookmarksEntryModelImpl);
-		}
-		else {
-			if ((bookmarksEntryModelImpl.getColumnBitmask() &
-					FINDER_PATH_FETCH_BY_UUID_G.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						bookmarksEntryModelImpl.getUuid(),
-						bookmarksEntryModelImpl.getGroupId()
-					};
-
-				finderCache.putResult(FINDER_PATH_COUNT_BY_UUID_G, args,
-					Long.valueOf(1));
-				finderCache.putResult(FINDER_PATH_FETCH_BY_UUID_G, args,
-					bookmarksEntryModelImpl);
-			}
-		}
-	}
-
-	protected void clearUniqueFindersCache(
 		BookmarksEntryModelImpl bookmarksEntryModelImpl) {
 		Object[] args = new Object[] {
 				bookmarksEntryModelImpl.getUuid(),
 				bookmarksEntryModelImpl.getGroupId()
 			};
 
-		finderCache.removeResult(FINDER_PATH_COUNT_BY_UUID_G, args);
-		finderCache.removeResult(FINDER_PATH_FETCH_BY_UUID_G, args);
+		finderCache.putResult(FINDER_PATH_COUNT_BY_UUID_G, args,
+			Long.valueOf(1), false);
+		finderCache.putResult(FINDER_PATH_FETCH_BY_UUID_G, args,
+			bookmarksEntryModelImpl, false);
+	}
 
+	protected void clearUniqueFindersCache(
+		BookmarksEntryModelImpl bookmarksEntryModelImpl) {
 		if ((bookmarksEntryModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_UUID_G.getColumnBitmask()) != 0) {
-			args = new Object[] {
+			Object[] args = new Object[] {
 					bookmarksEntryModelImpl.getOriginalUuid(),
 					bookmarksEntryModelImpl.getOriginalGroupId()
 				};
@@ -12810,7 +12786,7 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 			bookmarksEntry, false);
 
 		clearUniqueFindersCache(bookmarksEntryModelImpl);
-		cacheUniqueFindersCache(bookmarksEntryModelImpl, isNew);
+		cacheUniqueFindersCache(bookmarksEntryModelImpl);
 
 		bookmarksEntry.resetOriginalValues();
 

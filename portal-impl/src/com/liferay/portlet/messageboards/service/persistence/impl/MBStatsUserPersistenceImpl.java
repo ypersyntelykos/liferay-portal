@@ -1969,47 +1969,23 @@ public class MBStatsUserPersistenceImpl extends BasePersistenceImpl<MBStatsUser>
 	}
 
 	protected void cacheUniqueFindersCache(
-		MBStatsUserModelImpl mbStatsUserModelImpl, boolean isNew) {
-		if (isNew) {
-			Object[] args = new Object[] {
-					mbStatsUserModelImpl.getGroupId(),
-					mbStatsUserModelImpl.getUserId()
-				};
-
-			finderCache.putResult(FINDER_PATH_COUNT_BY_G_U, args,
-				Long.valueOf(1));
-			finderCache.putResult(FINDER_PATH_FETCH_BY_G_U, args,
-				mbStatsUserModelImpl);
-		}
-		else {
-			if ((mbStatsUserModelImpl.getColumnBitmask() &
-					FINDER_PATH_FETCH_BY_G_U.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						mbStatsUserModelImpl.getGroupId(),
-						mbStatsUserModelImpl.getUserId()
-					};
-
-				finderCache.putResult(FINDER_PATH_COUNT_BY_G_U, args,
-					Long.valueOf(1));
-				finderCache.putResult(FINDER_PATH_FETCH_BY_G_U, args,
-					mbStatsUserModelImpl);
-			}
-		}
-	}
-
-	protected void clearUniqueFindersCache(
 		MBStatsUserModelImpl mbStatsUserModelImpl) {
 		Object[] args = new Object[] {
 				mbStatsUserModelImpl.getGroupId(),
 				mbStatsUserModelImpl.getUserId()
 			};
 
-		finderCache.removeResult(FINDER_PATH_COUNT_BY_G_U, args);
-		finderCache.removeResult(FINDER_PATH_FETCH_BY_G_U, args);
+		finderCache.putResult(FINDER_PATH_COUNT_BY_G_U, args, Long.valueOf(1),
+			false);
+		finderCache.putResult(FINDER_PATH_FETCH_BY_G_U, args,
+			mbStatsUserModelImpl, false);
+	}
 
+	protected void clearUniqueFindersCache(
+		MBStatsUserModelImpl mbStatsUserModelImpl) {
 		if ((mbStatsUserModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_G_U.getColumnBitmask()) != 0) {
-			args = new Object[] {
+			Object[] args = new Object[] {
 					mbStatsUserModelImpl.getOriginalGroupId(),
 					mbStatsUserModelImpl.getOriginalUserId()
 				};
@@ -2197,7 +2173,7 @@ public class MBStatsUserPersistenceImpl extends BasePersistenceImpl<MBStatsUser>
 			false);
 
 		clearUniqueFindersCache(mbStatsUserModelImpl);
-		cacheUniqueFindersCache(mbStatsUserModelImpl, isNew);
+		cacheUniqueFindersCache(mbStatsUserModelImpl);
 
 		mbStatsUser.resetOriginalValues();
 

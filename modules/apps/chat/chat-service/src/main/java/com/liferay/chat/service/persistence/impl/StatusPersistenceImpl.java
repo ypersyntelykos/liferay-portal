@@ -1915,38 +1915,19 @@ public class StatusPersistenceImpl extends BasePersistenceImpl<Status>
 		}
 	}
 
-	protected void cacheUniqueFindersCache(StatusModelImpl statusModelImpl,
-		boolean isNew) {
-		if (isNew) {
-			Object[] args = new Object[] { statusModelImpl.getUserId() };
+	protected void cacheUniqueFindersCache(StatusModelImpl statusModelImpl) {
+		Object[] args = new Object[] { statusModelImpl.getUserId() };
 
-			finderCache.putResult(FINDER_PATH_COUNT_BY_USERID, args,
-				Long.valueOf(1));
-			finderCache.putResult(FINDER_PATH_FETCH_BY_USERID, args,
-				statusModelImpl);
-		}
-		else {
-			if ((statusModelImpl.getColumnBitmask() &
-					FINDER_PATH_FETCH_BY_USERID.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] { statusModelImpl.getUserId() };
-
-				finderCache.putResult(FINDER_PATH_COUNT_BY_USERID, args,
-					Long.valueOf(1));
-				finderCache.putResult(FINDER_PATH_FETCH_BY_USERID, args,
-					statusModelImpl);
-			}
-		}
+		finderCache.putResult(FINDER_PATH_COUNT_BY_USERID, args,
+			Long.valueOf(1), false);
+		finderCache.putResult(FINDER_PATH_FETCH_BY_USERID, args,
+			statusModelImpl, false);
 	}
 
 	protected void clearUniqueFindersCache(StatusModelImpl statusModelImpl) {
-		Object[] args = new Object[] { statusModelImpl.getUserId() };
-
-		finderCache.removeResult(FINDER_PATH_COUNT_BY_USERID, args);
-		finderCache.removeResult(FINDER_PATH_FETCH_BY_USERID, args);
-
 		if ((statusModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_USERID.getColumnBitmask()) != 0) {
-			args = new Object[] { statusModelImpl.getOriginalUserId() };
+			Object[] args = new Object[] { statusModelImpl.getOriginalUserId() };
 
 			finderCache.removeResult(FINDER_PATH_COUNT_BY_USERID, args);
 			finderCache.removeResult(FINDER_PATH_FETCH_BY_USERID, args);
@@ -2145,7 +2126,7 @@ public class StatusPersistenceImpl extends BasePersistenceImpl<Status>
 			StatusImpl.class, status.getPrimaryKey(), status, false);
 
 		clearUniqueFindersCache(statusModelImpl);
-		cacheUniqueFindersCache(statusModelImpl, isNew);
+		cacheUniqueFindersCache(statusModelImpl);
 
 		status.resetOriginalValues();
 

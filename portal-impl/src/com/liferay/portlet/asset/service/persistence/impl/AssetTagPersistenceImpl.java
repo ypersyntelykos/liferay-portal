@@ -4688,67 +4688,30 @@ public class AssetTagPersistenceImpl extends BasePersistenceImpl<AssetTag>
 		}
 	}
 
-	protected void cacheUniqueFindersCache(
-		AssetTagModelImpl assetTagModelImpl, boolean isNew) {
-		if (isNew) {
-			Object[] args = new Object[] {
-					assetTagModelImpl.getUuid(), assetTagModelImpl.getGroupId()
-				};
-
-			finderCache.putResult(FINDER_PATH_COUNT_BY_UUID_G, args,
-				Long.valueOf(1));
-			finderCache.putResult(FINDER_PATH_FETCH_BY_UUID_G, args,
-				assetTagModelImpl);
-
-			args = new Object[] {
-					assetTagModelImpl.getGroupId(), assetTagModelImpl.getName()
-				};
-
-			finderCache.putResult(FINDER_PATH_COUNT_BY_G_N, args,
-				Long.valueOf(1));
-			finderCache.putResult(FINDER_PATH_FETCH_BY_G_N, args,
-				assetTagModelImpl);
-		}
-		else {
-			if ((assetTagModelImpl.getColumnBitmask() &
-					FINDER_PATH_FETCH_BY_UUID_G.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						assetTagModelImpl.getUuid(),
-						assetTagModelImpl.getGroupId()
-					};
-
-				finderCache.putResult(FINDER_PATH_COUNT_BY_UUID_G, args,
-					Long.valueOf(1));
-				finderCache.putResult(FINDER_PATH_FETCH_BY_UUID_G, args,
-					assetTagModelImpl);
-			}
-
-			if ((assetTagModelImpl.getColumnBitmask() &
-					FINDER_PATH_FETCH_BY_G_N.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						assetTagModelImpl.getGroupId(),
-						assetTagModelImpl.getName()
-					};
-
-				finderCache.putResult(FINDER_PATH_COUNT_BY_G_N, args,
-					Long.valueOf(1));
-				finderCache.putResult(FINDER_PATH_FETCH_BY_G_N, args,
-					assetTagModelImpl);
-			}
-		}
-	}
-
-	protected void clearUniqueFindersCache(AssetTagModelImpl assetTagModelImpl) {
+	protected void cacheUniqueFindersCache(AssetTagModelImpl assetTagModelImpl) {
 		Object[] args = new Object[] {
 				assetTagModelImpl.getUuid(), assetTagModelImpl.getGroupId()
 			};
 
-		finderCache.removeResult(FINDER_PATH_COUNT_BY_UUID_G, args);
-		finderCache.removeResult(FINDER_PATH_FETCH_BY_UUID_G, args);
+		finderCache.putResult(FINDER_PATH_COUNT_BY_UUID_G, args,
+			Long.valueOf(1), false);
+		finderCache.putResult(FINDER_PATH_FETCH_BY_UUID_G, args,
+			assetTagModelImpl, false);
 
+		args = new Object[] {
+				assetTagModelImpl.getGroupId(), assetTagModelImpl.getName()
+			};
+
+		finderCache.putResult(FINDER_PATH_COUNT_BY_G_N, args, Long.valueOf(1),
+			false);
+		finderCache.putResult(FINDER_PATH_FETCH_BY_G_N, args,
+			assetTagModelImpl, false);
+	}
+
+	protected void clearUniqueFindersCache(AssetTagModelImpl assetTagModelImpl) {
 		if ((assetTagModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_UUID_G.getColumnBitmask()) != 0) {
-			args = new Object[] {
+			Object[] args = new Object[] {
 					assetTagModelImpl.getOriginalUuid(),
 					assetTagModelImpl.getOriginalGroupId()
 				};
@@ -4757,16 +4720,9 @@ public class AssetTagPersistenceImpl extends BasePersistenceImpl<AssetTag>
 			finderCache.removeResult(FINDER_PATH_FETCH_BY_UUID_G, args);
 		}
 
-		args = new Object[] {
-				assetTagModelImpl.getGroupId(), assetTagModelImpl.getName()
-			};
-
-		finderCache.removeResult(FINDER_PATH_COUNT_BY_G_N, args);
-		finderCache.removeResult(FINDER_PATH_FETCH_BY_G_N, args);
-
 		if ((assetTagModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_G_N.getColumnBitmask()) != 0) {
-			args = new Object[] {
+			Object[] args = new Object[] {
 					assetTagModelImpl.getOriginalGroupId(),
 					assetTagModelImpl.getOriginalName()
 				};
@@ -5005,7 +4961,7 @@ public class AssetTagPersistenceImpl extends BasePersistenceImpl<AssetTag>
 			AssetTagImpl.class, assetTag.getPrimaryKey(), assetTag, false);
 
 		clearUniqueFindersCache(assetTagModelImpl);
-		cacheUniqueFindersCache(assetTagModelImpl, isNew);
+		cacheUniqueFindersCache(assetTagModelImpl);
 
 		assetTag.resetOriginalValues();
 

@@ -2537,38 +2537,19 @@ public class AppPersistenceImpl extends BasePersistenceImpl<App>
 		}
 	}
 
-	protected void cacheUniqueFindersCache(AppModelImpl appModelImpl,
-		boolean isNew) {
-		if (isNew) {
-			Object[] args = new Object[] { appModelImpl.getRemoteAppId() };
+	protected void cacheUniqueFindersCache(AppModelImpl appModelImpl) {
+		Object[] args = new Object[] { appModelImpl.getRemoteAppId() };
 
-			finderCache.putResult(FINDER_PATH_COUNT_BY_REMOTEAPPID, args,
-				Long.valueOf(1));
-			finderCache.putResult(FINDER_PATH_FETCH_BY_REMOTEAPPID, args,
-				appModelImpl);
-		}
-		else {
-			if ((appModelImpl.getColumnBitmask() &
-					FINDER_PATH_FETCH_BY_REMOTEAPPID.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] { appModelImpl.getRemoteAppId() };
-
-				finderCache.putResult(FINDER_PATH_COUNT_BY_REMOTEAPPID, args,
-					Long.valueOf(1));
-				finderCache.putResult(FINDER_PATH_FETCH_BY_REMOTEAPPID, args,
-					appModelImpl);
-			}
-		}
+		finderCache.putResult(FINDER_PATH_COUNT_BY_REMOTEAPPID, args,
+			Long.valueOf(1), false);
+		finderCache.putResult(FINDER_PATH_FETCH_BY_REMOTEAPPID, args,
+			appModelImpl, false);
 	}
 
 	protected void clearUniqueFindersCache(AppModelImpl appModelImpl) {
-		Object[] args = new Object[] { appModelImpl.getRemoteAppId() };
-
-		finderCache.removeResult(FINDER_PATH_COUNT_BY_REMOTEAPPID, args);
-		finderCache.removeResult(FINDER_PATH_FETCH_BY_REMOTEAPPID, args);
-
 		if ((appModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_REMOTEAPPID.getColumnBitmask()) != 0) {
-			args = new Object[] { appModelImpl.getOriginalRemoteAppId() };
+			Object[] args = new Object[] { appModelImpl.getOriginalRemoteAppId() };
 
 			finderCache.removeResult(FINDER_PATH_COUNT_BY_REMOTEAPPID, args);
 			finderCache.removeResult(FINDER_PATH_FETCH_BY_REMOTEAPPID, args);
@@ -2812,7 +2793,7 @@ public class AppPersistenceImpl extends BasePersistenceImpl<App>
 			app.getPrimaryKey(), app, false);
 
 		clearUniqueFindersCache(appModelImpl);
-		cacheUniqueFindersCache(appModelImpl, isNew);
+		cacheUniqueFindersCache(appModelImpl);
 
 		app.resetOriginalValues();
 

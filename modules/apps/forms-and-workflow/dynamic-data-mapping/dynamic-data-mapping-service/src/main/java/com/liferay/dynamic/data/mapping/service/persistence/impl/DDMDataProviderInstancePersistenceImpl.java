@@ -3457,48 +3457,23 @@ public class DDMDataProviderInstancePersistenceImpl extends BasePersistenceImpl<
 	}
 
 	protected void cacheUniqueFindersCache(
-		DDMDataProviderInstanceModelImpl ddmDataProviderInstanceModelImpl,
-		boolean isNew) {
-		if (isNew) {
-			Object[] args = new Object[] {
-					ddmDataProviderInstanceModelImpl.getUuid(),
-					ddmDataProviderInstanceModelImpl.getGroupId()
-				};
-
-			finderCache.putResult(FINDER_PATH_COUNT_BY_UUID_G, args,
-				Long.valueOf(1));
-			finderCache.putResult(FINDER_PATH_FETCH_BY_UUID_G, args,
-				ddmDataProviderInstanceModelImpl);
-		}
-		else {
-			if ((ddmDataProviderInstanceModelImpl.getColumnBitmask() &
-					FINDER_PATH_FETCH_BY_UUID_G.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						ddmDataProviderInstanceModelImpl.getUuid(),
-						ddmDataProviderInstanceModelImpl.getGroupId()
-					};
-
-				finderCache.putResult(FINDER_PATH_COUNT_BY_UUID_G, args,
-					Long.valueOf(1));
-				finderCache.putResult(FINDER_PATH_FETCH_BY_UUID_G, args,
-					ddmDataProviderInstanceModelImpl);
-			}
-		}
-	}
-
-	protected void clearUniqueFindersCache(
 		DDMDataProviderInstanceModelImpl ddmDataProviderInstanceModelImpl) {
 		Object[] args = new Object[] {
 				ddmDataProviderInstanceModelImpl.getUuid(),
 				ddmDataProviderInstanceModelImpl.getGroupId()
 			};
 
-		finderCache.removeResult(FINDER_PATH_COUNT_BY_UUID_G, args);
-		finderCache.removeResult(FINDER_PATH_FETCH_BY_UUID_G, args);
+		finderCache.putResult(FINDER_PATH_COUNT_BY_UUID_G, args,
+			Long.valueOf(1), false);
+		finderCache.putResult(FINDER_PATH_FETCH_BY_UUID_G, args,
+			ddmDataProviderInstanceModelImpl, false);
+	}
 
+	protected void clearUniqueFindersCache(
+		DDMDataProviderInstanceModelImpl ddmDataProviderInstanceModelImpl) {
 		if ((ddmDataProviderInstanceModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_UUID_G.getColumnBitmask()) != 0) {
-			args = new Object[] {
+			Object[] args = new Object[] {
 					ddmDataProviderInstanceModelImpl.getOriginalUuid(),
 					ddmDataProviderInstanceModelImpl.getOriginalGroupId()
 				};
@@ -3766,7 +3741,7 @@ public class DDMDataProviderInstancePersistenceImpl extends BasePersistenceImpl<
 			false);
 
 		clearUniqueFindersCache(ddmDataProviderInstanceModelImpl);
-		cacheUniqueFindersCache(ddmDataProviderInstanceModelImpl, isNew);
+		cacheUniqueFindersCache(ddmDataProviderInstanceModelImpl);
 
 		ddmDataProviderInstance.resetOriginalValues();
 

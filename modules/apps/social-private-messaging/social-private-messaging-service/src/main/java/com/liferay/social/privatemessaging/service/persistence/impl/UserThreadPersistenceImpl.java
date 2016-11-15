@@ -2544,47 +2544,23 @@ public class UserThreadPersistenceImpl extends BasePersistenceImpl<UserThread>
 	}
 
 	protected void cacheUniqueFindersCache(
-		UserThreadModelImpl userThreadModelImpl, boolean isNew) {
-		if (isNew) {
-			Object[] args = new Object[] {
-					userThreadModelImpl.getUserId(),
-					userThreadModelImpl.getMbThreadId()
-				};
-
-			finderCache.putResult(FINDER_PATH_COUNT_BY_U_M, args,
-				Long.valueOf(1));
-			finderCache.putResult(FINDER_PATH_FETCH_BY_U_M, args,
-				userThreadModelImpl);
-		}
-		else {
-			if ((userThreadModelImpl.getColumnBitmask() &
-					FINDER_PATH_FETCH_BY_U_M.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						userThreadModelImpl.getUserId(),
-						userThreadModelImpl.getMbThreadId()
-					};
-
-				finderCache.putResult(FINDER_PATH_COUNT_BY_U_M, args,
-					Long.valueOf(1));
-				finderCache.putResult(FINDER_PATH_FETCH_BY_U_M, args,
-					userThreadModelImpl);
-			}
-		}
-	}
-
-	protected void clearUniqueFindersCache(
 		UserThreadModelImpl userThreadModelImpl) {
 		Object[] args = new Object[] {
 				userThreadModelImpl.getUserId(),
 				userThreadModelImpl.getMbThreadId()
 			};
 
-		finderCache.removeResult(FINDER_PATH_COUNT_BY_U_M, args);
-		finderCache.removeResult(FINDER_PATH_FETCH_BY_U_M, args);
+		finderCache.putResult(FINDER_PATH_COUNT_BY_U_M, args, Long.valueOf(1),
+			false);
+		finderCache.putResult(FINDER_PATH_FETCH_BY_U_M, args,
+			userThreadModelImpl, false);
+	}
 
+	protected void clearUniqueFindersCache(
+		UserThreadModelImpl userThreadModelImpl) {
 		if ((userThreadModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_U_M.getColumnBitmask()) != 0) {
-			args = new Object[] {
+			Object[] args = new Object[] {
 					userThreadModelImpl.getOriginalUserId(),
 					userThreadModelImpl.getOriginalMbThreadId()
 				};
@@ -2838,7 +2814,7 @@ public class UserThreadPersistenceImpl extends BasePersistenceImpl<UserThread>
 			UserThreadImpl.class, userThread.getPrimaryKey(), userThread, false);
 
 		clearUniqueFindersCache(userThreadModelImpl);
-		cacheUniqueFindersCache(userThreadModelImpl, isNew);
+		cacheUniqueFindersCache(userThreadModelImpl);
 
 		userThread.resetOriginalValues();
 

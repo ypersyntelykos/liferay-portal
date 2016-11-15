@@ -2073,46 +2073,22 @@ public class MDRActionPersistenceImpl extends BasePersistenceImpl<MDRAction>
 	}
 
 	protected void cacheUniqueFindersCache(
-		MDRActionModelImpl mdrActionModelImpl, boolean isNew) {
-		if (isNew) {
-			Object[] args = new Object[] {
-					mdrActionModelImpl.getUuid(),
-					mdrActionModelImpl.getGroupId()
-				};
-
-			finderCache.putResult(FINDER_PATH_COUNT_BY_UUID_G, args,
-				Long.valueOf(1));
-			finderCache.putResult(FINDER_PATH_FETCH_BY_UUID_G, args,
-				mdrActionModelImpl);
-		}
-		else {
-			if ((mdrActionModelImpl.getColumnBitmask() &
-					FINDER_PATH_FETCH_BY_UUID_G.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						mdrActionModelImpl.getUuid(),
-						mdrActionModelImpl.getGroupId()
-					};
-
-				finderCache.putResult(FINDER_PATH_COUNT_BY_UUID_G, args,
-					Long.valueOf(1));
-				finderCache.putResult(FINDER_PATH_FETCH_BY_UUID_G, args,
-					mdrActionModelImpl);
-			}
-		}
-	}
-
-	protected void clearUniqueFindersCache(
 		MDRActionModelImpl mdrActionModelImpl) {
 		Object[] args = new Object[] {
 				mdrActionModelImpl.getUuid(), mdrActionModelImpl.getGroupId()
 			};
 
-		finderCache.removeResult(FINDER_PATH_COUNT_BY_UUID_G, args);
-		finderCache.removeResult(FINDER_PATH_FETCH_BY_UUID_G, args);
+		finderCache.putResult(FINDER_PATH_COUNT_BY_UUID_G, args,
+			Long.valueOf(1), false);
+		finderCache.putResult(FINDER_PATH_FETCH_BY_UUID_G, args,
+			mdrActionModelImpl, false);
+	}
 
+	protected void clearUniqueFindersCache(
+		MDRActionModelImpl mdrActionModelImpl) {
 		if ((mdrActionModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_UUID_G.getColumnBitmask()) != 0) {
-			args = new Object[] {
+			Object[] args = new Object[] {
 					mdrActionModelImpl.getOriginalUuid(),
 					mdrActionModelImpl.getOriginalGroupId()
 				};
@@ -2354,7 +2330,7 @@ public class MDRActionPersistenceImpl extends BasePersistenceImpl<MDRAction>
 			MDRActionImpl.class, mdrAction.getPrimaryKey(), mdrAction, false);
 
 		clearUniqueFindersCache(mdrActionModelImpl);
-		cacheUniqueFindersCache(mdrActionModelImpl, isNew);
+		cacheUniqueFindersCache(mdrActionModelImpl);
 
 		mdrAction.resetOriginalValues();
 

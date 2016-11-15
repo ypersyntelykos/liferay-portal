@@ -995,38 +995,19 @@ public class TicketPersistenceImpl extends BasePersistenceImpl<Ticket>
 		}
 	}
 
-	protected void cacheUniqueFindersCache(TicketModelImpl ticketModelImpl,
-		boolean isNew) {
-		if (isNew) {
-			Object[] args = new Object[] { ticketModelImpl.getKey() };
+	protected void cacheUniqueFindersCache(TicketModelImpl ticketModelImpl) {
+		Object[] args = new Object[] { ticketModelImpl.getKey() };
 
-			finderCache.putResult(FINDER_PATH_COUNT_BY_KEY, args,
-				Long.valueOf(1));
-			finderCache.putResult(FINDER_PATH_FETCH_BY_KEY, args,
-				ticketModelImpl);
-		}
-		else {
-			if ((ticketModelImpl.getColumnBitmask() &
-					FINDER_PATH_FETCH_BY_KEY.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] { ticketModelImpl.getKey() };
-
-				finderCache.putResult(FINDER_PATH_COUNT_BY_KEY, args,
-					Long.valueOf(1));
-				finderCache.putResult(FINDER_PATH_FETCH_BY_KEY, args,
-					ticketModelImpl);
-			}
-		}
+		finderCache.putResult(FINDER_PATH_COUNT_BY_KEY, args, Long.valueOf(1),
+			false);
+		finderCache.putResult(FINDER_PATH_FETCH_BY_KEY, args, ticketModelImpl,
+			false);
 	}
 
 	protected void clearUniqueFindersCache(TicketModelImpl ticketModelImpl) {
-		Object[] args = new Object[] { ticketModelImpl.getKey() };
-
-		finderCache.removeResult(FINDER_PATH_COUNT_BY_KEY, args);
-		finderCache.removeResult(FINDER_PATH_FETCH_BY_KEY, args);
-
 		if ((ticketModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_KEY.getColumnBitmask()) != 0) {
-			args = new Object[] { ticketModelImpl.getOriginalKey() };
+			Object[] args = new Object[] { ticketModelImpl.getOriginalKey() };
 
 			finderCache.removeResult(FINDER_PATH_COUNT_BY_KEY, args);
 			finderCache.removeResult(FINDER_PATH_FETCH_BY_KEY, args);
@@ -1196,7 +1177,7 @@ public class TicketPersistenceImpl extends BasePersistenceImpl<Ticket>
 			TicketImpl.class, ticket.getPrimaryKey(), ticket, false);
 
 		clearUniqueFindersCache(ticketModelImpl);
-		cacheUniqueFindersCache(ticketModelImpl, isNew);
+		cacheUniqueFindersCache(ticketModelImpl);
 
 		ticket.resetOriginalValues();
 

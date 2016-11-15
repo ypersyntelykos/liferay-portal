@@ -3230,44 +3230,21 @@ public class GadgetPersistenceImpl extends BasePersistenceImpl<Gadget>
 		}
 	}
 
-	protected void cacheUniqueFindersCache(GadgetModelImpl gadgetModelImpl,
-		boolean isNew) {
-		if (isNew) {
-			Object[] args = new Object[] {
-					gadgetModelImpl.getCompanyId(), gadgetModelImpl.getUrl()
-				};
-
-			finderCache.putResult(FINDER_PATH_COUNT_BY_C_U, args,
-				Long.valueOf(1));
-			finderCache.putResult(FINDER_PATH_FETCH_BY_C_U, args,
-				gadgetModelImpl);
-		}
-		else {
-			if ((gadgetModelImpl.getColumnBitmask() &
-					FINDER_PATH_FETCH_BY_C_U.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						gadgetModelImpl.getCompanyId(), gadgetModelImpl.getUrl()
-					};
-
-				finderCache.putResult(FINDER_PATH_COUNT_BY_C_U, args,
-					Long.valueOf(1));
-				finderCache.putResult(FINDER_PATH_FETCH_BY_C_U, args,
-					gadgetModelImpl);
-			}
-		}
-	}
-
-	protected void clearUniqueFindersCache(GadgetModelImpl gadgetModelImpl) {
+	protected void cacheUniqueFindersCache(GadgetModelImpl gadgetModelImpl) {
 		Object[] args = new Object[] {
 				gadgetModelImpl.getCompanyId(), gadgetModelImpl.getUrl()
 			};
 
-		finderCache.removeResult(FINDER_PATH_COUNT_BY_C_U, args);
-		finderCache.removeResult(FINDER_PATH_FETCH_BY_C_U, args);
+		finderCache.putResult(FINDER_PATH_COUNT_BY_C_U, args, Long.valueOf(1),
+			false);
+		finderCache.putResult(FINDER_PATH_FETCH_BY_C_U, args, gadgetModelImpl,
+			false);
+	}
 
+	protected void clearUniqueFindersCache(GadgetModelImpl gadgetModelImpl) {
 		if ((gadgetModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_C_U.getColumnBitmask()) != 0) {
-			args = new Object[] {
+			Object[] args = new Object[] {
 					gadgetModelImpl.getOriginalCompanyId(),
 					gadgetModelImpl.getOriginalUrl()
 				};
@@ -3503,7 +3480,7 @@ public class GadgetPersistenceImpl extends BasePersistenceImpl<Gadget>
 			GadgetImpl.class, gadget.getPrimaryKey(), gadget, false);
 
 		clearUniqueFindersCache(gadgetModelImpl);
-		cacheUniqueFindersCache(gadgetModelImpl, isNew);
+		cacheUniqueFindersCache(gadgetModelImpl);
 
 		gadget.resetOriginalValues();
 

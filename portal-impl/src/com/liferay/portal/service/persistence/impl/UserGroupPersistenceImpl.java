@@ -4166,46 +4166,22 @@ public class UserGroupPersistenceImpl extends BasePersistenceImpl<UserGroup>
 	}
 
 	protected void cacheUniqueFindersCache(
-		UserGroupModelImpl userGroupModelImpl, boolean isNew) {
-		if (isNew) {
-			Object[] args = new Object[] {
-					userGroupModelImpl.getCompanyId(),
-					userGroupModelImpl.getName()
-				};
-
-			finderCache.putResult(FINDER_PATH_COUNT_BY_C_N, args,
-				Long.valueOf(1));
-			finderCache.putResult(FINDER_PATH_FETCH_BY_C_N, args,
-				userGroupModelImpl);
-		}
-		else {
-			if ((userGroupModelImpl.getColumnBitmask() &
-					FINDER_PATH_FETCH_BY_C_N.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						userGroupModelImpl.getCompanyId(),
-						userGroupModelImpl.getName()
-					};
-
-				finderCache.putResult(FINDER_PATH_COUNT_BY_C_N, args,
-					Long.valueOf(1));
-				finderCache.putResult(FINDER_PATH_FETCH_BY_C_N, args,
-					userGroupModelImpl);
-			}
-		}
-	}
-
-	protected void clearUniqueFindersCache(
 		UserGroupModelImpl userGroupModelImpl) {
 		Object[] args = new Object[] {
 				userGroupModelImpl.getCompanyId(), userGroupModelImpl.getName()
 			};
 
-		finderCache.removeResult(FINDER_PATH_COUNT_BY_C_N, args);
-		finderCache.removeResult(FINDER_PATH_FETCH_BY_C_N, args);
+		finderCache.putResult(FINDER_PATH_COUNT_BY_C_N, args, Long.valueOf(1),
+			false);
+		finderCache.putResult(FINDER_PATH_FETCH_BY_C_N, args,
+			userGroupModelImpl, false);
+	}
 
+	protected void clearUniqueFindersCache(
+		UserGroupModelImpl userGroupModelImpl) {
 		if ((userGroupModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_C_N.getColumnBitmask()) != 0) {
-			args = new Object[] {
+			Object[] args = new Object[] {
 					userGroupModelImpl.getOriginalCompanyId(),
 					userGroupModelImpl.getOriginalName()
 				};
@@ -4472,7 +4448,7 @@ public class UserGroupPersistenceImpl extends BasePersistenceImpl<UserGroup>
 			UserGroupImpl.class, userGroup.getPrimaryKey(), userGroup, false);
 
 		clearUniqueFindersCache(userGroupModelImpl);
-		cacheUniqueFindersCache(userGroupModelImpl, isNew);
+		cacheUniqueFindersCache(userGroupModelImpl);
 
 		userGroup.resetOriginalValues();
 

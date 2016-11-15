@@ -940,45 +940,21 @@ public class AccountPersistenceImpl extends BasePersistenceImpl<Account>
 		}
 	}
 
-	protected void cacheUniqueFindersCache(AccountModelImpl accountModelImpl,
-		boolean isNew) {
-		if (isNew) {
-			Object[] args = new Object[] {
-					accountModelImpl.getUserId(), accountModelImpl.getAddress()
-				};
-
-			finderCache.putResult(FINDER_PATH_COUNT_BY_U_A, args,
-				Long.valueOf(1));
-			finderCache.putResult(FINDER_PATH_FETCH_BY_U_A, args,
-				accountModelImpl);
-		}
-		else {
-			if ((accountModelImpl.getColumnBitmask() &
-					FINDER_PATH_FETCH_BY_U_A.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						accountModelImpl.getUserId(),
-						accountModelImpl.getAddress()
-					};
-
-				finderCache.putResult(FINDER_PATH_COUNT_BY_U_A, args,
-					Long.valueOf(1));
-				finderCache.putResult(FINDER_PATH_FETCH_BY_U_A, args,
-					accountModelImpl);
-			}
-		}
-	}
-
-	protected void clearUniqueFindersCache(AccountModelImpl accountModelImpl) {
+	protected void cacheUniqueFindersCache(AccountModelImpl accountModelImpl) {
 		Object[] args = new Object[] {
 				accountModelImpl.getUserId(), accountModelImpl.getAddress()
 			};
 
-		finderCache.removeResult(FINDER_PATH_COUNT_BY_U_A, args);
-		finderCache.removeResult(FINDER_PATH_FETCH_BY_U_A, args);
+		finderCache.putResult(FINDER_PATH_COUNT_BY_U_A, args, Long.valueOf(1),
+			false);
+		finderCache.putResult(FINDER_PATH_FETCH_BY_U_A, args, accountModelImpl,
+			false);
+	}
 
+	protected void clearUniqueFindersCache(AccountModelImpl accountModelImpl) {
 		if ((accountModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_U_A.getColumnBitmask()) != 0) {
-			args = new Object[] {
+			Object[] args = new Object[] {
 					accountModelImpl.getOriginalUserId(),
 					accountModelImpl.getOriginalAddress()
 				};
@@ -1169,7 +1145,7 @@ public class AccountPersistenceImpl extends BasePersistenceImpl<Account>
 			AccountImpl.class, account.getPrimaryKey(), account, false);
 
 		clearUniqueFindersCache(accountModelImpl);
-		cacheUniqueFindersCache(accountModelImpl, isNew);
+		cacheUniqueFindersCache(accountModelImpl);
 
 		account.resetOriginalValues();
 

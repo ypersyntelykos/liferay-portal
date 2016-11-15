@@ -2070,47 +2070,23 @@ public class WSRPProducerPersistenceImpl extends BasePersistenceImpl<WSRPProduce
 	}
 
 	protected void cacheUniqueFindersCache(
-		WSRPProducerModelImpl wsrpProducerModelImpl, boolean isNew) {
-		if (isNew) {
-			Object[] args = new Object[] {
-					wsrpProducerModelImpl.getUuid(),
-					wsrpProducerModelImpl.getGroupId()
-				};
-
-			finderCache.putResult(FINDER_PATH_COUNT_BY_UUID_G, args,
-				Long.valueOf(1));
-			finderCache.putResult(FINDER_PATH_FETCH_BY_UUID_G, args,
-				wsrpProducerModelImpl);
-		}
-		else {
-			if ((wsrpProducerModelImpl.getColumnBitmask() &
-					FINDER_PATH_FETCH_BY_UUID_G.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						wsrpProducerModelImpl.getUuid(),
-						wsrpProducerModelImpl.getGroupId()
-					};
-
-				finderCache.putResult(FINDER_PATH_COUNT_BY_UUID_G, args,
-					Long.valueOf(1));
-				finderCache.putResult(FINDER_PATH_FETCH_BY_UUID_G, args,
-					wsrpProducerModelImpl);
-			}
-		}
-	}
-
-	protected void clearUniqueFindersCache(
 		WSRPProducerModelImpl wsrpProducerModelImpl) {
 		Object[] args = new Object[] {
 				wsrpProducerModelImpl.getUuid(),
 				wsrpProducerModelImpl.getGroupId()
 			};
 
-		finderCache.removeResult(FINDER_PATH_COUNT_BY_UUID_G, args);
-		finderCache.removeResult(FINDER_PATH_FETCH_BY_UUID_G, args);
+		finderCache.putResult(FINDER_PATH_COUNT_BY_UUID_G, args,
+			Long.valueOf(1), false);
+		finderCache.putResult(FINDER_PATH_FETCH_BY_UUID_G, args,
+			wsrpProducerModelImpl, false);
+	}
 
+	protected void clearUniqueFindersCache(
+		WSRPProducerModelImpl wsrpProducerModelImpl) {
 		if ((wsrpProducerModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_UUID_G.getColumnBitmask()) != 0) {
-			args = new Object[] {
+			Object[] args = new Object[] {
 					wsrpProducerModelImpl.getOriginalUuid(),
 					wsrpProducerModelImpl.getOriginalGroupId()
 				};
@@ -2352,7 +2328,7 @@ public class WSRPProducerPersistenceImpl extends BasePersistenceImpl<WSRPProduce
 			false);
 
 		clearUniqueFindersCache(wsrpProducerModelImpl);
-		cacheUniqueFindersCache(wsrpProducerModelImpl, isNew);
+		cacheUniqueFindersCache(wsrpProducerModelImpl);
 
 		wsrpProducer.resetOriginalValues();
 

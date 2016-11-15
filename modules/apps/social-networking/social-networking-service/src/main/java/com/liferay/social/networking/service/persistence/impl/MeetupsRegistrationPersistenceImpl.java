@@ -1490,47 +1490,23 @@ public class MeetupsRegistrationPersistenceImpl extends BasePersistenceImpl<Meet
 	}
 
 	protected void cacheUniqueFindersCache(
-		MeetupsRegistrationModelImpl meetupsRegistrationModelImpl, boolean isNew) {
-		if (isNew) {
-			Object[] args = new Object[] {
-					meetupsRegistrationModelImpl.getUserId(),
-					meetupsRegistrationModelImpl.getMeetupsEntryId()
-				};
-
-			finderCache.putResult(FINDER_PATH_COUNT_BY_U_ME, args,
-				Long.valueOf(1));
-			finderCache.putResult(FINDER_PATH_FETCH_BY_U_ME, args,
-				meetupsRegistrationModelImpl);
-		}
-		else {
-			if ((meetupsRegistrationModelImpl.getColumnBitmask() &
-					FINDER_PATH_FETCH_BY_U_ME.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						meetupsRegistrationModelImpl.getUserId(),
-						meetupsRegistrationModelImpl.getMeetupsEntryId()
-					};
-
-				finderCache.putResult(FINDER_PATH_COUNT_BY_U_ME, args,
-					Long.valueOf(1));
-				finderCache.putResult(FINDER_PATH_FETCH_BY_U_ME, args,
-					meetupsRegistrationModelImpl);
-			}
-		}
-	}
-
-	protected void clearUniqueFindersCache(
 		MeetupsRegistrationModelImpl meetupsRegistrationModelImpl) {
 		Object[] args = new Object[] {
 				meetupsRegistrationModelImpl.getUserId(),
 				meetupsRegistrationModelImpl.getMeetupsEntryId()
 			};
 
-		finderCache.removeResult(FINDER_PATH_COUNT_BY_U_ME, args);
-		finderCache.removeResult(FINDER_PATH_FETCH_BY_U_ME, args);
+		finderCache.putResult(FINDER_PATH_COUNT_BY_U_ME, args, Long.valueOf(1),
+			false);
+		finderCache.putResult(FINDER_PATH_FETCH_BY_U_ME, args,
+			meetupsRegistrationModelImpl, false);
+	}
 
+	protected void clearUniqueFindersCache(
+		MeetupsRegistrationModelImpl meetupsRegistrationModelImpl) {
 		if ((meetupsRegistrationModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_U_ME.getColumnBitmask()) != 0) {
-			args = new Object[] {
+			Object[] args = new Object[] {
 					meetupsRegistrationModelImpl.getOriginalUserId(),
 					meetupsRegistrationModelImpl.getOriginalMeetupsEntryId()
 				};
@@ -1753,7 +1729,7 @@ public class MeetupsRegistrationPersistenceImpl extends BasePersistenceImpl<Meet
 			meetupsRegistration, false);
 
 		clearUniqueFindersCache(meetupsRegistrationModelImpl);
-		cacheUniqueFindersCache(meetupsRegistrationModelImpl, isNew);
+		cacheUniqueFindersCache(meetupsRegistrationModelImpl);
 
 		meetupsRegistration.resetOriginalValues();
 

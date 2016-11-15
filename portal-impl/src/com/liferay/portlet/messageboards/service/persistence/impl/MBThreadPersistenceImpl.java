@@ -13003,64 +13003,28 @@ public class MBThreadPersistenceImpl extends BasePersistenceImpl<MBThread>
 		}
 	}
 
-	protected void cacheUniqueFindersCache(
-		MBThreadModelImpl mbThreadModelImpl, boolean isNew) {
-		if (isNew) {
-			Object[] args = new Object[] {
-					mbThreadModelImpl.getUuid(), mbThreadModelImpl.getGroupId()
-				};
-
-			finderCache.putResult(FINDER_PATH_COUNT_BY_UUID_G, args,
-				Long.valueOf(1));
-			finderCache.putResult(FINDER_PATH_FETCH_BY_UUID_G, args,
-				mbThreadModelImpl);
-
-			args = new Object[] { mbThreadModelImpl.getRootMessageId() };
-
-			finderCache.putResult(FINDER_PATH_COUNT_BY_ROOTMESSAGEID, args,
-				Long.valueOf(1));
-			finderCache.putResult(FINDER_PATH_FETCH_BY_ROOTMESSAGEID, args,
-				mbThreadModelImpl);
-		}
-		else {
-			if ((mbThreadModelImpl.getColumnBitmask() &
-					FINDER_PATH_FETCH_BY_UUID_G.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						mbThreadModelImpl.getUuid(),
-						mbThreadModelImpl.getGroupId()
-					};
-
-				finderCache.putResult(FINDER_PATH_COUNT_BY_UUID_G, args,
-					Long.valueOf(1));
-				finderCache.putResult(FINDER_PATH_FETCH_BY_UUID_G, args,
-					mbThreadModelImpl);
-			}
-
-			if ((mbThreadModelImpl.getColumnBitmask() &
-					FINDER_PATH_FETCH_BY_ROOTMESSAGEID.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						mbThreadModelImpl.getRootMessageId()
-					};
-
-				finderCache.putResult(FINDER_PATH_COUNT_BY_ROOTMESSAGEID, args,
-					Long.valueOf(1));
-				finderCache.putResult(FINDER_PATH_FETCH_BY_ROOTMESSAGEID, args,
-					mbThreadModelImpl);
-			}
-		}
-	}
-
-	protected void clearUniqueFindersCache(MBThreadModelImpl mbThreadModelImpl) {
+	protected void cacheUniqueFindersCache(MBThreadModelImpl mbThreadModelImpl) {
 		Object[] args = new Object[] {
 				mbThreadModelImpl.getUuid(), mbThreadModelImpl.getGroupId()
 			};
 
-		finderCache.removeResult(FINDER_PATH_COUNT_BY_UUID_G, args);
-		finderCache.removeResult(FINDER_PATH_FETCH_BY_UUID_G, args);
+		finderCache.putResult(FINDER_PATH_COUNT_BY_UUID_G, args,
+			Long.valueOf(1), false);
+		finderCache.putResult(FINDER_PATH_FETCH_BY_UUID_G, args,
+			mbThreadModelImpl, false);
 
+		args = new Object[] { mbThreadModelImpl.getRootMessageId() };
+
+		finderCache.putResult(FINDER_PATH_COUNT_BY_ROOTMESSAGEID, args,
+			Long.valueOf(1), false);
+		finderCache.putResult(FINDER_PATH_FETCH_BY_ROOTMESSAGEID, args,
+			mbThreadModelImpl, false);
+	}
+
+	protected void clearUniqueFindersCache(MBThreadModelImpl mbThreadModelImpl) {
 		if ((mbThreadModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_UUID_G.getColumnBitmask()) != 0) {
-			args = new Object[] {
+			Object[] args = new Object[] {
 					mbThreadModelImpl.getOriginalUuid(),
 					mbThreadModelImpl.getOriginalGroupId()
 				};
@@ -13069,14 +13033,11 @@ public class MBThreadPersistenceImpl extends BasePersistenceImpl<MBThread>
 			finderCache.removeResult(FINDER_PATH_FETCH_BY_UUID_G, args);
 		}
 
-		args = new Object[] { mbThreadModelImpl.getRootMessageId() };
-
-		finderCache.removeResult(FINDER_PATH_COUNT_BY_ROOTMESSAGEID, args);
-		finderCache.removeResult(FINDER_PATH_FETCH_BY_ROOTMESSAGEID, args);
-
 		if ((mbThreadModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_ROOTMESSAGEID.getColumnBitmask()) != 0) {
-			args = new Object[] { mbThreadModelImpl.getOriginalRootMessageId() };
+			Object[] args = new Object[] {
+					mbThreadModelImpl.getOriginalRootMessageId()
+				};
 
 			finderCache.removeResult(FINDER_PATH_COUNT_BY_ROOTMESSAGEID, args);
 			finderCache.removeResult(FINDER_PATH_FETCH_BY_ROOTMESSAGEID, args);
@@ -13441,7 +13402,7 @@ public class MBThreadPersistenceImpl extends BasePersistenceImpl<MBThread>
 			MBThreadImpl.class, mbThread.getPrimaryKey(), mbThread, false);
 
 		clearUniqueFindersCache(mbThreadModelImpl);
-		cacheUniqueFindersCache(mbThreadModelImpl, isNew);
+		cacheUniqueFindersCache(mbThreadModelImpl);
 
 		mbThread.resetOriginalValues();
 
