@@ -1952,7 +1952,7 @@ public class MBStatsUserPersistenceImpl extends BasePersistenceImpl<MBStatsUser>
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
-		clearUniqueFindersCache((MBStatsUserModelImpl)mbStatsUser);
+		clearUniqueFindersCache((MBStatsUserModelImpl)mbStatsUser, true);
 	}
 
 	@Override
@@ -1964,7 +1964,7 @@ public class MBStatsUserPersistenceImpl extends BasePersistenceImpl<MBStatsUser>
 			entityCache.removeResult(MBStatsUserModelImpl.ENTITY_CACHE_ENABLED,
 				MBStatsUserImpl.class, mbStatsUser.getPrimaryKey());
 
-			clearUniqueFindersCache((MBStatsUserModelImpl)mbStatsUser);
+			clearUniqueFindersCache((MBStatsUserModelImpl)mbStatsUser, true);
 		}
 	}
 
@@ -1982,7 +1982,17 @@ public class MBStatsUserPersistenceImpl extends BasePersistenceImpl<MBStatsUser>
 	}
 
 	protected void clearUniqueFindersCache(
-		MBStatsUserModelImpl mbStatsUserModelImpl) {
+		MBStatsUserModelImpl mbStatsUserModelImpl, boolean clearCurrent) {
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					mbStatsUserModelImpl.getGroupId(),
+					mbStatsUserModelImpl.getUserId()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_G_U, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_G_U, args);
+		}
+
 		if ((mbStatsUserModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_G_U.getColumnBitmask()) != 0) {
 			Object[] args = new Object[] {
@@ -2172,7 +2182,7 @@ public class MBStatsUserPersistenceImpl extends BasePersistenceImpl<MBStatsUser>
 			MBStatsUserImpl.class, mbStatsUser.getPrimaryKey(), mbStatsUser,
 			false);
 
-		clearUniqueFindersCache(mbStatsUserModelImpl);
+		clearUniqueFindersCache(mbStatsUserModelImpl, false);
 		cacheUniqueFindersCache(mbStatsUserModelImpl);
 
 		mbStatsUser.resetOriginalValues();

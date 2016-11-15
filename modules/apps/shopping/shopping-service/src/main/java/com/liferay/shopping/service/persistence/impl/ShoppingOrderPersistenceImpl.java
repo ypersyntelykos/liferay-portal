@@ -2591,7 +2591,7 @@ public class ShoppingOrderPersistenceImpl extends BasePersistenceImpl<ShoppingOr
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
-		clearUniqueFindersCache((ShoppingOrderModelImpl)shoppingOrder);
+		clearUniqueFindersCache((ShoppingOrderModelImpl)shoppingOrder, true);
 	}
 
 	@Override
@@ -2603,7 +2603,7 @@ public class ShoppingOrderPersistenceImpl extends BasePersistenceImpl<ShoppingOr
 			entityCache.removeResult(ShoppingOrderModelImpl.ENTITY_CACHE_ENABLED,
 				ShoppingOrderImpl.class, shoppingOrder.getPrimaryKey());
 
-			clearUniqueFindersCache((ShoppingOrderModelImpl)shoppingOrder);
+			clearUniqueFindersCache((ShoppingOrderModelImpl)shoppingOrder, true);
 		}
 	}
 
@@ -2625,7 +2625,14 @@ public class ShoppingOrderPersistenceImpl extends BasePersistenceImpl<ShoppingOr
 	}
 
 	protected void clearUniqueFindersCache(
-		ShoppingOrderModelImpl shoppingOrderModelImpl) {
+		ShoppingOrderModelImpl shoppingOrderModelImpl, boolean clearCurrent) {
+		if (clearCurrent) {
+			Object[] args = new Object[] { shoppingOrderModelImpl.getNumber() };
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_NUMBER, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_NUMBER, args);
+		}
+
 		if ((shoppingOrderModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_NUMBER.getColumnBitmask()) != 0) {
 			Object[] args = new Object[] {
@@ -2634,6 +2641,13 @@ public class ShoppingOrderPersistenceImpl extends BasePersistenceImpl<ShoppingOr
 
 			finderCache.removeResult(FINDER_PATH_COUNT_BY_NUMBER, args);
 			finderCache.removeResult(FINDER_PATH_FETCH_BY_NUMBER, args);
+		}
+
+		if (clearCurrent) {
+			Object[] args = new Object[] { shoppingOrderModelImpl.getPpTxnId() };
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_PPTXNID, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_PPTXNID, args);
 		}
 
 		if ((shoppingOrderModelImpl.getColumnBitmask() &
@@ -2853,7 +2867,7 @@ public class ShoppingOrderPersistenceImpl extends BasePersistenceImpl<ShoppingOr
 			ShoppingOrderImpl.class, shoppingOrder.getPrimaryKey(),
 			shoppingOrder, false);
 
-		clearUniqueFindersCache(shoppingOrderModelImpl);
+		clearUniqueFindersCache(shoppingOrderModelImpl, false);
 		cacheUniqueFindersCache(shoppingOrderModelImpl);
 
 		shoppingOrder.resetOriginalValues();

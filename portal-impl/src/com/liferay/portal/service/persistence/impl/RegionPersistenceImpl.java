@@ -1948,7 +1948,7 @@ public class RegionPersistenceImpl extends BasePersistenceImpl<Region>
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
-		clearUniqueFindersCache((RegionModelImpl)region);
+		clearUniqueFindersCache((RegionModelImpl)region, true);
 	}
 
 	@Override
@@ -1960,7 +1960,7 @@ public class RegionPersistenceImpl extends BasePersistenceImpl<Region>
 			entityCache.removeResult(RegionModelImpl.ENTITY_CACHE_ENABLED,
 				RegionImpl.class, region.getPrimaryKey());
 
-			clearUniqueFindersCache((RegionModelImpl)region);
+			clearUniqueFindersCache((RegionModelImpl)region, true);
 		}
 	}
 
@@ -1975,7 +1975,18 @@ public class RegionPersistenceImpl extends BasePersistenceImpl<Region>
 			false);
 	}
 
-	protected void clearUniqueFindersCache(RegionModelImpl regionModelImpl) {
+	protected void clearUniqueFindersCache(RegionModelImpl regionModelImpl,
+		boolean clearCurrent) {
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					regionModelImpl.getCountryId(),
+					regionModelImpl.getRegionCode()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_C_R, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_C_R, args);
+		}
+
 		if ((regionModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_C_R.getColumnBitmask()) != 0) {
 			Object[] args = new Object[] {
@@ -2179,7 +2190,7 @@ public class RegionPersistenceImpl extends BasePersistenceImpl<Region>
 		entityCache.putResult(RegionModelImpl.ENTITY_CACHE_ENABLED,
 			RegionImpl.class, region.getPrimaryKey(), region, false);
 
-		clearUniqueFindersCache(regionModelImpl);
+		clearUniqueFindersCache(regionModelImpl, false);
 		cacheUniqueFindersCache(regionModelImpl);
 
 		region.resetOriginalValues();

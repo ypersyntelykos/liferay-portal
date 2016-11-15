@@ -2521,7 +2521,7 @@ public class AppPersistenceImpl extends BasePersistenceImpl<App>
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
-		clearUniqueFindersCache((AppModelImpl)app);
+		clearUniqueFindersCache((AppModelImpl)app, true);
 	}
 
 	@Override
@@ -2533,7 +2533,7 @@ public class AppPersistenceImpl extends BasePersistenceImpl<App>
 			entityCache.removeResult(AppModelImpl.ENTITY_CACHE_ENABLED,
 				AppImpl.class, app.getPrimaryKey());
 
-			clearUniqueFindersCache((AppModelImpl)app);
+			clearUniqueFindersCache((AppModelImpl)app, true);
 		}
 	}
 
@@ -2546,7 +2546,15 @@ public class AppPersistenceImpl extends BasePersistenceImpl<App>
 			appModelImpl, false);
 	}
 
-	protected void clearUniqueFindersCache(AppModelImpl appModelImpl) {
+	protected void clearUniqueFindersCache(AppModelImpl appModelImpl,
+		boolean clearCurrent) {
+		if (clearCurrent) {
+			Object[] args = new Object[] { appModelImpl.getRemoteAppId() };
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_REMOTEAPPID, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_REMOTEAPPID, args);
+		}
+
 		if ((appModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_REMOTEAPPID.getColumnBitmask()) != 0) {
 			Object[] args = new Object[] { appModelImpl.getOriginalRemoteAppId() };
@@ -2792,7 +2800,7 @@ public class AppPersistenceImpl extends BasePersistenceImpl<App>
 		entityCache.putResult(AppModelImpl.ENTITY_CACHE_ENABLED, AppImpl.class,
 			app.getPrimaryKey(), app, false);
 
-		clearUniqueFindersCache(appModelImpl);
+		clearUniqueFindersCache(appModelImpl, false);
 		cacheUniqueFindersCache(appModelImpl);
 
 		app.resetOriginalValues();

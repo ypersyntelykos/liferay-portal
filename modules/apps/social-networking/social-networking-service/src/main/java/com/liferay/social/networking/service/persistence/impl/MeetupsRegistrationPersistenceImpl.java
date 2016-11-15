@@ -1472,7 +1472,8 @@ public class MeetupsRegistrationPersistenceImpl extends BasePersistenceImpl<Meet
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
-		clearUniqueFindersCache((MeetupsRegistrationModelImpl)meetupsRegistration);
+		clearUniqueFindersCache((MeetupsRegistrationModelImpl)meetupsRegistration,
+			true);
 	}
 
 	@Override
@@ -1485,7 +1486,8 @@ public class MeetupsRegistrationPersistenceImpl extends BasePersistenceImpl<Meet
 				MeetupsRegistrationImpl.class,
 				meetupsRegistration.getPrimaryKey());
 
-			clearUniqueFindersCache((MeetupsRegistrationModelImpl)meetupsRegistration);
+			clearUniqueFindersCache((MeetupsRegistrationModelImpl)meetupsRegistration,
+				true);
 		}
 	}
 
@@ -1503,7 +1505,18 @@ public class MeetupsRegistrationPersistenceImpl extends BasePersistenceImpl<Meet
 	}
 
 	protected void clearUniqueFindersCache(
-		MeetupsRegistrationModelImpl meetupsRegistrationModelImpl) {
+		MeetupsRegistrationModelImpl meetupsRegistrationModelImpl,
+		boolean clearCurrent) {
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					meetupsRegistrationModelImpl.getUserId(),
+					meetupsRegistrationModelImpl.getMeetupsEntryId()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_U_ME, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_U_ME, args);
+		}
+
 		if ((meetupsRegistrationModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_U_ME.getColumnBitmask()) != 0) {
 			Object[] args = new Object[] {
@@ -1728,7 +1741,7 @@ public class MeetupsRegistrationPersistenceImpl extends BasePersistenceImpl<Meet
 			MeetupsRegistrationImpl.class, meetupsRegistration.getPrimaryKey(),
 			meetupsRegistration, false);
 
-		clearUniqueFindersCache(meetupsRegistrationModelImpl);
+		clearUniqueFindersCache(meetupsRegistrationModelImpl, false);
 		cacheUniqueFindersCache(meetupsRegistrationModelImpl);
 
 		meetupsRegistration.resetOriginalValues();

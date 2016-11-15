@@ -2649,7 +2649,7 @@ public class TeamPersistenceImpl extends BasePersistenceImpl<Team>
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
-		clearUniqueFindersCache((TeamModelImpl)team);
+		clearUniqueFindersCache((TeamModelImpl)team, true);
 	}
 
 	@Override
@@ -2661,7 +2661,7 @@ public class TeamPersistenceImpl extends BasePersistenceImpl<Team>
 			entityCache.removeResult(TeamModelImpl.ENTITY_CACHE_ENABLED,
 				TeamImpl.class, team.getPrimaryKey());
 
-			clearUniqueFindersCache((TeamModelImpl)team);
+			clearUniqueFindersCache((TeamModelImpl)team, true);
 		}
 	}
 
@@ -2683,7 +2683,17 @@ public class TeamPersistenceImpl extends BasePersistenceImpl<Team>
 			false);
 	}
 
-	protected void clearUniqueFindersCache(TeamModelImpl teamModelImpl) {
+	protected void clearUniqueFindersCache(TeamModelImpl teamModelImpl,
+		boolean clearCurrent) {
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					teamModelImpl.getUuid(), teamModelImpl.getGroupId()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_UUID_G, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_UUID_G, args);
+		}
+
 		if ((teamModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_UUID_G.getColumnBitmask()) != 0) {
 			Object[] args = new Object[] {
@@ -2693,6 +2703,15 @@ public class TeamPersistenceImpl extends BasePersistenceImpl<Team>
 
 			finderCache.removeResult(FINDER_PATH_COUNT_BY_UUID_G, args);
 			finderCache.removeResult(FINDER_PATH_FETCH_BY_UUID_G, args);
+		}
+
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					teamModelImpl.getGroupId(), teamModelImpl.getName()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_G_N, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_G_N, args);
 		}
 
 		if ((teamModelImpl.getColumnBitmask() &
@@ -2932,7 +2951,7 @@ public class TeamPersistenceImpl extends BasePersistenceImpl<Team>
 		entityCache.putResult(TeamModelImpl.ENTITY_CACHE_ENABLED,
 			TeamImpl.class, team.getPrimaryKey(), team, false);
 
-		clearUniqueFindersCache(teamModelImpl);
+		clearUniqueFindersCache(teamModelImpl, false);
 		cacheUniqueFindersCache(teamModelImpl);
 
 		team.resetOriginalValues();

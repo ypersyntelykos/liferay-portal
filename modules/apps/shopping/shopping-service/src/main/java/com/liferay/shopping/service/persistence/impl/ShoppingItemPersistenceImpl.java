@@ -1989,7 +1989,7 @@ public class ShoppingItemPersistenceImpl extends BasePersistenceImpl<ShoppingIte
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
-		clearUniqueFindersCache((ShoppingItemModelImpl)shoppingItem);
+		clearUniqueFindersCache((ShoppingItemModelImpl)shoppingItem, true);
 	}
 
 	@Override
@@ -2001,7 +2001,7 @@ public class ShoppingItemPersistenceImpl extends BasePersistenceImpl<ShoppingIte
 			entityCache.removeResult(ShoppingItemModelImpl.ENTITY_CACHE_ENABLED,
 				ShoppingItemImpl.class, shoppingItem.getPrimaryKey());
 
-			clearUniqueFindersCache((ShoppingItemModelImpl)shoppingItem);
+			clearUniqueFindersCache((ShoppingItemModelImpl)shoppingItem, true);
 		}
 	}
 
@@ -2040,7 +2040,14 @@ public class ShoppingItemPersistenceImpl extends BasePersistenceImpl<ShoppingIte
 	}
 
 	protected void clearUniqueFindersCache(
-		ShoppingItemModelImpl shoppingItemModelImpl) {
+		ShoppingItemModelImpl shoppingItemModelImpl, boolean clearCurrent) {
+		if (clearCurrent) {
+			Object[] args = new Object[] { shoppingItemModelImpl.getSmallImageId() };
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_SMALLIMAGEID, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_SMALLIMAGEID, args);
+		}
+
 		if ((shoppingItemModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_SMALLIMAGEID.getColumnBitmask()) != 0) {
 			Object[] args = new Object[] {
@@ -2049,6 +2056,15 @@ public class ShoppingItemPersistenceImpl extends BasePersistenceImpl<ShoppingIte
 
 			finderCache.removeResult(FINDER_PATH_COUNT_BY_SMALLIMAGEID, args);
 			finderCache.removeResult(FINDER_PATH_FETCH_BY_SMALLIMAGEID, args);
+		}
+
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					shoppingItemModelImpl.getMediumImageId()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_MEDIUMIMAGEID, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_MEDIUMIMAGEID, args);
 		}
 
 		if ((shoppingItemModelImpl.getColumnBitmask() &
@@ -2061,6 +2077,13 @@ public class ShoppingItemPersistenceImpl extends BasePersistenceImpl<ShoppingIte
 			finderCache.removeResult(FINDER_PATH_FETCH_BY_MEDIUMIMAGEID, args);
 		}
 
+		if (clearCurrent) {
+			Object[] args = new Object[] { shoppingItemModelImpl.getLargeImageId() };
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_LARGEIMAGEID, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_LARGEIMAGEID, args);
+		}
+
 		if ((shoppingItemModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_LARGEIMAGEID.getColumnBitmask()) != 0) {
 			Object[] args = new Object[] {
@@ -2069,6 +2092,16 @@ public class ShoppingItemPersistenceImpl extends BasePersistenceImpl<ShoppingIte
 
 			finderCache.removeResult(FINDER_PATH_COUNT_BY_LARGEIMAGEID, args);
 			finderCache.removeResult(FINDER_PATH_FETCH_BY_LARGEIMAGEID, args);
+		}
+
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					shoppingItemModelImpl.getCompanyId(),
+					shoppingItemModelImpl.getSku()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_C_S, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_C_S, args);
 		}
 
 		if ((shoppingItemModelImpl.getColumnBitmask() &
@@ -2269,7 +2302,7 @@ public class ShoppingItemPersistenceImpl extends BasePersistenceImpl<ShoppingIte
 			ShoppingItemImpl.class, shoppingItem.getPrimaryKey(), shoppingItem,
 			false);
 
-		clearUniqueFindersCache(shoppingItemModelImpl);
+		clearUniqueFindersCache(shoppingItemModelImpl, false);
 		cacheUniqueFindersCache(shoppingItemModelImpl);
 
 		shoppingItem.resetOriginalValues();

@@ -1343,7 +1343,7 @@ public class CompanyPersistenceImpl extends BasePersistenceImpl<Company>
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
-		clearUniqueFindersCache((CompanyModelImpl)company);
+		clearUniqueFindersCache((CompanyModelImpl)company, true);
 	}
 
 	@Override
@@ -1355,7 +1355,7 @@ public class CompanyPersistenceImpl extends BasePersistenceImpl<Company>
 			entityCache.removeResult(CompanyModelImpl.ENTITY_CACHE_ENABLED,
 				CompanyImpl.class, company.getPrimaryKey());
 
-			clearUniqueFindersCache((CompanyModelImpl)company);
+			clearUniqueFindersCache((CompanyModelImpl)company, true);
 		}
 	}
 
@@ -1382,7 +1382,15 @@ public class CompanyPersistenceImpl extends BasePersistenceImpl<Company>
 			companyModelImpl, false);
 	}
 
-	protected void clearUniqueFindersCache(CompanyModelImpl companyModelImpl) {
+	protected void clearUniqueFindersCache(CompanyModelImpl companyModelImpl,
+		boolean clearCurrent) {
+		if (clearCurrent) {
+			Object[] args = new Object[] { companyModelImpl.getWebId() };
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_WEBID, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_WEBID, args);
+		}
+
 		if ((companyModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_WEBID.getColumnBitmask()) != 0) {
 			Object[] args = new Object[] { companyModelImpl.getOriginalWebId() };
@@ -1391,12 +1399,26 @@ public class CompanyPersistenceImpl extends BasePersistenceImpl<Company>
 			finderCache.removeResult(FINDER_PATH_FETCH_BY_WEBID, args);
 		}
 
+		if (clearCurrent) {
+			Object[] args = new Object[] { companyModelImpl.getMx() };
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_MX, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_MX, args);
+		}
+
 		if ((companyModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_MX.getColumnBitmask()) != 0) {
 			Object[] args = new Object[] { companyModelImpl.getOriginalMx() };
 
 			finderCache.removeResult(FINDER_PATH_COUNT_BY_MX, args);
 			finderCache.removeResult(FINDER_PATH_FETCH_BY_MX, args);
+		}
+
+		if (clearCurrent) {
+			Object[] args = new Object[] { companyModelImpl.getLogoId() };
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_LOGOID, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_LOGOID, args);
 		}
 
 		if ((companyModelImpl.getColumnBitmask() &
@@ -1564,7 +1586,7 @@ public class CompanyPersistenceImpl extends BasePersistenceImpl<Company>
 		entityCache.putResult(CompanyModelImpl.ENTITY_CACHE_ENABLED,
 			CompanyImpl.class, company.getPrimaryKey(), company, false);
 
-		clearUniqueFindersCache(companyModelImpl);
+		clearUniqueFindersCache(companyModelImpl, false);
 		cacheUniqueFindersCache(companyModelImpl);
 
 		company.resetOriginalValues();

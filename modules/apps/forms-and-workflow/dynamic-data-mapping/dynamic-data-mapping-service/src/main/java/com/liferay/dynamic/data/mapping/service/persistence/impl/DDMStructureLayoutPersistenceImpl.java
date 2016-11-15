@@ -1770,7 +1770,8 @@ public class DDMStructureLayoutPersistenceImpl extends BasePersistenceImpl<DDMSt
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
-		clearUniqueFindersCache((DDMStructureLayoutModelImpl)ddmStructureLayout);
+		clearUniqueFindersCache((DDMStructureLayoutModelImpl)ddmStructureLayout,
+			true);
 	}
 
 	@Override
@@ -1782,7 +1783,8 @@ public class DDMStructureLayoutPersistenceImpl extends BasePersistenceImpl<DDMSt
 			entityCache.removeResult(DDMStructureLayoutModelImpl.ENTITY_CACHE_ENABLED,
 				DDMStructureLayoutImpl.class, ddmStructureLayout.getPrimaryKey());
 
-			clearUniqueFindersCache((DDMStructureLayoutModelImpl)ddmStructureLayout);
+			clearUniqueFindersCache((DDMStructureLayoutModelImpl)ddmStructureLayout,
+				true);
 		}
 	}
 
@@ -1807,7 +1809,18 @@ public class DDMStructureLayoutPersistenceImpl extends BasePersistenceImpl<DDMSt
 	}
 
 	protected void clearUniqueFindersCache(
-		DDMStructureLayoutModelImpl ddmStructureLayoutModelImpl) {
+		DDMStructureLayoutModelImpl ddmStructureLayoutModelImpl,
+		boolean clearCurrent) {
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					ddmStructureLayoutModelImpl.getUuid(),
+					ddmStructureLayoutModelImpl.getGroupId()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_UUID_G, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_UUID_G, args);
+		}
+
 		if ((ddmStructureLayoutModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_UUID_G.getColumnBitmask()) != 0) {
 			Object[] args = new Object[] {
@@ -1817,6 +1830,17 @@ public class DDMStructureLayoutPersistenceImpl extends BasePersistenceImpl<DDMSt
 
 			finderCache.removeResult(FINDER_PATH_COUNT_BY_UUID_G, args);
 			finderCache.removeResult(FINDER_PATH_FETCH_BY_UUID_G, args);
+		}
+
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					ddmStructureLayoutModelImpl.getStructureVersionId()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_STRUCTUREVERSIONID,
+				args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_STRUCTUREVERSIONID,
+				args);
 		}
 
 		if ((ddmStructureLayoutModelImpl.getColumnBitmask() &
@@ -2049,7 +2073,7 @@ public class DDMStructureLayoutPersistenceImpl extends BasePersistenceImpl<DDMSt
 			DDMStructureLayoutImpl.class, ddmStructureLayout.getPrimaryKey(),
 			ddmStructureLayout, false);
 
-		clearUniqueFindersCache(ddmStructureLayoutModelImpl);
+		clearUniqueFindersCache(ddmStructureLayoutModelImpl, false);
 		cacheUniqueFindersCache(ddmStructureLayoutModelImpl);
 
 		ddmStructureLayout.resetOriginalValues();

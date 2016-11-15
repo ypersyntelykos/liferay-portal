@@ -5746,7 +5746,7 @@ public class SocialRelationPersistenceImpl extends BasePersistenceImpl<SocialRel
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
-		clearUniqueFindersCache((SocialRelationModelImpl)socialRelation);
+		clearUniqueFindersCache((SocialRelationModelImpl)socialRelation, true);
 	}
 
 	@Override
@@ -5758,7 +5758,8 @@ public class SocialRelationPersistenceImpl extends BasePersistenceImpl<SocialRel
 			entityCache.removeResult(SocialRelationModelImpl.ENTITY_CACHE_ENABLED,
 				SocialRelationImpl.class, socialRelation.getPrimaryKey());
 
-			clearUniqueFindersCache((SocialRelationModelImpl)socialRelation);
+			clearUniqueFindersCache((SocialRelationModelImpl)socialRelation,
+				true);
 		}
 	}
 
@@ -5777,7 +5778,18 @@ public class SocialRelationPersistenceImpl extends BasePersistenceImpl<SocialRel
 	}
 
 	protected void clearUniqueFindersCache(
-		SocialRelationModelImpl socialRelationModelImpl) {
+		SocialRelationModelImpl socialRelationModelImpl, boolean clearCurrent) {
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					socialRelationModelImpl.getUserId1(),
+					socialRelationModelImpl.getUserId2(),
+					socialRelationModelImpl.getType()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_U1_U2_T, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_U1_U2_T, args);
+		}
+
 		if ((socialRelationModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_U1_U2_T.getColumnBitmask()) != 0) {
 			Object[] args = new Object[] {
@@ -6135,7 +6147,7 @@ public class SocialRelationPersistenceImpl extends BasePersistenceImpl<SocialRel
 			SocialRelationImpl.class, socialRelation.getPrimaryKey(),
 			socialRelation, false);
 
-		clearUniqueFindersCache(socialRelationModelImpl);
+		clearUniqueFindersCache(socialRelationModelImpl, false);
 		cacheUniqueFindersCache(socialRelationModelImpl);
 
 		socialRelation.resetOriginalValues();

@@ -2215,7 +2215,7 @@ public class KaleoTransitionPersistenceImpl extends BasePersistenceImpl<KaleoTra
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
-		clearUniqueFindersCache((KaleoTransitionModelImpl)kaleoTransition);
+		clearUniqueFindersCache((KaleoTransitionModelImpl)kaleoTransition, true);
 	}
 
 	@Override
@@ -2227,7 +2227,8 @@ public class KaleoTransitionPersistenceImpl extends BasePersistenceImpl<KaleoTra
 			entityCache.removeResult(KaleoTransitionModelImpl.ENTITY_CACHE_ENABLED,
 				KaleoTransitionImpl.class, kaleoTransition.getPrimaryKey());
 
-			clearUniqueFindersCache((KaleoTransitionModelImpl)kaleoTransition);
+			clearUniqueFindersCache((KaleoTransitionModelImpl)kaleoTransition,
+				true);
 		}
 	}
 
@@ -2255,7 +2256,17 @@ public class KaleoTransitionPersistenceImpl extends BasePersistenceImpl<KaleoTra
 	}
 
 	protected void clearUniqueFindersCache(
-		KaleoTransitionModelImpl kaleoTransitionModelImpl) {
+		KaleoTransitionModelImpl kaleoTransitionModelImpl, boolean clearCurrent) {
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					kaleoTransitionModelImpl.getKaleoNodeId(),
+					kaleoTransitionModelImpl.getName()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_KNI_N, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_KNI_N, args);
+		}
+
 		if ((kaleoTransitionModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_KNI_N.getColumnBitmask()) != 0) {
 			Object[] args = new Object[] {
@@ -2265,6 +2276,16 @@ public class KaleoTransitionPersistenceImpl extends BasePersistenceImpl<KaleoTra
 
 			finderCache.removeResult(FINDER_PATH_COUNT_BY_KNI_N, args);
 			finderCache.removeResult(FINDER_PATH_FETCH_BY_KNI_N, args);
+		}
+
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					kaleoTransitionModelImpl.getKaleoNodeId(),
+					kaleoTransitionModelImpl.getDefaultTransition()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_KNI_DT, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_KNI_DT, args);
 		}
 
 		if ((kaleoTransitionModelImpl.getColumnBitmask() &
@@ -2501,7 +2522,7 @@ public class KaleoTransitionPersistenceImpl extends BasePersistenceImpl<KaleoTra
 			KaleoTransitionImpl.class, kaleoTransition.getPrimaryKey(),
 			kaleoTransition, false);
 
-		clearUniqueFindersCache(kaleoTransitionModelImpl);
+		clearUniqueFindersCache(kaleoTransitionModelImpl, false);
 		cacheUniqueFindersCache(kaleoTransitionModelImpl);
 
 		kaleoTransition.resetOriginalValues();

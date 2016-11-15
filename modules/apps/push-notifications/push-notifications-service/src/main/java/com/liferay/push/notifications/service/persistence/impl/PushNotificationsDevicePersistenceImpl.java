@@ -1311,7 +1311,8 @@ public class PushNotificationsDevicePersistenceImpl extends BasePersistenceImpl<
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
-		clearUniqueFindersCache((PushNotificationsDeviceModelImpl)pushNotificationsDevice);
+		clearUniqueFindersCache((PushNotificationsDeviceModelImpl)pushNotificationsDevice,
+			true);
 	}
 
 	@Override
@@ -1325,7 +1326,8 @@ public class PushNotificationsDevicePersistenceImpl extends BasePersistenceImpl<
 				PushNotificationsDeviceImpl.class,
 				pushNotificationsDevice.getPrimaryKey());
 
-			clearUniqueFindersCache((PushNotificationsDeviceModelImpl)pushNotificationsDevice);
+			clearUniqueFindersCache((PushNotificationsDeviceModelImpl)pushNotificationsDevice,
+				true);
 		}
 	}
 
@@ -1340,7 +1342,17 @@ public class PushNotificationsDevicePersistenceImpl extends BasePersistenceImpl<
 	}
 
 	protected void clearUniqueFindersCache(
-		PushNotificationsDeviceModelImpl pushNotificationsDeviceModelImpl) {
+		PushNotificationsDeviceModelImpl pushNotificationsDeviceModelImpl,
+		boolean clearCurrent) {
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					pushNotificationsDeviceModelImpl.getToken()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_TOKEN, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_TOKEN, args);
+		}
+
 		if ((pushNotificationsDeviceModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_TOKEN.getColumnBitmask()) != 0) {
 			Object[] args = new Object[] {
@@ -1520,7 +1532,7 @@ public class PushNotificationsDevicePersistenceImpl extends BasePersistenceImpl<
 			pushNotificationsDevice.getPrimaryKey(), pushNotificationsDevice,
 			false);
 
-		clearUniqueFindersCache(pushNotificationsDeviceModelImpl);
+		clearUniqueFindersCache(pushNotificationsDeviceModelImpl, false);
 		cacheUniqueFindersCache(pushNotificationsDeviceModelImpl);
 
 		pushNotificationsDevice.resetOriginalValues();

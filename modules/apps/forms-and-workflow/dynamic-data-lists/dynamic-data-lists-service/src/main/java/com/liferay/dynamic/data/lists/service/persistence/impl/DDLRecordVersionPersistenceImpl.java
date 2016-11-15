@@ -1467,7 +1467,8 @@ public class DDLRecordVersionPersistenceImpl extends BasePersistenceImpl<DDLReco
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
-		clearUniqueFindersCache((DDLRecordVersionModelImpl)ddlRecordVersion);
+		clearUniqueFindersCache((DDLRecordVersionModelImpl)ddlRecordVersion,
+			true);
 	}
 
 	@Override
@@ -1479,7 +1480,8 @@ public class DDLRecordVersionPersistenceImpl extends BasePersistenceImpl<DDLReco
 			entityCache.removeResult(DDLRecordVersionModelImpl.ENTITY_CACHE_ENABLED,
 				DDLRecordVersionImpl.class, ddlRecordVersion.getPrimaryKey());
 
-			clearUniqueFindersCache((DDLRecordVersionModelImpl)ddlRecordVersion);
+			clearUniqueFindersCache((DDLRecordVersionModelImpl)ddlRecordVersion,
+				true);
 		}
 	}
 
@@ -1497,7 +1499,18 @@ public class DDLRecordVersionPersistenceImpl extends BasePersistenceImpl<DDLReco
 	}
 
 	protected void clearUniqueFindersCache(
-		DDLRecordVersionModelImpl ddlRecordVersionModelImpl) {
+		DDLRecordVersionModelImpl ddlRecordVersionModelImpl,
+		boolean clearCurrent) {
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					ddlRecordVersionModelImpl.getRecordId(),
+					ddlRecordVersionModelImpl.getVersion()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_R_V, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_R_V, args);
+		}
+
 		if ((ddlRecordVersionModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_R_V.getColumnBitmask()) != 0) {
 			Object[] args = new Object[] {
@@ -1692,7 +1705,7 @@ public class DDLRecordVersionPersistenceImpl extends BasePersistenceImpl<DDLReco
 			DDLRecordVersionImpl.class, ddlRecordVersion.getPrimaryKey(),
 			ddlRecordVersion, false);
 
-		clearUniqueFindersCache(ddlRecordVersionModelImpl);
+		clearUniqueFindersCache(ddlRecordVersionModelImpl, false);
 		cacheUniqueFindersCache(ddlRecordVersionModelImpl);
 
 		ddlRecordVersion.resetOriginalValues();

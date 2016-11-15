@@ -1387,7 +1387,7 @@ public class KaleoTaskPersistenceImpl extends BasePersistenceImpl<KaleoTask>
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
-		clearUniqueFindersCache((KaleoTaskModelImpl)kaleoTask);
+		clearUniqueFindersCache((KaleoTaskModelImpl)kaleoTask, true);
 	}
 
 	@Override
@@ -1399,7 +1399,7 @@ public class KaleoTaskPersistenceImpl extends BasePersistenceImpl<KaleoTask>
 			entityCache.removeResult(KaleoTaskModelImpl.ENTITY_CACHE_ENABLED,
 				KaleoTaskImpl.class, kaleoTask.getPrimaryKey());
 
-			clearUniqueFindersCache((KaleoTaskModelImpl)kaleoTask);
+			clearUniqueFindersCache((KaleoTaskModelImpl)kaleoTask, true);
 		}
 	}
 
@@ -1414,7 +1414,14 @@ public class KaleoTaskPersistenceImpl extends BasePersistenceImpl<KaleoTask>
 	}
 
 	protected void clearUniqueFindersCache(
-		KaleoTaskModelImpl kaleoTaskModelImpl) {
+		KaleoTaskModelImpl kaleoTaskModelImpl, boolean clearCurrent) {
+		if (clearCurrent) {
+			Object[] args = new Object[] { kaleoTaskModelImpl.getKaleoNodeId() };
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_KALEONODEID, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_KALEONODEID, args);
+		}
+
 		if ((kaleoTaskModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_KALEONODEID.getColumnBitmask()) != 0) {
 			Object[] args = new Object[] {
@@ -1625,7 +1632,7 @@ public class KaleoTaskPersistenceImpl extends BasePersistenceImpl<KaleoTask>
 		entityCache.putResult(KaleoTaskModelImpl.ENTITY_CACHE_ENABLED,
 			KaleoTaskImpl.class, kaleoTask.getPrimaryKey(), kaleoTask, false);
 
-		clearUniqueFindersCache(kaleoTaskModelImpl);
+		clearUniqueFindersCache(kaleoTaskModelImpl, false);
 		cacheUniqueFindersCache(kaleoTaskModelImpl);
 
 		kaleoTask.resetOriginalValues();

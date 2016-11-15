@@ -2096,7 +2096,8 @@ public class SocialActivityLimitPersistenceImpl extends BasePersistenceImpl<Soci
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
-		clearUniqueFindersCache((SocialActivityLimitModelImpl)socialActivityLimit);
+		clearUniqueFindersCache((SocialActivityLimitModelImpl)socialActivityLimit,
+			true);
 	}
 
 	@Override
@@ -2109,7 +2110,8 @@ public class SocialActivityLimitPersistenceImpl extends BasePersistenceImpl<Soci
 				SocialActivityLimitImpl.class,
 				socialActivityLimit.getPrimaryKey());
 
-			clearUniqueFindersCache((SocialActivityLimitModelImpl)socialActivityLimit);
+			clearUniqueFindersCache((SocialActivityLimitModelImpl)socialActivityLimit,
+				true);
 		}
 	}
 
@@ -2131,7 +2133,22 @@ public class SocialActivityLimitPersistenceImpl extends BasePersistenceImpl<Soci
 	}
 
 	protected void clearUniqueFindersCache(
-		SocialActivityLimitModelImpl socialActivityLimitModelImpl) {
+		SocialActivityLimitModelImpl socialActivityLimitModelImpl,
+		boolean clearCurrent) {
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					socialActivityLimitModelImpl.getGroupId(),
+					socialActivityLimitModelImpl.getUserId(),
+					socialActivityLimitModelImpl.getClassNameId(),
+					socialActivityLimitModelImpl.getClassPK(),
+					socialActivityLimitModelImpl.getActivityType(),
+					socialActivityLimitModelImpl.getActivityCounterName()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_G_U_C_C_A_A, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_G_U_C_C_A_A, args);
+		}
+
 		if ((socialActivityLimitModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_G_U_C_C_A_A.getColumnBitmask()) != 0) {
 			Object[] args = new Object[] {
@@ -2349,7 +2366,7 @@ public class SocialActivityLimitPersistenceImpl extends BasePersistenceImpl<Soci
 			SocialActivityLimitImpl.class, socialActivityLimit.getPrimaryKey(),
 			socialActivityLimit, false);
 
-		clearUniqueFindersCache(socialActivityLimitModelImpl);
+		clearUniqueFindersCache(socialActivityLimitModelImpl, false);
 		cacheUniqueFindersCache(socialActivityLimitModelImpl);
 
 		socialActivityLimit.resetOriginalValues();

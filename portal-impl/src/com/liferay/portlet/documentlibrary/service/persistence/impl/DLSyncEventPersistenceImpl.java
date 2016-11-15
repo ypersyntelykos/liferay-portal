@@ -854,7 +854,7 @@ public class DLSyncEventPersistenceImpl extends BasePersistenceImpl<DLSyncEvent>
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
-		clearUniqueFindersCache((DLSyncEventModelImpl)dlSyncEvent);
+		clearUniqueFindersCache((DLSyncEventModelImpl)dlSyncEvent, true);
 	}
 
 	@Override
@@ -866,7 +866,7 @@ public class DLSyncEventPersistenceImpl extends BasePersistenceImpl<DLSyncEvent>
 			entityCache.removeResult(DLSyncEventModelImpl.ENTITY_CACHE_ENABLED,
 				DLSyncEventImpl.class, dlSyncEvent.getPrimaryKey());
 
-			clearUniqueFindersCache((DLSyncEventModelImpl)dlSyncEvent);
+			clearUniqueFindersCache((DLSyncEventModelImpl)dlSyncEvent, true);
 		}
 	}
 
@@ -881,7 +881,14 @@ public class DLSyncEventPersistenceImpl extends BasePersistenceImpl<DLSyncEvent>
 	}
 
 	protected void clearUniqueFindersCache(
-		DLSyncEventModelImpl dlSyncEventModelImpl) {
+		DLSyncEventModelImpl dlSyncEventModelImpl, boolean clearCurrent) {
+		if (clearCurrent) {
+			Object[] args = new Object[] { dlSyncEventModelImpl.getTypePK() };
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_TYPEPK, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_TYPEPK, args);
+		}
+
 		if ((dlSyncEventModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_TYPEPK.getColumnBitmask()) != 0) {
 			Object[] args = new Object[] {
@@ -1034,7 +1041,7 @@ public class DLSyncEventPersistenceImpl extends BasePersistenceImpl<DLSyncEvent>
 			DLSyncEventImpl.class, dlSyncEvent.getPrimaryKey(), dlSyncEvent,
 			false);
 
-		clearUniqueFindersCache(dlSyncEventModelImpl);
+		clearUniqueFindersCache(dlSyncEventModelImpl, false);
 		cacheUniqueFindersCache(dlSyncEventModelImpl);
 
 		dlSyncEvent.resetOriginalValues();

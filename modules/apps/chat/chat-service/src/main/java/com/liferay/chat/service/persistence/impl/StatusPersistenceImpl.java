@@ -1899,7 +1899,7 @@ public class StatusPersistenceImpl extends BasePersistenceImpl<Status>
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
-		clearUniqueFindersCache((StatusModelImpl)status);
+		clearUniqueFindersCache((StatusModelImpl)status, true);
 	}
 
 	@Override
@@ -1911,7 +1911,7 @@ public class StatusPersistenceImpl extends BasePersistenceImpl<Status>
 			entityCache.removeResult(StatusModelImpl.ENTITY_CACHE_ENABLED,
 				StatusImpl.class, status.getPrimaryKey());
 
-			clearUniqueFindersCache((StatusModelImpl)status);
+			clearUniqueFindersCache((StatusModelImpl)status, true);
 		}
 	}
 
@@ -1924,7 +1924,15 @@ public class StatusPersistenceImpl extends BasePersistenceImpl<Status>
 			statusModelImpl, false);
 	}
 
-	protected void clearUniqueFindersCache(StatusModelImpl statusModelImpl) {
+	protected void clearUniqueFindersCache(StatusModelImpl statusModelImpl,
+		boolean clearCurrent) {
+		if (clearCurrent) {
+			Object[] args = new Object[] { statusModelImpl.getUserId() };
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_USERID, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_USERID, args);
+		}
+
 		if ((statusModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_USERID.getColumnBitmask()) != 0) {
 			Object[] args = new Object[] { statusModelImpl.getOriginalUserId() };
@@ -2125,7 +2133,7 @@ public class StatusPersistenceImpl extends BasePersistenceImpl<Status>
 		entityCache.putResult(StatusModelImpl.ENTITY_CACHE_ENABLED,
 			StatusImpl.class, status.getPrimaryKey(), status, false);
 
-		clearUniqueFindersCache(statusModelImpl);
+		clearUniqueFindersCache(statusModelImpl, false);
 		cacheUniqueFindersCache(statusModelImpl);
 
 		status.resetOriginalValues();

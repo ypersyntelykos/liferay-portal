@@ -427,7 +427,7 @@ public class FeedPersistenceImpl extends BasePersistenceImpl<Feed>
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
-		clearUniqueFindersCache((FeedModelImpl)feed);
+		clearUniqueFindersCache((FeedModelImpl)feed, true);
 	}
 
 	@Override
@@ -439,7 +439,7 @@ public class FeedPersistenceImpl extends BasePersistenceImpl<Feed>
 			entityCache.removeResult(FeedModelImpl.ENTITY_CACHE_ENABLED,
 				FeedImpl.class, feed.getPrimaryKey());
 
-			clearUniqueFindersCache((FeedModelImpl)feed);
+			clearUniqueFindersCache((FeedModelImpl)feed, true);
 		}
 	}
 
@@ -454,7 +454,18 @@ public class FeedPersistenceImpl extends BasePersistenceImpl<Feed>
 			false);
 	}
 
-	protected void clearUniqueFindersCache(FeedModelImpl feedModelImpl) {
+	protected void clearUniqueFindersCache(FeedModelImpl feedModelImpl,
+		boolean clearCurrent) {
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					feedModelImpl.getUserId(),
+					feedModelImpl.getTwitterScreenName()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_U_TSN, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_U_TSN, args);
+		}
+
 		if ((feedModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_U_TSN.getColumnBitmask()) != 0) {
 			Object[] args = new Object[] {
@@ -626,7 +637,7 @@ public class FeedPersistenceImpl extends BasePersistenceImpl<Feed>
 		entityCache.putResult(FeedModelImpl.ENTITY_CACHE_ENABLED,
 			FeedImpl.class, feed.getPrimaryKey(), feed, false);
 
-		clearUniqueFindersCache(feedModelImpl);
+		clearUniqueFindersCache(feedModelImpl, false);
 		cacheUniqueFindersCache(feedModelImpl);
 
 		feed.resetOriginalValues();

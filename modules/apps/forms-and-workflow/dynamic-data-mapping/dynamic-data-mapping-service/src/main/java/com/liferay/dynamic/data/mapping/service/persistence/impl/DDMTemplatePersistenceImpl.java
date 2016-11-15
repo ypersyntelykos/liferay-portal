@@ -11954,7 +11954,7 @@ public class DDMTemplatePersistenceImpl extends BasePersistenceImpl<DDMTemplate>
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
-		clearUniqueFindersCache((DDMTemplateModelImpl)ddmTemplate);
+		clearUniqueFindersCache((DDMTemplateModelImpl)ddmTemplate, true);
 	}
 
 	@Override
@@ -11966,7 +11966,7 @@ public class DDMTemplatePersistenceImpl extends BasePersistenceImpl<DDMTemplate>
 			entityCache.removeResult(DDMTemplateModelImpl.ENTITY_CACHE_ENABLED,
 				DDMTemplateImpl.class, ddmTemplate.getPrimaryKey());
 
-			clearUniqueFindersCache((DDMTemplateModelImpl)ddmTemplate);
+			clearUniqueFindersCache((DDMTemplateModelImpl)ddmTemplate, true);
 		}
 	}
 
@@ -12002,7 +12002,17 @@ public class DDMTemplatePersistenceImpl extends BasePersistenceImpl<DDMTemplate>
 	}
 
 	protected void clearUniqueFindersCache(
-		DDMTemplateModelImpl ddmTemplateModelImpl) {
+		DDMTemplateModelImpl ddmTemplateModelImpl, boolean clearCurrent) {
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					ddmTemplateModelImpl.getUuid(),
+					ddmTemplateModelImpl.getGroupId()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_UUID_G, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_UUID_G, args);
+		}
+
 		if ((ddmTemplateModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_UUID_G.getColumnBitmask()) != 0) {
 			Object[] args = new Object[] {
@@ -12014,6 +12024,13 @@ public class DDMTemplatePersistenceImpl extends BasePersistenceImpl<DDMTemplate>
 			finderCache.removeResult(FINDER_PATH_FETCH_BY_UUID_G, args);
 		}
 
+		if (clearCurrent) {
+			Object[] args = new Object[] { ddmTemplateModelImpl.getSmallImageId() };
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_SMALLIMAGEID, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_SMALLIMAGEID, args);
+		}
+
 		if ((ddmTemplateModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_SMALLIMAGEID.getColumnBitmask()) != 0) {
 			Object[] args = new Object[] {
@@ -12022,6 +12039,17 @@ public class DDMTemplatePersistenceImpl extends BasePersistenceImpl<DDMTemplate>
 
 			finderCache.removeResult(FINDER_PATH_COUNT_BY_SMALLIMAGEID, args);
 			finderCache.removeResult(FINDER_PATH_FETCH_BY_SMALLIMAGEID, args);
+		}
+
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					ddmTemplateModelImpl.getGroupId(),
+					ddmTemplateModelImpl.getClassNameId(),
+					ddmTemplateModelImpl.getTemplateKey()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_G_C_T, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_G_C_T, args);
 		}
 
 		if ((ddmTemplateModelImpl.getColumnBitmask() &
@@ -12475,7 +12503,7 @@ public class DDMTemplatePersistenceImpl extends BasePersistenceImpl<DDMTemplate>
 			DDMTemplateImpl.class, ddmTemplate.getPrimaryKey(), ddmTemplate,
 			false);
 
-		clearUniqueFindersCache(ddmTemplateModelImpl);
+		clearUniqueFindersCache(ddmTemplateModelImpl, false);
 		cacheUniqueFindersCache(ddmTemplateModelImpl);
 
 		ddmTemplate.resetOriginalValues();

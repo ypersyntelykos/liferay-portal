@@ -2008,7 +2008,7 @@ public class DDMStorageLinkPersistenceImpl extends BasePersistenceImpl<DDMStorag
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
-		clearUniqueFindersCache((DDMStorageLinkModelImpl)ddmStorageLink);
+		clearUniqueFindersCache((DDMStorageLinkModelImpl)ddmStorageLink, true);
 	}
 
 	@Override
@@ -2020,7 +2020,8 @@ public class DDMStorageLinkPersistenceImpl extends BasePersistenceImpl<DDMStorag
 			entityCache.removeResult(DDMStorageLinkModelImpl.ENTITY_CACHE_ENABLED,
 				DDMStorageLinkImpl.class, ddmStorageLink.getPrimaryKey());
 
-			clearUniqueFindersCache((DDMStorageLinkModelImpl)ddmStorageLink);
+			clearUniqueFindersCache((DDMStorageLinkModelImpl)ddmStorageLink,
+				true);
 		}
 	}
 
@@ -2035,7 +2036,14 @@ public class DDMStorageLinkPersistenceImpl extends BasePersistenceImpl<DDMStorag
 	}
 
 	protected void clearUniqueFindersCache(
-		DDMStorageLinkModelImpl ddmStorageLinkModelImpl) {
+		DDMStorageLinkModelImpl ddmStorageLinkModelImpl, boolean clearCurrent) {
+		if (clearCurrent) {
+			Object[] args = new Object[] { ddmStorageLinkModelImpl.getClassPK() };
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_CLASSPK, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_CLASSPK, args);
+		}
+
 		if ((ddmStorageLinkModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_CLASSPK.getColumnBitmask()) != 0) {
 			Object[] args = new Object[] {
@@ -2256,7 +2264,7 @@ public class DDMStorageLinkPersistenceImpl extends BasePersistenceImpl<DDMStorag
 			DDMStorageLinkImpl.class, ddmStorageLink.getPrimaryKey(),
 			ddmStorageLink, false);
 
-		clearUniqueFindersCache(ddmStorageLinkModelImpl);
+		clearUniqueFindersCache(ddmStorageLinkModelImpl, false);
 		cacheUniqueFindersCache(ddmStorageLinkModelImpl);
 
 		ddmStorageLink.resetOriginalValues();

@@ -8562,7 +8562,7 @@ public class RolePersistenceImpl extends BasePersistenceImpl<Role>
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
-		clearUniqueFindersCache((RoleModelImpl)role);
+		clearUniqueFindersCache((RoleModelImpl)role, true);
 	}
 
 	@Override
@@ -8574,7 +8574,7 @@ public class RolePersistenceImpl extends BasePersistenceImpl<Role>
 			entityCache.removeResult(RoleModelImpl.ENTITY_CACHE_ENABLED,
 				RoleImpl.class, role.getPrimaryKey());
 
-			clearUniqueFindersCache((RoleModelImpl)role);
+			clearUniqueFindersCache((RoleModelImpl)role, true);
 		}
 	}
 
@@ -8599,7 +8599,17 @@ public class RolePersistenceImpl extends BasePersistenceImpl<Role>
 			false);
 	}
 
-	protected void clearUniqueFindersCache(RoleModelImpl roleModelImpl) {
+	protected void clearUniqueFindersCache(RoleModelImpl roleModelImpl,
+		boolean clearCurrent) {
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					roleModelImpl.getCompanyId(), roleModelImpl.getName()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_C_N, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_C_N, args);
+		}
+
 		if ((roleModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_C_N.getColumnBitmask()) != 0) {
 			Object[] args = new Object[] {
@@ -8609,6 +8619,16 @@ public class RolePersistenceImpl extends BasePersistenceImpl<Role>
 
 			finderCache.removeResult(FINDER_PATH_COUNT_BY_C_N, args);
 			finderCache.removeResult(FINDER_PATH_FETCH_BY_C_N, args);
+		}
+
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					roleModelImpl.getCompanyId(), roleModelImpl.getClassNameId(),
+					roleModelImpl.getClassPK()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_C_C_C, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_C_C_C, args);
 		}
 
 		if ((roleModelImpl.getColumnBitmask() &
@@ -8936,7 +8956,7 @@ public class RolePersistenceImpl extends BasePersistenceImpl<Role>
 		entityCache.putResult(RoleModelImpl.ENTITY_CACHE_ENABLED,
 			RoleImpl.class, role.getPrimaryKey(), role, false);
 
-		clearUniqueFindersCache(roleModelImpl);
+		clearUniqueFindersCache(roleModelImpl, false);
 		cacheUniqueFindersCache(roleModelImpl);
 
 		role.resetOriginalValues();

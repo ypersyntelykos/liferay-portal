@@ -3806,7 +3806,7 @@ public class AssetEntryPersistenceImpl extends BasePersistenceImpl<AssetEntry>
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
-		clearUniqueFindersCache((AssetEntryModelImpl)assetEntry);
+		clearUniqueFindersCache((AssetEntryModelImpl)assetEntry, true);
 	}
 
 	@Override
@@ -3818,7 +3818,7 @@ public class AssetEntryPersistenceImpl extends BasePersistenceImpl<AssetEntry>
 			entityCache.removeResult(AssetEntryModelImpl.ENTITY_CACHE_ENABLED,
 				AssetEntryImpl.class, assetEntry.getPrimaryKey());
 
-			clearUniqueFindersCache((AssetEntryModelImpl)assetEntry);
+			clearUniqueFindersCache((AssetEntryModelImpl)assetEntry, true);
 		}
 	}
 
@@ -3846,7 +3846,17 @@ public class AssetEntryPersistenceImpl extends BasePersistenceImpl<AssetEntry>
 	}
 
 	protected void clearUniqueFindersCache(
-		AssetEntryModelImpl assetEntryModelImpl) {
+		AssetEntryModelImpl assetEntryModelImpl, boolean clearCurrent) {
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					assetEntryModelImpl.getGroupId(),
+					assetEntryModelImpl.getClassUuid()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_G_CU, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_G_CU, args);
+		}
+
 		if ((assetEntryModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_G_CU.getColumnBitmask()) != 0) {
 			Object[] args = new Object[] {
@@ -3856,6 +3866,16 @@ public class AssetEntryPersistenceImpl extends BasePersistenceImpl<AssetEntry>
 
 			finderCache.removeResult(FINDER_PATH_COUNT_BY_G_CU, args);
 			finderCache.removeResult(FINDER_PATH_FETCH_BY_G_CU, args);
+		}
+
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					assetEntryModelImpl.getClassNameId(),
+					assetEntryModelImpl.getClassPK()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_C_C, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_C_C, args);
 		}
 
 		if ((assetEntryModelImpl.getColumnBitmask() &
@@ -4142,7 +4162,7 @@ public class AssetEntryPersistenceImpl extends BasePersistenceImpl<AssetEntry>
 		entityCache.putResult(AssetEntryModelImpl.ENTITY_CACHE_ENABLED,
 			AssetEntryImpl.class, assetEntry.getPrimaryKey(), assetEntry, false);
 
-		clearUniqueFindersCache(assetEntryModelImpl);
+		clearUniqueFindersCache(assetEntryModelImpl, false);
 		cacheUniqueFindersCache(assetEntryModelImpl);
 
 		assetEntry.resetOriginalValues();

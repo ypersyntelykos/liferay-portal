@@ -1382,7 +1382,7 @@ public class ExpandoRowPersistenceImpl extends BasePersistenceImpl<ExpandoRow>
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
-		clearUniqueFindersCache((ExpandoRowModelImpl)expandoRow);
+		clearUniqueFindersCache((ExpandoRowModelImpl)expandoRow, true);
 	}
 
 	@Override
@@ -1394,7 +1394,7 @@ public class ExpandoRowPersistenceImpl extends BasePersistenceImpl<ExpandoRow>
 			entityCache.removeResult(ExpandoRowModelImpl.ENTITY_CACHE_ENABLED,
 				ExpandoRowImpl.class, expandoRow.getPrimaryKey());
 
-			clearUniqueFindersCache((ExpandoRowModelImpl)expandoRow);
+			clearUniqueFindersCache((ExpandoRowModelImpl)expandoRow, true);
 		}
 	}
 
@@ -1412,7 +1412,17 @@ public class ExpandoRowPersistenceImpl extends BasePersistenceImpl<ExpandoRow>
 	}
 
 	protected void clearUniqueFindersCache(
-		ExpandoRowModelImpl expandoRowModelImpl) {
+		ExpandoRowModelImpl expandoRowModelImpl, boolean clearCurrent) {
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					expandoRowModelImpl.getTableId(),
+					expandoRowModelImpl.getClassPK()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_T_C, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_T_C, args);
+		}
+
 		if ((expandoRowModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_T_C.getColumnBitmask()) != 0) {
 			Object[] args = new Object[] {
@@ -1600,7 +1610,7 @@ public class ExpandoRowPersistenceImpl extends BasePersistenceImpl<ExpandoRow>
 		entityCache.putResult(ExpandoRowModelImpl.ENTITY_CACHE_ENABLED,
 			ExpandoRowImpl.class, expandoRow.getPrimaryKey(), expandoRow, false);
 
-		clearUniqueFindersCache(expandoRowModelImpl);
+		clearUniqueFindersCache(expandoRowModelImpl, false);
 		cacheUniqueFindersCache(expandoRowModelImpl);
 
 		expandoRow.resetOriginalValues();

@@ -1931,7 +1931,8 @@ public class RecentLayoutSetBranchPersistenceImpl extends BasePersistenceImpl<Re
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
-		clearUniqueFindersCache((RecentLayoutSetBranchModelImpl)recentLayoutSetBranch);
+		clearUniqueFindersCache((RecentLayoutSetBranchModelImpl)recentLayoutSetBranch,
+			true);
 	}
 
 	@Override
@@ -1944,7 +1945,8 @@ public class RecentLayoutSetBranchPersistenceImpl extends BasePersistenceImpl<Re
 				RecentLayoutSetBranchImpl.class,
 				recentLayoutSetBranch.getPrimaryKey());
 
-			clearUniqueFindersCache((RecentLayoutSetBranchModelImpl)recentLayoutSetBranch);
+			clearUniqueFindersCache((RecentLayoutSetBranchModelImpl)recentLayoutSetBranch,
+				true);
 		}
 	}
 
@@ -1962,7 +1964,18 @@ public class RecentLayoutSetBranchPersistenceImpl extends BasePersistenceImpl<Re
 	}
 
 	protected void clearUniqueFindersCache(
-		RecentLayoutSetBranchModelImpl recentLayoutSetBranchModelImpl) {
+		RecentLayoutSetBranchModelImpl recentLayoutSetBranchModelImpl,
+		boolean clearCurrent) {
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					recentLayoutSetBranchModelImpl.getUserId(),
+					recentLayoutSetBranchModelImpl.getLayoutSetId()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_U_L, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_U_L, args);
+		}
+
 		if ((recentLayoutSetBranchModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_U_L.getColumnBitmask()) != 0) {
 			Object[] args = new Object[] {
@@ -2176,7 +2189,7 @@ public class RecentLayoutSetBranchPersistenceImpl extends BasePersistenceImpl<Re
 			RecentLayoutSetBranchImpl.class,
 			recentLayoutSetBranch.getPrimaryKey(), recentLayoutSetBranch, false);
 
-		clearUniqueFindersCache(recentLayoutSetBranchModelImpl);
+		clearUniqueFindersCache(recentLayoutSetBranchModelImpl, false);
 		cacheUniqueFindersCache(recentLayoutSetBranchModelImpl);
 
 		recentLayoutSetBranch.resetOriginalValues();

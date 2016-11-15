@@ -1735,7 +1735,7 @@ public class MemberRequestPersistenceImpl extends BasePersistenceImpl<MemberRequ
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
-		clearUniqueFindersCache((MemberRequestModelImpl)memberRequest);
+		clearUniqueFindersCache((MemberRequestModelImpl)memberRequest, true);
 	}
 
 	@Override
@@ -1747,7 +1747,7 @@ public class MemberRequestPersistenceImpl extends BasePersistenceImpl<MemberRequ
 			entityCache.removeResult(MemberRequestModelImpl.ENTITY_CACHE_ENABLED,
 				MemberRequestImpl.class, memberRequest.getPrimaryKey());
 
-			clearUniqueFindersCache((MemberRequestModelImpl)memberRequest);
+			clearUniqueFindersCache((MemberRequestModelImpl)memberRequest, true);
 		}
 	}
 
@@ -1773,13 +1773,31 @@ public class MemberRequestPersistenceImpl extends BasePersistenceImpl<MemberRequ
 	}
 
 	protected void clearUniqueFindersCache(
-		MemberRequestModelImpl memberRequestModelImpl) {
+		MemberRequestModelImpl memberRequestModelImpl, boolean clearCurrent) {
+		if (clearCurrent) {
+			Object[] args = new Object[] { memberRequestModelImpl.getKey() };
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_KEY, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_KEY, args);
+		}
+
 		if ((memberRequestModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_KEY.getColumnBitmask()) != 0) {
 			Object[] args = new Object[] { memberRequestModelImpl.getOriginalKey() };
 
 			finderCache.removeResult(FINDER_PATH_COUNT_BY_KEY, args);
 			finderCache.removeResult(FINDER_PATH_FETCH_BY_KEY, args);
+		}
+
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					memberRequestModelImpl.getGroupId(),
+					memberRequestModelImpl.getReceiverUserId(),
+					memberRequestModelImpl.getStatus()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_G_R_S, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_G_R_S, args);
 		}
 
 		if ((memberRequestModelImpl.getColumnBitmask() &
@@ -2002,7 +2020,7 @@ public class MemberRequestPersistenceImpl extends BasePersistenceImpl<MemberRequ
 			MemberRequestImpl.class, memberRequest.getPrimaryKey(),
 			memberRequest, false);
 
-		clearUniqueFindersCache(memberRequestModelImpl);
+		clearUniqueFindersCache(memberRequestModelImpl, false);
 		cacheUniqueFindersCache(memberRequestModelImpl);
 
 		memberRequest.resetOriginalValues();

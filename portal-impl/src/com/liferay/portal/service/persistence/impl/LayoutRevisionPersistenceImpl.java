@@ -5937,7 +5937,7 @@ public class LayoutRevisionPersistenceImpl extends BasePersistenceImpl<LayoutRev
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
-		clearUniqueFindersCache((LayoutRevisionModelImpl)layoutRevision);
+		clearUniqueFindersCache((LayoutRevisionModelImpl)layoutRevision, true);
 	}
 
 	@Override
@@ -5949,7 +5949,8 @@ public class LayoutRevisionPersistenceImpl extends BasePersistenceImpl<LayoutRev
 			entityCache.removeResult(LayoutRevisionModelImpl.ENTITY_CACHE_ENABLED,
 				LayoutRevisionImpl.class, layoutRevision.getPrimaryKey());
 
-			clearUniqueFindersCache((LayoutRevisionModelImpl)layoutRevision);
+			clearUniqueFindersCache((LayoutRevisionModelImpl)layoutRevision,
+				true);
 		}
 	}
 
@@ -5968,7 +5969,18 @@ public class LayoutRevisionPersistenceImpl extends BasePersistenceImpl<LayoutRev
 	}
 
 	protected void clearUniqueFindersCache(
-		LayoutRevisionModelImpl layoutRevisionModelImpl) {
+		LayoutRevisionModelImpl layoutRevisionModelImpl, boolean clearCurrent) {
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					layoutRevisionModelImpl.getLayoutSetBranchId(),
+					layoutRevisionModelImpl.getHead(),
+					layoutRevisionModelImpl.getPlid()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_L_H_P, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_L_H_P, args);
+		}
+
 		if ((layoutRevisionModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_L_H_P.getColumnBitmask()) != 0) {
 			Object[] args = new Object[] {
@@ -6340,7 +6352,7 @@ public class LayoutRevisionPersistenceImpl extends BasePersistenceImpl<LayoutRev
 			LayoutRevisionImpl.class, layoutRevision.getPrimaryKey(),
 			layoutRevision, false);
 
-		clearUniqueFindersCache(layoutRevisionModelImpl);
+		clearUniqueFindersCache(layoutRevisionModelImpl, false);
 		cacheUniqueFindersCache(layoutRevisionModelImpl);
 
 		layoutRevision.resetOriginalValues();

@@ -1425,7 +1425,7 @@ public class TrashVersionPersistenceImpl extends BasePersistenceImpl<TrashVersio
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
-		clearUniqueFindersCache((TrashVersionModelImpl)trashVersion);
+		clearUniqueFindersCache((TrashVersionModelImpl)trashVersion, true);
 	}
 
 	@Override
@@ -1437,7 +1437,7 @@ public class TrashVersionPersistenceImpl extends BasePersistenceImpl<TrashVersio
 			entityCache.removeResult(TrashVersionModelImpl.ENTITY_CACHE_ENABLED,
 				TrashVersionImpl.class, trashVersion.getPrimaryKey());
 
-			clearUniqueFindersCache((TrashVersionModelImpl)trashVersion);
+			clearUniqueFindersCache((TrashVersionModelImpl)trashVersion, true);
 		}
 	}
 
@@ -1455,7 +1455,17 @@ public class TrashVersionPersistenceImpl extends BasePersistenceImpl<TrashVersio
 	}
 
 	protected void clearUniqueFindersCache(
-		TrashVersionModelImpl trashVersionModelImpl) {
+		TrashVersionModelImpl trashVersionModelImpl, boolean clearCurrent) {
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					trashVersionModelImpl.getClassNameId(),
+					trashVersionModelImpl.getClassPK()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_C_C, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_C_C, args);
+		}
+
 		if ((trashVersionModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_C_C.getColumnBitmask()) != 0) {
 			Object[] args = new Object[] {
@@ -1649,7 +1659,7 @@ public class TrashVersionPersistenceImpl extends BasePersistenceImpl<TrashVersio
 			TrashVersionImpl.class, trashVersion.getPrimaryKey(), trashVersion,
 			false);
 
-		clearUniqueFindersCache(trashVersionModelImpl);
+		clearUniqueFindersCache(trashVersionModelImpl, false);
 		cacheUniqueFindersCache(trashVersionModelImpl);
 
 		trashVersion.resetOriginalValues();

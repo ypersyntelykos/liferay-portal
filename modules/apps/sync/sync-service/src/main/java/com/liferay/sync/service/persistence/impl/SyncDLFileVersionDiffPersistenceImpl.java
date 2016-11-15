@@ -1480,7 +1480,8 @@ public class SyncDLFileVersionDiffPersistenceImpl extends BasePersistenceImpl<Sy
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
-		clearUniqueFindersCache((SyncDLFileVersionDiffModelImpl)syncDLFileVersionDiff);
+		clearUniqueFindersCache((SyncDLFileVersionDiffModelImpl)syncDLFileVersionDiff,
+			true);
 	}
 
 	@Override
@@ -1493,7 +1494,8 @@ public class SyncDLFileVersionDiffPersistenceImpl extends BasePersistenceImpl<Sy
 				SyncDLFileVersionDiffImpl.class,
 				syncDLFileVersionDiff.getPrimaryKey());
 
-			clearUniqueFindersCache((SyncDLFileVersionDiffModelImpl)syncDLFileVersionDiff);
+			clearUniqueFindersCache((SyncDLFileVersionDiffModelImpl)syncDLFileVersionDiff,
+				true);
 		}
 	}
 
@@ -1512,7 +1514,19 @@ public class SyncDLFileVersionDiffPersistenceImpl extends BasePersistenceImpl<Sy
 	}
 
 	protected void clearUniqueFindersCache(
-		SyncDLFileVersionDiffModelImpl syncDLFileVersionDiffModelImpl) {
+		SyncDLFileVersionDiffModelImpl syncDLFileVersionDiffModelImpl,
+		boolean clearCurrent) {
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					syncDLFileVersionDiffModelImpl.getFileEntryId(),
+					syncDLFileVersionDiffModelImpl.getSourceFileVersionId(),
+					syncDLFileVersionDiffModelImpl.getTargetFileVersionId()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_F_S_T, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_F_S_T, args);
+		}
+
 		if ((syncDLFileVersionDiffModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_F_S_T.getColumnBitmask()) != 0) {
 			Object[] args = new Object[] {
@@ -1689,7 +1703,7 @@ public class SyncDLFileVersionDiffPersistenceImpl extends BasePersistenceImpl<Sy
 			SyncDLFileVersionDiffImpl.class,
 			syncDLFileVersionDiff.getPrimaryKey(), syncDLFileVersionDiff, false);
 
-		clearUniqueFindersCache(syncDLFileVersionDiffModelImpl);
+		clearUniqueFindersCache(syncDLFileVersionDiffModelImpl, false);
 		cacheUniqueFindersCache(syncDLFileVersionDiffModelImpl);
 
 		syncDLFileVersionDiff.resetOriginalValues();

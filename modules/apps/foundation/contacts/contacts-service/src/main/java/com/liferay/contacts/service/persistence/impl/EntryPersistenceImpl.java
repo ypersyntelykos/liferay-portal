@@ -920,7 +920,7 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
-		clearUniqueFindersCache((EntryModelImpl)entry);
+		clearUniqueFindersCache((EntryModelImpl)entry, true);
 	}
 
 	@Override
@@ -932,7 +932,7 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 			entityCache.removeResult(EntryModelImpl.ENTITY_CACHE_ENABLED,
 				EntryImpl.class, entry.getPrimaryKey());
 
-			clearUniqueFindersCache((EntryModelImpl)entry);
+			clearUniqueFindersCache((EntryModelImpl)entry, true);
 		}
 	}
 
@@ -947,7 +947,17 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 			false);
 	}
 
-	protected void clearUniqueFindersCache(EntryModelImpl entryModelImpl) {
+	protected void clearUniqueFindersCache(EntryModelImpl entryModelImpl,
+		boolean clearCurrent) {
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					entryModelImpl.getUserId(), entryModelImpl.getEmailAddress()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_U_EA, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_U_EA, args);
+		}
+
 		if ((entryModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_U_EA.getColumnBitmask()) != 0) {
 			Object[] args = new Object[] {
@@ -1137,7 +1147,7 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 		entityCache.putResult(EntryModelImpl.ENTITY_CACHE_ENABLED,
 			EntryImpl.class, entry.getPrimaryKey(), entry, false);
 
-		clearUniqueFindersCache(entryModelImpl);
+		clearUniqueFindersCache(entryModelImpl, false);
 		cacheUniqueFindersCache(entryModelImpl);
 
 		entry.resetOriginalValues();

@@ -925,7 +925,7 @@ public class FolderPersistenceImpl extends BasePersistenceImpl<Folder>
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
-		clearUniqueFindersCache((FolderModelImpl)folder);
+		clearUniqueFindersCache((FolderModelImpl)folder, true);
 	}
 
 	@Override
@@ -937,7 +937,7 @@ public class FolderPersistenceImpl extends BasePersistenceImpl<Folder>
 			entityCache.removeResult(FolderModelImpl.ENTITY_CACHE_ENABLED,
 				FolderImpl.class, folder.getPrimaryKey());
 
-			clearUniqueFindersCache((FolderModelImpl)folder);
+			clearUniqueFindersCache((FolderModelImpl)folder, true);
 		}
 	}
 
@@ -952,7 +952,18 @@ public class FolderPersistenceImpl extends BasePersistenceImpl<Folder>
 			false);
 	}
 
-	protected void clearUniqueFindersCache(FolderModelImpl folderModelImpl) {
+	protected void clearUniqueFindersCache(FolderModelImpl folderModelImpl,
+		boolean clearCurrent) {
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					folderModelImpl.getAccountId(),
+					folderModelImpl.getFullName()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_A_F, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_A_F, args);
+		}
+
 		if ((folderModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_A_F.getColumnBitmask()) != 0) {
 			Object[] args = new Object[] {
@@ -1144,7 +1155,7 @@ public class FolderPersistenceImpl extends BasePersistenceImpl<Folder>
 		entityCache.putResult(FolderModelImpl.ENTITY_CACHE_ENABLED,
 			FolderImpl.class, folder.getPrimaryKey(), folder, false);
 
-		clearUniqueFindersCache(folderModelImpl);
+		clearUniqueFindersCache(folderModelImpl, false);
 		cacheUniqueFindersCache(folderModelImpl);
 
 		folder.resetOriginalValues();

@@ -2965,7 +2965,7 @@ public class SubscriptionPersistenceImpl extends BasePersistenceImpl<Subscriptio
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
-		clearUniqueFindersCache((SubscriptionModelImpl)subscription);
+		clearUniqueFindersCache((SubscriptionModelImpl)subscription, true);
 	}
 
 	@Override
@@ -2977,7 +2977,7 @@ public class SubscriptionPersistenceImpl extends BasePersistenceImpl<Subscriptio
 			entityCache.removeResult(SubscriptionModelImpl.ENTITY_CACHE_ENABLED,
 				SubscriptionImpl.class, subscription.getPrimaryKey());
 
-			clearUniqueFindersCache((SubscriptionModelImpl)subscription);
+			clearUniqueFindersCache((SubscriptionModelImpl)subscription, true);
 		}
 	}
 
@@ -2997,7 +2997,19 @@ public class SubscriptionPersistenceImpl extends BasePersistenceImpl<Subscriptio
 	}
 
 	protected void clearUniqueFindersCache(
-		SubscriptionModelImpl subscriptionModelImpl) {
+		SubscriptionModelImpl subscriptionModelImpl, boolean clearCurrent) {
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					subscriptionModelImpl.getCompanyId(),
+					subscriptionModelImpl.getUserId(),
+					subscriptionModelImpl.getClassNameId(),
+					subscriptionModelImpl.getClassPK()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_C_U_C_C, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_C_U_C_C, args);
+		}
+
 		if ((subscriptionModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_C_U_C_C.getColumnBitmask()) != 0) {
 			Object[] args = new Object[] {
@@ -3285,7 +3297,7 @@ public class SubscriptionPersistenceImpl extends BasePersistenceImpl<Subscriptio
 			SubscriptionImpl.class, subscription.getPrimaryKey(), subscription,
 			false);
 
-		clearUniqueFindersCache(subscriptionModelImpl);
+		clearUniqueFindersCache(subscriptionModelImpl, false);
 		cacheUniqueFindersCache(subscriptionModelImpl);
 
 		subscription.resetOriginalValues();

@@ -1396,7 +1396,7 @@ public class MessagePersistenceImpl extends BasePersistenceImpl<Message>
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
-		clearUniqueFindersCache((MessageModelImpl)message);
+		clearUniqueFindersCache((MessageModelImpl)message, true);
 	}
 
 	@Override
@@ -1408,7 +1408,7 @@ public class MessagePersistenceImpl extends BasePersistenceImpl<Message>
 			entityCache.removeResult(MessageModelImpl.ENTITY_CACHE_ENABLED,
 				MessageImpl.class, message.getPrimaryKey());
 
-			clearUniqueFindersCache((MessageModelImpl)message);
+			clearUniqueFindersCache((MessageModelImpl)message, true);
 		}
 	}
 
@@ -1424,7 +1424,18 @@ public class MessagePersistenceImpl extends BasePersistenceImpl<Message>
 			false);
 	}
 
-	protected void clearUniqueFindersCache(MessageModelImpl messageModelImpl) {
+	protected void clearUniqueFindersCache(MessageModelImpl messageModelImpl,
+		boolean clearCurrent) {
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					messageModelImpl.getFolderId(),
+					messageModelImpl.getRemoteMessageId()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_F_R, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_F_R, args);
+		}
+
 		if ((messageModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_F_R.getColumnBitmask()) != 0) {
 			Object[] args = new Object[] {
@@ -1634,7 +1645,7 @@ public class MessagePersistenceImpl extends BasePersistenceImpl<Message>
 		entityCache.putResult(MessageModelImpl.ENTITY_CACHE_ENABLED,
 			MessageImpl.class, message.getPrimaryKey(), message, false);
 
-		clearUniqueFindersCache(messageModelImpl);
+		clearUniqueFindersCache(messageModelImpl, false);
 		cacheUniqueFindersCache(messageModelImpl);
 
 		message.resetOriginalValues();

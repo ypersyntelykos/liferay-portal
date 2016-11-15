@@ -4929,7 +4929,8 @@ public class LayoutFriendlyURLPersistenceImpl extends BasePersistenceImpl<Layout
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
-		clearUniqueFindersCache((LayoutFriendlyURLModelImpl)layoutFriendlyURL);
+		clearUniqueFindersCache((LayoutFriendlyURLModelImpl)layoutFriendlyURL,
+			true);
 	}
 
 	@Override
@@ -4941,7 +4942,8 @@ public class LayoutFriendlyURLPersistenceImpl extends BasePersistenceImpl<Layout
 			entityCache.removeResult(LayoutFriendlyURLModelImpl.ENTITY_CACHE_ENABLED,
 				LayoutFriendlyURLImpl.class, layoutFriendlyURL.getPrimaryKey());
 
-			clearUniqueFindersCache((LayoutFriendlyURLModelImpl)layoutFriendlyURL);
+			clearUniqueFindersCache((LayoutFriendlyURLModelImpl)layoutFriendlyURL,
+				true);
 		}
 	}
 
@@ -4981,7 +4983,18 @@ public class LayoutFriendlyURLPersistenceImpl extends BasePersistenceImpl<Layout
 	}
 
 	protected void clearUniqueFindersCache(
-		LayoutFriendlyURLModelImpl layoutFriendlyURLModelImpl) {
+		LayoutFriendlyURLModelImpl layoutFriendlyURLModelImpl,
+		boolean clearCurrent) {
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					layoutFriendlyURLModelImpl.getUuid(),
+					layoutFriendlyURLModelImpl.getGroupId()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_UUID_G, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_UUID_G, args);
+		}
+
 		if ((layoutFriendlyURLModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_UUID_G.getColumnBitmask()) != 0) {
 			Object[] args = new Object[] {
@@ -4993,6 +5006,16 @@ public class LayoutFriendlyURLPersistenceImpl extends BasePersistenceImpl<Layout
 			finderCache.removeResult(FINDER_PATH_FETCH_BY_UUID_G, args);
 		}
 
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					layoutFriendlyURLModelImpl.getPlid(),
+					layoutFriendlyURLModelImpl.getLanguageId()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_P_L, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_P_L, args);
+		}
+
 		if ((layoutFriendlyURLModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_P_L.getColumnBitmask()) != 0) {
 			Object[] args = new Object[] {
@@ -5002,6 +5025,18 @@ public class LayoutFriendlyURLPersistenceImpl extends BasePersistenceImpl<Layout
 
 			finderCache.removeResult(FINDER_PATH_COUNT_BY_P_L, args);
 			finderCache.removeResult(FINDER_PATH_FETCH_BY_P_L, args);
+		}
+
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					layoutFriendlyURLModelImpl.getGroupId(),
+					layoutFriendlyURLModelImpl.getPrivateLayout(),
+					layoutFriendlyURLModelImpl.getFriendlyURL(),
+					layoutFriendlyURLModelImpl.getLanguageId()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_G_P_F_L, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_G_P_F_L, args);
 		}
 
 		if ((layoutFriendlyURLModelImpl.getColumnBitmask() &
@@ -5329,7 +5364,7 @@ public class LayoutFriendlyURLPersistenceImpl extends BasePersistenceImpl<Layout
 			LayoutFriendlyURLImpl.class, layoutFriendlyURL.getPrimaryKey(),
 			layoutFriendlyURL, false);
 
-		clearUniqueFindersCache(layoutFriendlyURLModelImpl);
+		clearUniqueFindersCache(layoutFriendlyURLModelImpl, false);
 		cacheUniqueFindersCache(layoutFriendlyURLModelImpl);
 
 		layoutFriendlyURL.resetOriginalValues();

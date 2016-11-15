@@ -3030,7 +3030,7 @@ public class AssetLinkPersistenceImpl extends BasePersistenceImpl<AssetLink>
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
-		clearUniqueFindersCache((AssetLinkModelImpl)assetLink);
+		clearUniqueFindersCache((AssetLinkModelImpl)assetLink, true);
 	}
 
 	@Override
@@ -3042,7 +3042,7 @@ public class AssetLinkPersistenceImpl extends BasePersistenceImpl<AssetLink>
 			entityCache.removeResult(AssetLinkModelImpl.ENTITY_CACHE_ENABLED,
 				AssetLinkImpl.class, assetLink.getPrimaryKey());
 
-			clearUniqueFindersCache((AssetLinkModelImpl)assetLink);
+			clearUniqueFindersCache((AssetLinkModelImpl)assetLink, true);
 		}
 	}
 
@@ -3060,7 +3060,18 @@ public class AssetLinkPersistenceImpl extends BasePersistenceImpl<AssetLink>
 	}
 
 	protected void clearUniqueFindersCache(
-		AssetLinkModelImpl assetLinkModelImpl) {
+		AssetLinkModelImpl assetLinkModelImpl, boolean clearCurrent) {
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					assetLinkModelImpl.getEntryId1(),
+					assetLinkModelImpl.getEntryId2(),
+					assetLinkModelImpl.getType()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_E_E_T, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_E_E_T, args);
+		}
+
 		if ((assetLinkModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_E_E_T.getColumnBitmask()) != 0) {
 			Object[] args = new Object[] {
@@ -3312,7 +3323,7 @@ public class AssetLinkPersistenceImpl extends BasePersistenceImpl<AssetLink>
 		entityCache.putResult(AssetLinkModelImpl.ENTITY_CACHE_ENABLED,
 			AssetLinkImpl.class, assetLink.getPrimaryKey(), assetLink, false);
 
-		clearUniqueFindersCache(assetLinkModelImpl);
+		clearUniqueFindersCache(assetLinkModelImpl, false);
 		cacheUniqueFindersCache(assetLinkModelImpl);
 
 		assetLink.resetOriginalValues();

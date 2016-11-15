@@ -7412,7 +7412,7 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
-		clearUniqueFindersCache((UserModelImpl)user);
+		clearUniqueFindersCache((UserModelImpl)user, true);
 	}
 
 	@Override
@@ -7424,7 +7424,7 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 			entityCache.removeResult(UserModelImpl.ENTITY_CACHE_ENABLED,
 				UserImpl.class, user.getPrimaryKey());
 
-			clearUniqueFindersCache((UserModelImpl)user);
+			clearUniqueFindersCache((UserModelImpl)user, true);
 		}
 	}
 
@@ -7507,7 +7507,15 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 			false);
 	}
 
-	protected void clearUniqueFindersCache(UserModelImpl userModelImpl) {
+	protected void clearUniqueFindersCache(UserModelImpl userModelImpl,
+		boolean clearCurrent) {
+		if (clearCurrent) {
+			Object[] args = new Object[] { userModelImpl.getContactId() };
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_CONTACTID, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_CONTACTID, args);
+		}
+
 		if ((userModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_CONTACTID.getColumnBitmask()) != 0) {
 			Object[] args = new Object[] { userModelImpl.getOriginalContactId() };
@@ -7516,12 +7524,28 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 			finderCache.removeResult(FINDER_PATH_FETCH_BY_CONTACTID, args);
 		}
 
+		if (clearCurrent) {
+			Object[] args = new Object[] { userModelImpl.getPortraitId() };
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_PORTRAITID, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_PORTRAITID, args);
+		}
+
 		if ((userModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_PORTRAITID.getColumnBitmask()) != 0) {
 			Object[] args = new Object[] { userModelImpl.getOriginalPortraitId() };
 
 			finderCache.removeResult(FINDER_PATH_COUNT_BY_PORTRAITID, args);
 			finderCache.removeResult(FINDER_PATH_FETCH_BY_PORTRAITID, args);
+		}
+
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					userModelImpl.getCompanyId(), userModelImpl.getUserId()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_C_U, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_C_U, args);
 		}
 
 		if ((userModelImpl.getColumnBitmask() &
@@ -7535,6 +7559,15 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 			finderCache.removeResult(FINDER_PATH_FETCH_BY_C_U, args);
 		}
 
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					userModelImpl.getCompanyId(), userModelImpl.getDefaultUser()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_C_DU, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_C_DU, args);
+		}
+
 		if ((userModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_C_DU.getColumnBitmask()) != 0) {
 			Object[] args = new Object[] {
@@ -7544,6 +7577,15 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 
 			finderCache.removeResult(FINDER_PATH_COUNT_BY_C_DU, args);
 			finderCache.removeResult(FINDER_PATH_FETCH_BY_C_DU, args);
+		}
+
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					userModelImpl.getCompanyId(), userModelImpl.getScreenName()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_C_SN, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_C_SN, args);
 		}
 
 		if ((userModelImpl.getColumnBitmask() &
@@ -7557,6 +7599,16 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 			finderCache.removeResult(FINDER_PATH_FETCH_BY_C_SN, args);
 		}
 
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					userModelImpl.getCompanyId(),
+					userModelImpl.getEmailAddress()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_C_EA, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_C_EA, args);
+		}
+
 		if ((userModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_C_EA.getColumnBitmask()) != 0) {
 			Object[] args = new Object[] {
@@ -7566,6 +7618,15 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 
 			finderCache.removeResult(FINDER_PATH_COUNT_BY_C_EA, args);
 			finderCache.removeResult(FINDER_PATH_FETCH_BY_C_EA, args);
+		}
+
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					userModelImpl.getCompanyId(), userModelImpl.getFacebookId()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_C_FID, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_C_FID, args);
 		}
 
 		if ((userModelImpl.getColumnBitmask() &
@@ -7579,6 +7640,16 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 			finderCache.removeResult(FINDER_PATH_FETCH_BY_C_FID, args);
 		}
 
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					userModelImpl.getCompanyId(),
+					userModelImpl.getGoogleUserId()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_C_GUID, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_C_GUID, args);
+		}
+
 		if ((userModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_C_GUID.getColumnBitmask()) != 0) {
 			Object[] args = new Object[] {
@@ -7588,6 +7659,15 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 
 			finderCache.removeResult(FINDER_PATH_COUNT_BY_C_GUID, args);
 			finderCache.removeResult(FINDER_PATH_FETCH_BY_C_GUID, args);
+		}
+
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					userModelImpl.getCompanyId(), userModelImpl.getOpenId()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_C_O, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_C_O, args);
 		}
 
 		if ((userModelImpl.getColumnBitmask() &
@@ -7960,7 +8040,7 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 		entityCache.putResult(UserModelImpl.ENTITY_CACHE_ENABLED,
 			UserImpl.class, user.getPrimaryKey(), user, false);
 
-		clearUniqueFindersCache(userModelImpl);
+		clearUniqueFindersCache(userModelImpl, false);
 		cacheUniqueFindersCache(userModelImpl);
 
 		user.resetOriginalValues();

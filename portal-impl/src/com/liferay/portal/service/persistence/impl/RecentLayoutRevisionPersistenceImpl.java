@@ -1958,7 +1958,8 @@ public class RecentLayoutRevisionPersistenceImpl extends BasePersistenceImpl<Rec
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
-		clearUniqueFindersCache((RecentLayoutRevisionModelImpl)recentLayoutRevision);
+		clearUniqueFindersCache((RecentLayoutRevisionModelImpl)recentLayoutRevision,
+			true);
 	}
 
 	@Override
@@ -1971,7 +1972,8 @@ public class RecentLayoutRevisionPersistenceImpl extends BasePersistenceImpl<Rec
 				RecentLayoutRevisionImpl.class,
 				recentLayoutRevision.getPrimaryKey());
 
-			clearUniqueFindersCache((RecentLayoutRevisionModelImpl)recentLayoutRevision);
+			clearUniqueFindersCache((RecentLayoutRevisionModelImpl)recentLayoutRevision,
+				true);
 		}
 	}
 
@@ -1990,7 +1992,19 @@ public class RecentLayoutRevisionPersistenceImpl extends BasePersistenceImpl<Rec
 	}
 
 	protected void clearUniqueFindersCache(
-		RecentLayoutRevisionModelImpl recentLayoutRevisionModelImpl) {
+		RecentLayoutRevisionModelImpl recentLayoutRevisionModelImpl,
+		boolean clearCurrent) {
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					recentLayoutRevisionModelImpl.getUserId(),
+					recentLayoutRevisionModelImpl.getLayoutSetBranchId(),
+					recentLayoutRevisionModelImpl.getPlid()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_U_L_P, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_U_L_P, args);
+		}
+
 		if ((recentLayoutRevisionModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_U_L_P.getColumnBitmask()) != 0) {
 			Object[] args = new Object[] {
@@ -2205,7 +2219,7 @@ public class RecentLayoutRevisionPersistenceImpl extends BasePersistenceImpl<Rec
 			RecentLayoutRevisionImpl.class,
 			recentLayoutRevision.getPrimaryKey(), recentLayoutRevision, false);
 
-		clearUniqueFindersCache(recentLayoutRevisionModelImpl);
+		clearUniqueFindersCache(recentLayoutRevisionModelImpl, false);
 		cacheUniqueFindersCache(recentLayoutRevisionModelImpl);
 
 		recentLayoutRevision.resetOriginalValues();

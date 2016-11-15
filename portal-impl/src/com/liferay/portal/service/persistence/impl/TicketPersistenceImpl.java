@@ -979,7 +979,7 @@ public class TicketPersistenceImpl extends BasePersistenceImpl<Ticket>
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
-		clearUniqueFindersCache((TicketModelImpl)ticket);
+		clearUniqueFindersCache((TicketModelImpl)ticket, true);
 	}
 
 	@Override
@@ -991,7 +991,7 @@ public class TicketPersistenceImpl extends BasePersistenceImpl<Ticket>
 			entityCache.removeResult(TicketModelImpl.ENTITY_CACHE_ENABLED,
 				TicketImpl.class, ticket.getPrimaryKey());
 
-			clearUniqueFindersCache((TicketModelImpl)ticket);
+			clearUniqueFindersCache((TicketModelImpl)ticket, true);
 		}
 	}
 
@@ -1004,7 +1004,15 @@ public class TicketPersistenceImpl extends BasePersistenceImpl<Ticket>
 			false);
 	}
 
-	protected void clearUniqueFindersCache(TicketModelImpl ticketModelImpl) {
+	protected void clearUniqueFindersCache(TicketModelImpl ticketModelImpl,
+		boolean clearCurrent) {
+		if (clearCurrent) {
+			Object[] args = new Object[] { ticketModelImpl.getKey() };
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_KEY, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_KEY, args);
+		}
+
 		if ((ticketModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_KEY.getColumnBitmask()) != 0) {
 			Object[] args = new Object[] { ticketModelImpl.getOriginalKey() };
@@ -1176,7 +1184,7 @@ public class TicketPersistenceImpl extends BasePersistenceImpl<Ticket>
 		entityCache.putResult(TicketModelImpl.ENTITY_CACHE_ENABLED,
 			TicketImpl.class, ticket.getPrimaryKey(), ticket, false);
 
-		clearUniqueFindersCache(ticketModelImpl);
+		clearUniqueFindersCache(ticketModelImpl, false);
 		cacheUniqueFindersCache(ticketModelImpl);
 
 		ticket.resetOriginalValues();

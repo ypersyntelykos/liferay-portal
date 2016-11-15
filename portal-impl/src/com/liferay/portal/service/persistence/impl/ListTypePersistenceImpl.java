@@ -993,7 +993,7 @@ public class ListTypePersistenceImpl extends BasePersistenceImpl<ListType>
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
-		clearUniqueFindersCache((ListTypeModelImpl)listType);
+		clearUniqueFindersCache((ListTypeModelImpl)listType, true);
 	}
 
 	@Override
@@ -1005,7 +1005,7 @@ public class ListTypePersistenceImpl extends BasePersistenceImpl<ListType>
 			entityCache.removeResult(ListTypeModelImpl.ENTITY_CACHE_ENABLED,
 				ListTypeImpl.class, listType.getPrimaryKey());
 
-			clearUniqueFindersCache((ListTypeModelImpl)listType);
+			clearUniqueFindersCache((ListTypeModelImpl)listType, true);
 		}
 	}
 
@@ -1020,7 +1020,17 @@ public class ListTypePersistenceImpl extends BasePersistenceImpl<ListType>
 			listTypeModelImpl, false);
 	}
 
-	protected void clearUniqueFindersCache(ListTypeModelImpl listTypeModelImpl) {
+	protected void clearUniqueFindersCache(
+		ListTypeModelImpl listTypeModelImpl, boolean clearCurrent) {
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					listTypeModelImpl.getName(), listTypeModelImpl.getType()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_N_T, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_N_T, args);
+		}
+
 		if ((listTypeModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_N_T.getColumnBitmask()) != 0) {
 			Object[] args = new Object[] {
@@ -1188,7 +1198,7 @@ public class ListTypePersistenceImpl extends BasePersistenceImpl<ListType>
 		entityCache.putResult(ListTypeModelImpl.ENTITY_CACHE_ENABLED,
 			ListTypeImpl.class, listType.getPrimaryKey(), listType, false);
 
-		clearUniqueFindersCache(listTypeModelImpl);
+		clearUniqueFindersCache(listTypeModelImpl, false);
 		cacheUniqueFindersCache(listTypeModelImpl);
 
 		listType.resetOriginalValues();

@@ -989,7 +989,7 @@ public class ResourceActionPersistenceImpl extends BasePersistenceImpl<ResourceA
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
-		clearUniqueFindersCache((ResourceActionModelImpl)resourceAction);
+		clearUniqueFindersCache((ResourceActionModelImpl)resourceAction, true);
 	}
 
 	@Override
@@ -1001,7 +1001,8 @@ public class ResourceActionPersistenceImpl extends BasePersistenceImpl<ResourceA
 			entityCache.removeResult(ResourceActionModelImpl.ENTITY_CACHE_ENABLED,
 				ResourceActionImpl.class, resourceAction.getPrimaryKey());
 
-			clearUniqueFindersCache((ResourceActionModelImpl)resourceAction);
+			clearUniqueFindersCache((ResourceActionModelImpl)resourceAction,
+				true);
 		}
 	}
 
@@ -1019,7 +1020,17 @@ public class ResourceActionPersistenceImpl extends BasePersistenceImpl<ResourceA
 	}
 
 	protected void clearUniqueFindersCache(
-		ResourceActionModelImpl resourceActionModelImpl) {
+		ResourceActionModelImpl resourceActionModelImpl, boolean clearCurrent) {
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					resourceActionModelImpl.getName(),
+					resourceActionModelImpl.getActionId()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_N_A, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_N_A, args);
+		}
+
 		if ((resourceActionModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_N_A.getColumnBitmask()) != 0) {
 			Object[] args = new Object[] {
@@ -1191,7 +1202,7 @@ public class ResourceActionPersistenceImpl extends BasePersistenceImpl<ResourceA
 			ResourceActionImpl.class, resourceAction.getPrimaryKey(),
 			resourceAction, false);
 
-		clearUniqueFindersCache(resourceActionModelImpl);
+		clearUniqueFindersCache(resourceActionModelImpl, false);
 		cacheUniqueFindersCache(resourceActionModelImpl);
 
 		resourceAction.resetOriginalValues();

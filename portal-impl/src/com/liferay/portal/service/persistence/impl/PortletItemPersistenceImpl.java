@@ -1682,7 +1682,7 @@ public class PortletItemPersistenceImpl extends BasePersistenceImpl<PortletItem>
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
-		clearUniqueFindersCache((PortletItemModelImpl)portletItem);
+		clearUniqueFindersCache((PortletItemModelImpl)portletItem, true);
 	}
 
 	@Override
@@ -1694,7 +1694,7 @@ public class PortletItemPersistenceImpl extends BasePersistenceImpl<PortletItem>
 			entityCache.removeResult(PortletItemModelImpl.ENTITY_CACHE_ENABLED,
 				PortletItemImpl.class, portletItem.getPrimaryKey());
 
-			clearUniqueFindersCache((PortletItemModelImpl)portletItem);
+			clearUniqueFindersCache((PortletItemModelImpl)portletItem, true);
 		}
 	}
 
@@ -1714,7 +1714,19 @@ public class PortletItemPersistenceImpl extends BasePersistenceImpl<PortletItem>
 	}
 
 	protected void clearUniqueFindersCache(
-		PortletItemModelImpl portletItemModelImpl) {
+		PortletItemModelImpl portletItemModelImpl, boolean clearCurrent) {
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					portletItemModelImpl.getGroupId(),
+					portletItemModelImpl.getName(),
+					portletItemModelImpl.getPortletId(),
+					portletItemModelImpl.getClassNameId()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_G_N_P_C, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_G_N_P_C, args);
+		}
+
 		if ((portletItemModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_G_N_P_C.getColumnBitmask()) != 0) {
 			Object[] args = new Object[] {
@@ -1939,7 +1951,7 @@ public class PortletItemPersistenceImpl extends BasePersistenceImpl<PortletItem>
 			PortletItemImpl.class, portletItem.getPrimaryKey(), portletItem,
 			false);
 
-		clearUniqueFindersCache(portletItemModelImpl);
+		clearUniqueFindersCache(portletItemModelImpl, false);
 		cacheUniqueFindersCache(portletItemModelImpl);
 
 		portletItem.resetOriginalValues();

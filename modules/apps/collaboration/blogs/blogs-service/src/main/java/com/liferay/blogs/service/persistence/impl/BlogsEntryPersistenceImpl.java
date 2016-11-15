@@ -20900,7 +20900,7 @@ public class BlogsEntryPersistenceImpl extends BasePersistenceImpl<BlogsEntry>
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
-		clearUniqueFindersCache((BlogsEntryModelImpl)blogsEntry);
+		clearUniqueFindersCache((BlogsEntryModelImpl)blogsEntry, true);
 	}
 
 	@Override
@@ -20912,7 +20912,7 @@ public class BlogsEntryPersistenceImpl extends BasePersistenceImpl<BlogsEntry>
 			entityCache.removeResult(BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
 				BlogsEntryImpl.class, blogsEntry.getPrimaryKey());
 
-			clearUniqueFindersCache((BlogsEntryModelImpl)blogsEntry);
+			clearUniqueFindersCache((BlogsEntryModelImpl)blogsEntry, true);
 		}
 	}
 
@@ -20939,7 +20939,17 @@ public class BlogsEntryPersistenceImpl extends BasePersistenceImpl<BlogsEntry>
 	}
 
 	protected void clearUniqueFindersCache(
-		BlogsEntryModelImpl blogsEntryModelImpl) {
+		BlogsEntryModelImpl blogsEntryModelImpl, boolean clearCurrent) {
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					blogsEntryModelImpl.getUuid(),
+					blogsEntryModelImpl.getGroupId()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_UUID_G, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_UUID_G, args);
+		}
+
 		if ((blogsEntryModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_UUID_G.getColumnBitmask()) != 0) {
 			Object[] args = new Object[] {
@@ -20949,6 +20959,16 @@ public class BlogsEntryPersistenceImpl extends BasePersistenceImpl<BlogsEntry>
 
 			finderCache.removeResult(FINDER_PATH_COUNT_BY_UUID_G, args);
 			finderCache.removeResult(FINDER_PATH_FETCH_BY_UUID_G, args);
+		}
+
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					blogsEntryModelImpl.getGroupId(),
+					blogsEntryModelImpl.getUrlTitle()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_G_UT, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_G_UT, args);
 		}
 
 		if ((blogsEntryModelImpl.getColumnBitmask() &
@@ -21370,7 +21390,7 @@ public class BlogsEntryPersistenceImpl extends BasePersistenceImpl<BlogsEntry>
 		entityCache.putResult(BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
 			BlogsEntryImpl.class, blogsEntry.getPrimaryKey(), blogsEntry, false);
 
-		clearUniqueFindersCache(blogsEntryModelImpl);
+		clearUniqueFindersCache(blogsEntryModelImpl, false);
 		cacheUniqueFindersCache(blogsEntryModelImpl);
 
 		blogsEntry.resetOriginalValues();

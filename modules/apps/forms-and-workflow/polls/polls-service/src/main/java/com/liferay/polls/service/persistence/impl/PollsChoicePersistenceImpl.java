@@ -2313,7 +2313,7 @@ public class PollsChoicePersistenceImpl extends BasePersistenceImpl<PollsChoice>
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
-		clearUniqueFindersCache((PollsChoiceModelImpl)pollsChoice);
+		clearUniqueFindersCache((PollsChoiceModelImpl)pollsChoice, true);
 	}
 
 	@Override
@@ -2325,7 +2325,7 @@ public class PollsChoicePersistenceImpl extends BasePersistenceImpl<PollsChoice>
 			entityCache.removeResult(PollsChoiceModelImpl.ENTITY_CACHE_ENABLED,
 				PollsChoiceImpl.class, pollsChoice.getPrimaryKey());
 
-			clearUniqueFindersCache((PollsChoiceModelImpl)pollsChoice);
+			clearUniqueFindersCache((PollsChoiceModelImpl)pollsChoice, true);
 		}
 	}
 
@@ -2353,7 +2353,17 @@ public class PollsChoicePersistenceImpl extends BasePersistenceImpl<PollsChoice>
 	}
 
 	protected void clearUniqueFindersCache(
-		PollsChoiceModelImpl pollsChoiceModelImpl) {
+		PollsChoiceModelImpl pollsChoiceModelImpl, boolean clearCurrent) {
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					pollsChoiceModelImpl.getUuid(),
+					pollsChoiceModelImpl.getGroupId()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_UUID_G, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_UUID_G, args);
+		}
+
 		if ((pollsChoiceModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_UUID_G.getColumnBitmask()) != 0) {
 			Object[] args = new Object[] {
@@ -2363,6 +2373,16 @@ public class PollsChoicePersistenceImpl extends BasePersistenceImpl<PollsChoice>
 
 			finderCache.removeResult(FINDER_PATH_COUNT_BY_UUID_G, args);
 			finderCache.removeResult(FINDER_PATH_FETCH_BY_UUID_G, args);
+		}
+
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					pollsChoiceModelImpl.getQuestionId(),
+					pollsChoiceModelImpl.getName()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_Q_N, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_Q_N, args);
 		}
 
 		if ((pollsChoiceModelImpl.getColumnBitmask() &
@@ -2607,7 +2627,7 @@ public class PollsChoicePersistenceImpl extends BasePersistenceImpl<PollsChoice>
 			PollsChoiceImpl.class, pollsChoice.getPrimaryKey(), pollsChoice,
 			false);
 
-		clearUniqueFindersCache(pollsChoiceModelImpl);
+		clearUniqueFindersCache(pollsChoiceModelImpl, false);
 		cacheUniqueFindersCache(pollsChoiceModelImpl);
 
 		pollsChoice.resetOriginalValues();

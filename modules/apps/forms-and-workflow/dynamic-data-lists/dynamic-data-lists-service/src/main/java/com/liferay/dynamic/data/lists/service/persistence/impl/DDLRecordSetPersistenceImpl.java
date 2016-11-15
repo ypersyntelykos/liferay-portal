@@ -3132,7 +3132,7 @@ public class DDLRecordSetPersistenceImpl extends BasePersistenceImpl<DDLRecordSe
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
-		clearUniqueFindersCache((DDLRecordSetModelImpl)ddlRecordSet);
+		clearUniqueFindersCache((DDLRecordSetModelImpl)ddlRecordSet, true);
 	}
 
 	@Override
@@ -3144,7 +3144,7 @@ public class DDLRecordSetPersistenceImpl extends BasePersistenceImpl<DDLRecordSe
 			entityCache.removeResult(DDLRecordSetModelImpl.ENTITY_CACHE_ENABLED,
 				DDLRecordSetImpl.class, ddlRecordSet.getPrimaryKey());
 
-			clearUniqueFindersCache((DDLRecordSetModelImpl)ddlRecordSet);
+			clearUniqueFindersCache((DDLRecordSetModelImpl)ddlRecordSet, true);
 		}
 	}
 
@@ -3172,7 +3172,17 @@ public class DDLRecordSetPersistenceImpl extends BasePersistenceImpl<DDLRecordSe
 	}
 
 	protected void clearUniqueFindersCache(
-		DDLRecordSetModelImpl ddlRecordSetModelImpl) {
+		DDLRecordSetModelImpl ddlRecordSetModelImpl, boolean clearCurrent) {
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					ddlRecordSetModelImpl.getUuid(),
+					ddlRecordSetModelImpl.getGroupId()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_UUID_G, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_UUID_G, args);
+		}
+
 		if ((ddlRecordSetModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_UUID_G.getColumnBitmask()) != 0) {
 			Object[] args = new Object[] {
@@ -3182,6 +3192,16 @@ public class DDLRecordSetPersistenceImpl extends BasePersistenceImpl<DDLRecordSe
 
 			finderCache.removeResult(FINDER_PATH_COUNT_BY_UUID_G, args);
 			finderCache.removeResult(FINDER_PATH_FETCH_BY_UUID_G, args);
+		}
+
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					ddlRecordSetModelImpl.getGroupId(),
+					ddlRecordSetModelImpl.getRecordSetKey()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_G_R, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_G_R, args);
 		}
 
 		if ((ddlRecordSetModelImpl.getColumnBitmask() &
@@ -3427,7 +3447,7 @@ public class DDLRecordSetPersistenceImpl extends BasePersistenceImpl<DDLRecordSe
 			DDLRecordSetImpl.class, ddlRecordSet.getPrimaryKey(), ddlRecordSet,
 			false);
 
-		clearUniqueFindersCache(ddlRecordSetModelImpl);
+		clearUniqueFindersCache(ddlRecordSetModelImpl, false);
 		cacheUniqueFindersCache(ddlRecordSetModelImpl);
 
 		ddlRecordSet.resetOriginalValues();

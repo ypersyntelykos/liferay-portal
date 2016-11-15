@@ -384,7 +384,7 @@ public class ClassNamePersistenceImpl extends BasePersistenceImpl<ClassName>
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
-		clearUniqueFindersCache((ClassNameModelImpl)className);
+		clearUniqueFindersCache((ClassNameModelImpl)className, true);
 	}
 
 	@Override
@@ -396,7 +396,7 @@ public class ClassNamePersistenceImpl extends BasePersistenceImpl<ClassName>
 			entityCache.removeResult(ClassNameModelImpl.ENTITY_CACHE_ENABLED,
 				ClassNameImpl.class, className.getPrimaryKey());
 
-			clearUniqueFindersCache((ClassNameModelImpl)className);
+			clearUniqueFindersCache((ClassNameModelImpl)className, true);
 		}
 	}
 
@@ -411,7 +411,14 @@ public class ClassNamePersistenceImpl extends BasePersistenceImpl<ClassName>
 	}
 
 	protected void clearUniqueFindersCache(
-		ClassNameModelImpl classNameModelImpl) {
+		ClassNameModelImpl classNameModelImpl, boolean clearCurrent) {
+		if (clearCurrent) {
+			Object[] args = new Object[] { classNameModelImpl.getValue() };
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_VALUE, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_VALUE, args);
+		}
+
 		if ((classNameModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_VALUE.getColumnBitmask()) != 0) {
 			Object[] args = new Object[] { classNameModelImpl.getOriginalValue() };
@@ -559,7 +566,7 @@ public class ClassNamePersistenceImpl extends BasePersistenceImpl<ClassName>
 		entityCache.putResult(ClassNameModelImpl.ENTITY_CACHE_ENABLED,
 			ClassNameImpl.class, className.getPrimaryKey(), className, false);
 
-		clearUniqueFindersCache(classNameModelImpl);
+		clearUniqueFindersCache(classNameModelImpl, false);
 		cacheUniqueFindersCache(classNameModelImpl);
 
 		className.resetOriginalValues();

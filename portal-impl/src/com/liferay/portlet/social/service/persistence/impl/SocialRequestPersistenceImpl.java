@@ -6348,7 +6348,7 @@ public class SocialRequestPersistenceImpl extends BasePersistenceImpl<SocialRequ
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
-		clearUniqueFindersCache((SocialRequestModelImpl)socialRequest);
+		clearUniqueFindersCache((SocialRequestModelImpl)socialRequest, true);
 	}
 
 	@Override
@@ -6360,7 +6360,7 @@ public class SocialRequestPersistenceImpl extends BasePersistenceImpl<SocialRequ
 			entityCache.removeResult(SocialRequestModelImpl.ENTITY_CACHE_ENABLED,
 				SocialRequestImpl.class, socialRequest.getPrimaryKey());
 
-			clearUniqueFindersCache((SocialRequestModelImpl)socialRequest);
+			clearUniqueFindersCache((SocialRequestModelImpl)socialRequest, true);
 		}
 	}
 
@@ -6391,7 +6391,17 @@ public class SocialRequestPersistenceImpl extends BasePersistenceImpl<SocialRequ
 	}
 
 	protected void clearUniqueFindersCache(
-		SocialRequestModelImpl socialRequestModelImpl) {
+		SocialRequestModelImpl socialRequestModelImpl, boolean clearCurrent) {
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					socialRequestModelImpl.getUuid(),
+					socialRequestModelImpl.getGroupId()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_UUID_G, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_UUID_G, args);
+		}
+
 		if ((socialRequestModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_UUID_G.getColumnBitmask()) != 0) {
 			Object[] args = new Object[] {
@@ -6401,6 +6411,19 @@ public class SocialRequestPersistenceImpl extends BasePersistenceImpl<SocialRequ
 
 			finderCache.removeResult(FINDER_PATH_COUNT_BY_UUID_G, args);
 			finderCache.removeResult(FINDER_PATH_FETCH_BY_UUID_G, args);
+		}
+
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					socialRequestModelImpl.getUserId(),
+					socialRequestModelImpl.getClassNameId(),
+					socialRequestModelImpl.getClassPK(),
+					socialRequestModelImpl.getType(),
+					socialRequestModelImpl.getReceiverUserId()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_U_C_C_T_R, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_U_C_C_T_R, args);
 		}
 
 		if ((socialRequestModelImpl.getColumnBitmask() &
@@ -6779,7 +6802,7 @@ public class SocialRequestPersistenceImpl extends BasePersistenceImpl<SocialRequ
 			SocialRequestImpl.class, socialRequest.getPrimaryKey(),
 			socialRequest, false);
 
-		clearUniqueFindersCache(socialRequestModelImpl);
+		clearUniqueFindersCache(socialRequestModelImpl, false);
 		cacheUniqueFindersCache(socialRequestModelImpl);
 
 		socialRequest.resetOriginalValues();

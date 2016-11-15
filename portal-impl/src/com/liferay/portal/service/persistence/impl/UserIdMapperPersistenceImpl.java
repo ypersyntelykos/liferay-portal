@@ -1205,7 +1205,7 @@ public class UserIdMapperPersistenceImpl extends BasePersistenceImpl<UserIdMappe
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
-		clearUniqueFindersCache((UserIdMapperModelImpl)userIdMapper);
+		clearUniqueFindersCache((UserIdMapperModelImpl)userIdMapper, true);
 	}
 
 	@Override
@@ -1217,7 +1217,7 @@ public class UserIdMapperPersistenceImpl extends BasePersistenceImpl<UserIdMappe
 			entityCache.removeResult(UserIdMapperModelImpl.ENTITY_CACHE_ENABLED,
 				UserIdMapperImpl.class, userIdMapper.getPrimaryKey());
 
-			clearUniqueFindersCache((UserIdMapperModelImpl)userIdMapper);
+			clearUniqueFindersCache((UserIdMapperModelImpl)userIdMapper, true);
 		}
 	}
 
@@ -1245,7 +1245,17 @@ public class UserIdMapperPersistenceImpl extends BasePersistenceImpl<UserIdMappe
 	}
 
 	protected void clearUniqueFindersCache(
-		UserIdMapperModelImpl userIdMapperModelImpl) {
+		UserIdMapperModelImpl userIdMapperModelImpl, boolean clearCurrent) {
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					userIdMapperModelImpl.getUserId(),
+					userIdMapperModelImpl.getType()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_U_T, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_U_T, args);
+		}
+
 		if ((userIdMapperModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_U_T.getColumnBitmask()) != 0) {
 			Object[] args = new Object[] {
@@ -1255,6 +1265,16 @@ public class UserIdMapperPersistenceImpl extends BasePersistenceImpl<UserIdMappe
 
 			finderCache.removeResult(FINDER_PATH_COUNT_BY_U_T, args);
 			finderCache.removeResult(FINDER_PATH_FETCH_BY_U_T, args);
+		}
+
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					userIdMapperModelImpl.getType(),
+					userIdMapperModelImpl.getExternalUserId()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_T_E, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_T_E, args);
 		}
 
 		if ((userIdMapperModelImpl.getColumnBitmask() &
@@ -1430,7 +1450,7 @@ public class UserIdMapperPersistenceImpl extends BasePersistenceImpl<UserIdMappe
 			UserIdMapperImpl.class, userIdMapper.getPrimaryKey(), userIdMapper,
 			false);
 
-		clearUniqueFindersCache(userIdMapperModelImpl);
+		clearUniqueFindersCache(userIdMapperModelImpl, false);
 		cacheUniqueFindersCache(userIdMapperModelImpl);
 
 		userIdMapper.resetOriginalValues();

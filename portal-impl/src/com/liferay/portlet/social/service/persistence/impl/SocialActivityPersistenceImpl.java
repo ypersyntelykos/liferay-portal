@@ -6236,7 +6236,7 @@ public class SocialActivityPersistenceImpl extends BasePersistenceImpl<SocialAct
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
-		clearUniqueFindersCache((SocialActivityModelImpl)socialActivity);
+		clearUniqueFindersCache((SocialActivityModelImpl)socialActivity, true);
 	}
 
 	@Override
@@ -6248,7 +6248,8 @@ public class SocialActivityPersistenceImpl extends BasePersistenceImpl<SocialAct
 			entityCache.removeResult(SocialActivityModelImpl.ENTITY_CACHE_ENABLED,
 				SocialActivityImpl.class, socialActivity.getPrimaryKey());
 
-			clearUniqueFindersCache((SocialActivityModelImpl)socialActivity);
+			clearUniqueFindersCache((SocialActivityModelImpl)socialActivity,
+				true);
 		}
 	}
 
@@ -6280,7 +6281,16 @@ public class SocialActivityPersistenceImpl extends BasePersistenceImpl<SocialAct
 	}
 
 	protected void clearUniqueFindersCache(
-		SocialActivityModelImpl socialActivityModelImpl) {
+		SocialActivityModelImpl socialActivityModelImpl, boolean clearCurrent) {
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					socialActivityModelImpl.getMirrorActivityId()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_MIRRORACTIVITYID, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_MIRRORACTIVITYID, args);
+		}
+
 		if ((socialActivityModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_MIRRORACTIVITYID.getColumnBitmask()) != 0) {
 			Object[] args = new Object[] {
@@ -6289,6 +6299,21 @@ public class SocialActivityPersistenceImpl extends BasePersistenceImpl<SocialAct
 
 			finderCache.removeResult(FINDER_PATH_COUNT_BY_MIRRORACTIVITYID, args);
 			finderCache.removeResult(FINDER_PATH_FETCH_BY_MIRRORACTIVITYID, args);
+		}
+
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					socialActivityModelImpl.getGroupId(),
+					socialActivityModelImpl.getUserId(),
+					socialActivityModelImpl.getCreateDate(),
+					socialActivityModelImpl.getClassNameId(),
+					socialActivityModelImpl.getClassPK(),
+					socialActivityModelImpl.getType(),
+					socialActivityModelImpl.getReceiverUserId()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_G_U_CD_C_C_T_R, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_G_U_CD_C_C_T_R, args);
 		}
 
 		if ((socialActivityModelImpl.getColumnBitmask() &
@@ -6654,7 +6679,7 @@ public class SocialActivityPersistenceImpl extends BasePersistenceImpl<SocialAct
 			SocialActivityImpl.class, socialActivity.getPrimaryKey(),
 			socialActivity, false);
 
-		clearUniqueFindersCache(socialActivityModelImpl);
+		clearUniqueFindersCache(socialActivityModelImpl, false);
 		cacheUniqueFindersCache(socialActivityModelImpl);
 
 		socialActivity.resetOriginalValues();

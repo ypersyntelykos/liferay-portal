@@ -12275,7 +12275,7 @@ public class DLFolderPersistenceImpl extends BasePersistenceImpl<DLFolder>
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
-		clearUniqueFindersCache((DLFolderModelImpl)dlFolder);
+		clearUniqueFindersCache((DLFolderModelImpl)dlFolder, true);
 	}
 
 	@Override
@@ -12287,7 +12287,7 @@ public class DLFolderPersistenceImpl extends BasePersistenceImpl<DLFolder>
 			entityCache.removeResult(DLFolderModelImpl.ENTITY_CACHE_ENABLED,
 				DLFolderImpl.class, dlFolder.getPrimaryKey());
 
-			clearUniqueFindersCache((DLFolderModelImpl)dlFolder);
+			clearUniqueFindersCache((DLFolderModelImpl)dlFolder, true);
 		}
 	}
 
@@ -12323,7 +12323,17 @@ public class DLFolderPersistenceImpl extends BasePersistenceImpl<DLFolder>
 			dlFolderModelImpl, false);
 	}
 
-	protected void clearUniqueFindersCache(DLFolderModelImpl dlFolderModelImpl) {
+	protected void clearUniqueFindersCache(
+		DLFolderModelImpl dlFolderModelImpl, boolean clearCurrent) {
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					dlFolderModelImpl.getUuid(), dlFolderModelImpl.getGroupId()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_UUID_G, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_UUID_G, args);
+		}
+
 		if ((dlFolderModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_UUID_G.getColumnBitmask()) != 0) {
 			Object[] args = new Object[] {
@@ -12335,6 +12345,16 @@ public class DLFolderPersistenceImpl extends BasePersistenceImpl<DLFolder>
 			finderCache.removeResult(FINDER_PATH_FETCH_BY_UUID_G, args);
 		}
 
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					dlFolderModelImpl.getRepositoryId(),
+					dlFolderModelImpl.getMountPoint()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_R_M, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_R_M, args);
+		}
+
 		if ((dlFolderModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_R_M.getColumnBitmask()) != 0) {
 			Object[] args = new Object[] {
@@ -12344,6 +12364,17 @@ public class DLFolderPersistenceImpl extends BasePersistenceImpl<DLFolder>
 
 			finderCache.removeResult(FINDER_PATH_COUNT_BY_R_M, args);
 			finderCache.removeResult(FINDER_PATH_FETCH_BY_R_M, args);
+		}
+
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					dlFolderModelImpl.getGroupId(),
+					dlFolderModelImpl.getParentFolderId(),
+					dlFolderModelImpl.getName()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_G_P_N, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_G_P_N, args);
 		}
 
 		if ((dlFolderModelImpl.getColumnBitmask() &
@@ -12785,7 +12816,7 @@ public class DLFolderPersistenceImpl extends BasePersistenceImpl<DLFolder>
 		entityCache.putResult(DLFolderModelImpl.ENTITY_CACHE_ENABLED,
 			DLFolderImpl.class, dlFolder.getPrimaryKey(), dlFolder, false);
 
-		clearUniqueFindersCache(dlFolderModelImpl);
+		clearUniqueFindersCache(dlFolderModelImpl, false);
 		cacheUniqueFindersCache(dlFolderModelImpl);
 
 		dlFolder.resetOriginalValues();

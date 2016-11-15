@@ -12379,7 +12379,7 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
-		clearUniqueFindersCache((BookmarksEntryModelImpl)bookmarksEntry);
+		clearUniqueFindersCache((BookmarksEntryModelImpl)bookmarksEntry, true);
 	}
 
 	@Override
@@ -12391,7 +12391,8 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 			entityCache.removeResult(BookmarksEntryModelImpl.ENTITY_CACHE_ENABLED,
 				BookmarksEntryImpl.class, bookmarksEntry.getPrimaryKey());
 
-			clearUniqueFindersCache((BookmarksEntryModelImpl)bookmarksEntry);
+			clearUniqueFindersCache((BookmarksEntryModelImpl)bookmarksEntry,
+				true);
 		}
 	}
 
@@ -12409,7 +12410,17 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	}
 
 	protected void clearUniqueFindersCache(
-		BookmarksEntryModelImpl bookmarksEntryModelImpl) {
+		BookmarksEntryModelImpl bookmarksEntryModelImpl, boolean clearCurrent) {
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					bookmarksEntryModelImpl.getUuid(),
+					bookmarksEntryModelImpl.getGroupId()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_UUID_G, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_UUID_G, args);
+		}
+
 		if ((bookmarksEntryModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_UUID_G.getColumnBitmask()) != 0) {
 			Object[] args = new Object[] {
@@ -12785,7 +12796,7 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 			BookmarksEntryImpl.class, bookmarksEntry.getPrimaryKey(),
 			bookmarksEntry, false);
 
-		clearUniqueFindersCache(bookmarksEntryModelImpl);
+		clearUniqueFindersCache(bookmarksEntryModelImpl, false);
 		cacheUniqueFindersCache(bookmarksEntryModelImpl);
 
 		bookmarksEntry.resetOriginalValues();

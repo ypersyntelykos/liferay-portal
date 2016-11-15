@@ -1815,7 +1815,8 @@ public class WikiPageResourcePersistenceImpl extends BasePersistenceImpl<WikiPag
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
-		clearUniqueFindersCache((WikiPageResourceModelImpl)wikiPageResource);
+		clearUniqueFindersCache((WikiPageResourceModelImpl)wikiPageResource,
+			true);
 	}
 
 	@Override
@@ -1827,7 +1828,8 @@ public class WikiPageResourcePersistenceImpl extends BasePersistenceImpl<WikiPag
 			entityCache.removeResult(WikiPageResourceModelImpl.ENTITY_CACHE_ENABLED,
 				WikiPageResourceImpl.class, wikiPageResource.getPrimaryKey());
 
-			clearUniqueFindersCache((WikiPageResourceModelImpl)wikiPageResource);
+			clearUniqueFindersCache((WikiPageResourceModelImpl)wikiPageResource,
+				true);
 		}
 	}
 
@@ -1855,7 +1857,18 @@ public class WikiPageResourcePersistenceImpl extends BasePersistenceImpl<WikiPag
 	}
 
 	protected void clearUniqueFindersCache(
-		WikiPageResourceModelImpl wikiPageResourceModelImpl) {
+		WikiPageResourceModelImpl wikiPageResourceModelImpl,
+		boolean clearCurrent) {
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					wikiPageResourceModelImpl.getUuid(),
+					wikiPageResourceModelImpl.getGroupId()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_UUID_G, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_UUID_G, args);
+		}
+
 		if ((wikiPageResourceModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_UUID_G.getColumnBitmask()) != 0) {
 			Object[] args = new Object[] {
@@ -1865,6 +1878,16 @@ public class WikiPageResourcePersistenceImpl extends BasePersistenceImpl<WikiPag
 
 			finderCache.removeResult(FINDER_PATH_COUNT_BY_UUID_G, args);
 			finderCache.removeResult(FINDER_PATH_FETCH_BY_UUID_G, args);
+		}
+
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					wikiPageResourceModelImpl.getNodeId(),
+					wikiPageResourceModelImpl.getTitle()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_N_T, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_N_T, args);
 		}
 
 		if ((wikiPageResourceModelImpl.getColumnBitmask() &
@@ -2071,7 +2094,7 @@ public class WikiPageResourcePersistenceImpl extends BasePersistenceImpl<WikiPag
 			WikiPageResourceImpl.class, wikiPageResource.getPrimaryKey(),
 			wikiPageResource, false);
 
-		clearUniqueFindersCache(wikiPageResourceModelImpl);
+		clearUniqueFindersCache(wikiPageResourceModelImpl, false);
 		cacheUniqueFindersCache(wikiPageResourceModelImpl);
 
 		wikiPageResource.resetOriginalValues();

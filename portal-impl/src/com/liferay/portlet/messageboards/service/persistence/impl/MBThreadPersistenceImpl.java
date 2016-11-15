@@ -12987,7 +12987,7 @@ public class MBThreadPersistenceImpl extends BasePersistenceImpl<MBThread>
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
-		clearUniqueFindersCache((MBThreadModelImpl)mbThread);
+		clearUniqueFindersCache((MBThreadModelImpl)mbThread, true);
 	}
 
 	@Override
@@ -12999,7 +12999,7 @@ public class MBThreadPersistenceImpl extends BasePersistenceImpl<MBThread>
 			entityCache.removeResult(MBThreadModelImpl.ENTITY_CACHE_ENABLED,
 				MBThreadImpl.class, mbThread.getPrimaryKey());
 
-			clearUniqueFindersCache((MBThreadModelImpl)mbThread);
+			clearUniqueFindersCache((MBThreadModelImpl)mbThread, true);
 		}
 	}
 
@@ -13021,7 +13021,17 @@ public class MBThreadPersistenceImpl extends BasePersistenceImpl<MBThread>
 			mbThreadModelImpl, false);
 	}
 
-	protected void clearUniqueFindersCache(MBThreadModelImpl mbThreadModelImpl) {
+	protected void clearUniqueFindersCache(
+		MBThreadModelImpl mbThreadModelImpl, boolean clearCurrent) {
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					mbThreadModelImpl.getUuid(), mbThreadModelImpl.getGroupId()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_UUID_G, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_UUID_G, args);
+		}
+
 		if ((mbThreadModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_UUID_G.getColumnBitmask()) != 0) {
 			Object[] args = new Object[] {
@@ -13031,6 +13041,13 @@ public class MBThreadPersistenceImpl extends BasePersistenceImpl<MBThread>
 
 			finderCache.removeResult(FINDER_PATH_COUNT_BY_UUID_G, args);
 			finderCache.removeResult(FINDER_PATH_FETCH_BY_UUID_G, args);
+		}
+
+		if (clearCurrent) {
+			Object[] args = new Object[] { mbThreadModelImpl.getRootMessageId() };
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_ROOTMESSAGEID, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_ROOTMESSAGEID, args);
 		}
 
 		if ((mbThreadModelImpl.getColumnBitmask() &
@@ -13401,7 +13418,7 @@ public class MBThreadPersistenceImpl extends BasePersistenceImpl<MBThread>
 		entityCache.putResult(MBThreadModelImpl.ENTITY_CACHE_ENABLED,
 			MBThreadImpl.class, mbThread.getPrimaryKey(), mbThread, false);
 
-		clearUniqueFindersCache(mbThreadModelImpl);
+		clearUniqueFindersCache(mbThreadModelImpl, false);
 		cacheUniqueFindersCache(mbThreadModelImpl);
 
 		mbThread.resetOriginalValues();

@@ -3059,7 +3059,7 @@ public class KBFolderPersistenceImpl extends BasePersistenceImpl<KBFolder>
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
-		clearUniqueFindersCache((KBFolderModelImpl)kbFolder);
+		clearUniqueFindersCache((KBFolderModelImpl)kbFolder, true);
 	}
 
 	@Override
@@ -3071,7 +3071,7 @@ public class KBFolderPersistenceImpl extends BasePersistenceImpl<KBFolder>
 			entityCache.removeResult(KBFolderModelImpl.ENTITY_CACHE_ENABLED,
 				KBFolderImpl.class, kbFolder.getPrimaryKey());
 
-			clearUniqueFindersCache((KBFolderModelImpl)kbFolder);
+			clearUniqueFindersCache((KBFolderModelImpl)kbFolder, true);
 		}
 	}
 
@@ -3108,7 +3108,17 @@ public class KBFolderPersistenceImpl extends BasePersistenceImpl<KBFolder>
 			kbFolderModelImpl, false);
 	}
 
-	protected void clearUniqueFindersCache(KBFolderModelImpl kbFolderModelImpl) {
+	protected void clearUniqueFindersCache(
+		KBFolderModelImpl kbFolderModelImpl, boolean clearCurrent) {
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					kbFolderModelImpl.getUuid(), kbFolderModelImpl.getGroupId()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_UUID_G, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_UUID_G, args);
+		}
+
 		if ((kbFolderModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_UUID_G.getColumnBitmask()) != 0) {
 			Object[] args = new Object[] {
@@ -3118,6 +3128,17 @@ public class KBFolderPersistenceImpl extends BasePersistenceImpl<KBFolder>
 
 			finderCache.removeResult(FINDER_PATH_COUNT_BY_UUID_G, args);
 			finderCache.removeResult(FINDER_PATH_FETCH_BY_UUID_G, args);
+		}
+
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					kbFolderModelImpl.getGroupId(),
+					kbFolderModelImpl.getParentKBFolderId(),
+					kbFolderModelImpl.getName()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_G_P_N, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_G_P_N, args);
 		}
 
 		if ((kbFolderModelImpl.getColumnBitmask() &
@@ -3130,6 +3151,17 @@ public class KBFolderPersistenceImpl extends BasePersistenceImpl<KBFolder>
 
 			finderCache.removeResult(FINDER_PATH_COUNT_BY_G_P_N, args);
 			finderCache.removeResult(FINDER_PATH_FETCH_BY_G_P_N, args);
+		}
+
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					kbFolderModelImpl.getGroupId(),
+					kbFolderModelImpl.getParentKBFolderId(),
+					kbFolderModelImpl.getUrlTitle()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_G_P_UT, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_G_P_UT, args);
 		}
 
 		if ((kbFolderModelImpl.getColumnBitmask() &
@@ -3376,7 +3408,7 @@ public class KBFolderPersistenceImpl extends BasePersistenceImpl<KBFolder>
 		entityCache.putResult(KBFolderModelImpl.ENTITY_CACHE_ENABLED,
 			KBFolderImpl.class, kbFolder.getPrimaryKey(), kbFolder, false);
 
-		clearUniqueFindersCache(kbFolderModelImpl);
+		clearUniqueFindersCache(kbFolderModelImpl, false);
 		cacheUniqueFindersCache(kbFolderModelImpl);
 
 		kbFolder.resetOriginalValues();

@@ -4149,7 +4149,7 @@ public class UserGroupPersistenceImpl extends BasePersistenceImpl<UserGroup>
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
-		clearUniqueFindersCache((UserGroupModelImpl)userGroup);
+		clearUniqueFindersCache((UserGroupModelImpl)userGroup, true);
 	}
 
 	@Override
@@ -4161,7 +4161,7 @@ public class UserGroupPersistenceImpl extends BasePersistenceImpl<UserGroup>
 			entityCache.removeResult(UserGroupModelImpl.ENTITY_CACHE_ENABLED,
 				UserGroupImpl.class, userGroup.getPrimaryKey());
 
-			clearUniqueFindersCache((UserGroupModelImpl)userGroup);
+			clearUniqueFindersCache((UserGroupModelImpl)userGroup, true);
 		}
 	}
 
@@ -4178,7 +4178,17 @@ public class UserGroupPersistenceImpl extends BasePersistenceImpl<UserGroup>
 	}
 
 	protected void clearUniqueFindersCache(
-		UserGroupModelImpl userGroupModelImpl) {
+		UserGroupModelImpl userGroupModelImpl, boolean clearCurrent) {
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					userGroupModelImpl.getCompanyId(),
+					userGroupModelImpl.getName()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_C_N, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_C_N, args);
+		}
+
 		if ((userGroupModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_C_N.getColumnBitmask()) != 0) {
 			Object[] args = new Object[] {
@@ -4447,7 +4457,7 @@ public class UserGroupPersistenceImpl extends BasePersistenceImpl<UserGroup>
 		entityCache.putResult(UserGroupModelImpl.ENTITY_CACHE_ENABLED,
 			UserGroupImpl.class, userGroup.getPrimaryKey(), userGroup, false);
 
-		clearUniqueFindersCache(userGroupModelImpl);
+		clearUniqueFindersCache(userGroupModelImpl, false);
 		cacheUniqueFindersCache(userGroupModelImpl);
 
 		userGroup.resetOriginalValues();

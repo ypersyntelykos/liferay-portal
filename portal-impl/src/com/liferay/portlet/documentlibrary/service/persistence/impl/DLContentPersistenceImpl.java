@@ -2288,7 +2288,7 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
-		clearUniqueFindersCache((DLContentModelImpl)dlContent);
+		clearUniqueFindersCache((DLContentModelImpl)dlContent, true);
 	}
 
 	@Override
@@ -2300,7 +2300,7 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 			entityCache.removeResult(DLContentModelImpl.ENTITY_CACHE_ENABLED,
 				DLContentImpl.class, dlContent.getPrimaryKey());
 
-			clearUniqueFindersCache((DLContentModelImpl)dlContent);
+			clearUniqueFindersCache((DLContentModelImpl)dlContent, true);
 		}
 	}
 
@@ -2319,7 +2319,19 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 	}
 
 	protected void clearUniqueFindersCache(
-		DLContentModelImpl dlContentModelImpl) {
+		DLContentModelImpl dlContentModelImpl, boolean clearCurrent) {
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					dlContentModelImpl.getCompanyId(),
+					dlContentModelImpl.getRepositoryId(),
+					dlContentModelImpl.getPath(),
+					dlContentModelImpl.getVersion()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_C_R_P_V, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_C_R_P_V, args);
+		}
+
 		if ((dlContentModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_C_R_P_V.getColumnBitmask()) != 0) {
 			Object[] args = new Object[] {
@@ -2524,7 +2536,7 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 		entityCache.putResult(DLContentModelImpl.ENTITY_CACHE_ENABLED,
 			DLContentImpl.class, dlContent.getPrimaryKey(), dlContent, false);
 
-		clearUniqueFindersCache(dlContentModelImpl);
+		clearUniqueFindersCache(dlContentModelImpl, false);
 		cacheUniqueFindersCache(dlContentModelImpl);
 
 		dlContent.resetOriginalValues();

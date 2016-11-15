@@ -1948,7 +1948,8 @@ public class RecentLayoutBranchPersistenceImpl extends BasePersistenceImpl<Recen
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
-		clearUniqueFindersCache((RecentLayoutBranchModelImpl)recentLayoutBranch);
+		clearUniqueFindersCache((RecentLayoutBranchModelImpl)recentLayoutBranch,
+			true);
 	}
 
 	@Override
@@ -1960,7 +1961,8 @@ public class RecentLayoutBranchPersistenceImpl extends BasePersistenceImpl<Recen
 			entityCache.removeResult(RecentLayoutBranchModelImpl.ENTITY_CACHE_ENABLED,
 				RecentLayoutBranchImpl.class, recentLayoutBranch.getPrimaryKey());
 
-			clearUniqueFindersCache((RecentLayoutBranchModelImpl)recentLayoutBranch);
+			clearUniqueFindersCache((RecentLayoutBranchModelImpl)recentLayoutBranch,
+				true);
 		}
 	}
 
@@ -1979,7 +1981,19 @@ public class RecentLayoutBranchPersistenceImpl extends BasePersistenceImpl<Recen
 	}
 
 	protected void clearUniqueFindersCache(
-		RecentLayoutBranchModelImpl recentLayoutBranchModelImpl) {
+		RecentLayoutBranchModelImpl recentLayoutBranchModelImpl,
+		boolean clearCurrent) {
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					recentLayoutBranchModelImpl.getUserId(),
+					recentLayoutBranchModelImpl.getLayoutSetBranchId(),
+					recentLayoutBranchModelImpl.getPlid()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_U_L_P, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_U_L_P, args);
+		}
+
 		if ((recentLayoutBranchModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_U_L_P.getColumnBitmask()) != 0) {
 			Object[] args = new Object[] {
@@ -2193,7 +2207,7 @@ public class RecentLayoutBranchPersistenceImpl extends BasePersistenceImpl<Recen
 			RecentLayoutBranchImpl.class, recentLayoutBranch.getPrimaryKey(),
 			recentLayoutBranch, false);
 
-		clearUniqueFindersCache(recentLayoutBranchModelImpl);
+		clearUniqueFindersCache(recentLayoutBranchModelImpl, false);
 		cacheUniqueFindersCache(recentLayoutBranchModelImpl);
 
 		recentLayoutBranch.resetOriginalValues();

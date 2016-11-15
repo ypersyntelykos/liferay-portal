@@ -394,7 +394,8 @@ public class PortalPreferencesPersistenceImpl extends BasePersistenceImpl<Portal
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
-		clearUniqueFindersCache((PortalPreferencesModelImpl)portalPreferences);
+		clearUniqueFindersCache((PortalPreferencesModelImpl)portalPreferences,
+			true);
 	}
 
 	@Override
@@ -406,7 +407,8 @@ public class PortalPreferencesPersistenceImpl extends BasePersistenceImpl<Portal
 			entityCache.removeResult(PortalPreferencesModelImpl.ENTITY_CACHE_ENABLED,
 				PortalPreferencesImpl.class, portalPreferences.getPrimaryKey());
 
-			clearUniqueFindersCache((PortalPreferencesModelImpl)portalPreferences);
+			clearUniqueFindersCache((PortalPreferencesModelImpl)portalPreferences,
+				true);
 		}
 	}
 
@@ -424,7 +426,18 @@ public class PortalPreferencesPersistenceImpl extends BasePersistenceImpl<Portal
 	}
 
 	protected void clearUniqueFindersCache(
-		PortalPreferencesModelImpl portalPreferencesModelImpl) {
+		PortalPreferencesModelImpl portalPreferencesModelImpl,
+		boolean clearCurrent) {
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					portalPreferencesModelImpl.getOwnerId(),
+					portalPreferencesModelImpl.getOwnerType()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_O_O, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_O_O, args);
+		}
+
 		if ((portalPreferencesModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_O_O.getColumnBitmask()) != 0) {
 			Object[] args = new Object[] {
@@ -577,7 +590,7 @@ public class PortalPreferencesPersistenceImpl extends BasePersistenceImpl<Portal
 			PortalPreferencesImpl.class, portalPreferences.getPrimaryKey(),
 			portalPreferences, false);
 
-		clearUniqueFindersCache(portalPreferencesModelImpl);
+		clearUniqueFindersCache(portalPreferencesModelImpl, false);
 		cacheUniqueFindersCache(portalPreferencesModelImpl);
 
 		portalPreferences.resetOriginalValues();

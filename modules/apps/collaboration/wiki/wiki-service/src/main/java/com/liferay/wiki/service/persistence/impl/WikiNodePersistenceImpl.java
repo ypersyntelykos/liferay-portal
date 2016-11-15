@@ -4612,7 +4612,7 @@ public class WikiNodePersistenceImpl extends BasePersistenceImpl<WikiNode>
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
-		clearUniqueFindersCache((WikiNodeModelImpl)wikiNode);
+		clearUniqueFindersCache((WikiNodeModelImpl)wikiNode, true);
 	}
 
 	@Override
@@ -4624,7 +4624,7 @@ public class WikiNodePersistenceImpl extends BasePersistenceImpl<WikiNode>
 			entityCache.removeResult(WikiNodeModelImpl.ENTITY_CACHE_ENABLED,
 				WikiNodeImpl.class, wikiNode.getPrimaryKey());
 
-			clearUniqueFindersCache((WikiNodeModelImpl)wikiNode);
+			clearUniqueFindersCache((WikiNodeModelImpl)wikiNode, true);
 		}
 	}
 
@@ -4648,7 +4648,17 @@ public class WikiNodePersistenceImpl extends BasePersistenceImpl<WikiNode>
 			wikiNodeModelImpl, false);
 	}
 
-	protected void clearUniqueFindersCache(WikiNodeModelImpl wikiNodeModelImpl) {
+	protected void clearUniqueFindersCache(
+		WikiNodeModelImpl wikiNodeModelImpl, boolean clearCurrent) {
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					wikiNodeModelImpl.getUuid(), wikiNodeModelImpl.getGroupId()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_UUID_G, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_UUID_G, args);
+		}
+
 		if ((wikiNodeModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_UUID_G.getColumnBitmask()) != 0) {
 			Object[] args = new Object[] {
@@ -4658,6 +4668,15 @@ public class WikiNodePersistenceImpl extends BasePersistenceImpl<WikiNode>
 
 			finderCache.removeResult(FINDER_PATH_COUNT_BY_UUID_G, args);
 			finderCache.removeResult(FINDER_PATH_FETCH_BY_UUID_G, args);
+		}
+
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					wikiNodeModelImpl.getGroupId(), wikiNodeModelImpl.getName()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_G_N, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_G_N, args);
 		}
 
 		if ((wikiNodeModelImpl.getColumnBitmask() &
@@ -4957,7 +4976,7 @@ public class WikiNodePersistenceImpl extends BasePersistenceImpl<WikiNode>
 		entityCache.putResult(WikiNodeModelImpl.ENTITY_CACHE_ENABLED,
 			WikiNodeImpl.class, wikiNode.getPrimaryKey(), wikiNode, false);
 
-		clearUniqueFindersCache(wikiNodeModelImpl);
+		clearUniqueFindersCache(wikiNodeModelImpl, false);
 		cacheUniqueFindersCache(wikiNodeModelImpl);
 
 		wikiNode.resetOriginalValues();

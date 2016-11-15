@@ -2585,7 +2585,8 @@ public class SocialActivityCounterPersistenceImpl extends BasePersistenceImpl<So
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
-		clearUniqueFindersCache((SocialActivityCounterModelImpl)socialActivityCounter);
+		clearUniqueFindersCache((SocialActivityCounterModelImpl)socialActivityCounter,
+			true);
 	}
 
 	@Override
@@ -2598,7 +2599,8 @@ public class SocialActivityCounterPersistenceImpl extends BasePersistenceImpl<So
 				SocialActivityCounterImpl.class,
 				socialActivityCounter.getPrimaryKey());
 
-			clearUniqueFindersCache((SocialActivityCounterModelImpl)socialActivityCounter);
+			clearUniqueFindersCache((SocialActivityCounterModelImpl)socialActivityCounter,
+				true);
 		}
 	}
 
@@ -2634,7 +2636,22 @@ public class SocialActivityCounterPersistenceImpl extends BasePersistenceImpl<So
 	}
 
 	protected void clearUniqueFindersCache(
-		SocialActivityCounterModelImpl socialActivityCounterModelImpl) {
+		SocialActivityCounterModelImpl socialActivityCounterModelImpl,
+		boolean clearCurrent) {
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					socialActivityCounterModelImpl.getGroupId(),
+					socialActivityCounterModelImpl.getClassNameId(),
+					socialActivityCounterModelImpl.getClassPK(),
+					socialActivityCounterModelImpl.getName(),
+					socialActivityCounterModelImpl.getOwnerType(),
+					socialActivityCounterModelImpl.getStartPeriod()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_G_C_C_N_O_S, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_G_C_C_N_O_S, args);
+		}
+
 		if ((socialActivityCounterModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_G_C_C_N_O_S.getColumnBitmask()) != 0) {
 			Object[] args = new Object[] {
@@ -2648,6 +2665,20 @@ public class SocialActivityCounterPersistenceImpl extends BasePersistenceImpl<So
 
 			finderCache.removeResult(FINDER_PATH_COUNT_BY_G_C_C_N_O_S, args);
 			finderCache.removeResult(FINDER_PATH_FETCH_BY_G_C_C_N_O_S, args);
+		}
+
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					socialActivityCounterModelImpl.getGroupId(),
+					socialActivityCounterModelImpl.getClassNameId(),
+					socialActivityCounterModelImpl.getClassPK(),
+					socialActivityCounterModelImpl.getName(),
+					socialActivityCounterModelImpl.getOwnerType(),
+					socialActivityCounterModelImpl.getEndPeriod()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_G_C_C_N_O_E, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_G_C_C_N_O_E, args);
 		}
 
 		if ((socialActivityCounterModelImpl.getColumnBitmask() &
@@ -2875,7 +2906,7 @@ public class SocialActivityCounterPersistenceImpl extends BasePersistenceImpl<So
 			SocialActivityCounterImpl.class,
 			socialActivityCounter.getPrimaryKey(), socialActivityCounter, false);
 
-		clearUniqueFindersCache(socialActivityCounterModelImpl);
+		clearUniqueFindersCache(socialActivityCounterModelImpl, false);
 		cacheUniqueFindersCache(socialActivityCounterModelImpl);
 
 		socialActivityCounter.resetOriginalValues();

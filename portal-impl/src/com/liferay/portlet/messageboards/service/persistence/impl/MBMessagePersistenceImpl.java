@@ -18963,7 +18963,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
-		clearUniqueFindersCache((MBMessageModelImpl)mbMessage);
+		clearUniqueFindersCache((MBMessageModelImpl)mbMessage, true);
 	}
 
 	@Override
@@ -18975,7 +18975,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 			entityCache.removeResult(MBMessageModelImpl.ENTITY_CACHE_ENABLED,
 				MBMessageImpl.class, mbMessage.getPrimaryKey());
 
-			clearUniqueFindersCache((MBMessageModelImpl)mbMessage);
+			clearUniqueFindersCache((MBMessageModelImpl)mbMessage, true);
 		}
 	}
 
@@ -18992,7 +18992,17 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 	}
 
 	protected void clearUniqueFindersCache(
-		MBMessageModelImpl mbMessageModelImpl) {
+		MBMessageModelImpl mbMessageModelImpl, boolean clearCurrent) {
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					mbMessageModelImpl.getUuid(),
+					mbMessageModelImpl.getGroupId()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_UUID_G, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_UUID_G, args);
+		}
+
 		if ((mbMessageModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_UUID_G.getColumnBitmask()) != 0) {
 			Object[] args = new Object[] {
@@ -19751,7 +19761,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 		entityCache.putResult(MBMessageModelImpl.ENTITY_CACHE_ENABLED,
 			MBMessageImpl.class, mbMessage.getPrimaryKey(), mbMessage, false);
 
-		clearUniqueFindersCache(mbMessageModelImpl);
+		clearUniqueFindersCache(mbMessageModelImpl, false);
 		cacheUniqueFindersCache(mbMessageModelImpl);
 
 		mbMessage.resetOriginalValues();

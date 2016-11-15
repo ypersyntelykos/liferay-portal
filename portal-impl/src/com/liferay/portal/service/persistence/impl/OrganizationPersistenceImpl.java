@@ -6656,7 +6656,7 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
-		clearUniqueFindersCache((OrganizationModelImpl)organization);
+		clearUniqueFindersCache((OrganizationModelImpl)organization, true);
 	}
 
 	@Override
@@ -6668,7 +6668,7 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 			entityCache.removeResult(OrganizationModelImpl.ENTITY_CACHE_ENABLED,
 				OrganizationImpl.class, organization.getPrimaryKey());
 
-			clearUniqueFindersCache((OrganizationModelImpl)organization);
+			clearUniqueFindersCache((OrganizationModelImpl)organization, true);
 		}
 	}
 
@@ -6686,7 +6686,17 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 	}
 
 	protected void clearUniqueFindersCache(
-		OrganizationModelImpl organizationModelImpl) {
+		OrganizationModelImpl organizationModelImpl, boolean clearCurrent) {
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					organizationModelImpl.getCompanyId(),
+					organizationModelImpl.getName()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_C_N, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_C_N, args);
+		}
+
 		if ((organizationModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_C_N.getColumnBitmask()) != 0) {
 			Object[] args = new Object[] {
@@ -6972,7 +6982,7 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 			OrganizationImpl.class, organization.getPrimaryKey(), organization,
 			false);
 
-		clearUniqueFindersCache(organizationModelImpl);
+		clearUniqueFindersCache(organizationModelImpl, false);
 		cacheUniqueFindersCache(organizationModelImpl);
 
 		organization.resetOriginalValues();

@@ -2228,7 +2228,8 @@ public class ShoppingCategoryPersistenceImpl extends BasePersistenceImpl<Shoppin
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
-		clearUniqueFindersCache((ShoppingCategoryModelImpl)shoppingCategory);
+		clearUniqueFindersCache((ShoppingCategoryModelImpl)shoppingCategory,
+			true);
 	}
 
 	@Override
@@ -2240,7 +2241,8 @@ public class ShoppingCategoryPersistenceImpl extends BasePersistenceImpl<Shoppin
 			entityCache.removeResult(ShoppingCategoryModelImpl.ENTITY_CACHE_ENABLED,
 				ShoppingCategoryImpl.class, shoppingCategory.getPrimaryKey());
 
-			clearUniqueFindersCache((ShoppingCategoryModelImpl)shoppingCategory);
+			clearUniqueFindersCache((ShoppingCategoryModelImpl)shoppingCategory,
+				true);
 		}
 	}
 
@@ -2258,7 +2260,18 @@ public class ShoppingCategoryPersistenceImpl extends BasePersistenceImpl<Shoppin
 	}
 
 	protected void clearUniqueFindersCache(
-		ShoppingCategoryModelImpl shoppingCategoryModelImpl) {
+		ShoppingCategoryModelImpl shoppingCategoryModelImpl,
+		boolean clearCurrent) {
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					shoppingCategoryModelImpl.getGroupId(),
+					shoppingCategoryModelImpl.getName()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_G_N, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_G_N, args);
+		}
+
 		if ((shoppingCategoryModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_G_N.getColumnBitmask()) != 0) {
 			Object[] args = new Object[] {
@@ -2476,7 +2489,7 @@ public class ShoppingCategoryPersistenceImpl extends BasePersistenceImpl<Shoppin
 			ShoppingCategoryImpl.class, shoppingCategory.getPrimaryKey(),
 			shoppingCategory, false);
 
-		clearUniqueFindersCache(shoppingCategoryModelImpl);
+		clearUniqueFindersCache(shoppingCategoryModelImpl, false);
 		cacheUniqueFindersCache(shoppingCategoryModelImpl);
 
 		shoppingCategory.resetOriginalValues();

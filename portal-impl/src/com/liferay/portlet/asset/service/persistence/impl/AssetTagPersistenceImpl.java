@@ -4672,7 +4672,7 @@ public class AssetTagPersistenceImpl extends BasePersistenceImpl<AssetTag>
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
-		clearUniqueFindersCache((AssetTagModelImpl)assetTag);
+		clearUniqueFindersCache((AssetTagModelImpl)assetTag, true);
 	}
 
 	@Override
@@ -4684,7 +4684,7 @@ public class AssetTagPersistenceImpl extends BasePersistenceImpl<AssetTag>
 			entityCache.removeResult(AssetTagModelImpl.ENTITY_CACHE_ENABLED,
 				AssetTagImpl.class, assetTag.getPrimaryKey());
 
-			clearUniqueFindersCache((AssetTagModelImpl)assetTag);
+			clearUniqueFindersCache((AssetTagModelImpl)assetTag, true);
 		}
 	}
 
@@ -4708,7 +4708,17 @@ public class AssetTagPersistenceImpl extends BasePersistenceImpl<AssetTag>
 			assetTagModelImpl, false);
 	}
 
-	protected void clearUniqueFindersCache(AssetTagModelImpl assetTagModelImpl) {
+	protected void clearUniqueFindersCache(
+		AssetTagModelImpl assetTagModelImpl, boolean clearCurrent) {
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					assetTagModelImpl.getUuid(), assetTagModelImpl.getGroupId()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_UUID_G, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_UUID_G, args);
+		}
+
 		if ((assetTagModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_UUID_G.getColumnBitmask()) != 0) {
 			Object[] args = new Object[] {
@@ -4718,6 +4728,15 @@ public class AssetTagPersistenceImpl extends BasePersistenceImpl<AssetTag>
 
 			finderCache.removeResult(FINDER_PATH_COUNT_BY_UUID_G, args);
 			finderCache.removeResult(FINDER_PATH_FETCH_BY_UUID_G, args);
+		}
+
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					assetTagModelImpl.getGroupId(), assetTagModelImpl.getName()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_G_N, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_G_N, args);
 		}
 
 		if ((assetTagModelImpl.getColumnBitmask() &
@@ -4960,7 +4979,7 @@ public class AssetTagPersistenceImpl extends BasePersistenceImpl<AssetTag>
 		entityCache.putResult(AssetTagModelImpl.ENTITY_CACHE_ENABLED,
 			AssetTagImpl.class, assetTag.getPrimaryKey(), assetTag, false);
 
-		clearUniqueFindersCache(assetTagModelImpl);
+		clearUniqueFindersCache(assetTagModelImpl, false);
 		cacheUniqueFindersCache(assetTagModelImpl);
 
 		assetTag.resetOriginalValues();

@@ -2044,7 +2044,8 @@ public class AssetCategoryPropertyPersistenceImpl extends BasePersistenceImpl<As
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
-		clearUniqueFindersCache((AssetCategoryPropertyModelImpl)assetCategoryProperty);
+		clearUniqueFindersCache((AssetCategoryPropertyModelImpl)assetCategoryProperty,
+			true);
 	}
 
 	@Override
@@ -2057,7 +2058,8 @@ public class AssetCategoryPropertyPersistenceImpl extends BasePersistenceImpl<As
 				AssetCategoryPropertyImpl.class,
 				assetCategoryProperty.getPrimaryKey());
 
-			clearUniqueFindersCache((AssetCategoryPropertyModelImpl)assetCategoryProperty);
+			clearUniqueFindersCache((AssetCategoryPropertyModelImpl)assetCategoryProperty,
+				true);
 		}
 	}
 
@@ -2075,7 +2077,18 @@ public class AssetCategoryPropertyPersistenceImpl extends BasePersistenceImpl<As
 	}
 
 	protected void clearUniqueFindersCache(
-		AssetCategoryPropertyModelImpl assetCategoryPropertyModelImpl) {
+		AssetCategoryPropertyModelImpl assetCategoryPropertyModelImpl,
+		boolean clearCurrent) {
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					assetCategoryPropertyModelImpl.getCategoryId(),
+					assetCategoryPropertyModelImpl.getKey()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_CA_K, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_CA_K, args);
+		}
+
 		if ((assetCategoryPropertyModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_CA_K.getColumnBitmask()) != 0) {
 			Object[] args = new Object[] {
@@ -2317,7 +2330,7 @@ public class AssetCategoryPropertyPersistenceImpl extends BasePersistenceImpl<As
 			AssetCategoryPropertyImpl.class,
 			assetCategoryProperty.getPrimaryKey(), assetCategoryProperty, false);
 
-		clearUniqueFindersCache(assetCategoryPropertyModelImpl);
+		clearUniqueFindersCache(assetCategoryPropertyModelImpl, false);
 		cacheUniqueFindersCache(assetCategoryPropertyModelImpl);
 
 		assetCategoryProperty.resetOriginalValues();

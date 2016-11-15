@@ -2363,7 +2363,7 @@ public class RepositoryPersistenceImpl extends BasePersistenceImpl<Repository>
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
-		clearUniqueFindersCache((RepositoryModelImpl)repository);
+		clearUniqueFindersCache((RepositoryModelImpl)repository, true);
 	}
 
 	@Override
@@ -2375,7 +2375,7 @@ public class RepositoryPersistenceImpl extends BasePersistenceImpl<Repository>
 			entityCache.removeResult(RepositoryModelImpl.ENTITY_CACHE_ENABLED,
 				RepositoryImpl.class, repository.getPrimaryKey());
 
-			clearUniqueFindersCache((RepositoryModelImpl)repository);
+			clearUniqueFindersCache((RepositoryModelImpl)repository, true);
 		}
 	}
 
@@ -2402,7 +2402,17 @@ public class RepositoryPersistenceImpl extends BasePersistenceImpl<Repository>
 	}
 
 	protected void clearUniqueFindersCache(
-		RepositoryModelImpl repositoryModelImpl) {
+		RepositoryModelImpl repositoryModelImpl, boolean clearCurrent) {
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					repositoryModelImpl.getUuid(),
+					repositoryModelImpl.getGroupId()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_UUID_G, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_UUID_G, args);
+		}
+
 		if ((repositoryModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_UUID_G.getColumnBitmask()) != 0) {
 			Object[] args = new Object[] {
@@ -2412,6 +2422,17 @@ public class RepositoryPersistenceImpl extends BasePersistenceImpl<Repository>
 
 			finderCache.removeResult(FINDER_PATH_COUNT_BY_UUID_G, args);
 			finderCache.removeResult(FINDER_PATH_FETCH_BY_UUID_G, args);
+		}
+
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					repositoryModelImpl.getGroupId(),
+					repositoryModelImpl.getName(),
+					repositoryModelImpl.getPortletId()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_G_N_P, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_G_N_P, args);
 		}
 
 		if ((repositoryModelImpl.getColumnBitmask() &
@@ -2657,7 +2678,7 @@ public class RepositoryPersistenceImpl extends BasePersistenceImpl<Repository>
 		entityCache.putResult(RepositoryModelImpl.ENTITY_CACHE_ENABLED,
 			RepositoryImpl.class, repository.getPrimaryKey(), repository, false);
 
-		clearUniqueFindersCache(repositoryModelImpl);
+		clearUniqueFindersCache(repositoryModelImpl, false);
 		cacheUniqueFindersCache(repositoryModelImpl);
 
 		repository.resetOriginalValues();

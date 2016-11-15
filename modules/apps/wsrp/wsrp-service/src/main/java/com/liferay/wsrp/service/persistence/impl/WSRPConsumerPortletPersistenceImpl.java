@@ -2104,7 +2104,8 @@ public class WSRPConsumerPortletPersistenceImpl extends BasePersistenceImpl<WSRP
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
-		clearUniqueFindersCache((WSRPConsumerPortletModelImpl)wsrpConsumerPortlet);
+		clearUniqueFindersCache((WSRPConsumerPortletModelImpl)wsrpConsumerPortlet,
+			true);
 	}
 
 	@Override
@@ -2117,7 +2118,8 @@ public class WSRPConsumerPortletPersistenceImpl extends BasePersistenceImpl<WSRP
 				WSRPConsumerPortletImpl.class,
 				wsrpConsumerPortlet.getPrimaryKey());
 
-			clearUniqueFindersCache((WSRPConsumerPortletModelImpl)wsrpConsumerPortlet);
+			clearUniqueFindersCache((WSRPConsumerPortletModelImpl)wsrpConsumerPortlet,
+				true);
 		}
 	}
 
@@ -2135,7 +2137,18 @@ public class WSRPConsumerPortletPersistenceImpl extends BasePersistenceImpl<WSRP
 	}
 
 	protected void clearUniqueFindersCache(
-		WSRPConsumerPortletModelImpl wsrpConsumerPortletModelImpl) {
+		WSRPConsumerPortletModelImpl wsrpConsumerPortletModelImpl,
+		boolean clearCurrent) {
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					wsrpConsumerPortletModelImpl.getWsrpConsumerId(),
+					wsrpConsumerPortletModelImpl.getPortletHandle()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_W_P, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_W_P, args);
+		}
+
 		if ((wsrpConsumerPortletModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_W_P.getColumnBitmask()) != 0) {
 			Object[] args = new Object[] {
@@ -2387,7 +2400,7 @@ public class WSRPConsumerPortletPersistenceImpl extends BasePersistenceImpl<WSRP
 			WSRPConsumerPortletImpl.class, wsrpConsumerPortlet.getPrimaryKey(),
 			wsrpConsumerPortlet, false);
 
-		clearUniqueFindersCache(wsrpConsumerPortletModelImpl);
+		clearUniqueFindersCache(wsrpConsumerPortletModelImpl, false);
 		cacheUniqueFindersCache(wsrpConsumerPortletModelImpl);
 
 		wsrpConsumerPortlet.resetOriginalValues();

@@ -3037,7 +3037,7 @@ public class BlogsStatsUserPersistenceImpl extends BasePersistenceImpl<BlogsStat
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
-		clearUniqueFindersCache((BlogsStatsUserModelImpl)blogsStatsUser);
+		clearUniqueFindersCache((BlogsStatsUserModelImpl)blogsStatsUser, true);
 	}
 
 	@Override
@@ -3049,7 +3049,8 @@ public class BlogsStatsUserPersistenceImpl extends BasePersistenceImpl<BlogsStat
 			entityCache.removeResult(BlogsStatsUserModelImpl.ENTITY_CACHE_ENABLED,
 				BlogsStatsUserImpl.class, blogsStatsUser.getPrimaryKey());
 
-			clearUniqueFindersCache((BlogsStatsUserModelImpl)blogsStatsUser);
+			clearUniqueFindersCache((BlogsStatsUserModelImpl)blogsStatsUser,
+				true);
 		}
 	}
 
@@ -3067,7 +3068,17 @@ public class BlogsStatsUserPersistenceImpl extends BasePersistenceImpl<BlogsStat
 	}
 
 	protected void clearUniqueFindersCache(
-		BlogsStatsUserModelImpl blogsStatsUserModelImpl) {
+		BlogsStatsUserModelImpl blogsStatsUserModelImpl, boolean clearCurrent) {
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					blogsStatsUserModelImpl.getGroupId(),
+					blogsStatsUserModelImpl.getUserId()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_G_U, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_G_U, args);
+		}
+
 		if ((blogsStatsUserModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_G_U.getColumnBitmask()) != 0) {
 			Object[] args = new Object[] {
@@ -3279,7 +3290,7 @@ public class BlogsStatsUserPersistenceImpl extends BasePersistenceImpl<BlogsStat
 			BlogsStatsUserImpl.class, blogsStatsUser.getPrimaryKey(),
 			blogsStatsUser, false);
 
-		clearUniqueFindersCache(blogsStatsUserModelImpl);
+		clearUniqueFindersCache(blogsStatsUserModelImpl, false);
 		cacheUniqueFindersCache(blogsStatsUserModelImpl);
 
 		blogsStatsUser.resetOriginalValues();

@@ -4578,7 +4578,8 @@ public class PortletPreferencesPersistenceImpl extends BasePersistenceImpl<Portl
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
-		clearUniqueFindersCache((PortletPreferencesModelImpl)portletPreferences);
+		clearUniqueFindersCache((PortletPreferencesModelImpl)portletPreferences,
+			true);
 	}
 
 	@Override
@@ -4590,7 +4591,8 @@ public class PortletPreferencesPersistenceImpl extends BasePersistenceImpl<Portl
 			entityCache.removeResult(PortletPreferencesModelImpl.ENTITY_CACHE_ENABLED,
 				PortletPreferencesImpl.class, portletPreferences.getPrimaryKey());
 
-			clearUniqueFindersCache((PortletPreferencesModelImpl)portletPreferences);
+			clearUniqueFindersCache((PortletPreferencesModelImpl)portletPreferences,
+				true);
 		}
 	}
 
@@ -4610,7 +4612,20 @@ public class PortletPreferencesPersistenceImpl extends BasePersistenceImpl<Portl
 	}
 
 	protected void clearUniqueFindersCache(
-		PortletPreferencesModelImpl portletPreferencesModelImpl) {
+		PortletPreferencesModelImpl portletPreferencesModelImpl,
+		boolean clearCurrent) {
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					portletPreferencesModelImpl.getOwnerId(),
+					portletPreferencesModelImpl.getOwnerType(),
+					portletPreferencesModelImpl.getPlid(),
+					portletPreferencesModelImpl.getPortletId()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_O_O_P_P, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_O_O_P_P, args);
+		}
+
 		if ((portletPreferencesModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_O_O_P_P.getColumnBitmask()) != 0) {
 			Object[] args = new Object[] {
@@ -4915,7 +4930,7 @@ public class PortletPreferencesPersistenceImpl extends BasePersistenceImpl<Portl
 			PortletPreferencesImpl.class, portletPreferences.getPrimaryKey(),
 			portletPreferences, false);
 
-		clearUniqueFindersCache(portletPreferencesModelImpl);
+		clearUniqueFindersCache(portletPreferencesModelImpl, false);
 		cacheUniqueFindersCache(portletPreferencesModelImpl);
 
 		portletPreferences.resetOriginalValues();

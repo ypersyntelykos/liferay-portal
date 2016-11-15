@@ -3251,7 +3251,7 @@ public class MBBanPersistenceImpl extends BasePersistenceImpl<MBBan>
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
-		clearUniqueFindersCache((MBBanModelImpl)mbBan);
+		clearUniqueFindersCache((MBBanModelImpl)mbBan, true);
 	}
 
 	@Override
@@ -3263,7 +3263,7 @@ public class MBBanPersistenceImpl extends BasePersistenceImpl<MBBan>
 			entityCache.removeResult(MBBanModelImpl.ENTITY_CACHE_ENABLED,
 				MBBanImpl.class, mbBan.getPrimaryKey());
 
-			clearUniqueFindersCache((MBBanModelImpl)mbBan);
+			clearUniqueFindersCache((MBBanModelImpl)mbBan, true);
 		}
 	}
 
@@ -3287,7 +3287,17 @@ public class MBBanPersistenceImpl extends BasePersistenceImpl<MBBan>
 			false);
 	}
 
-	protected void clearUniqueFindersCache(MBBanModelImpl mbBanModelImpl) {
+	protected void clearUniqueFindersCache(MBBanModelImpl mbBanModelImpl,
+		boolean clearCurrent) {
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					mbBanModelImpl.getUuid(), mbBanModelImpl.getGroupId()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_UUID_G, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_UUID_G, args);
+		}
+
 		if ((mbBanModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_UUID_G.getColumnBitmask()) != 0) {
 			Object[] args = new Object[] {
@@ -3297,6 +3307,15 @@ public class MBBanPersistenceImpl extends BasePersistenceImpl<MBBan>
 
 			finderCache.removeResult(FINDER_PATH_COUNT_BY_UUID_G, args);
 			finderCache.removeResult(FINDER_PATH_FETCH_BY_UUID_G, args);
+		}
+
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					mbBanModelImpl.getGroupId(), mbBanModelImpl.getBanUserId()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_G_B, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_G_B, args);
 		}
 
 		if ((mbBanModelImpl.getColumnBitmask() &
@@ -3565,7 +3584,7 @@ public class MBBanPersistenceImpl extends BasePersistenceImpl<MBBan>
 		entityCache.putResult(MBBanModelImpl.ENTITY_CACHE_ENABLED,
 			MBBanImpl.class, mbBan.getPrimaryKey(), mbBan, false);
 
-		clearUniqueFindersCache(mbBanModelImpl);
+		clearUniqueFindersCache(mbBanModelImpl, false);
 		cacheUniqueFindersCache(mbBanModelImpl);
 
 		mbBan.resetOriginalValues();

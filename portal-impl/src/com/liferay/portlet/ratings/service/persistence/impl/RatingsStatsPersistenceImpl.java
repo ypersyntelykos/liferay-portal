@@ -382,7 +382,7 @@ public class RatingsStatsPersistenceImpl extends BasePersistenceImpl<RatingsStat
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
-		clearUniqueFindersCache((RatingsStatsModelImpl)ratingsStats);
+		clearUniqueFindersCache((RatingsStatsModelImpl)ratingsStats, true);
 	}
 
 	@Override
@@ -394,7 +394,7 @@ public class RatingsStatsPersistenceImpl extends BasePersistenceImpl<RatingsStat
 			entityCache.removeResult(RatingsStatsModelImpl.ENTITY_CACHE_ENABLED,
 				RatingsStatsImpl.class, ratingsStats.getPrimaryKey());
 
-			clearUniqueFindersCache((RatingsStatsModelImpl)ratingsStats);
+			clearUniqueFindersCache((RatingsStatsModelImpl)ratingsStats, true);
 		}
 	}
 
@@ -412,7 +412,17 @@ public class RatingsStatsPersistenceImpl extends BasePersistenceImpl<RatingsStat
 	}
 
 	protected void clearUniqueFindersCache(
-		RatingsStatsModelImpl ratingsStatsModelImpl) {
+		RatingsStatsModelImpl ratingsStatsModelImpl, boolean clearCurrent) {
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					ratingsStatsModelImpl.getClassNameId(),
+					ratingsStatsModelImpl.getClassPK()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_C_C, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_C_C, args);
+		}
+
 		if ((ratingsStatsModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_C_C.getColumnBitmask()) != 0) {
 			Object[] args = new Object[] {
@@ -566,7 +576,7 @@ public class RatingsStatsPersistenceImpl extends BasePersistenceImpl<RatingsStat
 			RatingsStatsImpl.class, ratingsStats.getPrimaryKey(), ratingsStats,
 			false);
 
-		clearUniqueFindersCache(ratingsStatsModelImpl);
+		clearUniqueFindersCache(ratingsStatsModelImpl, false);
 		cacheUniqueFindersCache(ratingsStatsModelImpl);
 
 		ratingsStats.resetOriginalValues();

@@ -2047,7 +2047,7 @@ public class MDRRulePersistenceImpl extends BasePersistenceImpl<MDRRule>
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
-		clearUniqueFindersCache((MDRRuleModelImpl)mdrRule);
+		clearUniqueFindersCache((MDRRuleModelImpl)mdrRule, true);
 	}
 
 	@Override
@@ -2059,7 +2059,7 @@ public class MDRRulePersistenceImpl extends BasePersistenceImpl<MDRRule>
 			entityCache.removeResult(MDRRuleModelImpl.ENTITY_CACHE_ENABLED,
 				MDRRuleImpl.class, mdrRule.getPrimaryKey());
 
-			clearUniqueFindersCache((MDRRuleModelImpl)mdrRule);
+			clearUniqueFindersCache((MDRRuleModelImpl)mdrRule, true);
 		}
 	}
 
@@ -2074,7 +2074,17 @@ public class MDRRulePersistenceImpl extends BasePersistenceImpl<MDRRule>
 			mdrRuleModelImpl, false);
 	}
 
-	protected void clearUniqueFindersCache(MDRRuleModelImpl mdrRuleModelImpl) {
+	protected void clearUniqueFindersCache(MDRRuleModelImpl mdrRuleModelImpl,
+		boolean clearCurrent) {
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					mdrRuleModelImpl.getUuid(), mdrRuleModelImpl.getGroupId()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_UUID_G, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_UUID_G, args);
+		}
+
 		if ((mdrRuleModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_UUID_G.getColumnBitmask()) != 0) {
 			Object[] args = new Object[] {
@@ -2312,7 +2322,7 @@ public class MDRRulePersistenceImpl extends BasePersistenceImpl<MDRRule>
 		entityCache.putResult(MDRRuleModelImpl.ENTITY_CACHE_ENABLED,
 			MDRRuleImpl.class, mdrRule.getPrimaryKey(), mdrRule, false);
 
-		clearUniqueFindersCache(mdrRuleModelImpl);
+		clearUniqueFindersCache(mdrRuleModelImpl, false);
 		cacheUniqueFindersCache(mdrRuleModelImpl);
 
 		mdrRule.resetOriginalValues();

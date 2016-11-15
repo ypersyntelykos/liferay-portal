@@ -2905,7 +2905,7 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
-		clearUniqueFindersCache((ModuleModelImpl)module);
+		clearUniqueFindersCache((ModuleModelImpl)module, true);
 	}
 
 	@Override
@@ -2917,7 +2917,7 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 			entityCache.removeResult(ModuleModelImpl.ENTITY_CACHE_ENABLED,
 				ModuleImpl.class, module.getPrimaryKey());
 
-			clearUniqueFindersCache((ModuleModelImpl)module);
+			clearUniqueFindersCache((ModuleModelImpl)module, true);
 		}
 	}
 
@@ -2943,7 +2943,17 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 			moduleModelImpl, false);
 	}
 
-	protected void clearUniqueFindersCache(ModuleModelImpl moduleModelImpl) {
+	protected void clearUniqueFindersCache(ModuleModelImpl moduleModelImpl,
+		boolean clearCurrent) {
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					moduleModelImpl.getAppId(), moduleModelImpl.getContextName()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_A_CN, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_A_CN, args);
+		}
+
 		if ((moduleModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_A_CN.getColumnBitmask()) != 0) {
 			Object[] args = new Object[] {
@@ -2953,6 +2963,17 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 
 			finderCache.removeResult(FINDER_PATH_COUNT_BY_A_CN, args);
 			finderCache.removeResult(FINDER_PATH_FETCH_BY_A_CN, args);
+		}
+
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					moduleModelImpl.getAppId(),
+					moduleModelImpl.getBundleSymbolicName(),
+					moduleModelImpl.getBundleVersion()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_A_BSN_BV, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_A_BSN_BV, args);
 		}
 
 		if ((moduleModelImpl.getColumnBitmask() &
@@ -3182,7 +3203,7 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 		entityCache.putResult(ModuleModelImpl.ENTITY_CACHE_ENABLED,
 			ModuleImpl.class, module.getPrimaryKey(), module, false);
 
-		clearUniqueFindersCache(moduleModelImpl);
+		clearUniqueFindersCache(moduleModelImpl, false);
 		cacheUniqueFindersCache(moduleModelImpl);
 
 		module.resetOriginalValues();

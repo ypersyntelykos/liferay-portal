@@ -619,7 +619,7 @@ public class VirtualHostPersistenceImpl extends BasePersistenceImpl<VirtualHost>
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
-		clearUniqueFindersCache((VirtualHostModelImpl)virtualHost);
+		clearUniqueFindersCache((VirtualHostModelImpl)virtualHost, true);
 	}
 
 	@Override
@@ -631,7 +631,7 @@ public class VirtualHostPersistenceImpl extends BasePersistenceImpl<VirtualHost>
 			entityCache.removeResult(VirtualHostModelImpl.ENTITY_CACHE_ENABLED,
 				VirtualHostImpl.class, virtualHost.getPrimaryKey());
 
-			clearUniqueFindersCache((VirtualHostModelImpl)virtualHost);
+			clearUniqueFindersCache((VirtualHostModelImpl)virtualHost, true);
 		}
 	}
 
@@ -656,7 +656,14 @@ public class VirtualHostPersistenceImpl extends BasePersistenceImpl<VirtualHost>
 	}
 
 	protected void clearUniqueFindersCache(
-		VirtualHostModelImpl virtualHostModelImpl) {
+		VirtualHostModelImpl virtualHostModelImpl, boolean clearCurrent) {
+		if (clearCurrent) {
+			Object[] args = new Object[] { virtualHostModelImpl.getHostname() };
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_HOSTNAME, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_HOSTNAME, args);
+		}
+
 		if ((virtualHostModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_HOSTNAME.getColumnBitmask()) != 0) {
 			Object[] args = new Object[] {
@@ -665,6 +672,16 @@ public class VirtualHostPersistenceImpl extends BasePersistenceImpl<VirtualHost>
 
 			finderCache.removeResult(FINDER_PATH_COUNT_BY_HOSTNAME, args);
 			finderCache.removeResult(FINDER_PATH_FETCH_BY_HOSTNAME, args);
+		}
+
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					virtualHostModelImpl.getCompanyId(),
+					virtualHostModelImpl.getLayoutSetId()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_C_L, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_C_L, args);
 		}
 
 		if ((virtualHostModelImpl.getColumnBitmask() &
@@ -821,7 +838,7 @@ public class VirtualHostPersistenceImpl extends BasePersistenceImpl<VirtualHost>
 			VirtualHostImpl.class, virtualHost.getPrimaryKey(), virtualHost,
 			false);
 
-		clearUniqueFindersCache(virtualHostModelImpl);
+		clearUniqueFindersCache(virtualHostModelImpl, false);
 		cacheUniqueFindersCache(virtualHostModelImpl);
 
 		virtualHost.resetOriginalValues();
