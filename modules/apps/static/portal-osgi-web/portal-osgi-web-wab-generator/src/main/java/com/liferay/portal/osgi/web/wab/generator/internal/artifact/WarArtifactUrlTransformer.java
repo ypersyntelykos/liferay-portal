@@ -67,10 +67,15 @@ public class WarArtifactUrlTransformer implements ArtifactUrlTransformer {
 		try (ZipFile zipFile = new ZipFile(artifact)) {
 			ZipEntry resourceDir = zipFile.getEntry(
 				"WEB-INF/classes/resources-importer/");
+
+			if (resourceDir != null) {
+				return true;
+			}
+
 			ZipEntry templateDir = zipFile.getEntry(
 				"WEB-INF/classes/templates-importer/");
 
-			if ((resourceDir != null) || (templateDir != null)) {
+			if (templateDir != null) {
 				return true;
 			}
 
@@ -88,10 +93,8 @@ public class WarArtifactUrlTransformer implements ArtifactUrlTransformer {
 
 				properties.load(inputStream);
 
-				String resourcesDir = properties.getProperty(
-					"resources-importer-external-dir");
-
-				return Validator.isNotNull(resourcesDir);
+				return Validator.isNotNull(
+					properties.getProperty("resources-importer-external-dir"));
 			}
 		}
 		catch (IOException ioe) {
