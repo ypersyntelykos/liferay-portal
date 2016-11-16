@@ -68,7 +68,7 @@ public class HibernateStaleObjectStateAspect {
 			"org.hibernate.event.DeleteEvent)) && args(deleteEvent)"
 	)
 	public void trackDeleteEvent(DeleteEvent deleteEvent) {
-		_trackEvent(deleteEvent.getObject());
+		_trackEvent("Delete", deleteEvent.getObject());
 	}
 
 	@AfterReturning(
@@ -76,7 +76,7 @@ public class HibernateStaleObjectStateAspect {
 			"onMerge(org.hibernate.event.MergeEvent)) && args(mergeEvent)"
 	)
 	public void trackMergeEvent(MergeEvent mergeEvent) {
-		_trackEvent(mergeEvent.getOriginal());
+		_trackEvent("Merge", mergeEvent.getOriginal());
 	}
 
 	@AfterReturning(
@@ -85,7 +85,7 @@ public class HibernateStaleObjectStateAspect {
 				"args(saveOrUpdateEvent)"
 	)
 	public void trackSaveOrUpdateEvent(SaveOrUpdateEvent saveOrUpdateEvent) {
-		_trackEvent(saveOrUpdateEvent.getObject());
+		_trackEvent("SaveOrUpdate", saveOrUpdateEvent.getObject());
 	}
 
 	private void _suppressFailureCause(Object object, HibernateException he) {
@@ -96,36 +96,23 @@ public class HibernateStaleObjectStateAspect {
 		he.addSuppressed(_events.get(new EventKey((BaseModel<?>)object)));
 	}
 
-	private void _trackEvent(Object object) {
+	private void _trackEvent(String eventType, Object object) {
 		if (!(object instanceof MVCCModel)) {
 			return;
 		}
 
-		ConflictingLiferayUpdateException clue =
-			new ConflictingLiferayUpdateException();
+		Exception exception = new Exception(
+			eventType + " record for " + object);
 
-		ConflictingLiferayUpdateException previousCLUE = _events.put(
-			new EventKey((BaseModel<?>)object), clue);
+		Exception previousException = _events.put(
+			new EventKey((BaseModel<?>)object), exception);
 
-		if (previousCLUE != null) {
-			clue.addSuppressed(previousCLUE);
+		if (previousException != null) {
+			exception.addSuppressed(previousException);
 		}
 	}
 
-	private final Map<EventKey, ConflictingLiferayUpdateException> _events =
-		new ConcurrentHashMap<>();
-
-	private static class ConflictingLiferayUpdateException
-		extends RuntimeException {
-
-		@Override
-		public String getMessage() {
-			return "This update caused an MVCCModel to become stale. Either " +
-				"combine the updates or retrieve the model from the database " +
-					"before the stale update.";
-		}
-
-	}
+	private final Map<EventKey, Exception> _events = new ConcurrentHashMap<>();
 
 	private static class EventKey {
 
