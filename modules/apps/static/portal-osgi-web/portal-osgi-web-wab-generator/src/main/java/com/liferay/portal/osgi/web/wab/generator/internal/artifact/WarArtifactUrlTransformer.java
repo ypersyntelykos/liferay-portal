@@ -17,7 +17,6 @@ package com.liferay.portal.osgi.web.wab.generator.internal.artifact;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.osgi.web.wab.generator.internal.WabGenerator;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,10 +25,9 @@ import java.io.InputStream;
 import java.net.URL;
 
 import java.util.Properties;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
-
-import javax.servlet.ServletContext;
 
 import org.apache.felix.fileinstall.ArtifactUrlTransformer;
 
@@ -39,8 +37,8 @@ import org.apache.felix.fileinstall.ArtifactUrlTransformer;
  */
 public class WarArtifactUrlTransformer implements ArtifactUrlTransformer {
 
-	public WarArtifactUrlTransformer(WabGenerator wabGenerator) {
-		_wabGenerator = wabGenerator;
+	public WarArtifactUrlTransformer(AtomicBoolean portalIsReady) {
+		_portalIsReady = portalIsReady;
 	}
 
 	@Override
@@ -51,11 +49,11 @@ public class WarArtifactUrlTransformer implements ArtifactUrlTransformer {
 			return false;
 		}
 
-		if (_hasResources(artifact)) {
-			return _isReadyForImport();
+		if (!_hasResources(artifact)) {
+			return true;
 		}
 
-		return true;
+		return _portalIsReady.get();
 	}
 
 	@Override
@@ -104,19 +102,9 @@ public class WarArtifactUrlTransformer implements ArtifactUrlTransformer {
 		return false;
 	}
 
-	private boolean _isReadyForImport() {
-		ServletContext servletContext = _wabGenerator.getServletContext();
-
-		if (servletContext == null) {
-			return false;
-		}
-
-		return true;
-	}
-
 	private static final Log _log = LogFactoryUtil.getLog(
 		WarArtifactUrlTransformer.class);
 
-	private final WabGenerator _wabGenerator;
+	private final AtomicBoolean _portalIsReady;
 
 }

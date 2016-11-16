@@ -43,6 +43,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -83,10 +84,6 @@ public class WabGenerator
 			classLoader, file, parameters);
 
 		return wabProcessor.getProcessedFile();
-	}
-
-	public ServletContext getServletContext() {
-		return _servletContext;
 	}
 
 	@Activate
@@ -193,8 +190,8 @@ public class WabGenerator
 
 	protected void registerArtifactUrlTransformer(BundleContext bundleContext) {
 		_serviceRegistration = bundleContext.registerService(
-			ArtifactUrlTransformer.class, new WarArtifactUrlTransformer(this),
-			null);
+			ArtifactUrlTransformer.class,
+			new WarArtifactUrlTransformer(_portalIsReady), null);
 	}
 
 	protected void registerURLStreamHandlerService(
@@ -232,7 +229,7 @@ public class WabGenerator
 		target = "(&(original.bean=true)(bean.id=javax.servlet.ServletContext))"
 	)
 	protected void setServletContext(ServletContext servletContext) {
-		_servletContext = servletContext;
+		_portalIsReady.set(true);
 	}
 
 	protected void unsetModuleServiceLifecycle(
@@ -240,12 +237,12 @@ public class WabGenerator
 	}
 
 	protected void unsetServletContext(ServletContext servletContext) {
-		_servletContext = null;
+		_portalIsReady.set(false);
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(WabGenerator.class);
 
+	private final AtomicBoolean _portalIsReady = new AtomicBoolean();
 	private ServiceRegistration<ArtifactUrlTransformer> _serviceRegistration;
-	private volatile ServletContext _servletContext;
 
 }
