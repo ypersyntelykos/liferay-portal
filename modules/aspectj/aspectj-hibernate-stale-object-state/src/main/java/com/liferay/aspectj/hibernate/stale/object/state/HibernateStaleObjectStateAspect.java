@@ -44,7 +44,7 @@ public class HibernateStaleObjectStateAspect {
 		throwing = "sose",
 		value = "execution(void org.hibernate.event.def.DefaultMergeEventListener.onMerge(org.hibernate.event.MergeEvent)) && args(mergeEvent)"
 	)
-	public void initMergeCause(
+	public void supressMergeFailureCause(
 		MergeEvent mergeEvent, StaleObjectStateException sose) {
 
 		Object object = mergeEvent.getOriginal();
@@ -53,50 +53,44 @@ public class HibernateStaleObjectStateAspect {
 			return;
 		}
 
-		EventKey eventKey = new EventKey((BaseModel<?>)object);
-
-		StaleObjectStateException cause = _previousUpdates.get(eventKey);
-
-		sose.initCause(cause);
+		sose.addSuppressed(_events.get(new EventKey((BaseModel<?>)object)));
 	}
 
 	@AfterReturning(
 		"execution(void org.hibernate.event.DeleteEventListener.onDelete(" +
 			"org.hibernate.event.DeleteEvent)) && args(deleteEvent)"
 	)
-	public void logDeleteEvent(DeleteEvent deleteEvent) {
-		_logEvent(deleteEvent.getObject());
+	public void trackDeleteEvent(DeleteEvent deleteEvent) {
+		_trackEvent(deleteEvent.getObject());
 	}
 
 	@AfterReturning(
 		"execution(void org.hibernate.event.def.DefaultMergeEventListener." +
 			"onMerge(org.hibernate.event.MergeEvent)) && args(mergeEvent)"
 	)
-	public void logMergeEvent(MergeEvent mergeEvent) {
-		_logEvent(mergeEvent.getOriginal());
+	public void trackMergeEvent(MergeEvent mergeEvent) {
+		_trackEvent(mergeEvent.getOriginal());
 	}
 
-	private void _logEvent(Object object) {
+	private void _trackEvent(Object object) {
 		if (!(object instanceof MVCCModel)) {
 			return;
 		}
 
 		BaseModel<?> baseModel = (BaseModel<?>)object;
 
-		EventKey eventKey = new EventKey(baseModel);
-
 		StaleObjectStateException sose = new StaleObjectStateException(
 			baseModel.getModelClassName(), baseModel.getPrimaryKeyObj());
 
-		StaleObjectStateException oldCause = _previousUpdates.put(
-			eventKey, sose);
+		StaleObjectStateException previousSOSE = _events.put(
+			new EventKey(baseModel), sose);
 
-		if (oldCause != null) {
-			sose.addSuppressed(oldCause);
+		if (previousSOSE != null) {
+			sose.addSuppressed(previousSOSE);
 		}
 	}
 
-	private final Map<EventKey, StaleObjectStateException> _previousUpdates =
+	private final Map<EventKey, StaleObjectStateException> _events =
 		new ConcurrentHashMap<>();
 
 	private static class EventKey {
@@ -106,7 +100,7 @@ public class HibernateStaleObjectStateAspect {
 			EventKey eventKey = (EventKey)obj;
 
 			if ((eventKey._mvccVersion == _mvccVersion) &&
-				Objects.equals(eventKey._primaryKeyObject, _primaryKeyObject) &&
+				Objects.equals(eventKey._primaryKey, _primaryKey) &&
 				Objects.equals(eventKey._modelClassName, _modelClassName)) {
 
 				return true;
@@ -119,7 +113,7 @@ public class HibernateStaleObjectStateAspect {
 		public int hashCode() {
 			int hashCode = HashUtil.hash(0, _mvccVersion);
 
-			hashCode = HashUtil.hash(hashCode, _primaryKeyObject);
+			hashCode = HashUtil.hash(hashCode, _primaryKey);
 			hashCode = HashUtil.hash(hashCode, _modelClassName);
 
 			return hashCode;
@@ -127,7 +121,7 @@ public class HibernateStaleObjectStateAspect {
 
 		private EventKey(BaseModel<?> baseModel) {
 			_modelClassName = baseModel.getModelClassName();
-			_primaryKeyObject = baseModel.getPrimaryKeyObj();
+			_primaryKey = baseModel.getPrimaryKeyObj();
 
 			MVCCModel mvccModel = (MVCCModel)baseModel;
 
@@ -136,7 +130,7 @@ public class HibernateStaleObjectStateAspect {
 
 		private final String _modelClassName;
 		private final long _mvccVersion;
-		private final Serializable _primaryKeyObject;
+		private final Serializable _primaryKey;
 
 	}
 
