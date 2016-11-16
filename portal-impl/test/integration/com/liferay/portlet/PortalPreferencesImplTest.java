@@ -144,7 +144,6 @@ public class PortalPreferencesImplTest {
 
 			Assert.fail();
 		}
-
 		catch (Exception e) {
 			Throwable cause = e.getCause();
 
@@ -396,7 +395,7 @@ public class PortalPreferencesImplTest {
 			ProxyUtil.newProxyInstance(
 				PortalPreferencesLocalService.class.getClassLoader(),
 				new Class<?>[] {PortalPreferencesLocalService.class},
-				new SynchronousInvocationHandler()));
+				new SynchronousInvocationHandler(_testOwnerId)));
 
 		Thread thread1 = new Thread(futureTask1, "Update Thread 1");
 
@@ -414,7 +413,7 @@ public class PortalPreferencesImplTest {
 		FinderCacheUtil.clearLocalCache();
 	}
 
-	protected class SynchronizedTransactionExecutor
+	protected static class SynchronizedTransactionExecutor
 		extends DefaultTransactionExecutor {
 
 		@Override
@@ -447,6 +446,10 @@ public class PortalPreferencesImplTest {
 			}
 		}
 
+		private SynchronizedTransactionExecutor(long testOwnerId) {
+			_testOwnerId = testOwnerId;
+		}
+
 		private final CyclicBarrier _cyclicBarrier = new CyclicBarrier(
 			2,
 			new Runnable() {
@@ -459,9 +462,12 @@ public class PortalPreferencesImplTest {
 
 			});
 
+		private final long _testOwnerId;
+
 	}
 
-	protected class SynchronousInvocationHandler implements InvocationHandler {
+	protected static class SynchronousInvocationHandler
+		implements InvocationHandler {
 
 		@Override
 		public Object invoke(Object proxy, Method method, Object[] args)
@@ -476,21 +482,25 @@ public class PortalPreferencesImplTest {
 			return method.invoke(_originalPortalPreferencesLocalService, args);
 		}
 
-		private final CyclicBarrier _cyclicBarrier = new CyclicBarrier(
-			2,
-			new Runnable() {
+		private SynchronousInvocationHandler(long testOwnerId) {
+			_cyclicBarrier = new CyclicBarrier(
+				2,
+				new Runnable() {
 
-				@Override
-				public void run() {
-					_transactionInterceptor.setTransactionExecutor(
-						new SynchronizedTransactionExecutor());
+					@Override
+					public void run() {
+						_transactionInterceptor.setTransactionExecutor(
+							new SynchronizedTransactionExecutor(testOwnerId));
 
-					ReflectionTestUtil.setFieldValue(
-						PortalPreferencesLocalServiceUtil.class, "_service",
-						_originalPortalPreferencesLocalService);
-				}
+						ReflectionTestUtil.setFieldValue(
+							PortalPreferencesLocalServiceUtil.class, "_service",
+							_originalPortalPreferencesLocalService);
+					}
 
-			});
+				});
+		}
+
+		private final CyclicBarrier _cyclicBarrier;
 
 	}
 
