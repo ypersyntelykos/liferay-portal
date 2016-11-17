@@ -1768,11 +1768,10 @@ public class StringUtil {
 			return StringPool.BLANK;
 		}
 
-		StringBundler sb = new StringBundler(2 * col.size() - 1);
+		StringBundler sb = new StringBundler(2 * col.size());
 
 		for (Object object : col) {
 			sb.append(String.valueOf(object).trim());
-
 			sb.append(delimiter);
 		}
 
