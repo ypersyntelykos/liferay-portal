@@ -20,11 +20,13 @@ import com.liferay.portal.kernel.process.OutputProcessor;
 import com.liferay.portal.kernel.process.ProcessException;
 import com.liferay.portal.kernel.process.ProcessUtil;
 import com.liferay.portal.kernel.util.ObjectValuePair;
+import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Reader;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -66,7 +68,9 @@ public class ArquillianFailureAspect {
 
 			System.out.print("pids: ");
 
-			System.out.println(StringUtil.merge(objectValuePair.getKey()));
+			System.out.println(
+				StringUtil.merge(
+					objectValuePair.getKey(), StringPool.NEW_LINE));
 
 			System.out.print("errors: ");
 
@@ -108,23 +112,23 @@ public class ArquillianFailureAspect {
 		public List<String> processStdOut(InputStream stdOutInputStream)
 			throws ProcessException {
 
-			List<String> list = new ArrayList<>();
+			List<String> lines = new ArrayList<>();
 
-			try (UnsyncBufferedReader unsyncBufferedReader =
-					new UnsyncBufferedReader(
-						new InputStreamReader(stdOutInputStream))) {
+			try (Reader reader = new InputStreamReader(stdOutInputStream);
+				UnsyncBufferedReader unsyncBufferedReader =
+					new UnsyncBufferedReader(reader)) {
 
 				String line = null;
 
 				while ((line = unsyncBufferedReader.readLine()) != null) {
-					list.add(line);
+					lines.add(line);
 				}
 			}
 			catch (IOException ioe) {
 				throw new ProcessException(ioe);
 			}
 
-			return list;
+			return lines;
 		}
 
 	}
