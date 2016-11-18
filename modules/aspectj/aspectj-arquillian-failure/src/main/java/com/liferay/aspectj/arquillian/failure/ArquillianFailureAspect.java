@@ -20,6 +20,7 @@ import com.liferay.portal.kernel.process.OutputProcessor;
 import com.liferay.portal.kernel.process.ProcessException;
 import com.liferay.portal.kernel.process.ProcessUtil;
 import com.liferay.portal.kernel.util.ObjectValuePair;
+import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 
@@ -66,15 +67,21 @@ public class ArquillianFailureAspect {
 				}
 			}
 
-			System.out.print("pids: ");
+			List<String> lines = objectValuePair.getKey();
 
-			System.out.println(
-				StringUtil.merge(
-					objectValuePair.getKey(), StringPool.NEW_LINE));
+			StringBundler sb = new StringBundler(lines.size() * 2 + 3);
 
-			System.out.print("errors: ");
+			sb.append("pids:\n");
 
-			System.out.println(objectValuePair.getValue());
+			for (String line : lines) {
+				sb.append(line);
+				sb.append(StringPool.NEW_LINE);
+			}
+
+			sb.append("errors:\n");
+			sb.append(objectValuePair.getValue());
+
+			System.out.println(sb.toString());
 
 			if (pid == null) {
 				return;
