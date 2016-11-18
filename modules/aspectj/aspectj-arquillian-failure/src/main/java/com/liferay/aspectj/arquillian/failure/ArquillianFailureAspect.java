@@ -84,7 +84,7 @@ public class ArquillianFailureAspect {
 
 			NoticeableFuture<ObjectValuePair<Void, Void>>
 				jstackNoticeableFuture = ProcessUtil.execute(
-					ProcessUtil.ECHO_OUTPUT_PROCESSOR, "jstack", pid);
+					ProcessUtil.ECHO_OUTPUT_PROCESSOR, "jstack", "-l", pid);
 
 			jstackNoticeableFuture.get();
 		}
