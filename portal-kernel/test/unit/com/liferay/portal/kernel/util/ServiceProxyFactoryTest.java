@@ -25,8 +25,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Collections;
 import java.util.concurrent.Callable;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.locks.AbstractQueuedSynchronizer;
@@ -69,14 +68,13 @@ public class ServiceProxyFactoryTest {
 
 		try {
 			ServiceProxyFactory.newServiceTrackedInstance(
-				TestService.class, TestServiceClient.class, "wrongFieldName",
+				TestService.class, TestServiceUtil.class, "wrongFieldName",
 				false);
 
 			Assert.fail();
 		}
 		catch (Throwable throwable) {
-			Assert.assertEquals(
-				NoSuchFieldException.class, throwable.getClass());
+			Assert.assertSame(NoSuchFieldException.class, throwable.getClass());
 			Assert.assertEquals("wrongFieldName", throwable.getMessage());
 		}
 
@@ -84,17 +82,17 @@ public class ServiceProxyFactoryTest {
 
 		try {
 			ServiceProxyFactory.newServiceTrackedInstance(
-				TestService.class, TestServiceClient.class, "nonStaticField",
+				TestService.class, TestServiceUtil.class, "nonStaticField",
 				false);
 
 			Assert.fail();
 		}
 		catch (Throwable throwable) {
-			Assert.assertEquals(
+			Assert.assertSame(
 				IllegalArgumentException.class, throwable.getClass());
 
 			Field testServiceField = ReflectionUtil.getDeclaredField(
-				TestServiceClient.class, "nonStaticField");
+				TestServiceUtil.class, "nonStaticField");
 
 			Assert.assertEquals(
 				testServiceField + " is not static", throwable.getMessage());
@@ -140,8 +138,7 @@ public class ServiceProxyFactoryTest {
 	private void _testBlockingProxy(boolean proxyService) throws Exception {
 		final TestService testService =
 			ServiceProxyFactory.newServiceTrackedInstance(
-				TestService.class, TestServiceClient.class, "testService",
-				true);
+				TestService.class, TestServiceUtil.class, "testService", true);
 
 		Assert.assertTrue(ProxyUtil.isProxyClass(testService.getClass()));
 		Assert.assertNotSame(TestServiceImpl.class, testService.getClass());
@@ -156,7 +153,7 @@ public class ServiceProxyFactoryTest {
 					Assert.assertEquals(
 						_TEST_SERVICE_ID, testService.getTestServiceId());
 
-					TestService newTestService = TestServiceClient.testService;
+					TestService newTestService = TestServiceUtil.testService;
 
 					if (proxyService) {
 						Assert.assertTrue(
@@ -190,7 +187,7 @@ public class ServiceProxyFactoryTest {
 			serviceRegistration = registry.registerService(
 				TestService.class,
 				(TestService)ProxyFactory.newInstance(
-					ServiceProxyFactoryTest.class.getClassLoader(),
+					TestService.class.getClassLoader(),
 					new Class<?>[] {TestService.class},
 					TestServiceImpl.class.getName()));
 		}
@@ -209,13 +206,12 @@ public class ServiceProxyFactoryTest {
 
 		if (filterEnabled) {
 			testService = ServiceProxyFactory.newServiceTrackedInstance(
-				TestService.class, TestServiceClient.class, "testService",
+				TestService.class, TestServiceUtil.class, "testService",
 				"(test.filter=true)", false);
 		}
 		else {
 			testService = ServiceProxyFactory.newServiceTrackedInstance(
-				TestService.class, TestServiceClient.class, "testService",
-				false);
+				TestService.class, TestServiceUtil.class, "testService", false);
 		}
 
 		Assert.assertTrue(ProxyUtil.isProxyClass(testService.getClass()));
@@ -229,19 +225,16 @@ public class ServiceProxyFactoryTest {
 		ServiceRegistration<TestService> serviceRegistration = null;
 
 		if (filterEnabled) {
-			Map<String, Object> properties = new HashMap<>();
-
-			properties.put("test.filter", "true");
-
 			serviceRegistration = registry.registerService(
-				TestService.class, new TestServiceImpl(), properties);
+				TestService.class, new TestServiceImpl(),
+				Collections.singletonMap("test.filter", "true"));
 		}
 		else {
 			serviceRegistration = registry.registerService(
 				TestService.class, new TestServiceImpl());
 		}
 
-		TestService newTestService = TestServiceClient.testService;
+		TestService newTestService = TestServiceUtil.testService;
 
 		Assert.assertEquals(
 			_TEST_SERVICE_NAME, newTestService.getTestServiceName());
@@ -291,7 +284,7 @@ public class ServiceProxyFactoryTest {
 
 	private static final String _TEST_SERVICE_NAME = "TestServiceName";
 
-	private static class TestServiceClient {
+	private static class TestServiceUtil {
 
 		public static volatile TestService testService;
 
