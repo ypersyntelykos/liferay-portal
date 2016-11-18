@@ -50,7 +50,7 @@ public class ArquillianFailureAspect {
 		try {
 			NoticeableFuture<ObjectValuePair<List<String>, String>>
 				jpsNoticeableFuture = ProcessUtil.execute(
-					new StringOutputProcessor(), "jps");
+					new StringOutputProcessor(), "jps", "-ml");
 
 			ObjectValuePair<List<String>, String> objectValuePair =
 				jpsNoticeableFuture.get();
@@ -58,9 +58,9 @@ public class ArquillianFailureAspect {
 			String pid = null;
 
 			for (String line : objectValuePair.getKey()) {
-				if (line.endsWith(" Bootstrap")) {
+				if (line.endsWith(_TOMCAT_PROCESS_KEY)) {
 					pid = line.substring(
-						0, line.length() - " Bootstrap".length());
+						0, line.length() - _TOMCAT_PROCESS_KEY.length());
 
 					break;
 				}
@@ -92,6 +92,9 @@ public class ArquillianFailureAspect {
 			e1.addSuppressed(e2);
 		}
 	}
+
+	private static final String _TOMCAT_PROCESS_KEY =
+		" org.apache.catalina.startup.Bootstrap start";
 
 	private static class StringOutputProcessor
 		implements OutputProcessor<List<String>, String> {
