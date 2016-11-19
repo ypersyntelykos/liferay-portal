@@ -27,8 +27,8 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
-import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Before;
 
 import org.junit.Assert;
 import org.junit.ClassRule;
@@ -103,28 +103,25 @@ public class TikaSafeRandomizerBumperTest {
 			Assert.fail();
 		}
 		catch (ExceptionInInitializerError eiie) {
-			Throwable cause = eiie.getCause();
-
-			Assert.assertTrue(cause instanceof RuntimeException);
-
 			Assert.assertSame(
-				ReflectionTestUtilAdvice._MESSAGE, cause.getMessage());
+				ReflectionTestUtilAdvice._exception, eiie.getCause());
 		}
 	}
 
 	@Aspect
 	public static class ReflectionTestUtilAdvice {
 
-		@Around(
+		@Before(
 			"execution(public static T " +
 				"com.liferay.portal.kernel.test.ReflectionTestUtil." +
 					"getFieldValue(java.lang.Class<?>, java.lang.String))"
 		)
-		public <T> T getFieldValue() {
-			throw new RuntimeException(_MESSAGE);
+		public void getFieldValue() {
+			throw _exception;
 		}
 
-		private static final String _MESSAGE = "This is a test.";
+		private static final RuntimeException _exception =
+			new RuntimeException();
 
 	}
 
