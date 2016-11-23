@@ -78,10 +78,6 @@ public class SAPServiceUpgrade implements UpgradeStepRegistrator {
 		registry.register(
 			"com.liferay.portal.security.service.access.policy.service",
 			"2.0.12", "2.0.13", new DummyUpgradeStep());
-
-		registry.register(
-			"com.liferay.portal.security.service.access.policy.service",
-			"2.0.13", "2.0.13", new DummyUpgradeStep());
 	}
 
 }
