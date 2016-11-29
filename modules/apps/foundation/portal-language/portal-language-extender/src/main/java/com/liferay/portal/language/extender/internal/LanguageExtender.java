@@ -26,6 +26,7 @@ import org.osgi.framework.wiring.BundleCapability;
 import org.osgi.framework.wiring.BundleWiring;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 
 /**
  * @author Carlos Sierra Andrés
@@ -40,6 +41,11 @@ public class LanguageExtender extends AbstractExtender {
 		_logger = new Logger(bundleContext);
 
 		start(bundleContext);
+	}
+
+	@Deactivate
+	protected void deactivate(BundleContext bundleContext) throws Exception {
+		stop(bundleContext);
 	}
 
 	@Override
