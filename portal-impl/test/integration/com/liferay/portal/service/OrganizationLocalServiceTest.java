@@ -53,6 +53,7 @@ import org.junit.Test;
  * @author Jorge Ferrer
  * @author Sergio González
  */
+@Sync
 public class OrganizationLocalServiceTest {
 
 	@ClassRule
@@ -609,7 +610,6 @@ public class OrganizationLocalServiceTest {
 			organizationB.getGroupId(), groupAA.getParentGroupId());
 	}
 
-	@Sync
 	@Test
 	public void testSearchOrganizationsAndUsers() throws Exception {
 		Organization organization = OrganizationTestUtil.addOrganization();
@@ -651,7 +651,6 @@ public class OrganizationLocalServiceTest {
 			organization.getOrganizationId(), _user);
 	}
 
-	@Sync
 	@Test
 	public void testSearchOrganizationsAndUsersWhenNoOrganizations()
 		throws Exception {
@@ -691,7 +690,6 @@ public class OrganizationLocalServiceTest {
 			organization.getOrganizationId(), _user);
 	}
 
-	@Sync
 	@Test
 	public void testSearchOrganizationsAndUsersWhenNoUsers() throws Exception {
 		Organization organization = OrganizationTestUtil.addOrganization();
@@ -728,7 +726,6 @@ public class OrganizationLocalServiceTest {
 		Assert.assertEquals(hits.toString(), 0, hits.getLength());
 	}
 
-	@Sync
 	@Test
 	public void testSearchOrganizationsAndUsersWithRootOrganization()
 		throws Exception {
