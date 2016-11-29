@@ -68,7 +68,7 @@ public class WabFactory extends AbstractExtender {
 			_webBundleDeployer = new WebBundleDeployer(
 				bundleContext, properties, _eventUtil, _logger);
 
-			super.start(bundleContext);
+			start(bundleContext);
 		}
 		catch (Exception e) {
 			_logger.log(Logger.LOG_ERROR, e.getMessage(), e);
@@ -77,7 +77,7 @@ public class WabFactory extends AbstractExtender {
 
 	@Deactivate
 	public void deactivate(BundleContext bundleContext) throws Exception {
-		super.stop(bundleContext);
+		stop(bundleContext);
 
 		_eventUtil.close();
 
