@@ -35,8 +35,6 @@ public class LanguageExtender extends AbstractExtender {
 
 	@Activate
 	protected void activate(BundleContext bundleContext) throws Exception {
-		_bundleContext = bundleContext;
-
 		setSynchronous(true);
 
 		_logger = new Logger(bundleContext);
@@ -61,7 +59,7 @@ public class LanguageExtender extends AbstractExtender {
 		}
 
 		return new LanguageExtension(
-			_bundleContext, bundle, bundleCapabilities, _logger);
+			getBundleContext(), bundle, bundleCapabilities, _logger);
 	}
 
 	@Override
@@ -74,7 +72,6 @@ public class LanguageExtender extends AbstractExtender {
 		_logger.log(Logger.LOG_WARNING, "[" + bundle + "] " + s);
 	}
 
-	private BundleContext _bundleContext;
 	private Logger _logger;
 
 }
