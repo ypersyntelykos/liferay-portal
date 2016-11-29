@@ -53,10 +53,10 @@ public class WabFactory extends AbstractExtender {
 	public void activate(ComponentContext componentContext) {
 		setSynchronous(true);
 
-		_bundleContext = componentContext.getBundleContext();
+		BundleContext bundleContext = componentContext.getBundleContext();
 
-		_eventUtil = new EventUtil(_bundleContext);
-		_logger = new Logger(_bundleContext);
+		_eventUtil = new EventUtil(bundleContext);
+		_logger = new Logger(bundleContext);
 
 		Dictionary<String, Object> properties =
 			componentContext.getProperties();
@@ -66,9 +66,9 @@ public class WabFactory extends AbstractExtender {
 
 		try {
 			_webBundleDeployer = new WebBundleDeployer(
-				_bundleContext, properties, _eventUtil, _logger);
+				bundleContext, properties, _eventUtil, _logger);
 
-			super.start(_bundleContext);
+			super.start(bundleContext);
 		}
 		catch (Exception e) {
 			_logger.log(Logger.LOG_ERROR, e.getMessage(), e);
@@ -76,10 +76,8 @@ public class WabFactory extends AbstractExtender {
 	}
 
 	@Deactivate
-	public void deactivate() throws Exception {
-		super.stop(_bundleContext);
-
-		_bundleContext = null;
+	public void deactivate(BundleContext bundleContext) throws Exception {
+		super.stop(bundleContext);
 
 		_eventUtil.close();
 
@@ -117,7 +115,6 @@ public class WabFactory extends AbstractExtender {
 		_logger.log(Logger.LOG_WARNING, "[" + bundle + "] " + message, t);
 	}
 
-	private BundleContext _bundleContext;
 	private EventUtil _eventUtil;
 	private Logger _logger;
 
