@@ -58,6 +58,8 @@ public class HttpTunnelExtender extends AbstractExtender {
 			BundleContext bundleContext, Map<String, Object> properties)
 		throws Exception {
 
+		setSynchronous(true);
+
 		_httpTunnelExtenderConfiguration = ConfigurableUtil.createConfigurable(
 			HttpTunnelExtenderConfiguration.class, properties);
 		_logger = new Logger(bundleContext);
