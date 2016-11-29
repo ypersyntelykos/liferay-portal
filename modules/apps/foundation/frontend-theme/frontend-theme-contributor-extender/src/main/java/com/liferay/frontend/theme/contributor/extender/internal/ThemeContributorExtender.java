@@ -49,6 +49,8 @@ public class ThemeContributorExtender extends AbstractExtender {
 
 	@Activate
 	protected void activate(BundleContext bundleContext) throws Exception {
+		setSynchronous(true);
+
 		_logger = new Logger(bundleContext);
 
 		start(bundleContext);
