@@ -20,6 +20,7 @@ import com.liferay.portal.kernel.util.StringPool;
 
 import java.io.Serializable;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -29,7 +30,13 @@ public class BaseModelSearchResult<T extends BaseModel<T>>
 	implements Serializable {
 
 	public BaseModelSearchResult(List<T> baseModels, int length) {
-		_baseModels = baseModels;
+		if (baseModels == null) {
+			_baseModels = Collections.emptyList();
+		}
+		else {
+			_baseModels = baseModels;
+		}
+
 		_length = length;
 	}
 
@@ -43,12 +50,12 @@ public class BaseModelSearchResult<T extends BaseModel<T>>
 
 	@Override
 	public String toString() {
-		if ((_baseModels == null) || _baseModels.isEmpty()) {
+		if (_baseModels.isEmpty()) {
 			return "{baseModels={}, length=".concat(
 				String.valueOf(_length)).concat(StringPool.CLOSE_BRACKET);
 		}
 
-		StringBundler sb = new StringBundler(2 * _baseModels.size() + 4);
+		StringBundler sb = new StringBundler(2 * _baseModels.size() + 3);
 
 		sb.append("{baseModels={");
 
