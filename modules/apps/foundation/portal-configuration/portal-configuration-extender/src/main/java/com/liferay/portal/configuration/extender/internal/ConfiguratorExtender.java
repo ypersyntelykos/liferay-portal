@@ -115,8 +115,8 @@ public class ConfiguratorExtender extends AbstractExtender {
 				}
 			}
 			catch (Throwable t) {
-				if (_log.isInfoEnabled()) {
-					_log.info(t, t);
+				if (_log.isWarnEnabled()) {
+					_log.warn(t, t);
 				}
 			}
 		}
