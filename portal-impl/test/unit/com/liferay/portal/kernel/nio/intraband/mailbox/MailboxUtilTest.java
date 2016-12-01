@@ -275,7 +275,7 @@ public class MailboxUtilTest {
 			return proceedingJoinPoint.proceed();
 		}
 
-		private static boolean _throwException;
+		private static volatile boolean _throwException;
 
 	}
 
