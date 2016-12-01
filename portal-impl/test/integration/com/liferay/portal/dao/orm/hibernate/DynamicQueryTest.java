@@ -164,9 +164,10 @@ public class DynamicQueryTest {
 		Property classNameIdProperty = PropertyFactoryUtil.forName(
 			"classNameId");
 
-		ClassName endClassName = _allClassNames.get(_allClassNames.size() - 1);
+		ClassName lastClassName = _allClassNames.get(_allClassNames.size() - 1);
 
-		dynamicQuery.add(classNameIdProperty.le(endClassName.getClassNameId()));
+		dynamicQuery.add(
+			classNameIdProperty.le(lastClassName.getClassNameId()));
 
 		dynamicQuery.addOrder(OrderFactoryUtil.desc("classNameId"));
 
