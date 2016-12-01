@@ -72,15 +72,9 @@ public class LPKGOverrideTest {
 		Map<String, String> overrides = new HashMap<>();
 
 		try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(
-				Paths.get(liferayHome, "/osgi/marketplace"))) {
+				Paths.get(liferayHome, "/osgi/marketplace"), "*.lpkg")) {
 
 			for (Path lpkgPath : directoryStream) {
-				String lpkgPathString = lpkgPath.toString();
-
-				if (lpkgPathString.endsWith("override")) {
-					continue;
-				}
-
 				try (ZipFile zipFile = new ZipFile(lpkgPath.toFile())) {
 					Enumeration<? extends ZipEntry> zipEntries =
 						zipFile.entries();
@@ -102,6 +96,8 @@ public class LPKGOverrideTest {
 						if (matcher.matches()) {
 							name = matcher.group(1) + matcher.group(4);
 						}
+
+						String lpkgPathString = lpkgPath.toString();
 
 						if (lpkgPathString.contains("Static")) {
 							Path staticOverridePath = Paths.get(
