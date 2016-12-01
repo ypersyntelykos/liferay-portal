@@ -17,6 +17,7 @@ package com.liferay.portal.lpkg.override;
 import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayOutputStream;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.Validator;
 
 import java.io.File;
 import java.io.IOException;
@@ -58,8 +59,9 @@ public class LPKGOverrideTest {
 	public void testOverrideLPKG() throws IOException {
 		String liferayHome = System.getProperty("liferay.home");
 
-		Assert.assertNotNull(
-			"Missing system property \"liferay.home\"", liferayHome);
+		Assert.assertFalse(
+			"Missing system property \"liferay.home\"",
+			Validator.isNull(liferayHome));
 
 		File file = new File(liferayHome, "/osgi/marketplace/override");
 
