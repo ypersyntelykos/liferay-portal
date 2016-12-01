@@ -285,7 +285,9 @@ public class MailboxUtilTest {
 		Class<?> clazz = Class.forName(
 			mailboxUtilClassName.concat("$ReceiptStub"));
 
-		Constructor<?> constructor = clazz.getConstructor(long.class);
+		Constructor<?> constructor = clazz.getDeclaredConstructor(long.class);
+
+		constructor.setAccessible(true);
 
 		Object object = constructor.newInstance(0);
 
