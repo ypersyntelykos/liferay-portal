@@ -154,9 +154,9 @@ public class MailboxUtilTest {
 		reaperThread.join();
 
 		Assert.assertSame(
-			reaperThread, RecorderUncaughtExceptionHandler._thread);
+			reaperThread, recorderUncaughtExceptionHandler._thread);
 
-		Throwable throwable = RecorderUncaughtExceptionHandler._throwable;
+		Throwable throwable = recorderUncaughtExceptionHandler._throwable;
 
 		Assert.assertSame(IllegalStateException.class, throwable.getClass());
 
@@ -303,8 +303,8 @@ public class MailboxUtilTest {
 			_throwable = throwable;
 		}
 
-		private static volatile Thread _thread;
-		private static volatile Throwable _throwable;
+		private volatile Thread _thread;
+		private volatile Throwable _throwable;
 
 	}
 
