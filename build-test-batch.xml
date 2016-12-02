@@ -1343,6 +1343,7 @@ app.server.type=@{app.server.type}]]></echo>
 			<antcall inheritAll="false" target="prepare-system-ext-properties" />
 
 			<ant dir="modules" inheritAll="false" target="build-app-lpkg-all">
+				<property name="app.server.parent.dir" value="${project.dir}/bundles" />
 				<property name="osgi.dir" value="${app.server.parent.dir}/osgi" />
 			</ant>
 		</sequential>
