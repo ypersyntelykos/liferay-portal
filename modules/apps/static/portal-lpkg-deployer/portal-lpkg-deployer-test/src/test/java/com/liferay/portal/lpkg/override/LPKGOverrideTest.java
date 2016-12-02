@@ -93,13 +93,15 @@ public class LPKGOverrideTest {
 
 						Matcher matcher = _pattern.matcher(name);
 
-						if (matcher.matches()) {
-							name = matcher.group(1) + matcher.group(4);
-						}
+						Assert.assertTrue(
+							name + " does not match " + _pattern,
+							matcher.matches());
+
+						name = matcher.group(1) + matcher.group(4);
 
 						String lpkgPathString = lpkgPath.toString();
 
-						if (lpkgPathString.contains("Static")) {
+						if (lpkgPathString.endsWith("Static.lpkg")) {
 							Path staticOverridePath = Paths.get(
 								liferayHome, "/osgi/static/", name);
 
@@ -111,9 +113,7 @@ public class LPKGOverrideTest {
 							_upgradeModuleVersion(staticOverridePath, null);
 
 							overrides.put(
-								"static.".concat(
-									name.substring(0, name.length() - 4)),
-								null);
+								"static.".concat(matcher.group(1)), null);
 						}
 						else {
 							Path overridePath = Paths.get(
@@ -123,21 +123,13 @@ public class LPKGOverrideTest {
 								zipFile.getInputStream(zipEntry), overridePath,
 								StandardCopyOption.REPLACE_EXISTING);
 
-							String overrideString = overridePath.toString();
+							if (name.endsWith(".war")) {
+								String fileName = matcher.group(1);
 
-							if (overrideString.endsWith(".war")) {
-								Path fileName = overridePath.getFileName();
-
-								String fileNameString = fileName.toString();
-
-								fileNameString = fileNameString.replace(
+								fileName = fileName.replace(
 									"-dxp", StringPool.BLANK);
 
-								overrides.put(
-									"war.".concat(
-										fileNameString.substring(
-											0, fileNameString.length() - 4)),
-									null);
+								overrides.put("war.".concat(fileName), null);
 
 								continue;
 							}
@@ -182,8 +174,7 @@ public class LPKGOverrideTest {
 
 				Attributes attributes = manifest.getMainAttributes();
 
-				String versionString = (String)attributes.getValue(
-					"Bundle-Version");
+				String versionString = attributes.getValue("Bundle-Version");
 
 				Version version = new Version(versionString);
 
