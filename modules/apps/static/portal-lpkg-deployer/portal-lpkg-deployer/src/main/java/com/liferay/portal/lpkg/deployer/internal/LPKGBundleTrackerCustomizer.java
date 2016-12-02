@@ -159,7 +159,7 @@ public class LPKGBundleTrackerCustomizer
 
 				bundles.add(newBundle);
 			}
-			
+
 			Bundle systemBundle = _bundleContext.getBundle(0);
 
 			FrameworkWiring frameworkWiring = systemBundle.adapt(
@@ -174,13 +174,7 @@ public class LPKGBundleTrackerCustomizer
 
 					@Override
 					public void frameworkEvent(FrameworkEvent frameworkEvent) {
-						if (frameworkEvent.getType() == FrameworkEvent.ERROR) {
-							defaultNoticeableFuture.setException(
-								frameworkEvent.getThrowable());
-						}
-						else {
-							defaultNoticeableFuture.set(frameworkEvent);
-						}
+						defaultNoticeableFuture.set(frameworkEvent);
 					}
 
 				});
@@ -190,7 +184,6 @@ public class LPKGBundleTrackerCustomizer
 			if (frameworkEvent.getType() != FrameworkEvent.PACKAGES_REFRESHED) {
 				throw frameworkEvent.getThrowable();
 			}
-			
 		}
 		catch (Throwable t) {
 			_log.error("Rollback bundle installation for " + bundles, t);
