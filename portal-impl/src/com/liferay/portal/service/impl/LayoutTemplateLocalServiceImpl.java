@@ -155,8 +155,8 @@ public class LayoutTemplateLocalServiceImpl
 		List<LayoutTemplate> customLayoutTemplates = new ArrayList<>(
 			_portalCustom.size() + _warCustom.size());
 
-		customLayoutTemplates.addAll(ListUtil.fromMapValues(_portalCustom));
-		customLayoutTemplates.addAll(ListUtil.fromMapValues(_warCustom));
+		customLayoutTemplates.addAll(_portalCustom.values());
+		customLayoutTemplates.addAll(_warCustom.values());
 
 		return customLayoutTemplates;
 	}
