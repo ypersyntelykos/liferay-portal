@@ -45,6 +45,7 @@ import com.liferay.portal.util.PropsValues;
 import java.io.IOException;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -563,16 +564,16 @@ public class LayoutTemplateLocalServiceImpl
 		LayoutTemplateLocalServiceImpl.class);
 
 	private static final Map<String, Map<String, LayoutTemplate>>
-		_customThemes = new LinkedHashMap<>();
+		_customThemes = new HashMap<>();
 	private static final Map<String, LayoutTemplate> _portalCustom =
 		new LinkedHashMap<>();
 	private static final Map<String, LayoutTemplate> _portalStandard =
-		new LinkedHashMap<>();
+		new HashMap<>();
 	private static final Map<String, Map<String, LayoutTemplate>>
-		_standardThemes = new LinkedHashMap<>();
+		_standardThemes = new HashMap<>();
 	private static final Map<String, LayoutTemplate> _warCustom =
 		new LinkedHashMap<>();
 	private static final Map<String, LayoutTemplate> _warStandard =
-		new LinkedHashMap<>();
+		new HashMap<>();
 
 }
