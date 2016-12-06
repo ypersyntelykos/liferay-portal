@@ -140,18 +140,6 @@ public class ProxyUtil {
 
 	private static class LookupKey {
 
-		public LookupKey(Class<?>[] interfaces) {
-			_interfaces = interfaces;
-
-			int hashCode = 0;
-
-			for (Class<?> clazz : interfaces) {
-				hashCode = HashUtil.hash(hashCode, clazz.getName());
-			}
-
-			_hashCode = hashCode;
-		}
-
 		@Override
 		public boolean equals(Object obj) {
 			LookupKey lookupKey = (LookupKey)obj;
@@ -172,6 +160,18 @@ public class ProxyUtil {
 		@Override
 		public int hashCode() {
 			return _hashCode;
+		}
+
+		private LookupKey(Class<?>[] interfaces) {
+			_interfaces = interfaces;
+
+			int hashCode = 0;
+
+			for (Class<?> clazz : interfaces) {
+				hashCode = HashUtil.hash(hashCode, clazz.getName());
+			}
+
+			_hashCode = hashCode;
 		}
 
 		private final int _hashCode;
