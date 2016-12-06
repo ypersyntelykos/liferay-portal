@@ -2544,20 +2544,6 @@ ${tomcat-gc-log}
 		</sequential>
 	</macrodef>
 
-	<macrodef name="set-portal-impl-portal-ext-properties">
-		<sequential>
-			<generate-jdbc-properties properties.file="portal-impl/src/portal-ext.properties">
-				<post-action>
-					<echo file="@{properties.file}" append="true"><![CDATA[
-javascript.single.page.application.timeout=300000
-
-memory.scheduler.org.quartz.threadPool.threadCount=1
-persisted.scheduler.org.quartz.threadPool.threadCount=1]]></echo>
-				</post-action>
-			</generate-jdbc-properties>
-		</sequential>
-	</macrodef>
-
 	<macrodef name="set-portal-impl-portal-test-ext-properties">
 		<sequential>
 			<generate-jdbc-properties properties.file="portal-impl/test/portal-test-ext.properties">
@@ -9048,10 +9034,6 @@ jdbc.default.password=${database.mysql.password}</echo>
 		</if>
 
 		<antcall target="clean-up-web-xml" />
-	</target>
-
-	<target name="set-portal-impl-portal-ext-properties">
-		<set-portal-impl-portal-ext-properties />
 	</target>
 
 	<target name="set-portal-impl-portal-test-ext-properties">
