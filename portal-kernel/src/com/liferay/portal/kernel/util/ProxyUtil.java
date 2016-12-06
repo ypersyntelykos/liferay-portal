@@ -77,18 +77,20 @@ public class ProxyUtil {
 			}
 		}
 
-		Constructor<?> constructor = null;
+		if (!_constructors.containsKey(clazz)) {
+			Constructor<?> constructor = null;
 
-		try {
-			constructor = clazz.getConstructor(_argumentsClazz);
+			try {
+				constructor = clazz.getConstructor(_argumentsClazz);
 
-			constructor.setAccessible(true);
+				constructor.setAccessible(true);
+			}
+			catch (Exception e) {
+				throw new InternalError(e.toString());
+			}
+
+			_constructors.putIfAbsent(clazz, constructor);
 		}
-		catch (Exception e) {
-			throw new InternalError(e.toString());
-		}
-
-		_constructors.putIfAbsent(clazz, constructor);
 
 		return clazz;
 	}
