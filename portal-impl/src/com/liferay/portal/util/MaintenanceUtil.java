@@ -30,37 +30,6 @@ import javax.servlet.http.HttpSession;
 public class MaintenanceUtil {
 
 	public static void appendStatus(String status) {
-		_instance._appendStatus(status);
-	}
-
-	public static void cancel() {
-		_instance._cancel();
-	}
-
-	public static String getClassName() {
-		return _instance._getClassName();
-	}
-
-	public static String getSessionId() {
-		return _instance._getSessionId();
-	}
-
-	public static String getStatus() {
-		return _instance._getStatus();
-	}
-
-	public static boolean isMaintaining() {
-		return _instance._isMaintaining();
-	}
-
-	public static void maintain(String sessionId, String className) {
-		_instance._maintain(sessionId, className);
-	}
-
-	private MaintenanceUtil() {
-	}
-
-	private void _appendStatus(String status) {
 		if (_log.isDebugEnabled()) {
 			_log.debug(status);
 		}
@@ -69,7 +38,7 @@ public class MaintenanceUtil {
 			Time.getRFC822() + " " + HtmlUtil.escape(status) + "<br />");
 	}
 
-	private void _cancel() {
+	public static void cancel() {
 		HttpSession session = PortalSessionContext.get(_sessionId);
 
 		if (session != null) {
@@ -84,29 +53,29 @@ public class MaintenanceUtil {
 		_maintaining = false;
 	}
 
-	private String _getClassName() {
+	public static String getClassName() {
 		return _className;
 	}
 
-	private String _getSessionId() {
+	public static String getSessionId() {
 		return _sessionId;
 	}
 
-	private String _getStatus() {
+	public static String getStatus() {
 		return _status.toString();
 	}
 
-	private boolean _isMaintaining() {
+	public static boolean isMaintaining() {
 		return _maintaining;
 	}
 
-	private void _maintain(String sessionId, String className) {
+	public static void maintain(String sessionId, String className) {
 		_sessionId = sessionId;
 		_className = className;
 		_maintaining = true;
 		_status = new StringBuffer();
 
-		_appendStatus("Executing " + _className);
+		appendStatus("Executing " + _className);
 
 		Collection<HttpSession> sessions = PortalSessionContext.values();
 
@@ -121,14 +90,15 @@ public class MaintenanceUtil {
 		}
 	}
 
+	private MaintenanceUtil() {
+	}
+
 	private static final Log _log = LogFactoryUtil.getLog(
 		MaintenanceUtil.class);
 
-	private static final MaintenanceUtil _instance = new MaintenanceUtil();
-
-	private String _className;
-	private boolean _maintaining;
-	private String _sessionId;
-	private StringBuffer _status = new StringBuffer();
+	private static String _className;
+	private static boolean _maintaining;
+	private static String _sessionId;
+	private static StringBuffer _status = new StringBuffer();
 
 }
