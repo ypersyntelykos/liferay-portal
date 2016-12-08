@@ -57,6 +57,12 @@ gradle.beforeProject {
 	configure(project) {
 		apply plugin: "com.liferay.defaults.plugin"
 
+		pluginManager.withPlugin("com.liferay.node") {
+			npmInstall.outputs.upToDateWhen {
+				false
+			}
+		}
+
 		pluginManager.withPlugin("com.liferay.ant.plugin") {
 			task buildLang(dependsOn: "build-lang")
 
