@@ -18,6 +18,8 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.servlet.PortalSessionContext;
 import com.liferay.portal.kernel.util.HtmlUtil;
+import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Time;
 
 import java.util.Collection;
@@ -34,8 +36,14 @@ public class MaintenanceUtil {
 			_log.debug(status);
 		}
 
-		_status.append(
-			Time.getRFC822() + " " + HtmlUtil.escape(status) + "<br />");
+		StringBundler sb = new StringBundler(4);
+
+		sb.append(Time.getRFC822());
+		sb.append(StringPool.SPACE);
+		sb.append(HtmlUtil.escape(status));
+		sb.append("<br />");
+
+		_status = _status.concat(sb.toString());
 	}
 
 	public static void cancel() {
@@ -62,7 +70,7 @@ public class MaintenanceUtil {
 	}
 
 	public static String getStatus() {
-		return _status.toString();
+		return _status;
 	}
 
 	public static boolean isMaintaining() {
@@ -73,7 +81,7 @@ public class MaintenanceUtil {
 		_sessionId = sessionId;
 		_className = className;
 		_maintaining = true;
-		_status = new StringBuffer();
+		_status = StringPool.BLANK;
 
 		appendStatus("Executing " + _className);
 
@@ -99,6 +107,6 @@ public class MaintenanceUtil {
 	private static String _className;
 	private static boolean _maintaining;
 	private static String _sessionId;
-	private static StringBuffer _status = new StringBuffer();
+	private static String _status = StringPool.BLANK;
 
 }
