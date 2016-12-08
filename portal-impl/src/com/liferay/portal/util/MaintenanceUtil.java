@@ -104,9 +104,9 @@ public class MaintenanceUtil {
 	private static final Log _log = LogFactoryUtil.getLog(
 		MaintenanceUtil.class);
 
-	private static String _className;
-	private static boolean _maintaining;
-	private static String _sessionId;
-	private static String _status = StringPool.BLANK;
+	private static volatile String _className;
+	private static volatile boolean _maintaining;
+	private static volatile String _sessionId;
+	private static volatile String _status = StringPool.BLANK;
 
 }
