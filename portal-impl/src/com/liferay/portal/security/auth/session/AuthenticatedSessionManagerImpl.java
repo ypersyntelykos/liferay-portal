@@ -176,6 +176,10 @@ public class AuthenticatedSessionManagerImpl
 
 		String domain = CookieKeys.getDomain(request);
 
+		if (Validator.isNull(domain)) {
+			domain = null;
+		}
+
 		User user = UserLocalServiceUtil.getUserById(userId);
 
 		String userIdString = String.valueOf(userId);
@@ -198,7 +202,7 @@ public class AuthenticatedSessionManagerImpl
 		Cookie companyIdCookie = new Cookie(
 			CookieKeys.COMPANY_ID, String.valueOf(company.getCompanyId()));
 
-		if (Validator.isNotNull(domain)) {
+		if (domain != null) {
 			companyIdCookie.setDomain(domain);
 		}
 
@@ -208,7 +212,7 @@ public class AuthenticatedSessionManagerImpl
 			CookieKeys.ID,
 			Encryptor.encrypt(company.getKeyObj(), userIdString));
 
-		if (Validator.isNotNull(domain)) {
+		if (domain != null) {
 			idCookie.setDomain(domain);
 		}
 
@@ -270,7 +274,7 @@ public class AuthenticatedSessionManagerImpl
 		if (rememberMe) {
 			Cookie loginCookie = new Cookie(CookieKeys.LOGIN, login);
 
-			if (Validator.isNotNull(domain)) {
+			if (domain != null) {
 				loginCookie.setDomain(domain);
 			}
 
@@ -283,7 +287,7 @@ public class AuthenticatedSessionManagerImpl
 				CookieKeys.PASSWORD,
 				Encryptor.encrypt(company.getKeyObj(), password));
 
-			if (Validator.isNotNull(domain)) {
+			if (domain != null) {
 				passwordCookie.setDomain(domain);
 			}
 
@@ -295,7 +299,7 @@ public class AuthenticatedSessionManagerImpl
 			Cookie rememberMeCookie = new Cookie(
 				CookieKeys.REMEMBER_ME, Boolean.TRUE.toString());
 
-			if (Validator.isNotNull(domain)) {
+			if (domain != null) {
 				rememberMeCookie.setDomain(domain);
 			}
 
@@ -308,7 +312,7 @@ public class AuthenticatedSessionManagerImpl
 				CookieKeys.SCREEN_NAME,
 				Encryptor.encrypt(company.getKeyObj(), user.getScreenName()));
 
-			if (Validator.isNotNull(domain)) {
+			if (domain != null) {
 				screenNameCookie.setDomain(domain);
 			}
 
@@ -332,6 +336,10 @@ public class AuthenticatedSessionManagerImpl
 			response);
 
 		String domain = CookieKeys.getDomain(request);
+
+		if (Validator.isNull(domain)) {
+			domain = null;
+		}
 
 		deleteCookie(request, response, CookieKeys.COMPANY_ID, domain);
 		deleteCookie(request, response, CookieKeys.GUEST_LANGUAGE_ID, domain);
@@ -439,7 +447,7 @@ public class AuthenticatedSessionManagerImpl
 
 		Cookie cookie = new Cookie(cookieName, StringPool.BLANK);
 
-		if (Validator.isNotNull(domain)) {
+		if (domain != null) {
 			cookie.setDomain(domain);
 		}
 
