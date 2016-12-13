@@ -214,25 +214,6 @@ public class AuthenticatedSessionManagerImpl
 
 		idCookie.setPath(StringPool.SLASH);
 
-		Cookie passwordCookie = new Cookie(
-			CookieKeys.PASSWORD,
-			Encryptor.encrypt(company.getKeyObj(), password));
-
-		if (Validator.isNotNull(domain)) {
-			passwordCookie.setDomain(domain);
-		}
-
-		passwordCookie.setPath(StringPool.SLASH);
-
-		Cookie rememberMeCookie = new Cookie(
-			CookieKeys.REMEMBER_ME, Boolean.TRUE.toString());
-
-		if (Validator.isNotNull(domain)) {
-			rememberMeCookie.setDomain(domain);
-		}
-
-		rememberMeCookie.setPath(StringPool.SLASH);
-
 		int loginMaxAge = PropsValues.COMPANY_SECURITY_AUTO_LOGIN_MAX_AGE;
 
 		String userUUID = userIdString.concat(StringPool.PERIOD).concat(
@@ -253,8 +234,6 @@ public class AuthenticatedSessionManagerImpl
 		if (rememberMe) {
 			companyIdCookie.setMaxAge(loginMaxAge);
 			idCookie.setMaxAge(loginMaxAge);
-			passwordCookie.setMaxAge(loginMaxAge);
-			rememberMeCookie.setMaxAge(loginMaxAge);
 			userUUIDCookie.setMaxAge(loginMaxAge);
 		}
 		else {
@@ -267,30 +246,8 @@ public class AuthenticatedSessionManagerImpl
 
 			companyIdCookie.setMaxAge(-1);
 			idCookie.setMaxAge(-1);
-			passwordCookie.setMaxAge(-1);
-			rememberMeCookie.setMaxAge(0);
 			userUUIDCookie.setMaxAge(-1);
 		}
-
-		Cookie loginCookie = new Cookie(CookieKeys.LOGIN, login);
-
-		if (Validator.isNotNull(domain)) {
-			loginCookie.setDomain(domain);
-		}
-
-		loginCookie.setMaxAge(loginMaxAge);
-		loginCookie.setPath(StringPool.SLASH);
-
-		Cookie screenNameCookie = new Cookie(
-			CookieKeys.SCREEN_NAME,
-			Encryptor.encrypt(company.getKeyObj(), user.getScreenName()));
-
-		if (Validator.isNotNull(domain)) {
-			screenNameCookie.setDomain(domain);
-		}
-
-		screenNameCookie.setMaxAge(loginMaxAge);
-		screenNameCookie.setPath(StringPool.SLASH);
 
 		boolean secure = request.isSecure();
 
@@ -311,9 +268,53 @@ public class AuthenticatedSessionManagerImpl
 		CookieKeys.addCookie(request, response, userUUIDCookie, secure);
 
 		if (rememberMe) {
+			Cookie loginCookie = new Cookie(CookieKeys.LOGIN, login);
+
+			if (Validator.isNotNull(domain)) {
+				loginCookie.setDomain(domain);
+			}
+
+			loginCookie.setMaxAge(loginMaxAge);
+			loginCookie.setPath(StringPool.SLASH);
+
 			CookieKeys.addCookie(request, response, loginCookie, secure);
+
+			Cookie passwordCookie = new Cookie(
+				CookieKeys.PASSWORD,
+				Encryptor.encrypt(company.getKeyObj(), password));
+
+			if (Validator.isNotNull(domain)) {
+				passwordCookie.setDomain(domain);
+			}
+
+			passwordCookie.setMaxAge(loginMaxAge);
+			passwordCookie.setPath(StringPool.SLASH);
+
 			CookieKeys.addCookie(request, response, passwordCookie, secure);
+
+			Cookie rememberMeCookie = new Cookie(
+				CookieKeys.REMEMBER_ME, Boolean.TRUE.toString());
+
+			if (Validator.isNotNull(domain)) {
+				rememberMeCookie.setDomain(domain);
+			}
+
+			rememberMeCookie.setMaxAge(loginMaxAge);
+			rememberMeCookie.setPath(StringPool.SLASH);
+
 			CookieKeys.addCookie(request, response, rememberMeCookie, secure);
+
+			Cookie screenNameCookie = new Cookie(
+				CookieKeys.SCREEN_NAME,
+				Encryptor.encrypt(company.getKeyObj(), user.getScreenName()));
+
+			if (Validator.isNotNull(domain)) {
+				screenNameCookie.setDomain(domain);
+			}
+
+			screenNameCookie.setMaxAge(loginMaxAge);
+			screenNameCookie.setPath(StringPool.SLASH);
+
 			CookieKeys.addCookie(request, response, screenNameCookie, secure);
 		}
 
