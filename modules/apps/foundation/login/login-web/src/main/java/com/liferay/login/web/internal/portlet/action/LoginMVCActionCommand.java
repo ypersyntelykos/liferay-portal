@@ -34,7 +34,7 @@ import com.liferay.portal.kernel.portlet.PortletURLFactoryUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.security.auth.AuthException;
-import com.liferay.portal.kernel.security.auth.session.AuthenticatedSessionManagerUtil;
+import com.liferay.portal.kernel.security.auth.session.AuthenticatedSessionManager;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Http;
@@ -57,6 +57,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Brian Wing Shun Chan
@@ -200,7 +201,7 @@ public class LoginMVCActionCommand extends BaseMVCActionCommand {
 
 			String authType = portletPreferences.getValue("authType", null);
 
-			AuthenticatedSessionManagerUtil.login(
+			_authenticatedSessionManager.login(
 				request, response, login, password, rememberMe, authType);
 		}
 
@@ -288,5 +289,8 @@ public class LoginMVCActionCommand extends BaseMVCActionCommand {
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		LoginMVCActionCommand.class);
+
+	@Reference
+	private AuthenticatedSessionManager _authenticatedSessionManager;
 
 }
