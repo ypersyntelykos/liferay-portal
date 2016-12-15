@@ -119,9 +119,9 @@ public class SPAUtil {
 			themeDisplay.getCompanyId());
 
 		for (Portlet portlet : companyPortlets) {
-			if (portlet.isActive() && portlet.isReady() &&
-				!portlet.isUndeployedPortlet() &&
-				!portlet.isSinglePageApplication()) {
+			if (!portlet.isSinglePageApplication() &&
+				!portlet.isUndeployedPortlet() && portlet.isActive() &&
+				portlet.isReady()) {
 
 				jsonObject.put(portlet.getPortletId(), true);
 			}
