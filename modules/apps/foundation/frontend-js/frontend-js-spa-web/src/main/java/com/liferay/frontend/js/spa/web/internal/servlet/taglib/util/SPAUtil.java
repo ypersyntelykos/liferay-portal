@@ -284,7 +284,7 @@ public class SPAUtil {
 			List<String> selectors = StringPlus.asList(
 				reference.getProperty(_SPA_NAVIGATION_EXCEPTION_SELECTOR_KEY));
 
-			_navigationExceptionSelectors.remove(selectors);
+			_navigationExceptionSelectors.removeAll(selectors);
 
 			_serviceReferences.remove(reference);
 
