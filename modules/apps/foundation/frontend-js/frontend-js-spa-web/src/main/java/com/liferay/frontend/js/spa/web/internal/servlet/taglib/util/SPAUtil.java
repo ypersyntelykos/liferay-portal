@@ -108,8 +108,7 @@ public class SPAUtil {
 	}
 
 	public String getNavigationExceptionSelectors() {
-		return ListUtil.toString(
-			_navigationExceptionSelectors, (String)null, StringPool.BLANK);
+		return _navigationExceptionSelectorsString;
 	}
 
 	public String getPortletsBlacklist(ThemeDisplay themeDisplay) {
@@ -180,6 +179,9 @@ public class SPAUtil {
 		_navigationExceptionSelectors.addAll(
 			Arrays.asList(_spaConfiguration.navigationExceptionSelectors()));
 
+		_navigationExceptionSelectorsString = ListUtil.toString(
+			_navigationExceptionSelectors, (String)null, StringPool.BLANK);
+
 		Filter filter = bundleContext.createFilter(
 			"(&(objectClass=java.lang.Object)(" +
 				_SPA_NAVIGATION_EXCEPTION_SELECTOR_KEY + "=*))");
@@ -205,6 +207,9 @@ public class SPAUtil {
 
 		_navigationExceptionSelectors.addAll(
 			Arrays.asList(_spaConfiguration.navigationExceptionSelectors()));
+
+		_navigationExceptionSelectorsString = ListUtil.toString(
+			_navigationExceptionSelectors, (String)null, StringPool.BLANK);
 	}
 
 	@Reference(unbind = "-")
@@ -221,6 +226,7 @@ public class SPAUtil {
 
 	private static final List<String> _navigationExceptionSelectors =
 		new CopyOnWriteArrayList<>();
+	private static volatile String _navigationExceptionSelectorsString;
 
 	static {
 		Class<?> clazz = ServletResponseConstants.class;
@@ -258,6 +264,9 @@ public class SPAUtil {
 
 			_navigationExceptionSelectors.addAll(selectors);
 
+			_navigationExceptionSelectorsString = ListUtil.toString(
+				_navigationExceptionSelectors, (String)null, StringPool.BLANK);
+
 			Object service = _bundleContext.getService(reference);
 
 			_serviceReferences.add(reference);
@@ -282,6 +291,9 @@ public class SPAUtil {
 				reference.getProperty(_SPA_NAVIGATION_EXCEPTION_SELECTOR_KEY));
 
 			_navigationExceptionSelectors.removeAll(selectors);
+
+			_navigationExceptionSelectorsString = ListUtil.toString(
+				_navigationExceptionSelectors, (String)null, StringPool.BLANK);
 
 			_serviceReferences.remove(reference);
 
