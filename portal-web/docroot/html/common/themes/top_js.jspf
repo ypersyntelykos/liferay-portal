@@ -19,17 +19,28 @@
 		var Liferay = Liferay || {};
 
 		Liferay.Browser = {
+
+			<%
+				String version = BrowserSnifferUtil.getVersion(request);
+
+				String majorVersion = version;
+
+				if (version.isEmpty()) {
+					majorVersion = "0";
+				}
+			%>
+
 			acceptsGzip: function() {
 				return <%= BrowserSnifferUtil.acceptsGzip(request) %>;
 			},
 			getMajorVersion: function() {
-				return <%= BrowserSnifferUtil.getMajorVersion(request) %>;
+				return <%= majorVersion %>;
 			},
 			getRevision: function() {
 				return '<%= BrowserSnifferUtil.getRevision(request) %>';
 			},
 			getVersion: function() {
-				return '<%= BrowserSnifferUtil.getVersion(request) %>';
+				return '<%= version %>';
 			},
 			isAir: function() {
 				return <%= BrowserSnifferUtil.isAir(request) %>;
