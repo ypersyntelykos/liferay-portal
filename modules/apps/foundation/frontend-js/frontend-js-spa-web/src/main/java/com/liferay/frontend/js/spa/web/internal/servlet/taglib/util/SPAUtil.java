@@ -40,7 +40,6 @@ import com.liferay.portal.kernel.util.WebKeys;
 import java.lang.reflect.Field;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -257,9 +256,7 @@ public class SPAUtil {
 			List<String> selectors = StringPlus.asList(
 				reference.getProperty(_SPA_NAVIGATION_EXCEPTION_SELECTOR_KEY));
 
-			Collections.addAll(
-				_navigationExceptionSelectors,
-				selectors.toArray(new String[selectors.size()]));
+			_navigationExceptionSelectors.addAll(selectors);
 
 			Object service = _bundleContext.getService(reference);
 
