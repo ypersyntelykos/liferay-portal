@@ -73,13 +73,7 @@ import org.osgi.util.tracker.ServiceTrackerCustomizer;
 public class SPAUtil {
 
 	public long getCacheExpirationTime(long companyId) {
-		long cacheExpirationTime = _spaConfiguration.cacheExpirationTime();
-
-		if (cacheExpirationTime > 0) {
-			cacheExpirationTime *= Time.MINUTE;
-		}
-
-		return cacheExpirationTime;
+		return _cacheExpirationTime;
 	}
 
 	public String getExcludedPaths() {
@@ -162,6 +156,8 @@ public class SPAUtil {
 			BundleContext bundleContext, SPAConfiguration spaConfiguration)
 		throws InvalidSyntaxException {
 
+		_cacheExpirationTime = _getCacheExpirationTime(spaConfiguration);
+
 		_spaConfiguration = spaConfiguration;
 
 		_navigationExceptionSelectors.addAll(
@@ -188,6 +184,8 @@ public class SPAUtil {
 
 	@Modified
 	protected void modified(SPAConfiguration spaConfiguration) {
+		_cacheExpirationTime = _getCacheExpirationTime(spaConfiguration);
+
 		_navigationExceptionSelectors.removeAll(
 			Arrays.asList(_spaConfiguration.navigationExceptionSelectors()));
 
@@ -205,6 +203,16 @@ public class SPAUtil {
 		PortletLocalService portletLocalService) {
 
 		_portletLocalService = portletLocalService;
+	}
+
+	private long _getCacheExpirationTime(SPAConfiguration spaConfiguration) {
+		long cacheExpirationTime = spaConfiguration.cacheExpirationTime();
+
+		if (cacheExpirationTime > 0) {
+			cacheExpirationTime *= Time.MINUTE;
+		}
+
+		return cacheExpirationTime;
 	}
 
 	private static final String _SPA_NAVIGATION_EXCEPTION_SELECTOR_KEY =
@@ -250,6 +258,7 @@ public class SPAUtil {
 		_spaExcludedPaths = jsonArray.toString();
 	}
 
+	private long _cacheExpirationTime;
 	private ServiceTracker<Object, Object> _navigationExceptionSelectorTracker;
 	private PortletLocalService _portletLocalService;
 	private SPAConfiguration _spaConfiguration;
