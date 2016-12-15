@@ -154,12 +154,15 @@ public class SPAUtil {
 
 		String portletId = request.getParameter("p_p_id");
 
+		if (Validator.isNull(portletId)) {
+			return false;
+		}
+
 		String singlePageApplicationLastPortletId =
 			(String)session.getAttribute(
 				WebKeys.SINGLE_PAGE_APPLICATION_LAST_PORTLET_ID);
 
-		if (Validator.isNotNull(portletId) &&
-			Validator.isNotNull(singlePageApplicationLastPortletId) &&
+		if (Validator.isNotNull(singlePageApplicationLastPortletId) &&
 			!Objects.equals(portletId, singlePageApplicationLastPortletId)) {
 
 			return true;
