@@ -14,6 +14,8 @@
 
 package com.liferay.frontend.js.bundle.config.extender.internal;
 
+import com.liferay.portal.servlet.delegate.ServletContextDelegate;
+
 import javax.servlet.ServletContext;
 
 import org.osgi.framework.BundleContext;
@@ -86,7 +88,7 @@ public class JSBundleConfigPortalWebResources {
 		}
 
 		private InternalPortalWebResources(ServletContext servletContext) {
-			_servletContext = servletContext;
+			_servletContext = ServletContextDelegate.create(servletContext);
 		}
 
 		private final ServletContext _servletContext;
