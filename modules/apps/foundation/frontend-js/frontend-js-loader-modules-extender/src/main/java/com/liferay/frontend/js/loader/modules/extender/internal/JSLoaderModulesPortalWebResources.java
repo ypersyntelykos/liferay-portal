@@ -14,7 +14,6 @@
 
 package com.liferay.frontend.js.loader.modules.extender.internal;
 
-import com.liferay.portal.servlet.ServletContextDelegate;
 
 import javax.servlet.ServletContext;
 
@@ -87,7 +86,7 @@ public class JSLoaderModulesPortalWebResources {
 		}
 
 		private InternalPortalWebResources(ServletContext servletContext) {
-			_servletContext = ServletContextDelegate.create(servletContext);
+			_servletContext = servletContext;
 		}
 
 		private final ServletContext _servletContext;
