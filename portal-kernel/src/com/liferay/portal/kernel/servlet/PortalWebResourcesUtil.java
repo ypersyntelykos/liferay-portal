@@ -41,14 +41,14 @@ public class PortalWebResourcesUtil {
 	}
 
 	public static long getLastModified(String resourceType) {
-		PortalWebResources portalWebResources = getPortalWebResources(
+		PortalWebResources portalWebResources = _portalWebResourcesMap.get(
 			resourceType);
 
 		return portalWebResources.getLastModified();
 	}
 
 	public static String getModuleContextPath(String resourceType) {
-		PortalWebResources portalWebResources = getPortalWebResources(
+		PortalWebResources portalWebResources = _portalWebResourcesMap.get(
 			resourceType);
 
 		return portalWebResources.getContextPath();
@@ -116,7 +116,7 @@ public class PortalWebResourcesUtil {
 	}
 
 	public static ServletContext getServletContext(String resourceType) {
-		PortalWebResources portalWebResources = getPortalWebResources(
+		PortalWebResources portalWebResources = _portalWebResourcesMap.get(
 			resourceType);
 
 		return portalWebResources.getServletContext();
