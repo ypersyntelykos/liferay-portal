@@ -25,10 +25,15 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Html;
 import com.liferay.portal.kernel.util.Props;
 import com.liferay.portal.kernel.util.PropsKeys;
-import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 
 import java.io.IOException;
+import java.io.InputStream;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -54,48 +59,64 @@ public class SPATopHeadJSPDynamicInclude extends BaseJSPDynamicInclude {
 		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
-		StringBundler sb = new StringBundler(26);
+		Map<String, String> values = new HashMap<>();
 
-		sb.append("var $ = AUI.$;var _ = AUI._;\n");
-		sb.append("Liferay.SPA = Liferay.SPA || {};\n");
-		sb.append("Liferay.SPA.cacheExpirationTime = ");
-		sb.append(_spaUtil.getCacheExpirationTime(themeDisplay.getCompanyId()));
-		sb.append(";\nLiferay.SPA.clearScreensCache = ");
-		sb.append(_spaUtil.isClearScreensCache(request, request.getSession()));
-		sb.append(";\nLiferay.SPA.excludedPaths = ");
-		sb.append(_spaUtil.getExcludedPaths());
-		sb.append(";\nLiferay.SPA.loginRedirect = '");
-		sb.append(_html.escapeJS(_spaUtil.getLoginRedirect(request)));
-		sb.append("';\nLiferay.SPA.navigationExceptionSelectors = '");
-		sb.append(_spaUtil.getNavigationExceptionSelectors());
-		sb.append("';\nLiferay.SPA.requestTimeout = ");
-		sb.append(_spaUtil.getRequestTimeout());
-		sb.append(";\nLiferay.SPA.userNotification = {\nmessage: '");
-		sb.append(
+		values.put(
+			"cacheExpirationTime",
+			String.valueOf(
+				_spaUtil.getCacheExpirationTime(themeDisplay.getCompanyId())));
+		values.put(
+			"clearScreensCache",
+			String.valueOf(
+				_spaUtil.isClearScreensCache(request, request.getSession())));
+		values.put("excludedPaths", _spaUtil.getExcludedPaths());
+		values.put(
+			"loginRedirect",
+			_html.escapeJS(_spaUtil.getLoginRedirect(request)));
+		values.put(
+			"message",
 			_language.get(
 				_spaUtil.getLanguageResourceBundle(themeDisplay.getLocale()),
 				"it-looks-like-this-is-taking-longer-than-expected"));
-		sb.append("',\ntimeout: ");
-		sb.append(_spaUtil.getUserNotificationTimeout());
-		sb.append(",\ntitle: '");
-		sb.append(
+		values.put(
+			"navigationExceptionSelectors",
+			_spaUtil.getNavigationExceptionSelectors());
+		values.put(
+			"portletsBlacklist", _spaUtil.getPortletsBlacklist(themeDisplay));
+		values.put(
+			"requestTimeout", String.valueOf(_spaUtil.getRequestTimeout()));
+		values.put(
+			"timeout", String.valueOf(_spaUtil.getUserNotificationTimeout()));
+		values.put(
+			"title",
 			_language.get(
 				_spaUtil.getLanguageResourceBundle(themeDisplay.getLocale()),
 				"oops"));
-		sb.append("'};\nfrontendJsSpaWebLiferayInitEs.default.init(\n");
-		sb.append("function(app) {\napp.setPortletsBlacklist(");
-		sb.append(_spaUtil.getPortletsBlacklist(themeDisplay));
-		sb.append(");\napp.setValidStatusCodes(");
-		sb.append(_spaUtil.getValidStatusCodes());
-		sb.append(");\n}\n);");
+		values.put("validStatusCodes", _spaUtil.getValidStatusCodes());
 
 		ScriptData scriptData = new ScriptData();
 
 		scriptData.append(
-			null, sb, "frontend-js-spa-web/liferay/init.es",
-			ScriptData.ModulesType.ES6);
+			null,
+			StringUtil.replaceToStringBundler(
+				_initTemplate, StringPool.POUND, StringPool.POUND, values),
+			"frontend-js-spa-web/liferay/init.es", ScriptData.ModulesType.ES6);
 
 		scriptData.writeTo(response.getWriter());
+	}
+
+	private static final String _initTemplate;
+
+	static {
+		try (InputStream inputStream =
+				SPATopHeadJSPDynamicInclude.class.getResourceAsStream(
+					"/META-INF/resources/init.template")) {
+
+			_initTemplate = StringUtil.read(inputStream);
+		}
+		catch (IOException ioe) {
+			throw new ExceptionInInitializerError(ioe);
+		}
 	}
 
 	@Override
