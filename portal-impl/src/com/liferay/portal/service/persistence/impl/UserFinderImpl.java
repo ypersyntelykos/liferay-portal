@@ -783,7 +783,8 @@ public class UserFinderImpl extends UserFinderBaseImpl implements UserFinder {
 
 			if (obc != null) {
 				for (String conditionField : obc.getOrderByConditionFields()) {
-					attributes += ", " + conditionField;
+					attributes += ", User_." + conditionField + " AS " +
+						conditionField;
 				}
 			}
 
