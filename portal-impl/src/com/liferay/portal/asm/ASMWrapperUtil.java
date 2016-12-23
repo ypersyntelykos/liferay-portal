@@ -15,6 +15,8 @@
 package com.liferay.portal.asm;
 
 import com.liferay.portal.kernel.util.ReflectionUtil;
+import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.portal.kernel.util.StringPool;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -39,7 +41,18 @@ public class ASMWrapperUtil {
 				interfaceClass + " is not an interface");
 		}
 
-		String asmWrapperClassName = interfaceClass.getName() + "ASMWrapper";
+		Class<?> clazz = delegateObject.getClass();
+
+		Package pkg = clazz.getPackage();
+
+		StringBundler sb = new StringBundler(4);
+
+		sb.append(pkg.getName());
+		sb.append(StringPool.PERIOD);
+		sb.append(interfaceClass.getSimpleName());
+		sb.append("ASMWrapper");
+
+		String asmWrapperClassName = sb.toString();
 
 		Class<?> asmWrapperClass = null;
 
@@ -55,7 +68,8 @@ public class ASMWrapperUtil {
 						byte[].class, int.class, int.class);
 
 					byte[] classData = _generateASMWrapperClassData(
-						interfaceClass, delegateObject, defaultObject);
+						asmWrapperClassName.replace('.', '/'), interfaceClass,
+						delegateObject, defaultObject);
 
 					asmWrapperClass = (Class<?>)defineClassMethod.invoke(
 						classLoader, asmWrapperClassName, classData, 0,
@@ -78,12 +92,10 @@ public class ASMWrapperUtil {
 	}
 
 	private static <T> byte[] _generateASMWrapperClassData(
-		Class<T> interfaceClass, Object delegateObject, T defaultObject) {
+		String asmWrapperClassBinaryName, Class<T> interfaceClass,
+		Object delegateObject, T defaultObject) {
 
 		String interfaceClassBinaryName = _getClassBinaryName(interfaceClass);
-
-		String asmWrapperClassBinaryName =
-			interfaceClassBinaryName + "ASMWrapper";
 
 		Class<?> delegateObjectClass = delegateObject.getClass();
 
