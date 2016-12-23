@@ -89,9 +89,14 @@ public class ASMWrapperUtilTest {
 		Class<?> asmWrapperClass = asmWrapper.getClass();
 
 		Assert.assertEquals(Modifier.PUBLIC, asmWrapperClass.getModifiers());
+
+		Package pkg = TestDelegate.class.getPackage();
+
 		Assert.assertEquals(
-			TestInterface.class.getName() + "ASMWrapper",
+			pkg.getName() + "." + TestInterface.class.getSimpleName() +
+				"ASMWrapper",
 			asmWrapperClass.getName());
+
 		Assert.assertSame(Object.class, asmWrapperClass.getSuperclass());
 
 		Method[] expectedMethods = _getDeclaredMethods(TestInterface.class);
