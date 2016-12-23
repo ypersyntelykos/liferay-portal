@@ -23,7 +23,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.osgi.web.servlet.jsp.compiler.internal.JspBundleClassloader;
 import com.liferay.portal.osgi.web.servlet.jsp.compiler.internal.JspServletContext;
 import com.liferay.portal.osgi.web.servlet.jsp.compiler.internal.JspTagHandlerPool;
-import com.liferay.portal.servlet.ServletContextDelegate;
+import com.liferay.portal.servlet.delegate.ServletContextDelegate;
 import com.liferay.taglib.servlet.JspFactorySwapper;
 
 import java.io.File;

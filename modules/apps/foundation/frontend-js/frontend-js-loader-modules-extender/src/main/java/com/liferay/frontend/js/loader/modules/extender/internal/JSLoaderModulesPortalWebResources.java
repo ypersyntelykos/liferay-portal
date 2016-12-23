@@ -14,7 +14,7 @@
 
 package com.liferay.frontend.js.loader.modules.extender.internal;
 
-import com.liferay.portal.servlet.ServletContextDelegate;
+import com.liferay.portal.servlet.delegate.ServletContextDelegate;
 
 import javax.servlet.ServletContext;
 
