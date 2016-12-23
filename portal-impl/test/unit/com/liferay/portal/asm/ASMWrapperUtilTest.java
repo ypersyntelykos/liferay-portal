@@ -96,6 +96,7 @@ public class ASMWrapperUtilTest {
 			pkg.getName() + "." + TestInterface.class.getSimpleName() +
 				"ASMWrapper",
 			asmWrapperClass.getName());
+
 		Assert.assertSame(Object.class, asmWrapperClass.getSuperclass());
 
 		Method[] expectedMethods = _getDeclaredMethods(TestInterface.class);
