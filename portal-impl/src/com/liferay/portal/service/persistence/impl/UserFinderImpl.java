@@ -454,7 +454,7 @@ public class UserFinderImpl extends UserFinderBaseImpl implements UserFinder {
 			String sql = CustomSQLUtil.get(FIND_BY_C_FN_MN_LN_SN_EA_S);
 
 			sql = StringUtil.replace(
-				sql, "[$ATTRIBUTES$]", "User_.userId AS userId");
+				sql, "[$COLUMN_NAMES$]", getColumnNames(null));
 
 			sql = replaceKeywords(
 				sql, firstNames, middleNames, lastNames, screenNames,
@@ -779,16 +779,8 @@ public class UserFinderImpl extends UserFinderBaseImpl implements UserFinder {
 
 			String sql = CustomSQLUtil.get(FIND_BY_C_FN_MN_LN_SN_EA_S);
 
-			String attributes = "User_.userId AS userId";
-
-			if (obc != null) {
-				for (String conditionField : obc.getOrderByConditionFields()) {
-					attributes += ", User_." + conditionField + " AS " +
-						conditionField;
-				}
-			}
-
-			sql = StringUtil.replace(sql, "[$ATTRIBUTES$]", attributes);
+			sql = StringUtil.replace(
+				sql, "[$COLUMN_NAMES$]", getColumnNames(obc));
 
 			sql = replaceKeywords(
 				sql, firstNames, middleNames, lastNames, screenNames,
@@ -851,6 +843,27 @@ public class UserFinderImpl extends UserFinderBaseImpl implements UserFinder {
 		finally {
 			closeSession(session);
 		}
+	}
+
+	protected String getColumnNames(OrderByComparator obc) {
+		if (obc == null) {
+			return "User_.userId AS userId";
+		}
+
+		String[] orderByFields = obc.getOrderByFields();
+
+		StringBundler sb = new StringBundler(orderByFields.length * 4 + 1);
+
+		sb.append("User_.userId AS userId");
+
+		for (String field : orderByFields) {
+			sb.append(", User_.");
+			sb.append(field);
+			sb.append(" AS ");
+			sb.append(field);
+		}
+
+		return sb.toString();
 	}
 
 	protected String getJoin(LinkedHashMap<String, Object> params) {

@@ -1622,7 +1622,7 @@
 	<sql id="com.liferay.portal.kernel.service.persistence.UserFinder.findByC_FN_MN_LN_SN_EA_S">
 		<![CDATA[
 			SELECT
-				[$ATTRIBUTES$]
+				[$COLUMN_NAMES$]
 			FROM
 				User_
 			[$JOIN$]
