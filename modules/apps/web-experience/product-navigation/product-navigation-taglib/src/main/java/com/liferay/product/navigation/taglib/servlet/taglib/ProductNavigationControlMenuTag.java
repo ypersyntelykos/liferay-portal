@@ -17,6 +17,7 @@ package com.liferay.product.navigation.taglib.servlet.taglib;
 import com.liferay.product.navigation.taglib.servlet.ServletContextUtil;
 import com.liferay.taglib.util.IncludeTag;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.PageContext;
 
 /**
@@ -43,6 +44,15 @@ public class ProductNavigationControlMenuTag extends IncludeTag {
 	@Override
 	protected String getPage() {
 		return _PAGE;
+	}
+
+	@Override
+	protected boolean isCleanUpSetAttributes() {
+		return false;
+	}
+
+	@Override
+	protected void setAttributes(HttpServletRequest request) {
 	}
 
 	private static final String _PAGE = "/control_menu/page.jsp";
