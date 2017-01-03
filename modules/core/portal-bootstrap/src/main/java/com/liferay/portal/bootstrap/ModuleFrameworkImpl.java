@@ -1379,15 +1379,6 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 		List<String> hostBundleSymbolicNames = new ArrayList<>();
 
 		for (Bundle bundle : installedBundles) {
-			BundleStartLevel bundleStartLevel = bundle.adapt(
-				BundleStartLevel.class);
-
-			if (bundleStartLevel.getStartLevel() !=
-					PropsValues.MODULE_FRAMEWORK_DYNAMIC_INSTALL_START_LEVEL) {
-
-				continue;
-			}
-
 			Dictionary<String, String> headers = bundle.getHeaders();
 
 			String fragmentHost = headers.get(Constants.FRAGMENT_HOST);
