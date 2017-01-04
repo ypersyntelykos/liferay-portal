@@ -304,7 +304,7 @@ public class UserImpl extends UserBaseImpl {
 
 		String profileFriendlyURL = getProfileFriendlyURL();
 
-		if (Validator.isNotNull(profileFriendlyURL)) {
+		if (profileFriendlyURL != null) {
 			return portalURL.concat(PortalUtil.getPathContext()).concat(
 				profileFriendlyURL);
 		}
@@ -387,7 +387,7 @@ public class UserImpl extends UserBaseImpl {
 
 		String profileFriendlyURL = getProfileFriendlyURL();
 
-		if (Validator.isNotNull(profileFriendlyURL)) {
+		if (profileFriendlyURL != null) {
 			return PortalUtil.addPreservedParameters(
 				themeDisplay,
 				portalURL.concat(
