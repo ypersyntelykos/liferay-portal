@@ -24,6 +24,7 @@ import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Validator;
 
+import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 
 import java.util.regex.Matcher;
@@ -123,28 +124,19 @@ public class PBKDF2PasswordEncryptor
 					_saltBytes, 0, SecureRandomUtil.nextLong());
 			}
 			else {
-				byte[] bytes = new byte[16];
+				ByteBuffer byteBuffer = ByteBuffer.wrap(
+					Base64.decode(encryptedPassword));
 
 				try {
-					byte[] encryptedPasswordBytes = Base64.decode(
-						encryptedPassword);
+					_keySize = byteBuffer.getInt();
+					_rounds = byteBuffer.getInt();
 
-					System.arraycopy(
-						encryptedPasswordBytes, 0, bytes, 0, bytes.length);
+					byteBuffer.get(_saltBytes);
 				}
-				catch (Exception e) {
+				catch (BufferUnderflowException bue) {
 					throw new PwdEncryptorException(
-						"Unable to extract salt from encrypted password " +
-							e.getMessage(),
-						e);
+						"Unable to extract salt from encrypted password", bue);
 				}
-
-				ByteBuffer byteBuffer = ByteBuffer.wrap(bytes);
-
-				_keySize = byteBuffer.getInt();
-				_rounds = byteBuffer.getInt();
-
-				byteBuffer.get(_saltBytes);
 			}
 		}
 
