@@ -33,47 +33,37 @@ import java.util.Map;
 public class CompositePasswordEncryptor
 	extends BasePasswordEncryptor implements PasswordEncryptor {
 
+	public void afterPropertiesSet() {
+		if (_defaultAlgorithmPasswordEncryptor == null) {
+			_defaultAlgorithmPasswordEncryptor = _select(
+				getDefaultPasswordAlgorithmType());
+		}
+	}
+
+	@Override
+	public String encrypt(String plainTextPassword, String encryptedPassword)
+		throws PwdEncryptorException {
+
+		if (Validator.isNull(plainTextPassword)) {
+			throw new PwdEncryptorException("Unable to encrypt blank password");
+		}
+
+		return _defaultAlgorithmPasswordEncryptor.encrypt(
+			getDefaultPasswordAlgorithmType(), plainTextPassword,
+			encryptedPassword);
+	}
+
 	@Override
 	public String encrypt(
 			String algorithm, String plainTextPassword,
 			String encryptedPassword)
 		throws PwdEncryptorException {
 
-		if (Validator.isNull(algorithm)) {
-			throw new IllegalArgumentException("Invalid algorithm");
-		}
-
 		if (Validator.isNull(plainTextPassword)) {
 			throw new PwdEncryptorException("Unable to encrypt blank password");
 		}
 
-		PasswordEncryptor passwordEncryptor = null;
-
-		if (algorithm.startsWith(PasswordEncryptorUtil.TYPE_BCRYPT)) {
-			passwordEncryptor = _passwordEncryptors.get(
-				PasswordEncryptorUtil.TYPE_BCRYPT);
-		}
-		else if (algorithm.startsWith(PasswordEncryptorUtil.TYPE_PBKDF2)) {
-			passwordEncryptor = _passwordEncryptors.get(
-				PasswordEncryptorUtil.TYPE_PBKDF2);
-		}
-		else {
-			passwordEncryptor = _passwordEncryptors.get(algorithm);
-		}
-
-		if (passwordEncryptor == null) {
-			if (_log.isDebugEnabled()) {
-				_log.debug("No password encryptor found for " + algorithm);
-			}
-
-			passwordEncryptor = _defaultPasswordEncryptor;
-		}
-
-		if (_log.isDebugEnabled()) {
-			_log.debug(
-				"Found " + ClassUtil.getClassName(passwordEncryptor) +
-					" to encrypt password using " + algorithm);
-		}
+		PasswordEncryptor passwordEncryptor = _select(algorithm);
 
 		return passwordEncryptor.encrypt(
 			algorithm, plainTextPassword, encryptedPassword);
@@ -116,9 +106,46 @@ public class CompositePasswordEncryptor
 		}
 	}
 
+	private PasswordEncryptor _select(String algorithm) {
+		if (Validator.isNull(algorithm)) {
+			throw new IllegalArgumentException("Invalid algorithm");
+		}
+
+		PasswordEncryptor passwordEncryptor = null;
+
+		if (algorithm.startsWith(PasswordEncryptorUtil.TYPE_BCRYPT)) {
+			passwordEncryptor = _passwordEncryptors.get(
+				PasswordEncryptorUtil.TYPE_BCRYPT);
+		}
+		else if (algorithm.startsWith(PasswordEncryptorUtil.TYPE_PBKDF2)) {
+			passwordEncryptor = _passwordEncryptors.get(
+				PasswordEncryptorUtil.TYPE_PBKDF2);
+		}
+		else {
+			passwordEncryptor = _passwordEncryptors.get(algorithm);
+		}
+
+		if (passwordEncryptor == null) {
+			if (_log.isDebugEnabled()) {
+				_log.debug("No password encryptor found for " + algorithm);
+			}
+
+			passwordEncryptor = _defaultPasswordEncryptor;
+		}
+
+		if (_log.isDebugEnabled()) {
+			_log.debug(
+				"Found " + ClassUtil.getClassName(passwordEncryptor) +
+					" to encrypt password using " + algorithm);
+		}
+
+		return passwordEncryptor;
+	}
+
 	private static final Log _log = LogFactoryUtil.getLog(
 		CompositePasswordEncryptor.class);
 
+	private PasswordEncryptor _defaultAlgorithmPasswordEncryptor;
 	private PasswordEncryptor _defaultPasswordEncryptor;
 	private final Map<String, PasswordEncryptor> _passwordEncryptors =
 		new HashMap<>();
