@@ -80,6 +80,10 @@ public class CompositePasswordEncryptor
 			throw new IllegalArgumentException("Invalid algorithm");
 		}
 
+		if (Validator.isNull(plainTextPassword)) {
+			throw new PwdEncryptorException("Unable to encrypt blank password");
+		}
+
 		PasswordEncryptor passwordEncryptor = null;
 
 		if (algorithm.startsWith(PasswordEncryptorUtil.TYPE_BCRYPT)) {
