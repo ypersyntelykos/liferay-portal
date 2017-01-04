@@ -44,12 +44,7 @@ public class LegacyAlgorithmAwarePasswordEncryptor
 	}
 
 	@Override
-	public String[] getSupportedAlgorithmTypes() {
-		return _parentPasswordEncryptor.getSupportedAlgorithmTypes();
-	}
-
-	@Override
-	protected String doEncrypt(
+	public String encrypt(
 			String algorithm, String plainTextPassword,
 			String encryptedPassword)
 		throws PwdEncryptorException {
@@ -124,6 +119,11 @@ public class LegacyAlgorithmAwarePasswordEncryptor
 		sb.append(newEncryptedPassword);
 
 		return sb.toString();
+	}
+
+	@Override
+	public String[] getSupportedAlgorithmTypes() {
+		return _parentPasswordEncryptor.getSupportedAlgorithmTypes();
 	}
 
 	protected String getAlgorithmName(String algorithm) {

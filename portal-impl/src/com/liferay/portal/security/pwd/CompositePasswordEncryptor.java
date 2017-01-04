@@ -34,44 +34,7 @@ public class CompositePasswordEncryptor
 	extends BasePasswordEncryptor implements PasswordEncryptor {
 
 	@Override
-	public String[] getSupportedAlgorithmTypes() {
-		throw new UnsupportedOperationException();
-	}
-
-	public void setDefaultPasswordEncryptor(
-		PasswordEncryptor defaultPasswordEncryptor) {
-
-		_defaultPasswordEncryptor = defaultPasswordEncryptor;
-	}
-
-	public void setPasswordEncryptors(
-		List<PasswordEncryptor> passwordEncryptors) {
-
-		for (PasswordEncryptor passwordEncryptor : passwordEncryptors) {
-			if (_log.isDebugEnabled()) {
-				_log.debug("Registering " + passwordEncryptor);
-			}
-
-			String[] supportedAlgorithmTypes =
-				passwordEncryptor.getSupportedAlgorithmTypes();
-
-			if (_log.isDebugEnabled()) {
-				Class<?> clazz = passwordEncryptor.getClass();
-
-				_log.debug(
-					"Registering " + StringUtil.merge(supportedAlgorithmTypes) +
-						" for " + clazz.getName());
-			}
-
-			for (String supportedAlgorithmType : supportedAlgorithmTypes) {
-				_passwordEncryptors.put(
-					supportedAlgorithmType, passwordEncryptor);
-			}
-		}
-	}
-
-	@Override
-	protected String doEncrypt(
+	public String encrypt(
 			String algorithm, String plainTextPassword,
 			String encryptedPassword)
 		throws PwdEncryptorException {
@@ -114,6 +77,43 @@ public class CompositePasswordEncryptor
 
 		return passwordEncryptor.encrypt(
 			algorithm, plainTextPassword, encryptedPassword);
+	}
+
+	@Override
+	public String[] getSupportedAlgorithmTypes() {
+		throw new UnsupportedOperationException();
+	}
+
+	public void setDefaultPasswordEncryptor(
+		PasswordEncryptor defaultPasswordEncryptor) {
+
+		_defaultPasswordEncryptor = defaultPasswordEncryptor;
+	}
+
+	public void setPasswordEncryptors(
+		List<PasswordEncryptor> passwordEncryptors) {
+
+		for (PasswordEncryptor passwordEncryptor : passwordEncryptors) {
+			if (_log.isDebugEnabled()) {
+				_log.debug("Registering " + passwordEncryptor);
+			}
+
+			String[] supportedAlgorithmTypes =
+				passwordEncryptor.getSupportedAlgorithmTypes();
+
+			if (_log.isDebugEnabled()) {
+				Class<?> clazz = passwordEncryptor.getClass();
+
+				_log.debug(
+					"Registering " + StringUtil.merge(supportedAlgorithmTypes) +
+						" for " + clazz.getName());
+			}
+
+			for (String supportedAlgorithmType : supportedAlgorithmTypes) {
+				_passwordEncryptors.put(
+					supportedAlgorithmType, passwordEncryptor);
+			}
+		}
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
