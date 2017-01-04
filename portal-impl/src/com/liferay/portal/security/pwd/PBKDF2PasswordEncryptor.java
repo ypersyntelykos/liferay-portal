@@ -41,12 +41,7 @@ public class PBKDF2PasswordEncryptor
 	extends BasePasswordEncryptor implements PasswordEncryptor {
 
 	@Override
-	public String[] getSupportedAlgorithmTypes() {
-		return new String[] {PasswordEncryptorUtil.TYPE_PBKDF2};
-	}
-
-	@Override
-	protected String doEncrypt(
+	public String encrypt(
 			String algorithm, String plainTextPassword,
 			String encryptedPassword)
 		throws PwdEncryptorException {
@@ -93,6 +88,11 @@ public class PBKDF2PasswordEncryptor
 		catch (Exception e) {
 			throw new PwdEncryptorException(e.getMessage(), e);
 		}
+	}
+
+	@Override
+	public String[] getSupportedAlgorithmTypes() {
+		return new String[] {PasswordEncryptorUtil.TYPE_PBKDF2};
 	}
 
 	private static final int _KEY_SIZE = 160;

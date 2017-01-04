@@ -36,23 +36,9 @@ public abstract class BasePasswordEncryptor implements PasswordEncryptor {
 	}
 
 	@Override
-	public String encrypt(
-			String algorithm, String plainTextPassword,
-			String encryptedPassword)
-		throws PwdEncryptorException {
-
-		return doEncrypt(algorithm, plainTextPassword, encryptedPassword);
-	}
-
-	@Override
 	public String getDefaultPasswordAlgorithmType() {
 		return _PASSWORDS_ENCRYPTION_ALGORITHM;
 	}
-
-	protected abstract String doEncrypt(
-			String algorithm, String plainTextPassword,
-			String encryptedPassword)
-		throws PwdEncryptorException;
 
 	private static final String _PASSWORDS_ENCRYPTION_ALGORITHM =
 		StringUtil.toUpperCase(
