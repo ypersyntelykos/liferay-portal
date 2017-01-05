@@ -104,9 +104,8 @@ public class PortalPreferencesImpl
 				getOwnerId(), getOwnerType(), getOriginalXML(),
 				new HashMap<>(getOriginalPreferences()), isSignedIn());
 		}
-		else if (Objects.equals(
-					originalXML, _portalPreferences.getPreferences())) {
 
+		if (Objects.equals(originalXML, _portalPreferences.getPreferences())) {
 			PortalPreferencesImpl portalPreferencesImpl =
 				new PortalPreferencesImpl(
 					getOwnerId(), getOwnerType(), originalXML,
