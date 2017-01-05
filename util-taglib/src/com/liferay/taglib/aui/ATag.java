@@ -217,7 +217,7 @@ public class ATag extends BaseATag {
 		String dynamicAttributesString = InlineUtil.buildDynamicAttributes(
 			getDynamicAttributes());
 
-		if (Validator.isNotNull(dynamicAttributesString)) {
+		if (!dynamicAttributesString.isEmpty()) {
 			jspWriter.write(dynamicAttributesString);
 		}
 	}
