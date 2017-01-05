@@ -90,7 +90,6 @@ public class ATag extends BaseATag {
 		String label = getLabel();
 		String lang = getLang();
 		Boolean localizeLabel = getLocalizeLabel();
-		String namespace = _getNamespace();
 		String onClick = getOnClick();
 		String target = getTarget();
 		String title = getTitle();
@@ -120,7 +119,7 @@ public class ATag extends BaseATag {
 
 		if (Validator.isNotNull(id)) {
 			jspWriter.write("id=\"");
-			jspWriter.write(namespace);
+			jspWriter.write(_getNamespace());
 			jspWriter.write(id);
 			jspWriter.write("\" ");
 		}
