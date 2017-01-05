@@ -162,7 +162,7 @@ public class ATag extends BaseATag {
 			jspWriter.write("\" ");
 		}
 
-		if (data != null) {
+		if ((data != null) && !data.isEmpty()) {
 			jspWriter.write(AUIUtil.buildData(data));
 		}
 
