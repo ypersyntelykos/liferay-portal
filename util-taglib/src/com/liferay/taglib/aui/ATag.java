@@ -199,16 +199,17 @@ public class ATag extends BaseATag {
 		PortletResponse portletResponse = (PortletResponse)request.getAttribute(
 			JavaConstants.JAVAX_PORTLET_RESPONSE);
 
-		String namespace = StringPool.BLANK;
-
-		boolean useNamespace = GetterUtil.getBoolean(
-			(String)request.getAttribute("aui:form:useNamespace"), true);
-
-		if ((portletResponse != null) && useNamespace) {
-			namespace = portletResponse.getNamespace();
+		if (portletResponse == null) {
+			return StringPool.BLANK;
 		}
 
-		return namespace;
+		if (GetterUtil.getBoolean(
+				(String)request.getAttribute("aui:form:useNamespace"), true)) {
+
+			return portletResponse.getNamespace();
+		}
+
+		return StringPool.BLANK;
 	}
 
 	private void _writeDynamicAttributes(JspWriter jspWriter)
