@@ -63,21 +63,21 @@ public class UserPortraitTag extends IncludeTag {
 
 		jspWriter.write("<div class=\"");
 
-		if (Validator.isNotNull(portraitURL)) {
-			jspWriter.write(_cssClass);
-			jspWriter.write(
-				" aspect-ratio-bg-cover user-icon\" style=\"background-image:" +
-					"url(");
-			jspWriter.write(HtmlUtil.escape(portraitURL));
-			jspWriter.write(")\"></div>");
-		}
-		else {
+		if (portraitURL == null) {
 			jspWriter.write(LexiconUtil.getUserColorCssClass(user));
 			jspWriter.write(" ");
 			jspWriter.write(_cssClass);
 			jspWriter.write(" user-icon user-icon-default\"><span>");
 			jspWriter.write(getUserInitials(user));
 			jspWriter.write("</span></div>");
+		}
+		else {
+			jspWriter.write(_cssClass);
+			jspWriter.write(
+				" aspect-ratio-bg-cover user-icon\" style=\"background-image:" +
+					"url(");
+			jspWriter.write(HtmlUtil.escape(portraitURL));
+			jspWriter.write(")\"></div>");
 		}
 
 		return EVAL_PAGE;
