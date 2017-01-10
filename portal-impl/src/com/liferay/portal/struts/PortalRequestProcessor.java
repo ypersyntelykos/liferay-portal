@@ -153,9 +153,9 @@ public class PortalRequestProcessor extends TilesRequestProcessor {
 		ActionMapping actionMapping =
 			(ActionMapping)moduleConfig.findActionConfig(path);
 
-		Action action = StrutsActionRegistryUtil.getAction(path);
+		if ((actionMapping == null) &&
+			(StrutsActionRegistryUtil.getAction(path) == null)) {
 
-		if ((actionMapping == null) && (action == null)) {
 			String lastPath = getLastPath(request);
 
 			if (_log.isDebugEnabled()) {
