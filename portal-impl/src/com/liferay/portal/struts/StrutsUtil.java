@@ -16,6 +16,7 @@ package com.liferay.portal.struts;
 
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.servlet.DirectRequestDispatcherFactoryUtil;
 
 import java.io.IOException;
 
@@ -65,7 +66,8 @@ public class StrutsUtil {
 			}
 
 			RequestDispatcher requestDispatcher =
-				servletContext.getRequestDispatcher(path);
+				DirectRequestDispatcherFactoryUtil.getRequestDispatcher(
+					servletContext, path);
 
 			try {
 				requestDispatcher.forward(request, response);
@@ -80,8 +82,9 @@ public class StrutsUtil {
 
 				String errorPath = TEXT_HTML_DIR + "/common/error.jsp";
 
-				requestDispatcher = servletContext.getRequestDispatcher(
-					errorPath);
+				requestDispatcher =
+					DirectRequestDispatcherFactoryUtil.getRequestDispatcher(
+						servletContext, errorPath);
 
 				try {
 					requestDispatcher.forward(request, response);
@@ -117,7 +120,8 @@ public class StrutsUtil {
 		}
 
 		RequestDispatcher requestDispatcher =
-			servletContext.getRequestDispatcher(path);
+			DirectRequestDispatcherFactoryUtil.getRequestDispatcher(
+				servletContext, path);
 
 		try {
 			requestDispatcher.include(request, response);
