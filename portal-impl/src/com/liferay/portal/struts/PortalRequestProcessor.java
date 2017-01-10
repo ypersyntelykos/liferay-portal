@@ -706,74 +706,77 @@ public class PortalRequestProcessor extends TilesRequestProcessor {
 			return _PATH_PORTAL_LOGOUT;
 		}
 
-		// Authenticated users must be active
-
-		if ((user != null) && !user.isActive()) {
-			SessionErrors.add(request, UserActiveException.class.getName());
-
-			return _PATH_PORTAL_ERROR;
-		}
-
 		long companyId = PortalUtil.getCompanyId(request);
 		String portletId = ParamUtil.getString(request, "p_p_id");
 
-		if ((user != null) && !path.equals(_PATH_PORTAL_JSON_SERVICE) &&
-			!path.equals(_PATH_PORTAL_RENDER_PORTLET) &&
-			!ParamUtil.getBoolean(request, "wsrp") &&
-			!themeDisplay.isImpersonated() &&
-			!InterruptedPortletRequestWhitelistUtil.
-				isPortletInvocationWhitelisted(
-					companyId, portletId,
-					PortalUtil.getStrutsAction(request))) {
+		// Authenticated users must be active
 
-			// Authenticated users should agree to Terms of Use
+		if (user != null) {
+			if (!user.isActive()) {
+				SessionErrors.add(request, UserActiveException.class.getName());
 
-			if (!user.isTermsOfUseComplete()) {
-				return _PATH_PORTAL_TERMS_OF_USE;
+				return _PATH_PORTAL_ERROR;
 			}
 
-			// Authenticated users should have a verified email address
+			if (!path.equals(_PATH_PORTAL_JSON_SERVICE) &&
+				!path.equals(_PATH_PORTAL_RENDER_PORTLET) &&
+				!ParamUtil.getBoolean(request, "wsrp") &&
+				!themeDisplay.isImpersonated() &&
+				!InterruptedPortletRequestWhitelistUtil.
+					isPortletInvocationWhitelisted(
+						companyId, portletId,
+						PortalUtil.getStrutsAction(request))) {
 
-			if (!user.isEmailAddressVerificationComplete()) {
-				if (path.equals(_PATH_PORTAL_UPDATE_EMAIL_ADDRESS)) {
-					return _PATH_PORTAL_UPDATE_EMAIL_ADDRESS;
+				// Authenticated users should agree to Terms of Use
+
+				if (!user.isTermsOfUseComplete()) {
+					return _PATH_PORTAL_TERMS_OF_USE;
 				}
 
-				return _PATH_PORTAL_VERIFY_EMAIL_ADDRESS;
-			}
+				// Authenticated users should have a verified email address
 
-			// Authenticated users must have a current password
+				if (!user.isEmailAddressVerificationComplete()) {
+					if (path.equals(_PATH_PORTAL_UPDATE_EMAIL_ADDRESS)) {
+						return _PATH_PORTAL_UPDATE_EMAIL_ADDRESS;
+					}
 
-			if (user.isPasswordReset()) {
-				try {
-					PasswordPolicy passwordPolicy = user.getPasswordPolicy();
+					return _PATH_PORTAL_VERIFY_EMAIL_ADDRESS;
+				}
 
-					if ((passwordPolicy == null) ||
-						passwordPolicy.isChangeable()) {
+				// Authenticated users must have a current password
+
+				if (user.isPasswordReset()) {
+					try {
+						PasswordPolicy passwordPolicy =
+							user.getPasswordPolicy();
+
+						if ((passwordPolicy == null) ||
+							passwordPolicy.isChangeable()) {
+
+							return _PATH_PORTAL_UPDATE_PASSWORD;
+						}
+					}
+					catch (Exception e) {
+						_log.error(e, e);
 
 						return _PATH_PORTAL_UPDATE_PASSWORD;
 					}
 				}
-				catch (Exception e) {
-					_log.error(e, e);
-
-					return _PATH_PORTAL_UPDATE_PASSWORD;
+				else if (path.equals(_PATH_PORTAL_UPDATE_PASSWORD)) {
+					return _PATH_PORTAL_LAYOUT;
 				}
-			}
-			else if (path.equals(_PATH_PORTAL_UPDATE_PASSWORD)) {
-				return _PATH_PORTAL_LAYOUT;
-			}
 
-			// Authenticated users must have an email address
+				// Authenticated users must have an email address
 
-			if (!user.isEmailAddressComplete()) {
-				return _PATH_PORTAL_UPDATE_EMAIL_ADDRESS;
-			}
+				if (!user.isEmailAddressComplete()) {
+					return _PATH_PORTAL_UPDATE_EMAIL_ADDRESS;
+				}
 
-			// Authenticated users should have a reminder query
+				// Authenticated users should have a reminder query
 
-			if (!user.isDefaultUser() && !user.isReminderQueryComplete()) {
-				return _PATH_PORTAL_UPDATE_REMINDER_QUERY;
+				if (!user.isDefaultUser() && !user.isReminderQueryComplete()) {
+					return _PATH_PORTAL_UPDATE_REMINDER_QUERY;
+				}
 			}
 		}
 
