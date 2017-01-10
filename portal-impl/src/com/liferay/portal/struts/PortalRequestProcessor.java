@@ -779,12 +779,10 @@ public class PortalRequestProcessor extends TilesRequestProcessor {
 
 		// Users must sign in
 
-		if (!isPublicPath(path)) {
-			if (user == null) {
-				SessionErrors.add(request, PrincipalException.class.getName());
+		if ((user == null) && !isPublicPath(path)) {
+			SessionErrors.add(request, PrincipalException.class.getName());
 
-				return _PATH_PORTAL_LOGIN;
-			}
+			return _PATH_PORTAL_LOGIN;
 		}
 
 		ActionMapping actionMapping =
