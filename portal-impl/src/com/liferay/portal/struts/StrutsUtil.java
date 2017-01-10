@@ -58,7 +58,7 @@ public class StrutsUtil {
 		}
 
 		if (!response.isCommitted()) {
-			String path = TEXT_HTML_DIR + uri;
+			String path = TEXT_HTML_DIR.concat(uri);
 
 			if (_log.isDebugEnabled()) {
 				_log.debug("Forward path " + path);
@@ -110,7 +110,7 @@ public class StrutsUtil {
 			_log.debug("Include URI " + uri);
 		}
 
-		String path = TEXT_HTML_DIR + uri;
+		String path = TEXT_HTML_DIR.concat(uri);
 
 		if (_log.isDebugEnabled()) {
 			_log.debug("Include path " + path);
