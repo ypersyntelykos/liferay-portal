@@ -717,7 +717,7 @@ public class PortalRequestProcessor extends TilesRequestProcessor {
 		long companyId = PortalUtil.getCompanyId(request);
 		String portletId = ParamUtil.getString(request, "p_p_id");
 
-		if (!path.equals(_PATH_PORTAL_JSON_SERVICE) &&
+		if ((user != null) && !path.equals(_PATH_PORTAL_JSON_SERVICE) &&
 			!path.equals(_PATH_PORTAL_RENDER_PORTLET) &&
 			!ParamUtil.getBoolean(request, "wsrp") &&
 			!themeDisplay.isImpersonated() &&
@@ -728,13 +728,13 @@ public class PortalRequestProcessor extends TilesRequestProcessor {
 
 			// Authenticated users should agree to Terms of Use
 
-			if ((user != null) && !user.isTermsOfUseComplete()) {
+			if (!user.isTermsOfUseComplete()) {
 				return _PATH_PORTAL_TERMS_OF_USE;
 			}
 
 			// Authenticated users should have a verified email address
 
-			if ((user != null) && !user.isEmailAddressVerificationComplete()) {
+			if (!user.isEmailAddressVerificationComplete()) {
 				if (path.equals(_PATH_PORTAL_UPDATE_EMAIL_ADDRESS)) {
 					return _PATH_PORTAL_UPDATE_EMAIL_ADDRESS;
 				}
@@ -744,40 +744,35 @@ public class PortalRequestProcessor extends TilesRequestProcessor {
 
 			// Authenticated users must have a current password
 
-			if (user != null) {
-				if (user.isPasswordReset()) {
-					try {
-						PasswordPolicy passwordPolicy =
-							user.getPasswordPolicy();
+			if (user.isPasswordReset()) {
+				try {
+					PasswordPolicy passwordPolicy = user.getPasswordPolicy();
 
-						if ((passwordPolicy == null) ||
-							passwordPolicy.isChangeable()) {
-
-							return _PATH_PORTAL_UPDATE_PASSWORD;
-						}
-					}
-					catch (Exception e) {
-						_log.error(e, e);
+					if ((passwordPolicy == null) ||
+						passwordPolicy.isChangeable()) {
 
 						return _PATH_PORTAL_UPDATE_PASSWORD;
 					}
 				}
-				else if (path.equals(_PATH_PORTAL_UPDATE_PASSWORD)) {
-					return _PATH_PORTAL_LAYOUT;
+				catch (Exception e) {
+					_log.error(e, e);
+
+					return _PATH_PORTAL_UPDATE_PASSWORD;
 				}
+			}
+			else if (path.equals(_PATH_PORTAL_UPDATE_PASSWORD)) {
+				return _PATH_PORTAL_LAYOUT;
 			}
 
 			// Authenticated users must have an email address
 
-			if ((user != null) && !user.isEmailAddressComplete()) {
+			if (!user.isEmailAddressComplete()) {
 				return _PATH_PORTAL_UPDATE_EMAIL_ADDRESS;
 			}
 
 			// Authenticated users should have a reminder query
 
-			if ((user != null) && !user.isDefaultUser() &&
-				!user.isReminderQueryComplete()) {
-
+			if (!user.isDefaultUser() && !user.isReminderQueryComplete()) {
 				return _PATH_PORTAL_UPDATE_REMINDER_QUERY;
 			}
 		}
