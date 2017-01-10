@@ -744,26 +744,27 @@ public class PortalRequestProcessor extends TilesRequestProcessor {
 
 			// Authenticated users must have a current password
 
-			if ((user != null) && user.isPasswordReset()) {
-				try {
-					PasswordPolicy passwordPolicy = user.getPasswordPolicy();
+			if (user != null) {
+				if (user.isPasswordReset()) {
+					try {
+						PasswordPolicy passwordPolicy =
+							user.getPasswordPolicy();
 
-					if ((passwordPolicy == null) ||
-						passwordPolicy.isChangeable()) {
+						if ((passwordPolicy == null) ||
+							passwordPolicy.isChangeable()) {
+
+							return _PATH_PORTAL_UPDATE_PASSWORD;
+						}
+					}
+					catch (Exception e) {
+						_log.error(e, e);
 
 						return _PATH_PORTAL_UPDATE_PASSWORD;
 					}
 				}
-				catch (Exception e) {
-					_log.error(e, e);
-
-					return _PATH_PORTAL_UPDATE_PASSWORD;
+				else if (path.equals(_PATH_PORTAL_UPDATE_PASSWORD)) {
+					return _PATH_PORTAL_LAYOUT;
 				}
-			}
-			else if ((user != null) && !user.isPasswordReset() &&
-					 path.equals(_PATH_PORTAL_UPDATE_PASSWORD)) {
-
-				return _PATH_PORTAL_LAYOUT;
 			}
 
 			// Authenticated users must have an email address
