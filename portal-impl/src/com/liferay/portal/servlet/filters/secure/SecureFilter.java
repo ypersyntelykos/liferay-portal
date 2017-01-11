@@ -40,6 +40,8 @@ import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.servlet.filters.BasePortalFilter;
 import com.liferay.portal.util.PropsUtil;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -82,8 +84,11 @@ public class SecureFilter extends BasePortalFilter {
 				PropsUtil.get(propertyPrefix + "https.required"));
 		}
 
-		for (String hostAllowed : hostsAllowed) {
-			_hostsAllowed.add(hostAllowed);
+		if (hostsAllowed.length == 0) {
+			_hostsAllowed = Collections.emptySet();
+		}
+		else {
+			_hostsAllowed = new HashSet<>(Arrays.asList(hostsAllowed));
 		}
 
 		_usePermissionChecker = GetterUtil.getBoolean(
@@ -362,7 +367,7 @@ public class SecureFilter extends BasePortalFilter {
 
 	private boolean _basicAuthEnabled;
 	private boolean _digestAuthEnabled;
-	private final Set<String> _hostsAllowed = new HashSet<>();
+	private Set<String> _hostsAllowed;
 	private boolean _httpsRequired;
 	private boolean _usePermissionChecker;
 
