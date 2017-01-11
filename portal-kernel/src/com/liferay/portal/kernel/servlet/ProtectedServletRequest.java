@@ -35,6 +35,10 @@ public class ProtectedServletRequest
 
 		super(request);
 
+		if (remoteUser == null) {
+			throw new NullPointerException("remoteUser is null");
+		}
+
 		if (request instanceof ProtectedServletRequest) {
 			ProtectedServletRequest parentRequest =
 				(ProtectedServletRequest)request;
@@ -43,15 +47,9 @@ public class ProtectedServletRequest
 		}
 
 		_remoteUser = remoteUser;
-
-		if (remoteUser != null) {
-			_userPrincipal = new ProtectedPrincipal(remoteUser);
-		}
-		else {
-			_userPrincipal = null;
-		}
-
 		_authType = authType;
+
+		_userPrincipal = new ProtectedPrincipal(remoteUser);
 	}
 
 	@Override
@@ -65,22 +63,12 @@ public class ProtectedServletRequest
 
 	@Override
 	public String getRemoteUser() {
-		if (_remoteUser != null) {
-			return _remoteUser;
-		}
-		else {
-			return super.getRemoteUser();
-		}
+		return _remoteUser;
 	}
 
 	@Override
 	public Principal getUserPrincipal() {
-		if (_userPrincipal != null) {
-			return _userPrincipal;
-		}
-		else {
-			return super.getUserPrincipal();
-		}
+		return _userPrincipal;
 	}
 
 	private final String _authType;
