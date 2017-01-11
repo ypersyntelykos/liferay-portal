@@ -675,29 +675,27 @@ public class PortalRequestProcessor extends TilesRequestProcessor {
 			return _PATH_PORTAL_LAYOUT;
 		}
 
-		// Authenticated users can always log out
+		if ((remoteUser != null) || (user != null)) {
 
-		if (((remoteUser != null) || (user != null)) &&
-			path.equals(_PATH_PORTAL_LOGOUT)) {
+			// Authenticated users can always log out
 
-			return path;
-		}
+			if (path.equals(_PATH_PORTAL_LOGOUT)) {
+				return path;
+			}
 
-		// Authenticated users can always extend or confirm their session
+			// Authenticated users can always extend or confirm their session
 
-		if (((remoteUser != null) || (user != null)) &&
-			(path.equals(_PATH_PORTAL_EXPIRE_SESSION) ||
-			 path.equals(_PATH_PORTAL_EXTEND_SESSION))) {
+			if (path.equals(_PATH_PORTAL_EXPIRE_SESSION) ||
+				path.equals(_PATH_PORTAL_EXTEND_SESSION)) {
 
-			return path;
-		}
+				return path;
+			}
 
-		// Authenticated users can always agree to terms of use
+			// Authenticated users can always agree to terms of use
 
-		if (((remoteUser != null) || (user != null)) &&
-			path.equals(_PATH_PORTAL_UPDATE_TERMS_OF_USE)) {
-
-			return path;
+			if (path.equals(_PATH_PORTAL_UPDATE_TERMS_OF_USE)) {
+				return path;
+			}
 		}
 
 		// Authenticated users must still exist in the system
