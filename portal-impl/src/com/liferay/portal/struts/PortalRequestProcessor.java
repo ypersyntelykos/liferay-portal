@@ -711,7 +711,7 @@ public class PortalRequestProcessor extends TilesRequestProcessor {
 
 		if (user != null) {
 			if (!user.isActive()) {
-				SessionErrors.add(request, UserActiveException.class.getName());
+				SessionErrors.add(session, UserActiveException.class.getName());
 
 				return _PATH_PORTAL_ERROR;
 			}
@@ -781,7 +781,7 @@ public class PortalRequestProcessor extends TilesRequestProcessor {
 
 			// Users must sign in
 
-			SessionErrors.add(request, PrincipalException.class.getName());
+			SessionErrors.add(session, PrincipalException.class.getName());
 
 			return _PATH_PORTAL_LOGIN;
 		}
@@ -833,7 +833,7 @@ public class PortalRequestProcessor extends TilesRequestProcessor {
 		// Authenticated users must have access to at least one layout
 
 		if (SessionErrors.contains(
-				request, LayoutPermissionException.class.getName())) {
+				session, LayoutPermissionException.class.getName())) {
 
 			return _PATH_PORTAL_ERROR;
 		}
