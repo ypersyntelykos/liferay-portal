@@ -60,19 +60,6 @@ public class ProtectedServletRequest
 			return super.getAuthType();
 		}
 
-		if (_authType.equals(HttpServletRequest.BASIC_AUTH)) {
-			return HttpServletRequest.BASIC_AUTH;
-		}
-		else if (_authType.equals(HttpServletRequest.CLIENT_CERT_AUTH)) {
-			return HttpServletRequest.CLIENT_CERT_AUTH;
-		}
-		else if (_authType.equals(HttpServletRequest.DIGEST_AUTH)) {
-			return HttpServletRequest.DIGEST_AUTH;
-		}
-		else if (_authType.equals(HttpServletRequest.FORM_AUTH)) {
-			return HttpServletRequest.FORM_AUTH;
-		}
-
 		return _authType;
 	}
 
