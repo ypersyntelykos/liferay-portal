@@ -12,49 +12,35 @@
  * details.
  */
 
-package com.liferay.subscription.internal.service;
+package com.liferay.subscription.internal.model.listener;
 
+import com.liferay.portal.kernel.exception.ModelListenerException;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.model.BaseModelListener;
+import com.liferay.portal.kernel.model.ModelListener;
 import com.liferay.portal.kernel.model.User;
-import com.liferay.portal.kernel.service.ServiceWrapper;
 import com.liferay.portal.kernel.service.SubscriptionLocalService;
-import com.liferay.portal.kernel.service.UserLocalService;
-import com.liferay.portal.kernel.service.UserLocalServiceWrapper;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 /**
- * @author Adolfo Pérez
+ * @author Shuyang Zhou
  */
-@Component(immediate = true, service = ServiceWrapper.class)
-public class SubscriptionUserLocalServiceWrapper
-	extends UserLocalServiceWrapper {
-
-	public SubscriptionUserLocalServiceWrapper() {
-		super(null);
-	}
-
-	public SubscriptionUserLocalServiceWrapper(
-		UserLocalService userLocalService) {
-
-		super(userLocalService);
-	}
+@Component(immediate = true, service = ModelListener.class)
+public class UserModelListener extends BaseModelListener<User> {
 
 	@Override
-	public User deleteUser(User user) throws PortalException {
-		_subscriptionLocalService.deleteSubscriptions(user.getUserId());
-
-		return super.deleteUser(user);
+	public void onBeforeRemove(User user) {
+		try {
+			_subscriptionLocalService.deleteSubscriptions(user.getUserId());
+		}
+		catch (PortalException pe) {
+			throw new ModelListenerException(pe);
+		}
 	}
 
-	@Reference(unbind = "-")
-	protected void setSubscriptionLocalService(
-		SubscriptionLocalService subscriptionLocalService) {
-
-		_subscriptionLocalService = subscriptionLocalService;
-	}
-
+	@Reference
 	private SubscriptionLocalService _subscriptionLocalService;
 
 }

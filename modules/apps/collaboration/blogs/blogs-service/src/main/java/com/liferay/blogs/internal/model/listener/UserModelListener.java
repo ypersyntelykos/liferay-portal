@@ -12,46 +12,28 @@
  * details.
  */
 
-package com.liferay.blogs.internal.service;
+package com.liferay.blogs.internal.model.listener;
 
 import com.liferay.blogs.service.BlogsStatsUserLocalService;
-import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.model.BaseModelListener;
+import com.liferay.portal.kernel.model.ModelListener;
 import com.liferay.portal.kernel.model.User;
-import com.liferay.portal.kernel.service.ServiceWrapper;
-import com.liferay.portal.kernel.service.UserLocalService;
-import com.liferay.portal.kernel.service.UserLocalServiceWrapper;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 /**
- * @author Sergio González
+ * @author Shuyang Zhou
  */
-@Component(immediate = true, service = ServiceWrapper.class)
-public class BlogsUserLocalServiceWrapper extends UserLocalServiceWrapper {
-
-	public BlogsUserLocalServiceWrapper() {
-		super(null);
-	}
-
-	public BlogsUserLocalServiceWrapper(UserLocalService userLocalService) {
-		super(userLocalService);
-	}
+@Component(immediate = true, service = ModelListener.class)
+public class UserModelListener extends BaseModelListener<User> {
 
 	@Override
-	public User deleteUser(User user) throws PortalException {
+	public void onBeforeRemove(User user) {
 		_blogsStatsUserLocalService.deleteStatsUserByUserId(user.getUserId());
-
-		return super.deleteUser(user);
 	}
 
-	@Reference(unbind = "-")
-	protected void setBlogsStatsUserLocalService(
-		BlogsStatsUserLocalService blogsStatsUserLocalService) {
-
-		_blogsStatsUserLocalService = blogsStatsUserLocalService;
-	}
-
+	@Reference
 	private BlogsStatsUserLocalService _blogsStatsUserLocalService;
 
 }
