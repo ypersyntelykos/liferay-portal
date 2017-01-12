@@ -397,7 +397,7 @@
 		<c:if test="<%= layoutTypePortlet != null %>">
 
 			<%
-			List<Portlet> allPortlets = layoutTypePortlet.getAllPortlets(true);
+			List<Portlet> allPortlets = layoutTypePortlet.getAllPortlets();
 
 			StringBundler sb = new StringBundler(allPortlets.size() * 2);
 
