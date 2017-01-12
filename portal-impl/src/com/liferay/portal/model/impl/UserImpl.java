@@ -145,7 +145,11 @@ public class UserImpl extends UserBaseImpl {
 	 */
 	@Override
 	public Contact getContact() throws PortalException {
-		return ContactLocalServiceUtil.getContact(getContactId());
+		if (_contact == null) {
+			_contact = ContactLocalServiceUtil.getContact(getContactId());
+		}
+
+		return _contact;
 	}
 
 	/**
@@ -972,6 +976,7 @@ public class UserImpl extends UserBaseImpl {
 	private static final boolean _hasUsersProfileFriendlyURL = Validator.isNull(
 		PropsValues.USERS_PROFILE_FRIENDLY_URL);
 
+	private Contact _contact;
 	private Locale _locale;
 	private boolean _passwordModified;
 	private PasswordPolicy _passwordPolicy;
