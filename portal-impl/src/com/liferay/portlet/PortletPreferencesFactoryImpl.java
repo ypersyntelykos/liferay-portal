@@ -477,10 +477,7 @@ public class PortletPreferencesFactoryImpl
 				ownerType = PortletKeys.PREFS_OWNER_TYPE_LAYOUT;
 				plid = layout.getPlid();
 
-				LayoutTypePortlet layoutTypePortlet =
-					(LayoutTypePortlet)layout.getLayoutType();
-
-				if (layoutTypePortlet.isPortletEmbedded(portletId)) {
+				if (layout.isPortletEmbedded(portletId, layout.getGroupId())) {
 					ownerId = layout.getGroupId();
 					plid = PortletKeys.PREFS_PLID_SHARED;
 				}

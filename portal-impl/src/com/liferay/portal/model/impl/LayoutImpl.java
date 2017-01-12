@@ -1326,10 +1326,8 @@ public class LayoutImpl extends LayoutBaseImpl {
 	}
 
 	private String _getLayoutTypeControllerType() {
-		LayoutType layoutType = getLayoutType();
-
 		LayoutTypeController layoutTypeController =
-			layoutType.getLayoutTypeController();
+			LayoutTypeControllerTracker.getLayoutTypeController(getType());
 
 		return layoutTypeController.getType();
 	}
