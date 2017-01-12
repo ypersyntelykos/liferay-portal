@@ -128,13 +128,15 @@ public class LayoutTypeControllerTracker {
 
 			String type = (String)serviceReference.getProperty("layout.type");
 
-			if (_defaultLayoutTypeControllers.containsKey(type)) {
-				_layoutTypeControllers.replace(
-					type, layoutTypeController,
-					_defaultLayoutTypeControllers.get(type));
+			LayoutTypeController defaultLayoutTypeController =
+				_defaultLayoutTypeControllers.get(type);
+
+			if (defaultLayoutTypeController == null) {
+				_layoutTypeControllers.remove(type);
 			}
 			else {
-				_layoutTypeControllers.remove(type);
+				_layoutTypeControllers.replace(
+					type, layoutTypeController, defaultLayoutTypeController);
 			}
 		}
 
