@@ -493,15 +493,10 @@ public class UserImpl extends UserBaseImpl {
 
 	@Override
 	public String getInitials() {
-		StringBundler sb = new StringBundler(2);
+		String firstInitial = StringUtil.shorten(getFirstName(), 1);
+		String lastInitial = StringUtil.shorten(getLastName(), 1);
 
-		String[] names = new String[] {getFirstName(), getLastName()};
-
-		for (String name : names) {
-			sb.append(StringUtil.toUpperCase(StringUtil.shorten(name, 1)));
-		}
-
-		return sb.toString();
+		return StringUtil.toUpperCase(firstInitial.concat(lastInitial));
 	}
 
 	@Override
