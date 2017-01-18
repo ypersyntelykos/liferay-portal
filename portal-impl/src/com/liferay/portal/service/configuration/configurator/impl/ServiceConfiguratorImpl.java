@@ -181,10 +181,25 @@ public class ServiceConfiguratorImpl implements ServiceConfigurator {
 		}
 
 		try {
-			_resourceActions.readAndCheck(
-				null, classLoader,
-				StringUtil.split(
-					configuration.get(PropsKeys.RESOURCE_ACTIONS_CONFIGS)));
+			String portlets = configuration.get(
+				"service.configurator.portlet.ids");
+
+			if (Validator.isNull(portlets)) {
+				_resourceActions.readAndCheck(
+					null, classLoader,
+					StringUtil.split(
+						configuration.get(PropsKeys.RESOURCE_ACTIONS_CONFIGS)));
+			}
+			else {
+				_resourceActions.read(
+					null, classLoader,
+					StringUtil.split(
+						configuration.get(PropsKeys.RESOURCE_ACTIONS_CONFIGS)));
+
+				for (String portletId : StringUtil.split(portlets)) {
+					_resourceActions.check(portletId);
+				}
+			}
 		}
 		catch (Exception e) {
 			_log.error(
