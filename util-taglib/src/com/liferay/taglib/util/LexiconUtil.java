@@ -25,8 +25,7 @@ public class LexiconUtil {
 		String colorCssClass = "user-icon-defaul";
 
 		if (user != null) {
-			colorCssClass =
-				"user-icon-color-" + (Math.abs(user.getUserId()) % 10);
+			colorCssClass = "user-icon-color-" + (user.getUserId() % 10);
 		}
 
 		return colorCssClass;
