@@ -5839,10 +5839,10 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 		User user = null;
 
 		if (authType.equals(CompanyConstants.AUTH_TYPE_EA)) {
-			user = fetchUserByEmailAddress(companyId, login);
+			user = userPersistence.fetchByC_EA(companyId, login);
 		}
 		else if (authType.equals(CompanyConstants.AUTH_TYPE_SN)) {
-			user = fetchUserByScreenName(companyId, login);
+			user = userPersistence.fetchByC_SN(companyId, login);
 		}
 		else if (authType.equals(CompanyConstants.AUTH_TYPE_ID)) {
 			user = userPersistence.fetchByPrimaryKey(GetterUtil.getLong(login));
