@@ -3,19 +3,10 @@
 <#list wikiNodeModels as wikiNodeModel>
 	${dataFactory.toInsertSQL(wikiNodeModel)}
 
-	<@insertResourcePermissions
-		_entry = wikiNodeModel
-	/>
-
 	<#assign wikiPageModels = dataFactory.newWikiPageModels(wikiNodeModel) />
 
 	<#list wikiPageModels as wikiPageModel>
 		${dataFactory.toInsertSQL(wikiPageModel)}
-
-		<@insertResourcePermissions
-			_entry = wikiPageModel
-		/>
-
 		${dataFactory.toInsertSQL(dataFactory.newSubscriptionModel(wikiPageModel))}
 		${dataFactory.toInsertSQL(dataFactory.newWikiPageResourceModel(wikiPageModel))}
 

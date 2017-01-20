@@ -30,10 +30,6 @@
 	${dataFactory.toInsertSQL(ddlRecordSetModel)}
 	${dataFactory.toInsertSQL(dataFactory.newDDMStructureLinkModel(ddlRecordSetModel))}
 
-	<@insertResourcePermissions
-		_entry = ddlRecordSetModel
-	/>
-
 	<#assign ddlRecordCounts = dataFactory.getSequence(dataFactory.maxDDLRecordCount) />
 
 	<#list ddlRecordCounts as ddlRecordCount>

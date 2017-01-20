@@ -2,11 +2,6 @@
 
 <#list mbCategoryModels as mbCategoryModel>
 	${dataFactory.toInsertSQL(mbCategoryModel)}
-
-	<@insertResourcePermissions
-		_entry = mbCategoryModel
-	/>
-
 	${dataFactory.toInsertSQL(dataFactory.newMBMailingListModel(mbCategoryModel))}
 
 	<#assign mbThreadModels = dataFactory.newMBThreadModels(mbCategoryModel) />
