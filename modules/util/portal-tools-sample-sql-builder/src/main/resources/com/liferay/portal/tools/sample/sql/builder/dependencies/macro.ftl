@@ -45,11 +45,6 @@
 	_ddmStructureVersionModel
 >
 	${dataFactory.toInsertSQL(_ddmStructureModel)}
-
-	<@insertResourcePermissions
-		_entry = _ddmStructureModel
-	/>
-
 	${dataFactory.toInsertSQL(_ddmStructureLayoutModel)}
 	${dataFactory.toInsertSQL(_ddmStructureVersionModel)}
 </#macro>
@@ -66,10 +61,6 @@
 		<#list dlFolderModels as dlFolderModel>
 			${dataFactory.toInsertSQL(dlFolderModel)}
 
-			<@insertResourcePermissions
-				_entry = dlFolderModel
-			/>
-
 			<@insertAssetEntry
 				_entry = dlFolderModel
 			/>
@@ -82,10 +73,6 @@
 				<#local dlFileVersionModel = dataFactory.newDLFileVersionModel(dlFileEntryModel)>
 
 				${dataFactory.toInsertSQL(dlFileVersionModel)}
-
-				<@insertResourcePermissions
-					_entry = dlFileEntryModel
-				/>
 
 				<@insertAssetEntry
 					_entry = dlFileEntryModel
@@ -134,10 +121,6 @@
 >
 	${dataFactory.toInsertSQL(_groupModel)}
 
-	<@insertResourcePermissions
-		_entry = _groupModel
-	/>
-
 	<#local layoutSetModels = dataFactory.newLayoutSetModels(_groupModel.groupId, _publicPageCount)>
 
 	<#list layoutSetModels as layoutSetModel>
@@ -149,11 +132,6 @@
 	_layoutModel
 >
 	${dataFactory.toInsertSQL(_layoutModel)}
-
-	<@insertResourcePermissions
-		_entry = _layoutModel
-	/>
-
 	${dataFactory.toInsertSQL(dataFactory.newLayoutFriendlyURLModel(_layoutModel))}
 </#macro>
 
@@ -193,10 +171,6 @@
 >
 	${dataFactory.toInsertSQL(_mbMessageModel)}
 
-	<@insertResourcePermissions
-		_entry = _mbMessageModel
-	/>
-
 	<@insertAssetEntry
 		_entry = _mbMessageModel
 	/>
@@ -206,20 +180,6 @@
 	_portletPreferencesModel
 >
 	${dataFactory.toInsertSQL(_portletPreferencesModel)}
-
-	<@insertResourcePermissions
-		_entry = _portletPreferencesModel
-	/>
-</#macro>
-
-<#macro insertResourcePermissions
-	_entry
->
-	<#local resourcePermissionModels = dataFactory.newResourcePermissionModels(_entry)>
-
-	<#list resourcePermissionModels as resourcePermissionModel>
-		${dataFactory.toInsertSQL(resourcePermissionModel)}
-	</#list>
 </#macro>
 
 <#macro insertUser

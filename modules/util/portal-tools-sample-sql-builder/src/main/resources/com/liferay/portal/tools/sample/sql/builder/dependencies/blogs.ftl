@@ -2,11 +2,6 @@
 
 <#list blogsEntryModels as blogsEntryModel>
 	${dataFactory.toInsertSQL(blogsEntryModel)}
-
-	<@insertResourcePermissions
-		_entry = blogsEntryModel
-	/>
-
 	${dataFactory.toInsertSQL(dataFactory.newFriendlyURLModel(blogsEntryModel))}
 
 	<@insertAssetEntry

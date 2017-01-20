@@ -2691,68 +2691,28 @@ public class DataFactory {
 		try {
 			StringBundler sb = new StringBundler();
 
-			sb.append("insert into ");
+			toInsertSQL(sb, baseModel);
 
 			Class<?> clazz = baseModel.getClass();
 
-			Field tableNameField = clazz.getField("TABLE_NAME");
+			for (Class<?> modelClass : clazz.getInterfaces()) {
+				try {
+					Method method = DataFactory.class.getMethod(
+						"newResourcePermissionModels", modelClass);
 
-			sb.append(tableNameField.get(null));
+					for (ResourcePermissionModel resourcePermissionModel :
+							(List<ResourcePermissionModel>)method.invoke(
+								this, baseModel)) {
 
-			sb.append(" values (");
+						sb.append("\n");
 
-			Field tableColumnsField = clazz.getField("TABLE_COLUMNS");
-
-			for (Object[] tableColumn :
-					(Object[][])tableColumnsField.get(null)) {
-
-				String name = TextFormatter.format(
-					(String)tableColumn[0], TextFormatter.G);
-
-				if (name.endsWith(StringPool.UNDERLINE)) {
-					name = name.substring(0, name.length() - 1);
-				}
-
-				int type = (int)tableColumn[1];
-
-				if (type == Types.TIMESTAMP) {
-					Method method = clazz.getMethod("get".concat(name));
-
-					Date date = (Date)method.invoke(baseModel);
-
-					if (date == null) {
-						sb.append("null");
-					}
-					else {
-						sb.append("'");
-						sb.append(getDateString(date));
-						sb.append("'");
+						toInsertSQL(sb, resourcePermissionModel);
 					}
 				}
-				else if ((type == Types.VARCHAR) || (type == Types.CLOB)) {
-					Method method = clazz.getMethod("get".concat(name));
-
-					sb.append("'");
-					sb.append(method.invoke(baseModel));
-					sb.append("'");
+				catch (NoSuchMethodException nsme) {
+					continue;
 				}
-				else if (type == Types.BOOLEAN) {
-					Method method = clazz.getMethod("is".concat(name));
-
-					sb.append(method.invoke(baseModel));
-				}
-				else {
-					Method method = clazz.getMethod("get".concat(name));
-
-					sb.append(method.invoke(baseModel));
-				}
-
-				sb.append(", ");
 			}
-
-			sb.setIndex(sb.index() - 1);
-
-			sb.append(");");
 
 			return sb.toString();
 		}
@@ -3492,6 +3452,76 @@ public class DataFactory {
 	protected Date nextFutureDate() {
 		return new Date(
 			_FUTURE_TIME + (_futureDateCounter.get() * Time.SECOND));
+	}
+
+	protected void toInsertSQL(StringBundler sb, BaseModel<?> baseModel) {
+		try {
+			sb.append("insert into ");
+
+			Class<?> clazz = baseModel.getClass();
+
+			Field tableNameField = clazz.getField("TABLE_NAME");
+
+			sb.append(tableNameField.get(null));
+
+			sb.append(" values (");
+
+			Field tableColumnsField = clazz.getField("TABLE_COLUMNS");
+
+			for (Object[] tableColumn :
+					(Object[][])tableColumnsField.get(null)) {
+
+				String name = TextFormatter.format(
+					(String)tableColumn[0], TextFormatter.G);
+
+				if (name.endsWith(StringPool.UNDERLINE)) {
+					name = name.substring(0, name.length() - 1);
+				}
+
+				int type = (int)tableColumn[1];
+
+				if (type == Types.TIMESTAMP) {
+					Method method = clazz.getMethod("get".concat(name));
+
+					Date date = (Date)method.invoke(baseModel);
+
+					if (date == null) {
+						sb.append("null");
+					}
+					else {
+						sb.append("'");
+						sb.append(getDateString(date));
+						sb.append("'");
+					}
+				}
+				else if ((type == Types.VARCHAR) || (type == Types.CLOB)) {
+					Method method = clazz.getMethod("get".concat(name));
+
+					sb.append("'");
+					sb.append(method.invoke(baseModel));
+					sb.append("'");
+				}
+				else if (type == Types.BOOLEAN) {
+					Method method = clazz.getMethod("is".concat(name));
+
+					sb.append(method.invoke(baseModel));
+				}
+				else {
+					Method method = clazz.getMethod("get".concat(name));
+
+					sb.append(method.invoke(baseModel));
+				}
+
+				sb.append(", ");
+			}
+
+			sb.setIndex(sb.index() - 1);
+
+			sb.append(");");
+		}
+		catch (ReflectiveOperationException roe) {
+			ReflectionUtil.throwException(roe);
+		}
 	}
 
 	private String _getResourcePermissionModelName(String... classNames) {
