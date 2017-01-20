@@ -16,14 +16,8 @@
 	<#assign portletPreferencesModels = dataFactory.newAssetPublisherPortletPreferencesModels(layoutModel.plid) />
 
 	<#list portletPreferencesModels as portletPreferencesModel>
-		<@insertPortletPreferences
-			_portletPreferencesModel = portletPreferencesModel
-		/>
+		${dataFactory.toInsertSQL(portletPreferencesModel)}
 	</#list>
 
-	<#assign portletPreferencesModel = dataFactory.newPortletPreferencesModel(layoutModel.plid, groupId, portletId, pageCount) />
-
-	<@insertPortletPreferences
-		_portletPreferencesModel = portletPreferencesModel
-	/>
+	${dataFactory.toInsertSQL(dataFactory.newPortletPreferencesModel(layoutModel.plid, groupId, portletId, pageCount))}
 </#list>
