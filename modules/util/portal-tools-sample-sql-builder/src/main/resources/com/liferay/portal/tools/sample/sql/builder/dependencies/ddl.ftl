@@ -48,17 +48,11 @@
 		${dataFactory.getCSVWriter("dynamicDataList").write(ddlRecordModel.groupId + "," + layoutName + "," + portletId + "," + ddlRecordSetModel.recordSetId + "," + ddlRecordModel.recordId + "\n")}
 	</#list>
 
-	<#assign portletPreferencesModel = dataFactory.newPortletPreferencesModel(layoutModel.plid, portletId, ddlRecordSetModel) />
-
-	<@insertPortletPreferences
-		_portletPreferencesModel = portletPreferencesModel
-	/>
+	${dataFactory.toInsertSQL(dataFactory.newPortletPreferencesModel(layoutModel.plid, portletId, ddlRecordSetModel))}
 
 	<#assign portletPreferencesModels = dataFactory.newDDLPortletPreferencesModels(layoutModel.plid) />
 
 	<#list portletPreferencesModels as portletPreferencesModel>
-		<@insertPortletPreferences
-			_portletPreferencesModel = portletPreferencesModel
-		/>
+		${dataFactory.toInsertSQL(portletPreferencesModel)}
 	</#list>
 </#list>

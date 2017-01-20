@@ -36,9 +36,7 @@ ${dataFactory.toInsertSQL(ddmTemplateModel)}
 	<#assign portletPreferencesModels = dataFactory.newJournalPortletPreferencesModels(layoutModel.plid) />
 
 	<#list portletPreferencesModels as portletPreferencesModel>
-		<@insertPortletPreferences
-			_portletPreferencesModel = portletPreferencesModel
-		/>
+		${dataFactory.toInsertSQL(portletPreferencesModel)}
 	</#list>
 
 	<#assign journalArticleCounts = dataFactory.getSequence(dataFactory.maxJournalArticleCount) />
@@ -79,12 +77,7 @@ ${dataFactory.toInsertSQL(ddmTemplateModel)}
 			_mbThreadId = dataFactory.getCounterNext()
 		/>
 
-		<#assign portletPreferencesModel = dataFactory.newPortletPreferencesModel(layoutModel.plid, portletIdPrefix + journalArticleCount, journalArticleResourceModel) />
-
-		<@insertPortletPreferences
-			_portletPreferencesModel = portletPreferencesModel
-		/>
-
+		${dataFactory.toInsertSQL(dataFactory.newPortletPreferencesModel(layoutModel.plid, portletIdPrefix + journalArticleCount, journalArticleResourceModel))}
 		${dataFactory.toInsertSQL(dataFactory.newJournalContentSearchModel(journalArticleModel, layoutModel.plid))}
 	</#list>
 </#list>
