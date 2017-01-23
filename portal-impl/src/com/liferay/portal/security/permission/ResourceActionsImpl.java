@@ -113,18 +113,12 @@ public class ResourceActionsImpl implements ResourceActions {
 
 	@Override
 	public void check(String portletName) {
-		List<String> portletActions = getPortletResourceActions(portletName);
-
 		ResourceActionLocalServiceUtil.checkResourceActions(
-			portletName, portletActions);
+			portletName, getPortletResourceActions(portletName));
 
-		List<String> modelNames = getPortletModelResources(portletName);
-
-		for (String modelName : modelNames) {
-			List<String> modelActions = getModelResourceActions(modelName);
-
+		for (String modelName : getPortletModelResources(portletName)) {
 			ResourceActionLocalServiceUtil.checkResourceActions(
-				modelName, modelActions);
+				modelName, getModelResourceActions(modelName));
 		}
 	}
 
