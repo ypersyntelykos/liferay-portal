@@ -128,11 +128,9 @@ public class ProductMenuProductNavigationControlMenuEntry
 			values.put("dataURL", "data-url='" + portletURL.toString() + "'");
 		}
 
-		String result = StringUtil.replace(_TMPL_CONTENT, "${", "}", values);
-
 		Writer writer = response.getWriter();
 
-		writer.write(result);
+		writer.write(StringUtil.replace(_TMPL_CONTENT, "${", "}", values));
 
 		return true;
 	}
