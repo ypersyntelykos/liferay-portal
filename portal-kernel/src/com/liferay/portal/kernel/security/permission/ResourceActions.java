@@ -139,7 +139,7 @@ public interface ResourceActions {
 
 	public void read(
 			String servletContextName, ClassLoader classLoader,
-			String[] sources)
+			String... sources)
 		throws Exception;
 
 	/**
@@ -151,7 +151,7 @@ public interface ResourceActions {
 
 	public void readAndCheck(
 			String servletContextName, ClassLoader classLoader,
-			String[] sources)
+			String... sources)
 		throws Exception;
 
 }

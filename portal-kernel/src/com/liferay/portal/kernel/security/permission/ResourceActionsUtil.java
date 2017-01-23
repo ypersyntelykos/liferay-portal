@@ -260,7 +260,7 @@ public class ResourceActionsUtil {
 
 	public static void read(
 			String servletContextName, ClassLoader classLoader,
-			String[] sources)
+			String... sources)
 		throws Exception {
 
 		getResourceActions().read(servletContextName, classLoader, sources);
@@ -278,7 +278,7 @@ public class ResourceActionsUtil {
 
 	public static void readAndCheck(
 			String servletContextName, ClassLoader classLoader,
-			String[] sources)
+			String... sources)
 		throws Exception {
 
 		getResourceActions().readAndCheck(

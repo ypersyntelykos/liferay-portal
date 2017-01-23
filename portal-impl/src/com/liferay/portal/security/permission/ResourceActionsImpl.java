@@ -678,7 +678,7 @@ public class ResourceActionsImpl implements ResourceActions {
 	@Override
 	public void read(
 			String servletContextName, ClassLoader classLoader,
-			String[] sources)
+			String... sources)
 		throws Exception {
 
 		for (String source : sources) {
@@ -702,7 +702,7 @@ public class ResourceActionsImpl implements ResourceActions {
 	@Override
 	public void readAndCheck(
 			String servletContextName, ClassLoader classLoader,
-			String[] sources)
+			String... sources)
 		throws Exception {
 
 		Set<String> portletNames = new HashSet<>();
