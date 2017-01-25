@@ -32,6 +32,9 @@ import com.liferay.portal.kernel.test.rule.callback.SynchronousDestinationTestCa
 import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.TransactionConfig;
 import com.liferay.portal.kernel.transaction.TransactionInvokerUtil;
+import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.registry.Filter;
 import com.liferay.registry.Registry;
 import com.liferay.registry.RegistryUtil;
@@ -158,8 +161,6 @@ public class SynchronousDestinationTestCallback
 				DestinationNames.BACKGROUND_TASK);
 			Filter backgroundTaskStatusFilter = _registerDestinationFilter(
 				DestinationNames.BACKGROUND_TASK_STATUS);
-			Filter kaleoGraphWalkerFilter = _registerDestinationFilter(
-				"liferay/kaleo_graph_walker");
 			Filter mailFilter = _registerDestinationFilter(
 				DestinationNames.MAIL);
 			Filter pdfProcessorFilter = _registerDestinationFilter(
@@ -171,8 +172,19 @@ public class SynchronousDestinationTestCallback
 
 			serviceDependencyManager.registerDependencies(
 				asyncFilter, backgroundTaskFilter, backgroundTaskStatusFilter,
-				kaleoGraphWalkerFilter, mailFilter, pdfProcessorFilter,
-				rawMetaDataProcessorFilter, subscrpitionSenderFilter);
+				mailFilter, pdfProcessorFilter, rawMetaDataProcessorFilter,
+				subscrpitionSenderFilter);
+
+			boolean schedulerEnabled = GetterUtil.getBoolean(
+				PropsUtil.get(PropsKeys.SCHEDULER_ENABLED));
+
+			if (schedulerEnabled) {
+				Filter kaleoGraphWalkerFilter = _registerDestinationFilter(
+					"liferay/kaleo_graph_walker");
+
+				serviceDependencyManager.registerDependencies(
+					kaleoGraphWalkerFilter);
+			}
 
 			serviceDependencyManager.waitForDependencies();
 
@@ -186,10 +198,13 @@ public class SynchronousDestinationTestCallback
 				DestinationNames.DOCUMENT_LIBRARY_RAW_METADATA_PROCESSOR);
 			replaceDestination(
 				DestinationNames.DOCUMENT_LIBRARY_SYNC_EVENT_PROCESSOR);
-			replaceDestination("liferay/kaleo_graph_walker");
 			replaceDestination(DestinationNames.MAIL);
 			replaceDestination(DestinationNames.SCHEDULER_ENGINE);
 			replaceDestination(DestinationNames.SUBSCRIPTION_SENDER);
+
+			if (schedulerEnabled) {
+				replaceDestination("liferay/kaleo_graph_walker");
+			}
 
 			for (String searchEngineId :
 					SearchEngineHelperUtil.getSearchEngineIds()) {
