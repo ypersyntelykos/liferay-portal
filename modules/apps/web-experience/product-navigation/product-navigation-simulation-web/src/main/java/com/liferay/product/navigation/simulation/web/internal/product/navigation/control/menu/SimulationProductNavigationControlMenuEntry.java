@@ -17,17 +17,17 @@ package com.liferay.product.navigation.simulation.web.internal.product.navigatio
 import com.liferay.application.list.PanelApp;
 import com.liferay.application.list.PanelAppRegistry;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
-import com.liferay.portal.kernel.portlet.PortletURLFactoryUtil;
+import com.liferay.portal.kernel.portlet.PortletURLFactory;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
-import com.liferay.portal.kernel.service.permission.LayoutPermissionUtil;
+import com.liferay.portal.kernel.service.permission.LayoutPermission;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.HtmlUtil;
-import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.kernel.util.Html;
+import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.ReflectionUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -54,6 +54,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -72,6 +73,13 @@ public class SimulationProductNavigationControlMenuEntry
 	extends BaseJSPProductNavigationControlMenuEntry
 	implements ProductNavigationControlMenuEntry {
 
+	@Activate
+	public void activate() {
+		_portletNamespace = _portal.getPortletNamespace(
+			ProductNavigationSimulationPortletKeys.
+				PRODUCT_NAVIGATION_SIMULATION);
+	}
+
 	@Override
 	public String getBodyJspPath() {
 		return "/portlet/control_menu/simulation_control_menu_body.jsp";
@@ -87,11 +95,7 @@ public class SimulationProductNavigationControlMenuEntry
 			HttpServletRequest request, HttpServletResponse response)
 		throws IOException {
 
-		String portletNamespace = PortalUtil.getPortletNamespace(
-			ProductNavigationSimulationPortletKeys.
-				PRODUCT_NAVIGATION_SIMULATION);
-
-		PortletURL simulationPanelURL = PortletURLFactoryUtil.create(
+		PortletURL simulationPanelURL = _portletURLFactory.create(
 			request,
 			ProductNavigationSimulationPortletKeys.
 				PRODUCT_NAVIGATION_SIMULATION,
@@ -119,10 +123,9 @@ public class SimulationProductNavigationControlMenuEntry
 			return false;
 		}
 
-		values.put("portletNamespace", portletNamespace);
+		values.put("portletNamespace", _portletNamespace);
 		values.put("simulationPanelURL", simulationPanelURL.toString());
-		values.put(
-			"title", HtmlUtil.escape(LanguageUtil.get(request, "simulation")));
+		values.put("title", _html.escape(_language.get(request, "simulation")));
 
 		Writer writer = response.getWriter();
 
@@ -170,7 +173,7 @@ public class SimulationProductNavigationControlMenuEntry
 	protected boolean hasUpdateLayoutPermission(ThemeDisplay themeDisplay)
 		throws PortalException {
 
-		return LayoutPermissionUtil.contains(
+		return _layoutPermission.contains(
 			themeDisplay.getPermissionChecker(), themeDisplay.getLayout(),
 			ActionKeys.UPDATE);
 	}
@@ -186,6 +189,23 @@ public class SimulationProductNavigationControlMenuEntry
 	private static final Log _log = LogFactoryUtil.getLog(
 		SimulationProductNavigationControlMenuEntry.class);
 
+	@Reference
+	private Html _html;
+
+	@Reference
+	private Language _language;
+
+	@Reference
+	private LayoutPermission _layoutPermission;
+
 	private PanelAppRegistry _panelAppRegistry;
+
+	@Reference
+	private Portal _portal;
+
+	private String _portletNamespace;
+
+	@Reference
+	private PortletURLFactory _portletURLFactory;
 
 }
