@@ -23,8 +23,6 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.portlet.PortletURLFactory;
-import com.liferay.portal.kernel.security.permission.ActionKeys;
-import com.liferay.portal.kernel.service.permission.LayoutPermission;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Html;
 import com.liferay.portal.kernel.util.Portal;
@@ -170,14 +168,6 @@ public class SimulationProductNavigationControlMenuEntry
 		SimulationPanelCategory simulationPanelCategory) {
 	}
 
-	protected boolean hasUpdateLayoutPermission(ThemeDisplay themeDisplay)
-		throws PortalException {
-
-		return _layoutPermission.contains(
-			themeDisplay.getPermissionChecker(), themeDisplay.getLayout(),
-			ActionKeys.UPDATE);
-	}
-
 	@Reference(unbind = "-")
 	protected void setPanelAppRegistry(PanelAppRegistry panelAppRegistry) {
 		_panelAppRegistry = panelAppRegistry;
@@ -194,9 +184,6 @@ public class SimulationProductNavigationControlMenuEntry
 
 	@Reference
 	private Language _language;
-
-	@Reference
-	private LayoutPermission _layoutPermission;
 
 	private PanelAppRegistry _panelAppRegistry;
 
