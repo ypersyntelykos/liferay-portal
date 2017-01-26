@@ -205,9 +205,7 @@ public class PortletContainerImpl implements PortletContainer {
 
 		PortletApp portletApp = portlet.getPortletApp();
 
-		Map<String, String[]> publicRenderParameters =
-			PublicRenderParametersPool.get(
-				request, layout.getPlid(), portletApp.isWARFile());
+		Map<String, String[]> publicRenderParameters = null;
 
 		Map<String, String[]> parameters = request.getParameterMap();
 
@@ -226,6 +224,11 @@ public class PortletContainerImpl implements PortletContainer {
 
 			if (publicRenderParameter == null) {
 				continue;
+			}
+
+			if (publicRenderParameters == null) {
+				publicRenderParameters = PublicRenderParametersPool.get(
+					request, layout.getPlid(), portletApp.isWARFile());
 			}
 
 			String publicRenderParameterName =
