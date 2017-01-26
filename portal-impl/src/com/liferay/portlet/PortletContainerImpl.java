@@ -209,10 +209,12 @@ public class PortletContainerImpl implements PortletContainer {
 
 		Map<String, String[]> parameters = request.getParameterMap();
 
+		PortletQName portletQName = PortletQNameUtil.getPortletQName();
+
 		for (Map.Entry<String, String[]> entry : parameters.entrySet()) {
 			String name = entry.getKey();
 
-			QName qName = PortletQNameUtil.getQName(name);
+			QName qName = portletQName.getQName(name);
 
 			if (qName == null) {
 				continue;
@@ -232,7 +234,7 @@ public class PortletContainerImpl implements PortletContainer {
 			}
 
 			String publicRenderParameterName =
-				PortletQNameUtil.getPublicRenderParameterName(qName);
+				portletQName.getPublicRenderParameterName(qName);
 
 			if (name.startsWith(
 					PortletQName.PUBLIC_RENDER_PARAMETER_NAMESPACE)) {
