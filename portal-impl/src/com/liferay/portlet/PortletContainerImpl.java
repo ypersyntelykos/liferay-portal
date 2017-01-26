@@ -200,8 +200,7 @@ public class PortletContainerImpl implements PortletContainer {
 	protected void processPublicRenderParameters(
 		HttpServletRequest request, Layout layout, Portlet portlet) {
 
-		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
-			WebKeys.THEME_DISPLAY);
+		ThemeDisplay themeDisplay = null;
 
 		PortletApp portletApp = portlet.getPortletApp();
 
@@ -238,6 +237,11 @@ public class PortletContainerImpl implements PortletContainer {
 
 			if (name.startsWith(
 					PortletQName.PUBLIC_RENDER_PARAMETER_NAMESPACE)) {
+
+				if (themeDisplay == null) {
+					themeDisplay = (ThemeDisplay)request.getAttribute(
+						WebKeys.THEME_DISPLAY);
+				}
 
 				String[] values = entry.getValue();
 
