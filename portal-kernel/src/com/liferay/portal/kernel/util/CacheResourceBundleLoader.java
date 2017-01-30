@@ -37,6 +37,10 @@ public class CacheResourceBundleLoader implements ResourceBundleLoader {
 	public ResourceBundle loadResourceBundle(String languageId) {
 		ResourceBundle resourceBundle = _resourceBundles.get(languageId);
 
+		if (resourceBundle == _nullResourceBundle) {
+			return null;
+		}
+
 		if (resourceBundle == null) {
 			try {
 				resourceBundle = _resourceBundleLoader.loadResourceBundle(
@@ -55,9 +59,6 @@ public class CacheResourceBundleLoader implements ResourceBundleLoader {
 				_resourceBundles.put(languageId, resourceBundle);
 			}
 		}
-		else if (resourceBundle == _nullResourceBundle) {
-			return null;
-		}
 
 		return resourceBundle;
 	}
@@ -66,24 +67,22 @@ public class CacheResourceBundleLoader implements ResourceBundleLoader {
 		CacheResourceBundleLoader.class);
 
 	private static final ResourceBundle _nullResourceBundle =
-		new NullResourceBundle();
+		new ResourceBundle() {
+
+			@Override
+			public Enumeration<String> getKeys() {
+				throw new UnsupportedOperationException();
+			}
+
+			@Override
+			protected Object handleGetObject(String key) {
+				throw new UnsupportedOperationException();
+			}
+
+		};
 
 	private final ResourceBundleLoader _resourceBundleLoader;
 	private final Map<String, ResourceBundle> _resourceBundles =
 		new ConcurrentHashMap<>();
-
-	private static class NullResourceBundle extends ResourceBundle {
-
-		@Override
-		public Enumeration<String> getKeys() {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		protected Object handleGetObject(String key) {
-			throw new UnsupportedOperationException();
-		}
-
-	}
 
 }
