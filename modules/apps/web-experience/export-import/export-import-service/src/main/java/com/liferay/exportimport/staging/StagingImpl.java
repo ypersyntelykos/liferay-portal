@@ -951,7 +951,7 @@ public class StagingImpl implements Staging {
 			return null;
 		}
 
-		if (!group.isStagedRemotely() && group.isStagingGroup()) {
+		if (group.isStagingGroup() && !group.isStagedRemotely()) {
 			return group.getLiveGroup();
 		}
 
