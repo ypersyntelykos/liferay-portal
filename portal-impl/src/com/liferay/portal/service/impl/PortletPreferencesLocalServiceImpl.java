@@ -23,6 +23,7 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.LayoutRevision;
+import com.liferay.portal.kernel.model.LayoutStagingHandler;
 import com.liferay.portal.kernel.model.Portlet;
 import com.liferay.portal.kernel.model.PortletConstants;
 import com.liferay.portal.kernel.model.PortletPreferences;
@@ -472,17 +473,20 @@ public class PortletPreferencesLocalServiceImpl
 			return layoutRevision;
 		}
 
-		Layout layout = layoutLocalService.fetchLayout(plid);
+		Layout layout = layoutPersistence.fetchByPrimaryKey(plid);
 
 		if (layout == null) {
 			return null;
 		}
 
-		if (!LayoutStagingUtil.isBranchingLayout(layout)) {
-			return null;
+		if (LayoutStagingUtil.isBranchingLayout(layout)) {
+			LayoutStagingHandler layoutStagingHandler =
+				new LayoutStagingHandler(layout);
+
+			return layoutStagingHandler.getLayoutRevision();
 		}
 
-		return LayoutStagingUtil.getLayoutRevision(layout);
+		return null;
 	}
 
 	private long _swapPlidForPortletPreferences(long plid) {
