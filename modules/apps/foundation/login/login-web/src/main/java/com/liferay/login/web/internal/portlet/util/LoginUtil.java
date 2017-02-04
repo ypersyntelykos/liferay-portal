@@ -159,7 +159,7 @@ public class LoginUtil {
 				Validator.isNull(login) &&
 				company.getAuthType().equals(CompanyConstants.AUTH_TYPE_EA)) {
 
-				login = "@" + company.getMx();
+				login = "@".concat(company.getMx());
 			}
 		}
 
