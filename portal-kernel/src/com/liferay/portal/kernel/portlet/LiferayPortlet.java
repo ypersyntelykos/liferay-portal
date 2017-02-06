@@ -102,13 +102,15 @@ public class LiferayPortlet extends GenericPortlet {
 				addSuccessMessage(actionRequest, actionResponse);
 			}
 
+			String key = SessionMessages.KEY_SUFFIX_FORCE_SEND_REDIRECT;
+
 			String portletId = PortalUtil.getPortletId(actionRequest);
 
-			if (!SessionMessages.contains(
-					actionRequest,
-					portletId.concat(
-						SessionMessages.KEY_SUFFIX_FORCE_SEND_REDIRECT))) {
+			if (portletId != null) {
+				key = portletId.concat(key);
+			}
 
+			if (!SessionMessages.contains(actionRequest, key)) {
 				if (isEmptySessionMessages(actionRequest) ||
 					isAlwaysSendRedirect()) {
 
@@ -505,13 +507,15 @@ public class LiferayPortlet extends GenericPortlet {
 			return false;
 		}
 
+		String key = SessionMessages.KEY_SUFFIX_HIDE_DEFAULT_SUCCESS_MESSAGE;
+
 		String portletId = PortalUtil.getPortletId(actionRequest);
 
-		if (SessionMessages.contains(
-				actionRequest,
-				portletId.concat(
-					SessionMessages.KEY_SUFFIX_HIDE_DEFAULT_SUCCESS_MESSAGE))) {
+		if (portletId != null) {
+			key = portletId.concat(key);
+		}
 
+		if (SessionMessages.contains(actionRequest, key)) {
 			return false;
 		}
 
@@ -522,9 +526,11 @@ public class LiferayPortlet extends GenericPortlet {
 		int sessionMessagesSize = SessionMessages.size(actionRequest);
 
 		for (String suffix : _IGNORED_SESSION_MESSAGE_SUFFIXES) {
-			if (SessionMessages.contains(
-					actionRequest, portletId.concat(suffix))) {
+			if (portletId != null) {
+				suffix = portletId.concat(suffix);
+			}
 
+			if (SessionMessages.contains(actionRequest, suffix)) {
 				sessionMessagesSize--;
 			}
 		}
@@ -550,9 +556,11 @@ public class LiferayPortlet extends GenericPortlet {
 		String portletId = PortalUtil.getPortletId(actionRequest);
 
 		for (String suffix : _IGNORED_SESSION_MESSAGE_SUFFIXES) {
-			if (SessionMessages.contains(
-					actionRequest, portletId.concat(suffix))) {
+			if (portletId != null) {
+				suffix = portletId.concat(suffix);
+			}
 
+			if (SessionMessages.contains(actionRequest, suffix)) {
 				sessionMessagesSize--;
 			}
 		}
