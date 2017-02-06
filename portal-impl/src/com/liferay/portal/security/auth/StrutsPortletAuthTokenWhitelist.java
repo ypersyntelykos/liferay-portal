@@ -82,7 +82,7 @@ public class StrutsPortletAuthTokenWhitelist extends BaseAuthTokenWhitelist {
 		String namespace = PortalUtil.getPortletNamespace(portletId);
 
 		String strutsAction = ParamUtil.getString(
-			request, namespace + "struts_action");
+			request, namespace.concat("struts_action"));
 
 		String rootPortletId = PortletConstants.getRootPortletId(portletId);
 
@@ -107,7 +107,7 @@ public class StrutsPortletAuthTokenWhitelist extends BaseAuthTokenWhitelist {
 		String namespace = PortalUtil.getPortletNamespace(portletId);
 
 		String strutsAction = ParamUtil.getString(
-			request, namespace + "struts_action");
+			request, namespace.concat("struts_action"));
 
 		if (Validator.isNull(strutsAction)) {
 			strutsAction = ParamUtil.getString(request, "struts_action");
