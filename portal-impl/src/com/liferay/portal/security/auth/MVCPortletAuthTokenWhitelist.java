@@ -183,8 +183,8 @@ public class MVCPortletAuthTokenWhitelist extends BaseAuthTokenWhitelist {
 
 		String namespace = PortalUtil.getPortletNamespace(portletId);
 
-		String[] actionNames = ParamUtil.getParameterValues(
-			request, namespace.concat(ActionRequest.ACTION_NAME));
+		String[] actionNames = request.getParameterValues(
+			namespace.concat(ActionRequest.ACTION_NAME));
 
 		String actions = StringUtil.merge(actionNames);
 
