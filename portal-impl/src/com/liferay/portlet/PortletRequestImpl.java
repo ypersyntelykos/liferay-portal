@@ -671,8 +671,9 @@ public abstract class PortletRequestImpl implements LiferayPortletRequest {
 
 		PortletApp portletApp = portlet.getPortletApp();
 
-		_publicRenderParameters = PublicRenderParametersPool.get(
-			request, plid, portletApp.isWARFile());
+		Map<String, String[]> publicRenderParametersMap =
+			PublicRenderParametersPool.get(
+				request, plid, portletApp.isWARFile());
 
 		if (invokerPortlet != null) {
 			if (invokerPortlet.isStrutsPortlet() ||
@@ -847,7 +848,8 @@ public abstract class PortletRequestImpl implements LiferayPortletRequest {
 			}
 		}
 
-		mergePublicRenderParameters(dynamicRequest, preferences, plid);
+		_mergePublicRenderParameters(
+			dynamicRequest, publicRenderParametersMap, preferences);
 
 		_request = dynamicRequest;
 		_originalRequest = request;
@@ -899,9 +901,34 @@ public abstract class PortletRequestImpl implements LiferayPortletRequest {
 		_plid = plid;
 	}
 
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link
+	 *             #_mergePublicRenderParameters(
+	 *             DynamicServletRequest, Map, PortletPreferences)}
+	 */
+	@Deprecated
 	protected void mergePublicRenderParameters(
 		DynamicServletRequest dynamicRequest, PortletPreferences preferences,
 		long plid) {
+
+		_mergePublicRenderParameters(
+			dynamicRequest, Collections.emptyMap(), preferences);
+	}
+
+	protected String removePortletNamespace(
+		String portletNamespace, String name) {
+
+		if (name.startsWith(portletNamespace)) {
+			name = name.substring(portletNamespace.length());
+		}
+
+		return name;
+	}
+
+	private void _mergePublicRenderParameters(
+		DynamicServletRequest dynamicRequest,
+		Map<String, String[]> publicRenderParametersMap,
+		PortletPreferences preferences) {
 
 		Set<PublicRenderParameter> publicRenderParameters =
 			_portlet.getPublicRenderParameters();
@@ -916,7 +943,7 @@ public abstract class PortletRequestImpl implements LiferayPortletRequest {
 			for (PublicRenderParameter publicRenderParameter :
 					publicRenderParameters) {
 
-				String[] values = _publicRenderParameters.get(
+				String[] values = publicRenderParametersMap.get(
 					PortletQNameUtil.getPublicRenderParameterName(
 						publicRenderParameter.getQName()));
 
@@ -970,7 +997,7 @@ public abstract class PortletRequestImpl implements LiferayPortletRequest {
 			String name = publicRenderParameter.getIdentifier();
 
 			if (ArrayUtil.isEmpty(newValues)) {
-				String[] values = _publicRenderParameters.get(
+				String[] values = publicRenderParametersMap.get(
 					publicRenderParameterName);
 
 				if (ArrayUtil.isEmpty(values) || Validator.isNull(values[0])) {
@@ -985,16 +1012,6 @@ public abstract class PortletRequestImpl implements LiferayPortletRequest {
 				dynamicRequest.setParameterValues(name, newValues);
 			}
 		}
-	}
-
-	protected String removePortletNamespace(
-		String portletNamespace, String name) {
-
-		if (name.startsWith(portletNamespace)) {
-			name = name.substring(portletNamespace.length());
-		}
-
-		return name;
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
@@ -1015,7 +1032,6 @@ public abstract class PortletRequestImpl implements LiferayPortletRequest {
 	private HttpServletRequest _portletRequestDispatcherRequest;
 	private PortletPreferences _preferences;
 	private Profile _profile;
-	private Map<String, String[]> _publicRenderParameters;
 	private String _remoteUser;
 	private long _remoteUserId;
 	private HttpServletRequest _request;
