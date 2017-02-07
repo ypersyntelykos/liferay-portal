@@ -136,8 +136,29 @@ public class LockLocalServiceImpl extends LockLocalServiceBaseImpl {
 
 	@Override
 	public Lock lock(
+			long userId, String className, long key, String owner,
+			boolean inheritable, long expirationTime, boolean renew)
+		throws PortalException {
+
+		return lock(
+			userId, className, String.valueOf(key), owner, inheritable,
+			expirationTime, renew);
+	}
+
+	@Override
+	public Lock lock(
 			long userId, String className, String key, String owner,
 			boolean inheritable, long expirationTime)
+		throws PortalException {
+
+		return lock(
+			userId, className, key, owner, inheritable, expirationTime, true);
+	}
+
+	@Override
+	public Lock lock(
+			long userId, String className, String key, String owner,
+			boolean inheritable, long expirationTime, boolean renew)
 		throws PortalException {
 
 		Date now = new Date();
@@ -169,6 +190,9 @@ public class LockLocalServiceImpl extends LockLocalServiceBaseImpl {
 			lock.setKey(key);
 			lock.setOwner(owner);
 			lock.setInheritable(inheritable);
+		}
+		else if (!renew) {
+			return lock;
 		}
 
 		lock.setCreateDate(now);
