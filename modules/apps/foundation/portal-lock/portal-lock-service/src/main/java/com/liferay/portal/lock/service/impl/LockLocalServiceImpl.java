@@ -418,6 +418,8 @@ public class LockLocalServiceImpl extends LockLocalServiceBaseImpl {
 
 		try {
 			lockPersistence.remove(lock);
+
+			lockPersistence.flush();
 		}
 		finally {
 			if (lockListener != null) {
