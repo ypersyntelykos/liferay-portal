@@ -62,6 +62,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -902,8 +903,39 @@ public abstract class PortletRequestImpl implements LiferayPortletRequest {
 		DynamicServletRequest dynamicRequest, PortletPreferences preferences,
 		long plid) {
 
+		Set<PublicRenderParameter> publicRenderParameters =
+			_portlet.getPublicRenderParameters();
+
+		if (publicRenderParameters.isEmpty()) {
+			return;
+		}
+
+		Map<String, String[]> portletPreferencesMap = preferences.getMap();
+
+		if (portletPreferencesMap.isEmpty()) {
+			for (PublicRenderParameter publicRenderParameter :
+					publicRenderParameters) {
+
+				String[] values = _publicRenderParameters.get(
+					PortletQNameUtil.getPublicRenderParameterName(
+						publicRenderParameter.getQName()));
+
+				if (ArrayUtil.isEmpty(values) || Validator.isNull(values[0])) {
+					continue;
+				}
+
+				String name = publicRenderParameter.getIdentifier();
+
+				if (dynamicRequest.getParameter(name) == null) {
+					dynamicRequest.setParameterValues(name, values);
+				}
+			}
+
+			return;
+		}
+
 		for (PublicRenderParameter publicRenderParameter :
-				_portlet.getPublicRenderParameters()) {
+				publicRenderParameters) {
 
 			String publicRenderParameterName =
 				PortletQNameUtil.getPublicRenderParameterName(
