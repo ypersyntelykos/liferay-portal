@@ -903,12 +903,8 @@ public abstract class PortletRequestImpl implements LiferayPortletRequest {
 		DynamicServletRequest dynamicRequest, PortletPreferences preferences,
 		long plid) {
 
-		Enumeration<PublicRenderParameter> publicRenderParameters =
-			Collections.enumeration(_portlet.getPublicRenderParameters());
-
-		while (publicRenderParameters.hasMoreElements()) {
-			PublicRenderParameter publicRenderParameter =
-				publicRenderParameters.nextElement();
+		for (PublicRenderParameter publicRenderParameter :
+				_portlet.getPublicRenderParameters()) {
 
 			String publicRenderParameterName =
 				PortletQNameUtil.getPublicRenderParameterName(
