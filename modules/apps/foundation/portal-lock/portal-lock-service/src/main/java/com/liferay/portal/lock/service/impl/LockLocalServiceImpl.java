@@ -176,6 +176,8 @@ public class LockLocalServiceImpl extends LockLocalServiceBaseImpl {
 			}
 		}
 
+		boolean isNew = false;
+
 		if (lock == null) {
 			User user = userLocalService.getUser(userId);
 
@@ -190,6 +192,8 @@ public class LockLocalServiceImpl extends LockLocalServiceBaseImpl {
 			lock.setKey(key);
 			lock.setOwner(owner);
 			lock.setInheritable(inheritable);
+
+			isNew = true;
 		}
 		else if (!renew) {
 			return lock;
@@ -204,7 +208,11 @@ public class LockLocalServiceImpl extends LockLocalServiceBaseImpl {
 			lock.setExpirationDate(new Date(now.getTime() + expirationTime));
 		}
 
-		lockPersistence.update(lock);
+		lock = lockPersistence.update(lock);
+
+		if (isNew) {
+			lock.setNew(true);
+		}
 
 		return lock;
 	}
