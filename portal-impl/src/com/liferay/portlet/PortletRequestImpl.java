@@ -44,7 +44,6 @@ import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
-import com.liferay.portal.kernel.xml.QName;
 import com.liferay.portal.security.lang.DoPrivilegedBean;
 import com.liferay.portal.security.lang.DoPrivilegedUtil;
 import com.liferay.portal.servlet.NamespaceServletRequest;
@@ -939,10 +938,8 @@ public abstract class PortletRequestImpl implements LiferayPortletRequest {
 			String name = publicRenderParameter.getIdentifier();
 
 			if (ArrayUtil.isEmpty(newValues)) {
-				QName qName = publicRenderParameter.getQName();
-
 				String[] values = _publicRenderParameters.get(
-					PortletQNameUtil.getPublicRenderParameterName(qName));
+					publicRenderParameterName);
 
 				if (ArrayUtil.isEmpty(values) || Validator.isNull(values[0])) {
 					continue;
