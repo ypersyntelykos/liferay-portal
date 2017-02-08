@@ -102,7 +102,8 @@ public class LiferayPortlet extends GenericPortlet {
 				addSuccessMessage(actionRequest, actionResponse);
 			}
 
-			String portletId = PortalUtil.getPortletId(actionRequest);
+			String portletId = GetterUtil.getString(
+				PortalUtil.getPortletId(actionRequest), StringPool.NULL);
 
 			if (!SessionMessages.contains(
 					actionRequest,
@@ -505,7 +506,8 @@ public class LiferayPortlet extends GenericPortlet {
 			return false;
 		}
 
-		String portletId = PortalUtil.getPortletId(actionRequest);
+		String portletId = GetterUtil.getString(
+			PortalUtil.getPortletId(actionRequest), StringPool.NULL);
 
 		if (SessionMessages.contains(
 				actionRequest,
@@ -547,7 +549,8 @@ public class LiferayPortlet extends GenericPortlet {
 
 		int sessionMessagesSize = SessionMessages.size(actionRequest);
 
-		String portletId = PortalUtil.getPortletId(actionRequest);
+		String portletId = GetterUtil.getString(
+			PortalUtil.getPortletId(actionRequest), StringPool.NULL);
 
 		for (String suffix : _IGNORED_SESSION_MESSAGE_SUFFIXES) {
 			if (SessionMessages.contains(
