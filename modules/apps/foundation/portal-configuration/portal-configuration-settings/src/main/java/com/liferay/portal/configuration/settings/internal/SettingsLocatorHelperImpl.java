@@ -78,19 +78,29 @@ public class SettingsLocatorHelperImpl implements SettingsLocatorHelper {
 	}
 
 	@Override
-	public Settings getConfigurationBeanSettings(
-		String configurationPid, Settings parentSettings) {
-
+	public Settings getConfigurationBeanSettings(String configurationPid) {
 		Object configurationBean = getConfigurationBean(configurationPid);
 
 		if (configurationBean == null) {
-			return parentSettings;
+			return _portalPropertiesSettings;
 		}
 
 		return new ConfigurationBeanSettings(
 			new LocationVariableResolver(
 				getResourceManager(configurationPid), this),
-			configurationBean, parentSettings);
+			configurationBean, _portalPropertiesSettings);
+	}
+
+	/**
+	 * @deprecated As of 2.0.0, replaced by {@link
+	 *             #getConfigurationBeanSettings(String)}
+	 */
+	@Deprecated
+	@Override
+	public Settings getConfigurationBeanSettings(
+		String configurationPid, Settings parentSettings) {
+
+		return getConfigurationBeanSettings(configurationPid);
 	}
 
 	public PortletPreferences getGroupPortletPreferences(
@@ -124,6 +134,10 @@ public class SettingsLocatorHelperImpl implements SettingsLocatorHelper {
 			PrefsPropsUtil.getPreferences(companyId), parentSettings);
 	}
 
+	/**
+	 * @deprecated As of 2.0.0, with no direct replacement
+	 */
+	@Deprecated
 	@Override
 	public Settings getPortalPropertiesSettings() {
 		return _portalPropertiesSettings;
@@ -172,8 +186,7 @@ public class SettingsLocatorHelperImpl implements SettingsLocatorHelper {
 
 	@Override
 	public Settings getServerSettings(String settingsId) {
-		return getConfigurationBeanSettings(
-			settingsId, getPortalPropertiesSettings());
+		return getConfigurationBeanSettings(settingsId);
 	}
 
 	@Activate

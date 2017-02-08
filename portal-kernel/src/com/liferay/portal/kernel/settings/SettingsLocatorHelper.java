@@ -25,6 +25,13 @@ public interface SettingsLocatorHelper {
 	public Settings getCompanyPortletPreferencesSettings(
 		long companyId, String settingsId, Settings parentSettings);
 
+	public Settings getConfigurationBeanSettings(String configurationPid);
+
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link
+	 *             #getConfigurationBeanSettings(String)}
+	 */
+	@Deprecated
 	public Settings getConfigurationBeanSettings(
 		String configurationPid, Settings parentSettings);
 
@@ -34,6 +41,10 @@ public interface SettingsLocatorHelper {
 	public Settings getPortalPreferencesSettings(
 		long companyId, Settings parentSettings);
 
+	/**
+	 * @deprecated As of 7.0.0, with no direct replacement
+	 */
+	@Deprecated
 	public Settings getPortalPropertiesSettings();
 
 	public Settings getPortletInstancePortletPreferencesSettings(
