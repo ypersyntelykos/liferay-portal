@@ -58,7 +58,7 @@ import org.osgi.service.component.annotations.ReferencePolicy;
  * @author Iván Zaera
  * @author Jorge Ferrer
  */
-@Component(service = SettingsLocatorHelper.class)
+@Component(immediate = true, service = SettingsLocatorHelper.class)
 @DoPrivileged
 public class SettingsLocatorHelperImpl implements SettingsLocatorHelper {
 
