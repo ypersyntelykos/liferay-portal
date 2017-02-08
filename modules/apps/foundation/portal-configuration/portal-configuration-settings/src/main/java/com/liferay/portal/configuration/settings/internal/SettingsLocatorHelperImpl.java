@@ -24,7 +24,6 @@ import com.liferay.portal.kernel.resource.manager.ClassLoaderResourceManager;
 import com.liferay.portal.kernel.resource.manager.ResourceManager;
 import com.liferay.portal.kernel.security.pacl.DoPrivileged;
 import com.liferay.portal.kernel.service.GroupLocalService;
-import com.liferay.portal.kernel.service.PortalPreferencesLocalService;
 import com.liferay.portal.kernel.service.PortletLocalService;
 import com.liferay.portal.kernel.service.PortletPreferencesLocalService;
 import com.liferay.portal.kernel.settings.ConfigurationBeanSettings;
@@ -39,6 +38,7 @@ import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
 import com.liferay.portal.kernel.util.PortletKeys;
 import com.liferay.portal.kernel.util.Props;
+import com.liferay.portal.util.PrefsPropsUtil;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -116,17 +116,12 @@ public class SettingsLocatorHelperImpl implements SettingsLocatorHelper {
 			getGroupPortletPreferences(groupId, settingsId), parentSettings);
 	}
 
-	public PortletPreferences getPortalPreferences(long companyId) {
-		return _portalPreferencesLocalService.getPreferences(
-			companyId, PortletKeys.PREFS_OWNER_TYPE_COMPANY);
-	}
-
 	@Override
 	public Settings getPortalPreferencesSettings(
 		long companyId, Settings parentSettings) {
 
 		return new PortletPreferencesSettings(
-			getPortalPreferences(companyId), parentSettings);
+			PrefsPropsUtil.getPreferences(companyId), parentSettings);
 	}
 
 	@Override
@@ -278,13 +273,6 @@ public class SettingsLocatorHelperImpl implements SettingsLocatorHelper {
 	}
 
 	@Reference(unbind = "-")
-	protected void setPortalPreferencesLocalService(
-		PortalPreferencesLocalService portalPreferencesLocalService) {
-
-		_portalPreferencesLocalService = portalPreferencesLocalService;
-	}
-
-	@Reference(unbind = "-")
 	protected void setPortletLocalService(
 		PortletLocalService portletLocalService) {
 	}
@@ -339,7 +327,6 @@ public class SettingsLocatorHelperImpl implements SettingsLocatorHelper {
 	private final ConcurrentMap<Class<?>, ConfigurationBeanManagedService>
 		_configurationBeanManagedServices = new ConcurrentHashMap<>();
 	private GroupLocalService _groupLocalService;
-	private PortalPreferencesLocalService _portalPreferencesLocalService;
 	private Settings _portalPropertiesSettings;
 	private PortletPreferencesLocalService _portletPreferencesLocalService;
 
