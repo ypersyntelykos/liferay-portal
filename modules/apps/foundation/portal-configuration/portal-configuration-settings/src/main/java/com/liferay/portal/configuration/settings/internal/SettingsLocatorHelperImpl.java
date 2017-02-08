@@ -40,7 +40,6 @@ import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
 import com.liferay.portal.kernel.util.PortletKeys;
 import com.liferay.portal.kernel.util.Props;
 
-import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -132,12 +131,7 @@ public class SettingsLocatorHelperImpl implements SettingsLocatorHelper {
 
 	@Override
 	public Settings getPortalPropertiesSettings() {
-		return new PropertiesSettings(
-			new LocationVariableResolver(
-				new ClassLoaderResourceManager(
-					PortalClassLoaderUtil.getClassLoader()),
-				this),
-			_portalProperties);
+		return _portalPropertiesSettings;
 	}
 
 	public PortletPreferences getPortletInstancePortletPreferences(
@@ -304,7 +298,12 @@ public class SettingsLocatorHelperImpl implements SettingsLocatorHelper {
 
 	@Reference(unbind = "-")
 	protected void setProps(Props props) {
-		_portalProperties = props.getProperties();
+		_portalPropertiesSettings = new PropertiesSettings(
+			new LocationVariableResolver(
+				new ClassLoaderResourceManager(
+					PortalClassLoaderUtil.getClassLoader()),
+				this),
+			props.getProperties());
 	}
 
 	protected void unsetConfigurationBeanDeclaration(
@@ -341,7 +340,7 @@ public class SettingsLocatorHelperImpl implements SettingsLocatorHelper {
 		_configurationBeanManagedServices = new ConcurrentHashMap<>();
 	private GroupLocalService _groupLocalService;
 	private PortalPreferencesLocalService _portalPreferencesLocalService;
-	private Properties _portalProperties;
+	private Settings _portalPropertiesSettings;
 	private PortletPreferencesLocalService _portletPreferencesLocalService;
 
 }
