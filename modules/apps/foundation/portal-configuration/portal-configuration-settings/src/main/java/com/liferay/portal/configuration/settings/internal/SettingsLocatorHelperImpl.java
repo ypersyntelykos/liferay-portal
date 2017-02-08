@@ -38,9 +38,8 @@ import com.liferay.portal.kernel.settings.definition.ConfigurationPidMapping;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
 import com.liferay.portal.kernel.util.PortletKeys;
-import com.liferay.portal.kernel.util.PropsUtil;
+import com.liferay.portal.kernel.util.Props;
 
-import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -130,18 +129,9 @@ public class SettingsLocatorHelperImpl implements SettingsLocatorHelper {
 			getPortalPreferences(companyId), parentSettings);
 	}
 
-	public Properties getPortalProperties() {
-		return PropsUtil.getProperties();
-	}
-
 	@Override
 	public Settings getPortalPropertiesSettings() {
-		return new PropertiesSettings(
-			new LocationVariableResolver(
-				new ClassLoaderResourceManager(
-					PortalClassLoaderUtil.getClassLoader()),
-				this),
-			getPortalProperties());
+		return _portalPropertiesSettings;
 	}
 
 	public PortletPreferences getPortletInstancePortletPreferences(
@@ -306,6 +296,16 @@ public class SettingsLocatorHelperImpl implements SettingsLocatorHelper {
 		_portletPreferencesLocalService = portletPreferencesLocalService;
 	}
 
+	@Reference(unbind = "-")
+	protected void setProps(Props props) {
+		_portalPropertiesSettings = new PropertiesSettings(
+			new LocationVariableResolver(
+				new ClassLoaderResourceManager(
+					PortalClassLoaderUtil.getClassLoader()),
+				this),
+			props.getProperties());
+	}
+
 	protected void unsetConfigurationBeanDeclaration(
 		ConfigurationBeanDeclaration configurationBeanDeclaration) {
 
@@ -340,6 +340,7 @@ public class SettingsLocatorHelperImpl implements SettingsLocatorHelper {
 		_configurationBeanManagedServices = new ConcurrentHashMap<>();
 	private GroupLocalService _groupLocalService;
 	private PortalPreferencesLocalService _portalPreferencesLocalService;
+	private Settings _portalPropertiesSettings;
 	private PortletPreferencesLocalService _portletPreferencesLocalService;
 
 }
