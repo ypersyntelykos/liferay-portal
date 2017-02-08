@@ -187,6 +187,12 @@ public class SettingsLocatorHelperImpl implements SettingsLocatorHelper {
 			parentSettings);
 	}
 
+	@Override
+	public Settings getServerSettings(String settingsId) {
+		return getConfigurationBeanSettings(
+			settingsId, getPortalPropertiesSettings());
+	}
+
 	@Activate
 	protected void activate(BundleContext bundleContext) {
 		_bundleContext = bundleContext;

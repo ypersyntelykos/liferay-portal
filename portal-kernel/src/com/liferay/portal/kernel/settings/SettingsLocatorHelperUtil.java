@@ -66,6 +66,10 @@ public class SettingsLocatorHelperUtil {
 				companyId, plid, portletId, parentSettings);
 	}
 
+	public Settings getServerSettings(String settingsId) {
+		return getSettingsLocatorHelper().getServerSettings(settingsId);
+	}
+
 	private static final ServiceTrackerList<SettingsLocatorHelper>
 		_settingsLocatorHelpers = ServiceTrackerCollections.openList(
 			SettingsLocatorHelper.class);
