@@ -155,14 +155,6 @@ public class FreeMarkerTemplate extends AbstractSingleResourceTemplate {
 				   WrapperTemplateModel, TemplateModelWithAPISupport,
 				   Serializable {
 
-		public CachableDefaultMapAdapter(Map<String, Object> map) {
-			super(FreeMarkerManager.getBeansWrapper());
-
-			_innerMap = map;
-			_objectWrapper = getObjectWrapper();
-			_wrappedValueMap = new HashMap<>();
-		}
-
 		@Override
 		public TemplateModel get(String key) throws TemplateModelException {
 			TemplateModel templateModel = _wrappedValueMap.get(key);
@@ -170,11 +162,12 @@ public class FreeMarkerTemplate extends AbstractSingleResourceTemplate {
 			if (templateModel == _NULL_TEMPLATE_MODEL) {
 				return null;
 			}
-			else if (templateModel != null) {
+
+			if (templateModel != null) {
 				return templateModel;
 			}
 
-			Object value = _innerMap.get(key);
+			Object value = _map.get(key);
 
 			if (value == null) {
 				_wrappedValueMap.put(key, _NULL_TEMPLATE_MODEL);
@@ -182,7 +175,7 @@ public class FreeMarkerTemplate extends AbstractSingleResourceTemplate {
 				return null;
 			}
 
-			templateModel = wrap(value);
+			templateModel = _objectWrapper.wrap(value);
 
 			_wrappedValueMap.put(key, templateModel);
 
@@ -190,42 +183,51 @@ public class FreeMarkerTemplate extends AbstractSingleResourceTemplate {
 		}
 
 		@Override
+		@SuppressWarnings("rawtypes")
 		public Object getAdaptedObject(Class hint) {
-			return _innerMap;
+			return _map;
 		}
 
 		@Override
 		public TemplateModel getAPI() throws TemplateModelException {
 			return ((ObjectWrapperWithAPISupport)_objectWrapper).wrapAsAPI(
-				_innerMap);
+				_map);
 		}
 
 		@Override
 		public Object getWrappedObject() {
-			return _innerMap;
+			return _map;
 		}
 
 		@Override
 		public boolean isEmpty() {
-			return _innerMap.isEmpty();
+			return _map.isEmpty();
 		}
 
 		@Override
 		public TemplateCollectionModel keys() {
-			return new SimpleCollection(_innerMap.keySet(), _objectWrapper);
+			return new SimpleCollection(_map.keySet(), _objectWrapper);
 		}
 
 		@Override
 		public int size() {
-			return _innerMap.size();
+			return _map.size();
 		}
 
 		@Override
 		public TemplateCollectionModel values() {
-			return new SimpleCollection(_innerMap.values(), _objectWrapper);
+			return new SimpleCollection(_map.values(), _objectWrapper);
 		}
 
-		private final Map<String, Object> _innerMap;
+		private CachableDefaultMapAdapter(Map<String, Object> map) {
+			super(FreeMarkerManager.getBeansWrapper());
+
+			_map = map;
+			_objectWrapper = FreeMarkerManager.getBeansWrapper();
+			_wrappedValueMap = new HashMap<>();
+		}
+
+		private final Map<String, Object> _map;
 		private final ObjectWrapper _objectWrapper;
 		private final Map<String, TemplateModel> _wrappedValueMap;
 
