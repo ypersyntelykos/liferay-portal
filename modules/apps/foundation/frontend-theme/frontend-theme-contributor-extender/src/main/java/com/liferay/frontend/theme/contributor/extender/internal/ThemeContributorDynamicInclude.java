@@ -60,29 +60,35 @@ public class ThemeContributorDynamicInclude implements DynamicInclude {
 		long themeLastModified = PortalWebResourcesUtil.getLastModified(
 			PortalWebResourceConstants.RESOURCE_TYPE_THEME_CONTRIBUTOR);
 
-		LinkRenderer linkRenderer = new LinkRenderer() {
+		if (!_cssResourceURLs.isEmpty()) {
+			LinkRenderer linkRenderer = new LinkRenderer() {
 
-			@Override
-			public void render(PrintWriter printWriter, String href) {
-				printWriter.println(
-					"<link data-senna-track=\"temporary\" href=\"" + href +
-						"\" rel=\"stylesheet\" type = \"text/css\" />");
+				@Override
+				public void render(PrintWriter printWriter, String href) {
+					printWriter.println(
+						"<link data-senna-track=\"temporary\" href=\"" + href +
+							"\" rel=\"stylesheet\" type = \"text/css\" />");
+				}
+
+			};
+
+			if (themeDisplay.isThemeCssFastLoad()) {
+				_renderCombo(
+					"css", themeLastModified, request, response.getWriter(),
+					_cssResourceURLs, linkRenderer);
 			}
-
-		};
-
-		if (themeDisplay.isThemeCssFastLoad()) {
-			_renderCombo(
-				"css", themeLastModified, request, response.getWriter(),
-				_cssResourceURLs, linkRenderer);
-		}
-		else {
-			_renderSimple(
-				themeLastModified, request, response.getWriter(),
-				_cssResourceURLs, linkRenderer);
+			else {
+				_renderSimple(
+					themeLastModified, request, response.getWriter(),
+					_cssResourceURLs, linkRenderer);
+			}
 		}
 
-		linkRenderer = new LinkRenderer() {
+		if (_jsResourceURLs.isEmpty()) {
+			return;
+		}
+
+		LinkRenderer linkRenderer = new LinkRenderer() {
 
 			@Override
 			public void render(PrintWriter printWriter, String href) {
@@ -184,10 +190,6 @@ public class ThemeContributorDynamicInclude implements DynamicInclude {
 		String minifierType, long themeLastModified, HttpServletRequest request,
 		PrintWriter printWriter, Collection<String> resourceURLs,
 		LinkRenderer linkRenderer) {
-
-		if (resourceURLs.isEmpty()) {
-			return;
-		}
 
 		StringBundler sb = new StringBundler();
 
