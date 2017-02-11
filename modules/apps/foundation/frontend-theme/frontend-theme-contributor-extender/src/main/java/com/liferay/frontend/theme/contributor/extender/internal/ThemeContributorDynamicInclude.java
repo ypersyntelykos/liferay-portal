@@ -61,26 +61,15 @@ public class ThemeContributorDynamicInclude implements DynamicInclude {
 			PortalWebResourceConstants.RESOURCE_TYPE_THEME_CONTRIBUTOR);
 
 		if (!_cssResourceURLs.isEmpty()) {
-			LinkRenderer linkRenderer = new LinkRenderer() {
-
-				@Override
-				public void render(PrintWriter printWriter, String href) {
-					printWriter.println(
-						"<link data-senna-track=\"temporary\" href=\"" + href +
-							"\" rel=\"stylesheet\" type = \"text/css\" />");
-				}
-
-			};
-
 			if (themeDisplay.isThemeCssFastLoad()) {
-				_renderCombo(
-					"css", themeLastModified, request, response.getWriter(),
-					_cssResourceURLs, linkRenderer);
+				_renderComboCSS(
+					themeLastModified, request, response.getWriter(),
+					_cssResourceURLs);
 			}
 			else {
-				_renderSimple(
+				_renderSimpleCSS(
 					themeLastModified, request, response.getWriter(),
-					_cssResourceURLs, linkRenderer);
+					_cssResourceURLs);
 			}
 		}
 
@@ -88,26 +77,15 @@ public class ThemeContributorDynamicInclude implements DynamicInclude {
 			return;
 		}
 
-		LinkRenderer linkRenderer = new LinkRenderer() {
-
-			@Override
-			public void render(PrintWriter printWriter, String href) {
-				printWriter.println(
-					"<script data-senna-track=\"temporary\" src=\"" + href +
-						"\" \" type = \"text/javascript\"></script>");
-			}
-
-		};
-
 		if (themeDisplay.isThemeJsFastLoad()) {
-			_renderCombo(
-				"js", themeLastModified, request, response.getWriter(),
-				_jsResourceURLs, linkRenderer);
+			_renderComboJS(
+				themeLastModified, request, response.getWriter(),
+				_jsResourceURLs);
 		}
 		else {
-			_renderSimple(
+			_renderSimpleJS(
 				themeLastModified, request, response.getWriter(),
-				_jsResourceURLs, linkRenderer);
+				_jsResourceURLs);
 		}
 	}
 
@@ -186,30 +164,51 @@ public class ThemeContributorDynamicInclude implements DynamicInclude {
 		_jsResourceURLs = jsResourceURLs;
 	}
 
-	private void _renderCombo(
-		String minifierType, long themeLastModified, HttpServletRequest request,
-		PrintWriter printWriter, Collection<String> resourceURLs,
-		LinkRenderer linkRenderer) {
+	private void _renderComboCSS(
+		long themeLastModified, HttpServletRequest request,
+		PrintWriter printWriter, Collection<String> resourceURLs) {
 
 		StringBundler sb = new StringBundler();
 
 		sb.append(
 			PortalUtil.getStaticResourceURL(
 				request, PortalUtil.getPathContext() + "/combo",
-				"minifierType=" + minifierType, themeLastModified));
+				"minifierType=css", themeLastModified));
 
 		for (String resourceURL : resourceURLs) {
 			sb.append("&");
 			sb.append(resourceURL);
 		}
 
-		linkRenderer.render(printWriter, sb.toString());
+		printWriter.println(
+			"<link data-senna-track=\"temporary\" href=\"" + sb.toString() +
+				"\" rel=\"stylesheet\" type = \"text/css\" />");
 	}
 
-	private void _renderSimple(
+	private void _renderComboJS(
 		long themeLastModified, HttpServletRequest request,
-		PrintWriter printWriter, Collection<String> resourceURLs,
-		LinkRenderer linkRenderer) {
+		PrintWriter printWriter, Collection<String> resourceURLs) {
+
+		StringBundler sb = new StringBundler();
+
+		sb.append(
+			PortalUtil.getStaticResourceURL(
+				request, PortalUtil.getPathContext() + "/combo",
+				"minifierType=js", themeLastModified));
+
+		for (String resourceURL : resourceURLs) {
+			sb.append("&");
+			sb.append(resourceURL);
+		}
+
+		printWriter.println(
+			"<script data-senna-track=\"temporary\" src=\"" + sb.toString() +
+				"\" \" type = \"text/javascript\"></script>");
+	}
+
+	private void _renderSimpleCSS(
+		long themeLastModified, HttpServletRequest request,
+		PrintWriter printWriter, Collection<String> resourceURLs) {
 
 		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
 			WebKeys.THEME_DISPLAY);
@@ -221,7 +220,31 @@ public class ThemeContributorDynamicInclude implements DynamicInclude {
 					resourceURL,
 				themeLastModified);
 
-			linkRenderer.render(printWriter, staticResourceURL);
+			printWriter.println(
+				"<link data-senna-track=\"temporary\" href=\"" +
+					staticResourceURL +
+						"\" rel=\"stylesheet\" type = \"text/css\" />");
+		}
+	}
+
+	private void _renderSimpleJS(
+		long themeLastModified, HttpServletRequest request,
+		PrintWriter printWriter, Collection<String> resourceURLs) {
+
+		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
+		for (String resourceURL : resourceURLs) {
+			String staticResourceURL = PortalUtil.getStaticResourceURL(
+				request,
+				themeDisplay.getPortalURL() + PortalUtil.getPathProxy() +
+					resourceURL,
+				themeLastModified);
+
+			printWriter.println(
+				"<script data-senna-track=\"temporary\" src=\"" +
+					staticResourceURL +
+						"\" \" type = \"text/javascript\"></script>");
 		}
 	}
 
@@ -232,11 +255,5 @@ public class ThemeContributorDynamicInclude implements DynamicInclude {
 		Collections.emptyList();
 	private volatile Collection<String> _jsResourceURLs =
 		Collections.emptyList();
-
-	private interface LinkRenderer {
-
-		public void render(PrintWriter printWriter, String href);
-
-	}
 
 }
