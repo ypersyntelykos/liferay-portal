@@ -162,8 +162,7 @@ public class ServiceBeanAopProxy
 
 		ServiceBeanMethodInvocation serviceBeanMethodInvocation =
 			new ServiceBeanMethodInvocation(
-				targetSource.getTarget(), targetSource.getTargetClass(), method,
-				arguments);
+				targetSource.getTarget(), method, arguments);
 
 		_setMethodInterceptors(serviceBeanMethodInvocation);
 
