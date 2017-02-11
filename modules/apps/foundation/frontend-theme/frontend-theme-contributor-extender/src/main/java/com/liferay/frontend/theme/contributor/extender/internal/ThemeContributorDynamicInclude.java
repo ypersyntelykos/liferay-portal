@@ -68,8 +68,8 @@ public class ThemeContributorDynamicInclude implements DynamicInclude {
 			}
 			else {
 				_renderSimpleCSS(
-					themeLastModified, request, response.getWriter(),
-					_cssResourceURLs);
+					themeLastModified, request, themeDisplay.getPortalURL(),
+					response.getWriter(), _cssResourceURLs);
 			}
 		}
 
@@ -84,8 +84,8 @@ public class ThemeContributorDynamicInclude implements DynamicInclude {
 		}
 		else {
 			_renderSimpleJS(
-				themeLastModified, request, response.getWriter(),
-				_jsResourceURLs);
+				themeLastModified, request, themeDisplay.getPortalURL(),
+				response.getWriter(), _jsResourceURLs);
 		}
 	}
 
@@ -207,17 +207,12 @@ public class ThemeContributorDynamicInclude implements DynamicInclude {
 	}
 
 	private void _renderSimpleCSS(
-		long themeLastModified, HttpServletRequest request,
+		long themeLastModified, HttpServletRequest request, String portalURL,
 		PrintWriter printWriter, Collection<String> resourceURLs) {
-
-		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
-			WebKeys.THEME_DISPLAY);
 
 		for (String resourceURL : resourceURLs) {
 			String staticResourceURL = PortalUtil.getStaticResourceURL(
-				request,
-				themeDisplay.getPortalURL() + PortalUtil.getPathProxy() +
-					resourceURL,
+				request, portalURL + PortalUtil.getPathProxy() + resourceURL,
 				themeLastModified);
 
 			printWriter.println(
@@ -228,17 +223,12 @@ public class ThemeContributorDynamicInclude implements DynamicInclude {
 	}
 
 	private void _renderSimpleJS(
-		long themeLastModified, HttpServletRequest request,
+		long themeLastModified, HttpServletRequest request, String portalURL,
 		PrintWriter printWriter, Collection<String> resourceURLs) {
-
-		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
-			WebKeys.THEME_DISPLAY);
 
 		for (String resourceURL : resourceURLs) {
 			String staticResourceURL = PortalUtil.getStaticResourceURL(
-				request,
-				themeDisplay.getPortalURL() + PortalUtil.getPathProxy() +
-					resourceURL,
+				request, portalURL + PortalUtil.getPathProxy() + resourceURL,
 				themeLastModified);
 
 			printWriter.println(
