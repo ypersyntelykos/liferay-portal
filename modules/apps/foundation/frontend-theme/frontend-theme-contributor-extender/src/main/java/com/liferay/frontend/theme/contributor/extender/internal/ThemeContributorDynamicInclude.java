@@ -154,13 +154,15 @@ public class ThemeContributorDynamicInclude implements DynamicInclude {
 				for (String cssResourcePath :
 						bundleWebResources.getCssResourcePaths()) {
 
-					cssResourceURLs.add(servletContextPath + cssResourcePath);
+					cssResourceURLs.add(
+						servletContextPath.concat(cssResourcePath));
 				}
 
 				for (String jsResourcePath :
 						bundleWebResources.getJsResourcePaths()) {
 
-					jsResourceURLs.add(servletContextPath + jsResourcePath);
+					jsResourceURLs.add(
+						servletContextPath.concat(jsResourcePath));
 				}
 			}
 			finally {
@@ -216,7 +218,8 @@ public class ThemeContributorDynamicInclude implements DynamicInclude {
 
 		for (String resourceURL : resourceURLs) {
 			String staticResourceURL = _portal.getStaticResourceURL(
-				request, portalURL + _portal.getPathProxy() + resourceURL,
+				request,
+				portalURL.concat(_portal.getPathProxy()).concat(resourceURL),
 				themeLastModified);
 
 			printWriter.write("<link data-senna-track=\"temporary\" href=\"");
@@ -231,7 +234,8 @@ public class ThemeContributorDynamicInclude implements DynamicInclude {
 
 		for (String resourceURL : resourceURLs) {
 			String staticResourceURL = _portal.getStaticResourceURL(
-				request, portalURL + _portal.getPathProxy() + resourceURL,
+				request,
+				portalURL.concat(_portal.getPathProxy()).concat(resourceURL),
 				themeLastModified);
 
 			printWriter.write("<script data-senna-track=\"temporary\" src=\"");
