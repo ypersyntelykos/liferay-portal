@@ -19,7 +19,7 @@ import com.liferay.portal.kernel.servlet.PortalWebResourceConstants;
 import com.liferay.portal.kernel.servlet.PortalWebResourcesUtil;
 import com.liferay.portal.kernel.servlet.taglib.DynamicInclude;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.WebKeys;
 
 import java.io.IOException;
@@ -92,6 +92,15 @@ public class ThemeContributorDynamicInclude implements DynamicInclude {
 	public void register(DynamicIncludeRegistry dynamicIncludeRegistry) {
 		dynamicIncludeRegistry.register(
 			"/html/common/themes/top_head.jsp#post");
+	}
+
+	@Reference(unbind = "-")
+	public void setPortal(Portal portal) {
+		String pathContext = portal.getPathContext();
+
+		_comboContextPath = pathContext.concat("/combo");
+
+		_portal = portal;
 	}
 
 	@Activate
@@ -170,9 +179,9 @@ public class ThemeContributorDynamicInclude implements DynamicInclude {
 		printWriter.write("<link data-senna-track=\"temporary\" href=\"");
 
 		printWriter.write(
-			PortalUtil.getStaticResourceURL(
-				request, PortalUtil.getPathContext() + "/combo",
-				"minifierType=css", themeLastModified));
+			_portal.getStaticResourceURL(
+				request, _comboContextPath, "minifierType=css",
+				themeLastModified));
 
 		for (String resourceURL : resourceURLs) {
 			printWriter.write("&");
@@ -189,9 +198,9 @@ public class ThemeContributorDynamicInclude implements DynamicInclude {
 		printWriter.write("<script data-senna-track=\"temporary\" src=\"");
 
 		printWriter.write(
-			PortalUtil.getStaticResourceURL(
-				request, PortalUtil.getPathContext() + "/combo",
-				"minifierType=js", themeLastModified));
+			_portal.getStaticResourceURL(
+				request, _comboContextPath, "minifierType=js",
+				themeLastModified));
 
 		for (String resourceURL : resourceURLs) {
 			printWriter.write("&");
@@ -206,8 +215,8 @@ public class ThemeContributorDynamicInclude implements DynamicInclude {
 		PrintWriter printWriter, Collection<String> resourceURLs) {
 
 		for (String resourceURL : resourceURLs) {
-			String staticResourceURL = PortalUtil.getStaticResourceURL(
-				request, portalURL + PortalUtil.getPathProxy() + resourceURL,
+			String staticResourceURL = _portal.getStaticResourceURL(
+				request, portalURL + _portal.getPathProxy() + resourceURL,
 				themeLastModified);
 
 			printWriter.write("<link data-senna-track=\"temporary\" href=\"");
@@ -221,8 +230,8 @@ public class ThemeContributorDynamicInclude implements DynamicInclude {
 		PrintWriter printWriter, Collection<String> resourceURLs) {
 
 		for (String resourceURL : resourceURLs) {
-			String staticResourceURL = PortalUtil.getStaticResourceURL(
-				request, portalURL + PortalUtil.getPathProxy() + resourceURL,
+			String staticResourceURL = _portal.getStaticResourceURL(
+				request, portalURL + _portal.getPathProxy() + resourceURL,
 				themeLastModified);
 
 			printWriter.write("<script data-senna-track=\"temporary\" src=\"");
@@ -234,9 +243,11 @@ public class ThemeContributorDynamicInclude implements DynamicInclude {
 	private BundleContext _bundleContext;
 	private final Collection<ServiceReference<BundleWebResources>>
 		_bundleWebResourcesServiceReferences = new TreeSet<>();
+	private String _comboContextPath;
 	private volatile Collection<String> _cssResourceURLs =
 		Collections.emptyList();
 	private volatile Collection<String> _jsResourceURLs =
 		Collections.emptyList();
+	private Portal _portal;
 
 }
