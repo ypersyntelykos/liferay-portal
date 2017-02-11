@@ -20,6 +20,7 @@ import com.liferay.portal.kernel.servlet.PortalWebResourcesUtil;
 import com.liferay.portal.kernel.servlet.taglib.DynamicInclude;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.WebKeys;
 
@@ -62,8 +63,7 @@ public class ThemeContributorDynamicInclude implements DynamicInclude {
 		if (_cssResourceURLs.length > 0) {
 			if (themeDisplay.isThemeCssFastLoad()) {
 				_renderComboCSS(
-					themeLastModified, request, response.getWriter(),
-					_cssResourceURLs);
+					themeLastModified, request, response.getWriter());
 			}
 			else {
 				_renderSimpleCSS(
@@ -77,9 +77,7 @@ public class ThemeContributorDynamicInclude implements DynamicInclude {
 		}
 
 		if (themeDisplay.isThemeJsFastLoad()) {
-			_renderComboJS(
-				themeLastModified, request, response.getWriter(),
-				_jsResourceURLs);
+			_renderComboJS(themeLastModified, request, response.getWriter());
 		}
 		else {
 			_renderSimpleJS(
@@ -172,13 +170,36 @@ public class ThemeContributorDynamicInclude implements DynamicInclude {
 
 		_cssResourceURLs = cssResourceURLs.toArray(
 			new String[cssResourceURLs.size()]);
+
+		StringBundler sb = new StringBundler(cssResourceURLs.size() * 2 + 1);
+
+		for (String cssResourceURL : cssResourceURLs) {
+			sb.append("&");
+			sb.append(cssResourceURL);
+		}
+
+		sb.append("\" rel=\"stylesheet\" type = \"text/css\" />\n");
+
+		_mergedCSSResourceURLs = sb.toString();
+
 		_jsResourceURLs = jsResourceURLs.toArray(
 			new String[jsResourceURLs.size()]);
+
+		sb = new StringBundler(jsResourceURLs.size() * 2 + 1);
+
+		for (String jsResourceURL : jsResourceURLs) {
+			sb.append("&");
+			sb.append(jsResourceURL);
+		}
+
+		sb.append("\" \" type = \"text/javascript\"></script>\n");
+
+		_mergedJSResourceURLs = sb.toString();
 	}
 
 	private void _renderComboCSS(
 		long themeLastModified, HttpServletRequest request,
-		PrintWriter printWriter, String[] resourceURLs) {
+		PrintWriter printWriter) {
 
 		printWriter.write("<link data-senna-track=\"temporary\" href=\"");
 
@@ -187,17 +208,12 @@ public class ThemeContributorDynamicInclude implements DynamicInclude {
 				request, _comboContextPath, "minifierType=css",
 				themeLastModified));
 
-		for (String resourceURL : resourceURLs) {
-			printWriter.write("&");
-			printWriter.write(resourceURL);
-		}
-
-		printWriter.write("\" rel=\"stylesheet\" type = \"text/css\" />\n");
+		printWriter.write(_mergedCSSResourceURLs);
 	}
 
 	private void _renderComboJS(
 		long themeLastModified, HttpServletRequest request,
-		PrintWriter printWriter, String[] resourceURLs) {
+		PrintWriter printWriter) {
 
 		printWriter.write("<script data-senna-track=\"temporary\" src=\"");
 
@@ -206,12 +222,7 @@ public class ThemeContributorDynamicInclude implements DynamicInclude {
 				request, _comboContextPath, "minifierType=js",
 				themeLastModified));
 
-		for (String resourceURL : resourceURLs) {
-			printWriter.write("&");
-			printWriter.write(resourceURL);
-		}
-
-		printWriter.write("\" \" type = \"text/javascript\"></script>\n");
+		printWriter.write(_mergedJSResourceURLs);
 	}
 
 	private void _renderSimpleCSS(
@@ -252,6 +263,8 @@ public class ThemeContributorDynamicInclude implements DynamicInclude {
 	private String _comboContextPath;
 	private volatile String[] _cssResourceURLs = StringPool.EMPTY_ARRAY;
 	private volatile String[] _jsResourceURLs = StringPool.EMPTY_ARRAY;
+	private volatile String _mergedCSSResourceURLs;
+	private volatile String _mergedJSResourceURLs;
 	private Portal _portal;
 
 }
