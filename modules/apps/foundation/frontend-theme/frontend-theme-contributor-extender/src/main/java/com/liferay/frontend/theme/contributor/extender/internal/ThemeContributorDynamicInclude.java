@@ -20,6 +20,7 @@ import com.liferay.portal.kernel.servlet.PortalWebResourcesUtil;
 import com.liferay.portal.kernel.servlet.taglib.DynamicInclude;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.WebKeys;
 
 import java.io.IOException;
@@ -27,7 +28,6 @@ import java.io.PrintWriter;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.TreeSet;
 
 import javax.servlet.http.HttpServletRequest;
@@ -59,7 +59,7 @@ public class ThemeContributorDynamicInclude implements DynamicInclude {
 		long themeLastModified = PortalWebResourcesUtil.getLastModified(
 			PortalWebResourceConstants.RESOURCE_TYPE_THEME_CONTRIBUTOR);
 
-		if (!_cssResourceURLs.isEmpty()) {
+		if (_cssResourceURLs.length > 0) {
 			if (themeDisplay.isThemeCssFastLoad()) {
 				_renderComboCSS(
 					themeLastModified, request, response.getWriter(),
@@ -72,7 +72,7 @@ public class ThemeContributorDynamicInclude implements DynamicInclude {
 			}
 		}
 
-		if (_jsResourceURLs.isEmpty()) {
+		if (_jsResourceURLs.length == 0) {
 			return;
 		}
 
@@ -170,13 +170,15 @@ public class ThemeContributorDynamicInclude implements DynamicInclude {
 			}
 		}
 
-		_cssResourceURLs = cssResourceURLs;
-		_jsResourceURLs = jsResourceURLs;
+		_cssResourceURLs = cssResourceURLs.toArray(
+			new String[cssResourceURLs.size()]);
+		_jsResourceURLs = jsResourceURLs.toArray(
+			new String[jsResourceURLs.size()]);
 	}
 
 	private void _renderComboCSS(
 		long themeLastModified, HttpServletRequest request,
-		PrintWriter printWriter, Collection<String> resourceURLs) {
+		PrintWriter printWriter, String[] resourceURLs) {
 
 		printWriter.write("<link data-senna-track=\"temporary\" href=\"");
 
@@ -195,7 +197,7 @@ public class ThemeContributorDynamicInclude implements DynamicInclude {
 
 	private void _renderComboJS(
 		long themeLastModified, HttpServletRequest request,
-		PrintWriter printWriter, Collection<String> resourceURLs) {
+		PrintWriter printWriter, String[] resourceURLs) {
 
 		printWriter.write("<script data-senna-track=\"temporary\" src=\"");
 
@@ -214,7 +216,7 @@ public class ThemeContributorDynamicInclude implements DynamicInclude {
 
 	private void _renderSimpleCSS(
 		long themeLastModified, HttpServletRequest request, String portalURL,
-		PrintWriter printWriter, Collection<String> resourceURLs) {
+		PrintWriter printWriter, String[] resourceURLs) {
 
 		for (String resourceURL : resourceURLs) {
 			String staticResourceURL = _portal.getStaticResourceURL(
@@ -230,7 +232,7 @@ public class ThemeContributorDynamicInclude implements DynamicInclude {
 
 	private void _renderSimpleJS(
 		long themeLastModified, HttpServletRequest request, String portalURL,
-		PrintWriter printWriter, Collection<String> resourceURLs) {
+		PrintWriter printWriter, String[] resourceURLs) {
 
 		for (String resourceURL : resourceURLs) {
 			String staticResourceURL = _portal.getStaticResourceURL(
@@ -248,10 +250,8 @@ public class ThemeContributorDynamicInclude implements DynamicInclude {
 	private final Collection<ServiceReference<BundleWebResources>>
 		_bundleWebResourcesServiceReferences = new TreeSet<>();
 	private String _comboContextPath;
-	private volatile Collection<String> _cssResourceURLs =
-		Collections.emptyList();
-	private volatile Collection<String> _jsResourceURLs =
-		Collections.emptyList();
+	private volatile String[] _cssResourceURLs = StringPool.EMPTY_ARRAY;
+	private volatile String[] _jsResourceURLs = StringPool.EMPTY_ARRAY;
 	private Portal _portal;
 
 }
