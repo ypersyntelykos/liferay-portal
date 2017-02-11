@@ -20,7 +20,6 @@ import com.liferay.portal.kernel.servlet.PortalWebResourcesUtil;
 import com.liferay.portal.kernel.servlet.taglib.DynamicInclude;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.PortalUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.WebKeys;
 
 import java.io.IOException;
@@ -168,42 +167,38 @@ public class ThemeContributorDynamicInclude implements DynamicInclude {
 		long themeLastModified, HttpServletRequest request,
 		PrintWriter printWriter, Collection<String> resourceURLs) {
 
-		StringBundler sb = new StringBundler();
+		printWriter.write("<link data-senna-track=\"temporary\" href=\"");
 
-		sb.append(
+		printWriter.write(
 			PortalUtil.getStaticResourceURL(
 				request, PortalUtil.getPathContext() + "/combo",
 				"minifierType=css", themeLastModified));
 
 		for (String resourceURL : resourceURLs) {
-			sb.append("&");
-			sb.append(resourceURL);
+			printWriter.write("&");
+			printWriter.write(resourceURL);
 		}
 
-		printWriter.println(
-			"<link data-senna-track=\"temporary\" href=\"" + sb.toString() +
-				"\" rel=\"stylesheet\" type = \"text/css\" />");
+		printWriter.write("\" rel=\"stylesheet\" type = \"text/css\" />\n");
 	}
 
 	private void _renderComboJS(
 		long themeLastModified, HttpServletRequest request,
 		PrintWriter printWriter, Collection<String> resourceURLs) {
 
-		StringBundler sb = new StringBundler();
+		printWriter.write("<script data-senna-track=\"temporary\" src=\"");
 
-		sb.append(
+		printWriter.write(
 			PortalUtil.getStaticResourceURL(
 				request, PortalUtil.getPathContext() + "/combo",
 				"minifierType=js", themeLastModified));
 
 		for (String resourceURL : resourceURLs) {
-			sb.append("&");
-			sb.append(resourceURL);
+			printWriter.write("&");
+			printWriter.write(resourceURL);
 		}
 
-		printWriter.println(
-			"<script data-senna-track=\"temporary\" src=\"" + sb.toString() +
-				"\" \" type = \"text/javascript\"></script>");
+		printWriter.write("\" \" type = \"text/javascript\"></script>\n");
 	}
 
 	private void _renderSimpleCSS(
@@ -215,10 +210,9 @@ public class ThemeContributorDynamicInclude implements DynamicInclude {
 				request, portalURL + PortalUtil.getPathProxy() + resourceURL,
 				themeLastModified);
 
-			printWriter.println(
-				"<link data-senna-track=\"temporary\" href=\"" +
-					staticResourceURL +
-						"\" rel=\"stylesheet\" type = \"text/css\" />");
+			printWriter.write("<link data-senna-track=\"temporary\" href=\"");
+			printWriter.write(staticResourceURL);
+			printWriter.write("\" rel=\"stylesheet\" type = \"text/css\" />\n");
 		}
 	}
 
@@ -231,10 +225,9 @@ public class ThemeContributorDynamicInclude implements DynamicInclude {
 				request, portalURL + PortalUtil.getPathProxy() + resourceURL,
 				themeLastModified);
 
-			printWriter.println(
-				"<script data-senna-track=\"temporary\" src=\"" +
-					staticResourceURL +
-						"\" \" type = \"text/javascript\"></script>");
+			printWriter.write("<script data-senna-track=\"temporary\" src=\"");
+			printWriter.write(staticResourceURL);
+			printWriter.write("\" \" type = \"text/javascript\"></script>\n");
 		}
 	}
 
