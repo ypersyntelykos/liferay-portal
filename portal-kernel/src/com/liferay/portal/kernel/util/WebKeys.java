@@ -100,6 +100,10 @@ public interface WebKeys {
 
 	public static final String CTX = "CTX";
 
+	/**
+	 * @deprecated As of 7.0.0, with no direct replacement
+	 */
+	@Deprecated
 	public static final String CTX_PATH = "CTX_PATH";
 
 	public static final String CURRENT_COMPLETE_URL = "CURRENT_COMPLETE_URL";
