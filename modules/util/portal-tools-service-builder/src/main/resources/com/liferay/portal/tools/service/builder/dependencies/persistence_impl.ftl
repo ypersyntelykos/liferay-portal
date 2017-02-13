@@ -662,7 +662,32 @@ public class ${entity.name}PersistenceImpl extends BasePersistenceImpl<${entity.
 		</#if>
 
 		if (isNew) {
-			finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+			<#if entity.finderColumnsList?size &gt; 64>
+				finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+			<#else>
+				<#if columnBitmaskEnabled && (collectionFinderList?size != 0)>
+					Object[]
+					<#list collectionFinderList as finder>
+						<#assign finderColsList = finder.getColumns() />
+
+						args = new Object[] {
+							<#list finderColsList as finderCol>
+								${entity.varName}ModelImpl.get${finderCol.methodName}()
+
+								<#if finderCol_has_next>
+									,
+								</#if>
+							</#list>
+						};
+
+						finderCache.removeResult(FINDER_PATH_COUNT_BY_${finder.name?upper_case}, args);
+						finderCache.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_${finder.name?upper_case}, args);
+					</#list>
+				</#if>
+
+				finderCache.removeResult(FINDER_PATH_COUNT_ALL, FINDER_ARGS_EMPTY);
+				finderCache.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_ALL, FINDER_ARGS_EMPTY);
+			</#if>
 		}
 
 		<#if collectionFinderList?size != 0>
