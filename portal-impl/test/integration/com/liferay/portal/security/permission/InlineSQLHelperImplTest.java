@@ -232,11 +232,11 @@ public class InlineSQLHelperImplTest {
 
 	@Test(expected = IllegalArgumentException.class)
 	public void testInvalidCompany() throws Exception {
-		Company company = CompanyTestUtil.addCompany();
+		_company = CompanyTestUtil.addCompany();
 
 		_groupThree = GroupTestUtil.addGroup();
 
-		_groupThree.setCompanyId(company.getCompanyId());
+		_groupThree.setCompanyId(_company.getCompanyId());
 
 		GroupLocalServiceUtil.updateGroup(_groupThree);
 
@@ -420,6 +420,9 @@ public class InlineSQLHelperImplTest {
 		_RESOURCE_PERMISSION + ".ownerId";
 
 	private static final String _WHERE_CLAUSE = " WHERE ";
+
+	@DeleteAfterTestRun
+	private Company _company;
 
 	private long[] _groupIds;
 
