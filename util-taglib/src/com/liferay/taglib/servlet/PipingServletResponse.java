@@ -51,7 +51,7 @@ public class PipingServletResponse extends HttpServletResponseWrapper {
 			return new PipingServletResponse(httpServletResponse, jspWriter);
 		}
 
-		return httpServletResponse;
+		return new PipingServletResponse(httpServletResponse, jspWriter);
 	}
 
 	public PipingServletResponse(
