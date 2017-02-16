@@ -57,7 +57,24 @@ public class Transformer {
 	public Transformer(String errorTemplatePropertyKey, boolean restricted) {
 		_restricted = restricted;
 
-		setErrorTemplateIds(errorTemplatePropertyKey);
+		Class<?> clazz = getClass();
+
+		ClassLoader classLoader = clazz.getClassLoader();
+
+		for (String langType : TemplateManagerUtil.getTemplateManagerNames()) {
+			String errorTemplateId = getErrorTemplateId(
+				errorTemplatePropertyKey, langType);
+
+			if (Validator.isNotNull(errorTemplateId)) {
+				URL url = classLoader.getResource(errorTemplateId);
+
+				if (url != null) {
+					_errorTemplates.put(
+						langType,
+						new URLTemplateResource(errorTemplateId, url));
+				}
+			}
+		}
 	}
 
 	public Transformer(
@@ -235,27 +252,6 @@ public class Transformer {
 		}
 
 		template.prepare(themeDisplay.getRequest());
-	}
-
-	protected void setErrorTemplateIds(String errorTemplatePropertyKey) {
-		Class<?> clazz = getClass();
-
-		ClassLoader classLoader = clazz.getClassLoader();
-
-		for (String langType : TemplateManagerUtil.getTemplateManagerNames()) {
-			String errorTemplateId = getErrorTemplateId(
-				errorTemplatePropertyKey, langType);
-
-			if (Validator.isNotNull(errorTemplateId)) {
-				URL url = classLoader.getResource(errorTemplateId);
-
-				if (url != null) {
-					_errorTemplates.put(
-						langType,
-						new URLTemplateResource(errorTemplateId, url));
-				}
-			}
-		}
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(Transformer.class);
