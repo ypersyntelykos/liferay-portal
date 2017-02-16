@@ -30,12 +30,8 @@ import com.liferay.portal.kernel.template.TemplateManagerUtil;
 import com.liferay.portal.kernel.template.TemplateResource;
 import com.liferay.portal.kernel.template.URLTemplateResource;
 import com.liferay.portal.kernel.templateparser.TransformException;
-import com.liferay.portal.kernel.templateparser.TransformerListener;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.InstanceFactory;
-import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
-import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -45,9 +41,7 @@ import com.liferay.portal.util.PropsUtil;
 import java.net.URL;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * @author Brian Wing Shun Chan
@@ -71,10 +65,6 @@ public class Transformer {
 		boolean restricted) {
 
 		this(errorTemplatePropertyKey, restricted);
-
-		ClassLoader classLoader = PortalClassLoaderUtil.getClassLoader();
-
-		setTransformerListeners(transformerListenerPropertyKey, classLoader);
 	}
 
 	public String transform(
@@ -267,37 +257,6 @@ public class Transformer {
 			}
 		}
 	}
-
-	protected void setTransformerListeners(
-		String transformerListenerPropertyKey, ClassLoader classLoader) {
-
-		Set<String> transformerListenerClassNames = SetUtil.fromArray(
-			PropsUtil.getArray(transformerListenerPropertyKey));
-
-		for (String transformerListenerClassName :
-				transformerListenerClassNames) {
-
-			try {
-				if (_log.isDebugEnabled()) {
-					_log.debug(
-						"Instantiating transformer listener " +
-							transformerListenerClassName);
-				}
-
-				TransformerListener transformerListener =
-					(TransformerListener)InstanceFactory.newInstance(
-						classLoader, transformerListenerClassName);
-
-				transformerListeners.add(transformerListener);
-			}
-			catch (Exception e) {
-				_log.error(e, e);
-			}
-		}
-	}
-
-	protected final Set<TransformerListener> transformerListeners =
-		new HashSet<>();
 
 	private static final Log _log = LogFactoryUtil.getLog(Transformer.class);
 
