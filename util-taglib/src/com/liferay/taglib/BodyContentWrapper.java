@@ -33,19 +33,12 @@ public class BodyContentWrapper
 	extends BodyContent
 	implements com.liferay.portal.kernel.servlet.taglib.BodyContentWrapper {
 
-	public BodyContentWrapper(BodyContent bodyContent) {
-		super(bodyContent.getEnclosingWriter());
-	}
-
-	/**
-	 * @deprecated As of 7.0.0, replaced by {@link
-	 *             #BodyContentWrapper(BodyContent)}
-	 */
-	@Deprecated
 	public BodyContentWrapper(
 		BodyContent bodyContent, UnsyncStringWriter unsyncStringWriter) {
 
-		this(bodyContent);
+		super(bodyContent.getEnclosingWriter());
+
+		_sb = unsyncStringWriter.getStringBundler();
 	}
 
 	@Override
@@ -296,6 +289,6 @@ public class BodyContentWrapper
 	private static final String _LINE_SEPARATOR = System.getProperty(
 		"line.separator");
 
-	private final StringBundler _sb = new StringBundler();
+	private final StringBundler _sb;
 
 }
