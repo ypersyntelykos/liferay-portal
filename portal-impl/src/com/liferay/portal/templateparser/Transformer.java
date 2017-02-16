@@ -170,21 +170,7 @@ public class Transformer {
 	}
 
 	protected TemplateResource getErrorTemplateResource(String langType) {
-		try {
-			Class<?> clazz = getClass();
-
-			ClassLoader classLoader = clazz.getClassLoader();
-
-			String errorTemplateId = errorTemplateIds.get(langType);
-
-			URL url = classLoader.getResource(errorTemplateId);
-
-			return new URLTemplateResource(errorTemplateId, url);
-		}
-		catch (Exception e) {
-		}
-
-		return null;
+		return _errorTemplates.get(langType);
 	}
 
 	protected Template getTemplate(
@@ -262,14 +248,22 @@ public class Transformer {
 	}
 
 	protected void setErrorTemplateIds(String errorTemplatePropertyKey) {
-		Set<String> langTypes = TemplateManagerUtil.getTemplateManagerNames();
+		Class<?> clazz = getClass();
 
-		for (String langType : langTypes) {
+		ClassLoader classLoader = clazz.getClassLoader();
+
+		for (String langType : TemplateManagerUtil.getTemplateManagerNames()) {
 			String errorTemplateId = getErrorTemplateId(
 				errorTemplatePropertyKey, langType);
 
 			if (Validator.isNotNull(errorTemplateId)) {
-				errorTemplateIds.put(langType, errorTemplateId);
+				URL url = classLoader.getResource(errorTemplateId);
+
+				if (url != null) {
+					_errorTemplates.put(
+						langType,
+						new URLTemplateResource(errorTemplateId, url));
+				}
 			}
 		}
 	}
@@ -302,12 +296,13 @@ public class Transformer {
 		}
 	}
 
-	protected final Map<String, String> errorTemplateIds = new HashMap<>();
 	protected final Set<TransformerListener> transformerListeners =
 		new HashSet<>();
 
 	private static final Log _log = LogFactoryUtil.getLog(Transformer.class);
 
+	private final Map<String, TemplateResource> _errorTemplates =
+		new HashMap<>();
 	private final boolean _restricted;
 
 }
