@@ -91,7 +91,7 @@ public abstract class BasePreferencesImpl implements Serializable {
 		Preference preference = preferences.get(key);
 
 		if (preference == null) {
-			return getActualValue(def);
+			return def;
 		}
 
 		String[] values = preference.getValues();
@@ -113,7 +113,7 @@ public abstract class BasePreferencesImpl implements Serializable {
 		Preference preference = preferences.get(key);
 
 		if (preference == null) {
-			return getActualValues(def);
+			return def;
 		}
 
 		String[] values = preference.getValues();
