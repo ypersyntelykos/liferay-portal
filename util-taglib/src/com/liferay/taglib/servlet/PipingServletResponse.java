@@ -18,12 +18,14 @@ import com.liferay.portal.kernel.io.WriterOutputStream;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.servlet.ServletOutputStreamAdapter;
+import com.liferay.portal.kernel.util.ReflectionUtil;
 import com.liferay.portal.kernel.util.UnsyncPrintWriterPool;
 
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.Writer;
 
+import java.lang.reflect.Field;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
@@ -50,6 +52,24 @@ public class PipingServletResponse extends HttpServletResponseWrapper {
 
 			return new PipingServletResponse(httpServletResponse, jspWriter);
 		}
+
+		try {
+			Field outField = ReflectionUtil.getDeclaredField(
+				jspWriter.getClass(), "out");
+
+			Object out = outField.get(jspWriter);
+
+			if (out == httpServletResponse.getWriter()) {
+				return httpServletResponse;
+			}
+		}
+		catch (Exception e) {
+			ReflectionUtil.throwException(e);
+		}
+
+		System.out.println(
+			"######Failed direct return for " + pageContext + ", out=" +
+				pageContext.getOut());
 
 		return new PipingServletResponse(httpServletResponse, jspWriter);
 	}
