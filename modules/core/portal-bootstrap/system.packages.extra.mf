@@ -2671,7 +2671,7 @@ Export-Package: com.liferay.ibm.icu;version="4.0.1",com.liferay.ibm.ic
  aglib.ui,javax.portlet",com.liferay.portal.kernel.portlet.toolbar.con
  tributor.locator;version="1.0.0";uses:="com.liferay.portal.kernel.por
  tlet.toolbar.contributor,javax.portlet",com.liferay.portal.kernel.por
- tletdisplaytemplate;version="6.3.0";uses:="com.liferay.dynamic.data.m
+ tletdisplaytemplate;version="6.4.0";uses:="com.liferay.dynamic.data.m
  apping.kernel,com.liferay.portal.kernel.template,javax.servlet.http",
  com.liferay.portal.kernel.portletfilerepository;version="1.0.0";uses:
  ="com.liferay.portal.kernel.exception,com.liferay.portal.kernel.model
