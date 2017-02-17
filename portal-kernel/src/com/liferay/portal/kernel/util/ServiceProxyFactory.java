@@ -286,15 +286,15 @@ public class ServiceProxyFactory {
 	private static class CloseServiceTrackerFinalizeAction
 		implements FinalizeAction {
 
-		public CloseServiceTrackerFinalizeAction(
-			ServiceTracker<?, ?> serviceTracker) {
-
-			_serviceTracker = serviceTracker;
-		}
-
 		@Override
 		public void doFinalize(Reference<?> reference) {
 			_serviceTracker.close();
+		}
+
+		private CloseServiceTrackerFinalizeAction(
+			ServiceTracker<?, ?> serviceTracker) {
+
+			_serviceTracker = serviceTracker;
 		}
 
 		private final ServiceTracker<?, ?> _serviceTracker;
