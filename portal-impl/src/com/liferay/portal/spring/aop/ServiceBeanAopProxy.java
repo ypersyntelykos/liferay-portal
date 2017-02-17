@@ -234,8 +234,7 @@ public class ServiceBeanAopProxy
 				_classLevelMethodInterceptors, methodInterceptors);
 
 			_serviceBeanAopCacheManager.putMethodInterceptorsBag(
-				serviceBeanMethodInvocation.toCacheKeyModel(),
-				methodInterceptorsBag);
+				serviceBeanMethodInvocation, methodInterceptorsBag);
 		}
 
 		serviceBeanMethodInvocation.setMethodInterceptors(

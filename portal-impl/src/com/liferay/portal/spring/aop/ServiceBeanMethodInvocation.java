@@ -177,6 +177,10 @@ public class ServiceBeanMethodInvocation
 		_methodInterceptors = methodInterceptors;
 	}
 
+	/**
+	 * @deprecated As of 7.0.0, with no direct replacement
+	 */
+	@Deprecated
 	public ServiceBeanMethodInvocation toCacheKeyModel() {
 		ServiceBeanMethodInvocation serviceBeanMethodInvocation =
 			new ServiceBeanMethodInvocation(null, _method, null);

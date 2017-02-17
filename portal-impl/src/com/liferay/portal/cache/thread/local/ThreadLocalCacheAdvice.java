@@ -18,6 +18,7 @@ import com.liferay.portal.kernel.cache.thread.local.Lifecycle;
 import com.liferay.portal.kernel.cache.thread.local.ThreadLocalCachable;
 import com.liferay.portal.kernel.cache.thread.local.ThreadLocalCache;
 import com.liferay.portal.kernel.cache.thread.local.ThreadLocalCacheManager;
+import com.liferay.portal.kernel.util.MethodKey;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -104,7 +105,7 @@ public class ThreadLocalCacheAdvice
 			ServiceBeanMethodInvocation serviceBeanMethodInvocation =
 				(ServiceBeanMethodInvocation)methodInvocation;
 
-			return serviceBeanMethodInvocation.toCacheKeyModel();
+			return new MethodKey(serviceBeanMethodInvocation.getMethod());
 		}
 		else {
 			return methodInvocation.toString();
