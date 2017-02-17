@@ -91,8 +91,8 @@ public class ServiceProxyFactory {
 
 		if (declaringInstance == null) {
 			return newServiceTrackedInstance(
-				serviceClass, declaringClass, fieldName, filterString,
-				blocking);
+				serviceClass, declaringClass, fieldName, filterString, blocking,
+				false);
 		}
 
 		try {
