@@ -22,6 +22,7 @@ import com.liferay.portal.kernel.model.LayoutTemplate;
 import com.liferay.portal.kernel.model.LayoutTemplateConstants;
 import com.liferay.portal.kernel.model.PluginSetting;
 import com.liferay.portal.kernel.plugin.PluginPackage;
+import com.liferay.portal.kernel.spring.aop.Skip;
 import com.liferay.portal.kernel.template.StringTemplateResource;
 import com.liferay.portal.kernel.template.Template;
 import com.liferay.portal.kernel.template.TemplateConstants;
@@ -59,6 +60,7 @@ import javax.servlet.ServletContext;
  * @author Brian Wing Shun Chan
  * @author Raymond Augé
  */
+@Skip
 public class LayoutTemplateLocalServiceImpl
 	extends LayoutTemplateLocalServiceBaseImpl {
 
