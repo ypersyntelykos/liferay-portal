@@ -15,12 +15,15 @@
 package com.liferay.portal.upgrade.v7_0_0;
 
 import com.liferay.portal.kernel.dao.jdbc.AutoBatchPreparedStatementUtil;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LoggingTimer;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 
 /**
  * @author Sampsa Sohlman
@@ -32,6 +35,11 @@ public class UpgradeResourcePermission extends UpgradeProcess {
 			runSQL(
 				"create index IX_D5F1E2A2 on ResourcePermission " +
 					"(name[$COLUMN_LENGTH:255$])");
+		}
+		catch (SQLException sqle) {
+			if (_log.isDebugEnabled()) {
+				_log.debug("Unable to create index", sqle);
+			}
 		}
 	}
 
@@ -86,5 +94,8 @@ public class UpgradeResourcePermission extends UpgradeProcess {
 			}
 		}
 	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		UpgradeResourcePermission.class);
 
 }
