@@ -28,12 +28,6 @@ public class DefineObjectsTag extends TagSupport {
 
 	@Override
 	public int doStartTag() {
-		if (!GetterUtil.getBoolean(
-				pageContext.getAttribute(WebKeys.THEME_DEFINE_OBJECTS), true)) {
-
-			return SKIP_BODY;
-		}
-
 		HttpServletRequest request =
 			(HttpServletRequest)pageContext.getRequest();
 
@@ -41,6 +35,14 @@ public class DefineObjectsTag extends TagSupport {
 			WebKeys.THEME_DISPLAY);
 
 		if (themeDisplay == null) {
+			return SKIP_BODY;
+		}
+
+		if (!GetterUtil.getBoolean(
+				pageContext.getAttribute(WebKeys.THEME_DEFINE_OBJECTS), true)) {
+
+			pageContext.setAttribute("themeDisplay", themeDisplay);
+
 			return SKIP_BODY;
 		}
 
