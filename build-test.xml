@@ -1567,13 +1567,13 @@ jdbc.counter.connectionProperties=oracle.jdbc.ReadTimeout=0;oracle.net.CONNECT_T
 			<echo file="${liferay.home}/osgi/portal/com.liferay.portal.search.elasticsearch.configuration.ElasticsearchConfiguration.cfg">
 				additionalConfigurations=\
 					cluster.routing.allocation.disk.threshold_enabled: false\n\
-					cluster.service.slow_task_logging_threshold: 600s\n\
+					cluster.service.slow_task_logging_threshold: 1800s\n\
 					httpEnabled: false\n\
-					index.indexing.slowlog.threshold.index.warn: 600s\n\
-					index.search.slowlog.threshold.fetch.warn: 600s\n\
-					index.search.slowlog.threshold.query.warn: 600s\n\
-					monitor.jvm.gc.old.warn: 600s\n\
-					monitor.jvm.gc.young.warn: 600s\n\
+					index.indexing.slowlog.threshold.index.warn: 1800s\n\
+					index.search.slowlog.threshold.fetch.warn: 1800s\n\
+					index.search.slowlog.threshold.query.warn: 1800s\n\
+					monitor.jvm.gc.old.warn: 1800s\n\
+					monitor.jvm.gc.young.warn: 1800s\n\
 					threadpool.bulk.size: 1\n\
 					threadpool.fetch_shard_started.size: 1\n\
 					threadpool.fetch_shard_store.size: 1\n\
