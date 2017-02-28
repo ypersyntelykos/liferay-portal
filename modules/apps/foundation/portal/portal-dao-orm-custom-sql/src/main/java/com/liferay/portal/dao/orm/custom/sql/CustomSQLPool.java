@@ -14,6 +14,9 @@
 
 package com.liferay.portal.dao.orm.custom.sql;
 
+import com.liferay.portal.kernel.concurrent.ConcurrentReferenceKeyHashMap;
+import com.liferay.portal.kernel.memory.FinalizeManager;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -98,6 +101,7 @@ public class CustomSQLPool {
 	}
 
 	private static Map<BundleContext, Map<String, String>> _maps =
-		new WeakHashMap<>();
+		new ConcurrentReferenceKeyHashMap<>(
+			FinalizeManager.WEAK_REFERENCE_FACTORY);
 
 }
