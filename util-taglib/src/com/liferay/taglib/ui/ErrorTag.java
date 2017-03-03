@@ -51,9 +51,8 @@ public class ErrorTag extends IncludeTag implements BodyTag {
 		if (SessionErrors.isEmpty(portletRequest)) {
 			return SKIP_BODY;
 		}
-		else {
-			_hasError = true;
-		}
+
+		_hasError = true;
 
 		if (!SessionErrors.contains(portletRequest, _key)) {
 			return SKIP_BODY;
