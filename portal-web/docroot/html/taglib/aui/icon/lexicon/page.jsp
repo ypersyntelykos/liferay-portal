@@ -17,7 +17,9 @@
 <%@ include file="/html/taglib/aui/icon/init.jsp" %>
 
 <liferay-util:buffer var="iconContent">
-	<i class="icon-<%= image %>"></i>
+	<svg class="lexicon-icon lexicon-icon-<%= image %>" role="img" title="<%= Validator.isNotNull(label) ? HtmlUtil.escapeAttribute(LanguageUtil.get(resourceBundle, label)) : StringPool.BLANK %>" <%= InlineUtil.buildDynamicAttributes(dynamicAttributes) %>>
+		<use xlink:href="<%= Validator.isNotNull(src) ? src : themeDisplay.getPathThemeImages() + "/lexicon/icons.svg" %>#<%= image %>" />
+	</svg>
 
 	<c:if test="<%= Validator.isNotNull(label) %>">
 		<span class="taglib-icon-label">

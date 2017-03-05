@@ -61,7 +61,7 @@ public class IconTag extends BaseIconTag {
 
 	@Override
 	protected String getPage() {
-		return _PAGE;
+		return _getPage(getMarkupView());
 	}
 
 	@Override
@@ -79,6 +79,12 @@ public class IconTag extends BaseIconTag {
 		super.setAttributes(request);
 	}
 
-	private static final String _PAGE = "/html/taglib/aui/icon/page.jsp";
+	private static String _getPage(String markupView) {
+		if (Validator.isNotNull(markupView)) {
+			return "/html/taglib/aui/icon/" + markupView + "/page.jsp";
+		}
+
+		return "/html/taglib/aui/icon/page.jsp";
+	}
 
 }
