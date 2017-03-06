@@ -37,6 +37,12 @@ public class UtilTaglibCompatTest {
 
 		Assert.assertTrue(importedClassesPropertiesFile.exists());
 
+		File srcDir = new File("../../../util-taglib/src/");
+
+		srcDir = srcDir.getCanonicalFile();
+
+		Assert.assertTrue(srcDir + "is not util-taglib/src", srcDir.exists());
+
 		try (FileReader fileReader = new FileReader(
 				importedClassesPropertiesFile);
 			UnsyncBufferedReader unsyncBufferedReader =
@@ -58,8 +64,7 @@ public class UtilTaglibCompatTest {
 					}
 
 					File file = new File(
-						"../../../util-taglib/src/" + line.replace('.', '/') +
-							".java");
+						srcDir, line.replace('.', '/') + ".java");
 
 					Assert.assertFalse(file.getPath(), file.exists());
 				}

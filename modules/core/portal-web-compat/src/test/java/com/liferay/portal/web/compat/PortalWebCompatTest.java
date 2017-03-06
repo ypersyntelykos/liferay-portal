@@ -37,6 +37,13 @@ public class PortalWebCompatTest {
 
 		Assert.assertTrue(importedClassesPropertiesFile.exists());
 
+		File docrootDir = new File("../../../portal-web/docroot/");
+
+		docrootDir = docrootDir.getCanonicalFile();
+
+		Assert.assertTrue(
+			docrootDir + " is not portal-web/docroot", docrootDir.exists());
+
 		try (FileReader fileReader = new FileReader(
 				importedClassesPropertiesFile);
 			UnsyncBufferedReader unsyncBufferedReader =
@@ -57,7 +64,7 @@ public class PortalWebCompatTest {
 						line = line.substring(0, line.length() - 2);
 					}
 
-					File file = new File("../../../portal-web/docroot/" + line);
+					File file = new File(docrootDir, line);
 
 					Assert.assertFalse(file.getPath(), file.exists());
 				}
