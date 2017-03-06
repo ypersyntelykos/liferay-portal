@@ -66,7 +66,8 @@ public class UtilTaglibCompatTest {
 					File file = new File(
 						srcDir, line.replace('.', '/') + ".java");
 
-					Assert.assertFalse(file.getPath(), file.exists());
+					Assert.assertFalse(
+						file.getPath() + " should not exist", file.exists());
 				}
 			}
 		}

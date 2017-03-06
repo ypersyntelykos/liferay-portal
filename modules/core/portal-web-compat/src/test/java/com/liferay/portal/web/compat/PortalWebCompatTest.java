@@ -66,7 +66,8 @@ public class PortalWebCompatTest {
 
 					File file = new File(docrootDir, line);
 
-					Assert.assertFalse(file.getPath(), file.exists());
+					Assert.assertFalse(
+						file.getPath() + " should not exist", file.exists());
 				}
 			}
 		}
