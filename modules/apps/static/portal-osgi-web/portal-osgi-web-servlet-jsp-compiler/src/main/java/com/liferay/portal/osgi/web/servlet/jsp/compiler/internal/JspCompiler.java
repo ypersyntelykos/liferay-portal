@@ -352,8 +352,8 @@ public class JspCompiler extends Jsr199JavaCompiler {
 		return new ForwardingJavaFileManager<JavaFileManager>(
 			super.getJavaFileManager(javaFileManager)) {
 
-			@Override
 			@SuppressWarnings("unchecked")
+			@Override
 			public Iterable<JavaFileObject> list(
 					Location location, String packageName, Set<Kind> kinds,
 					boolean recurse)
