@@ -20,6 +20,7 @@ import com.liferay.portal.kernel.concurrent.ConcurrentReferenceValueHashMap;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.memory.FinalizeManager;
+import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.osgi.web.servlet.jsp.compiler.internal.util.ClassPathUtil;
@@ -27,6 +28,7 @@ import com.liferay.portal.osgi.web.servlet.jsp.compiler.internal.util.ClassPathU
 import java.io.File;
 import java.io.IOException;
 
+import java.net.URI;
 import java.net.URL;
 
 import java.security.AccessController;
@@ -41,6 +43,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.ServletContext;
 
@@ -347,6 +350,31 @@ public class JspCompiler extends Jsr199JavaCompiler {
 		}
 
 		return super.getJavaFileManager(javaFileManager);
+	}
+
+	@Override
+	protected JavaFileObject getOutputFile(String className, URI uri) {
+		Map<String, Map<String, JavaFileObject>> packageMap =
+			rtctxt.getPackageMap();
+
+		String packageName = className.substring(
+			0, className.lastIndexOf(CharPool.PERIOD));
+
+		// The super impl's packageJavaFileObjects is plain HashMap which is not
+		// threadsafe, copy-swap it to be ConcurrentHashMap
+
+		Map<String, JavaFileObject> packageJavaFileObjects = packageMap.get(
+			packageName);
+
+		JavaFileObject javaFileObject = super.getOutputFile(className, uri);
+
+		if (packageJavaFileObjects == null) {
+			packageMap.put(
+				packageName,
+				new ConcurrentHashMap<>(packageMap.get(packageName)));
+		}
+
+		return javaFileObject;
 	}
 
 	protected void initClassPath(ServletContext servletContext) {
