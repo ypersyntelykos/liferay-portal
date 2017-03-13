@@ -114,6 +114,7 @@ public interface GroupLocalService extends BaseLocalService,
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public boolean hasUserGroups(long userId);
 
+	@Skip
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public boolean isLiveGroupActive(Group group);
 

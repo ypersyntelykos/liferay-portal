@@ -1911,6 +1911,7 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 	}
 
 	@Override
+	@Skip
 	public boolean isLiveGroupActive(Group group) {
 		if (group == null) {
 			return false;
