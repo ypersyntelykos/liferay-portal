@@ -664,12 +664,7 @@ public class DataFactory {
 	}
 
 	public String getPortletId(String portletPrefix) {
-		StringBundler sb = new StringBundler(2);
-
-		sb.append(portletPrefix);
-		sb.append(PortletConstants.generateInstanceId());
-
-		return sb.toString();
+		return portletPrefix.concat(PortletConstants.generateInstanceId());
 	}
 
 	public RoleModel getPowerUserRoleModel() {
