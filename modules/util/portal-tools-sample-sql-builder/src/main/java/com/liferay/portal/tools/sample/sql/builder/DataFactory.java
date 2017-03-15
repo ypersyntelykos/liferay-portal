@@ -664,9 +664,7 @@ public class DataFactory {
 	}
 
 	public String getPortletId(String portletPrefix) {
-		int length = portletPrefix.length();
-
-		StringBundler sb = new StringBundler(length + 12);
+		StringBundler sb = new StringBundler(2);
 
 		sb.append(portletPrefix);
 		sb.append(PortletConstants.generateInstanceId());
