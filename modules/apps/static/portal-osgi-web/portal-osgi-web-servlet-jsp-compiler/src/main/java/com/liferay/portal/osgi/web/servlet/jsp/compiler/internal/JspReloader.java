@@ -43,10 +43,6 @@ public class JspReloader {
 
 				@Override
 				public Void addingBundle(Bundle bundle, BundleEvent event) {
-					if (bundle.findEntries("/", "*.jsp", true) == null) {
-						return null;
-					}
-
 					File file = new File(
 						_WORK_DIR,
 						bundle.getSymbolicName() + StringPool.DASH +
