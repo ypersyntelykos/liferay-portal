@@ -20,9 +20,6 @@ import com.liferay.portal.util.PropsValues;
 
 import java.io.File;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
@@ -40,7 +37,7 @@ public class JspReloader {
 
 	@Activate
 	protected void activate(BundleContext bundleContext) {
-		_bundleTracker = new BundleTracker(
+		_bundleTracker = new BundleTracker<>(
 			bundleContext, Bundle.ACTIVE,
 			new BundleTrackerCustomizer<Void>() {
 
@@ -50,12 +47,10 @@ public class JspReloader {
 						return null;
 					}
 
-					Path folderPath = Paths.get(
+					File file = new File(
 						_WORK_DIR,
 						bundle.getSymbolicName() + StringPool.DASH +
 							bundle.getVersion());
-
-					File file = new File(folderPath.toString());
 
 					if (file.exists() &&
 						(file.lastModified() < bundle.getLastModified())) {
