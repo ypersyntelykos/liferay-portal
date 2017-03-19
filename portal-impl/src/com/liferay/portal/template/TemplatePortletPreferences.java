@@ -42,21 +42,24 @@ public class TemplatePortletPreferences {
 			sb.append(entry.getKey());
 			sb.append("</name>");
 
-			String[] values = _NULL_VALUE;
-
 			Object valueObject = entry.getValue();
 
 			if (valueObject instanceof String) {
-				values = new String[] {(String)valueObject};
+				sb.append("<value>");
+				sb.append(XMLUtil.toCompactSafe((String)valueObject));
+				sb.append("</value>");
 			}
 			else if (valueObject instanceof String[]) {
-				values = (String[])valueObject;
+				for (String value : (String[])valueObject) {
+					sb.append("<value>");
+					sb.append(XMLUtil.toCompactSafe(value));
+					sb.append("</value>");
+				}
 			}
+			else {
+				sb.setIndex(sb.index() - 3);
 
-			for (String value : values) {
-				sb.append("<value>");
-				sb.append(XMLUtil.toCompactSafe(value));
-				sb.append("</value>");
+				continue;
 			}
 
 			sb.append("</preference>");
@@ -94,8 +97,6 @@ public class TemplatePortletPreferences {
 	public void setValues(String key, String[] values)
 		throws ReadOnlyException {
 	}
-
-	private static final String[] _NULL_VALUE = new String[] {"NULL_VALUE"};
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		TemplatePortletPreferences.class);
