@@ -4451,20 +4451,8 @@ public class PortalImpl implements Portal {
 		PortletConfig portletConfig = PortletConfigFactoryUtil.create(
 			portlet, servletContext);
 
-		ResourceBundle resourceBundle = portletConfig.getResourceBundle(locale);
-
-		String portletTitle = LanguageUtil.get(
-			resourceBundle,
-			JavaConstants.JAVAX_PORTLET_TITLE.concat(StringPool.PERIOD).concat(
-				portlet.getRootPortletId()),
-			null);
-
-		if (Validator.isNull(portletTitle)) {
-			portletTitle = LanguageUtil.get(
-				resourceBundle, JavaConstants.JAVAX_PORTLET_TITLE);
-		}
-
-		return portletTitle;
+		return _getPortletTitle(
+			portlet.getRootPortletId(), portletConfig, locale);
 	}
 
 	@Override
@@ -4498,20 +4486,9 @@ public class PortalImpl implements Portal {
 			return getPortletTitle(portlet, servletContext, locale);
 		}
 
-		ResourceBundle resourceBundle = portletConfig.getResourceBundle(locale);
-
-		String portletTitle = LanguageUtil.get(
-			resourceBundle,
-			JavaConstants.JAVAX_PORTLET_TITLE.concat(StringPool.PERIOD).concat(
-				PortletConstants.getRootPortletId(portletId)),
-			null);
-
-		if (Validator.isNull(portletTitle)) {
-			portletTitle = LanguageUtil.get(
-				resourceBundle, JavaConstants.JAVAX_PORTLET_TITLE);
-		}
-
-		return portletTitle;
+		return _getPortletTitle(
+			PortletConstants.getRootPortletId(portletId), portletConfig,
+			locale);
 	}
 
 	@Override
@@ -8363,6 +8340,25 @@ public class PortalImpl implements Portal {
 		}
 
 		return sb.toString();
+	}
+
+	private String _getPortletTitle(
+		String rootPortletId, PortletConfig portletConfig, Locale locale) {
+
+		ResourceBundle resourceBundle = portletConfig.getResourceBundle(locale);
+
+		String portletTitle = LanguageUtil.get(
+			resourceBundle,
+			JavaConstants.JAVAX_PORTLET_TITLE.concat(StringPool.PERIOD).concat(
+				rootPortletId),
+			null);
+
+		if (Validator.isNull(portletTitle)) {
+			portletTitle = LanguageUtil.get(
+				resourceBundle, JavaConstants.JAVAX_PORTLET_TITLE);
+		}
+
+		return portletTitle;
 	}
 
 	private static final Log _logWebServerServlet = LogFactoryUtil.getLog(
