@@ -17,8 +17,6 @@ package com.liferay.portal.kernel.service;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSON;
 import com.liferay.portal.kernel.language.LanguageUtil;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.AuditedModel;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.PortletConstants;
@@ -39,7 +37,6 @@ import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.ReflectionUtil;
-import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
@@ -762,11 +759,7 @@ public class ServiceContext implements Cloneable, Serializable {
 				_userDisplayURL = user.getDisplayURL(themeDisplay);
 			}
 			catch (PortalException pe) {
-				if (_log.isWarnEnabled()) {
-					_log.warn(pe, pe);
-				}
-
-				_userDisplayURL = StringPool.BLANK;
+				ReflectionUtil.throwException(pe);
 			}
 		}
 
@@ -1596,8 +1589,6 @@ public class ServiceContext implements Cloneable, Serializable {
 			}
 		}
 	}
-
-	private static final Log _log = LogFactoryUtil.getLog(ServiceContext.class);
 
 	private boolean _addGroupPermissions;
 	private boolean _addGuestPermissions;
