@@ -58,8 +58,20 @@ import java.util.Set;
  */
 public class AnnouncementsUtil {
 
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link #getAnnouncementScopes(User)}
+	 */
+	@Deprecated
 	public static LinkedHashMap<Long, long[]> getAnnouncementScopes(long userId)
 		throws PortalException {
+
+		return getAnnouncementScopes(UserLocalServiceUtil.getUserById(userId));
+	}
+
+	public static LinkedHashMap<Long, long[]> getAnnouncementScopes(User user)
+		throws PortalException {
+
+		long userId = user.getUserId();
 
 		LinkedHashMap<Long, long[]> scopes = new LinkedHashMap<>();
 
@@ -127,8 +139,6 @@ public class AnnouncementsUtil {
 		List<Team> teams = TeamLocalServiceUtil.getUserTeams(userId);
 
 		long[] teamIds = ListUtil.toLongArray(teams, Team.TEAM_ID_ACCESSOR);
-
-		User user = UserLocalServiceUtil.getUserById(userId);
 
 		long companyId = user.getCompanyId();
 
