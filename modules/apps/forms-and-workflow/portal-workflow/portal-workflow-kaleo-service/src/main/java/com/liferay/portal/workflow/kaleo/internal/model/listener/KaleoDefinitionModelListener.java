@@ -21,9 +21,12 @@ import com.liferay.portal.kernel.model.BaseModelListener;
 import com.liferay.portal.kernel.model.ModelListener;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
+import com.liferay.portal.kernel.workflow.WorkflowDefinition;
+import com.liferay.portal.workflow.kaleo.KaleoWorkflowModelConverter;
 import com.liferay.portal.workflow.kaleo.model.KaleoDefinition;
 
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Kenneth Chang
@@ -40,9 +43,13 @@ public class KaleoDefinitionModelListener
 			Message message = new Message();
 
 			message.put("command", "create");
-			message.put("name", kaleoDefinition.getName());
 			message.put("serviceContext", getServiceContext(kaleoDefinition));
-			message.put("version", kaleoDefinition.getVersion());
+
+			WorkflowDefinition workflowDefinition =
+				_kaleoWorkflowModelConverter.toWorkflowDefinition(
+					kaleoDefinition);
+
+			message.setPayload(workflowDefinition);
 
 			MessageBusUtil.sendMessage("liferay/kaleo_definition", message);
 		}
@@ -85,5 +92,8 @@ public class KaleoDefinitionModelListener
 
 		return serviceContext;
 	}
+
+	@Reference
+	private KaleoWorkflowModelConverter _kaleoWorkflowModelConverter;
 
 }
