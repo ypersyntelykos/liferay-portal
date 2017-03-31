@@ -38,6 +38,7 @@ public class QNameCache extends org.dom4j.tree.QNameCache {
 			FinalizeManager.WEAK_REFERENCE_FACTORY);
 	}
 
+	@Override
 	protected Map<String, QName> createMap() {
 		return new ConcurrentHashMap<>();
 	}

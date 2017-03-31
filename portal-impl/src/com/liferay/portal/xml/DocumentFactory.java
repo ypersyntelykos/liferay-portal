@@ -19,6 +19,7 @@ package com.liferay.portal.xml;
  */
 public class DocumentFactory extends org.dom4j.DocumentFactory {
 
+	@Override
 	protected QNameCache createQNameCache() {
 		return new QNameCache(this);
 	}
