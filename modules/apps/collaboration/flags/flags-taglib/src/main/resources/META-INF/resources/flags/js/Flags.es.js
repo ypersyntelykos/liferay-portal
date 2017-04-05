@@ -58,8 +58,7 @@ FlagsPortlet.STATE = {
 		validator: core.isObject
 	},
 	inTrash: {
-		validator: core.isBoolean,
-		value: false
+		validator: core.isBoolean
 	},
 	label: {
 		validator: core.isBoolean,
