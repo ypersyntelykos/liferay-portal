@@ -1,7 +1,7 @@
-import { core } from 'metal';
-import Component from 'metal-component';
+import core from 'metal/src/core';
+import Component from 'metal-component/src/Component';
 
-import Soy from 'metal-soy';
+import Soy from 'metal-soy/src/Soy';
 
 import templates from './Flags.soy';
 
