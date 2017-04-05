@@ -27,7 +27,6 @@ import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.portlet.PortletURLFactoryUtil;
 import com.liferay.portal.kernel.portlet.PortletURLUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PortletKeys;
@@ -76,9 +75,9 @@ public class FlagsTag extends TemplateRendererTag {
 
 			putValue("inTrash", inTrash);
 
-			boolean label = GetterUtil.getBoolean(context.get("label"), true);
-
-			putValue("label", label);
+			if (Validator.isNull(context.get("label"))) {
+				putValue("label", true);
+			}
 
 			if (Validator.isNull(context.get("message"))) {
 				putValue("message", LanguageUtil.get(request, "flag"));
