@@ -133,7 +133,7 @@ public class FlagsTag extends TemplateRendererTag {
 
 	@Override
 	public String getModule() {
-		return "flags-taglib/flags/Flags.es";
+		return "flags-taglib/flags/js/Flags.es";
 	}
 
 	public void setClassName(String className) {
