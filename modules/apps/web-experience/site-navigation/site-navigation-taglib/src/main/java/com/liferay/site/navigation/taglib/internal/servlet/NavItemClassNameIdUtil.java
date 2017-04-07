@@ -14,9 +14,11 @@
 
 package com.liferay.site.navigation.taglib.internal.servlet;
 
+import com.liferay.portal.kernel.module.framework.ModuleServiceLifecycle;
 import com.liferay.portal.kernel.theme.NavItem;
 import com.liferay.portal.kernel.util.Portal;
 
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -30,11 +32,19 @@ public class NavItemClassNameIdUtil {
 		return _navItemClassNameId;
 	}
 
-	@Reference(unbind = "-")
-	protected void setPortal(Portal portal) {
-		_navItemClassNameId = portal.getClassNameId(NavItem.class);
+	@Activate
+	public void activate() {
+		_navItemClassNameId = _portal.getClassNameId(NavItem.class);
+	}
+
+	@Reference(target = ModuleServiceLifecycle.PORTAL_INITIALIZED, unbind = "-")
+	protected void setModuleServiceLifecycle(
+		ModuleServiceLifecycle moduleServiceLifecycle) {
 	}
 
 	private static long _navItemClassNameId;
+
+	@Reference
+	private Portal _portal;
 
 }
