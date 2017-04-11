@@ -371,11 +371,20 @@ public class HttpImpl implements Http {
 		return path;
 	}
 
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link URLCodec#encodeURL(String)}
+	 */
+	@Deprecated
 	@Override
 	public String encodeURL(String url) {
 		return encodeURL(url, false);
 	}
 
+	/**
+	 * @deprecated As of 7.0.0, replaced by
+	 *     {@link URLCodec#encodeURL(String, boolean)}
+	 */
+	@Deprecated
 	@Override
 	public String encodeURL(String url, boolean escapeSpaces) {
 		return URLCodec.encodeURL(url, StringPool.UTF8, escapeSpaces);
