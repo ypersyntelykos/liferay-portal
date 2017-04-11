@@ -5151,23 +5151,13 @@ public class PortalImpl implements Portal {
 
 	@Override
 	public long getSiteGroupId(long groupId) {
-		if (groupId <= 0) {
-			return 0;
-		}
-
-		Group group = GroupLocalServiceUtil.fetchGroup(groupId);
+		Group group = _getSiteGroup(groupId);
 
 		if (group == null) {
 			return 0;
 		}
 
-		long siteGroupId = groupId;
-
-		if (group.isLayout()) {
-			siteGroupId = group.getParentGroupId();
-		}
-
-		return siteGroupId;
+		return group.getGroupId();
 	}
 
 	@Override
@@ -7464,9 +7454,7 @@ public class PortalImpl implements Portal {
 
 		Set<Group> groups = new LinkedHashSet<>();
 
-		long siteGroupId = getSiteGroupId(groupId);
-
-		Group siteGroup = GroupLocalServiceUtil.fetchGroup(siteGroupId);
+		Group siteGroup = _getSiteGroup(groupId);
 
 		if (siteGroup == null) {
 			return groups;
@@ -7495,9 +7483,7 @@ public class PortalImpl implements Portal {
 	}
 
 	protected Group doGetCurrentSiteGroup(long groupId) throws PortalException {
-		long siteGroupId = getSiteGroupId(groupId);
-
-		Group siteGroup = GroupLocalServiceUtil.getGroup(siteGroupId);
+		Group siteGroup = _getSiteGroup(groupId);
 
 		if (!siteGroup.isLayoutPrototype()) {
 			return siteGroup;
@@ -8411,6 +8397,24 @@ public class PortalImpl implements Portal {
 		}
 
 		return portletTitle;
+	}
+
+	private Group _getSiteGroup(long groupId) {
+		if (groupId <= 0) {
+			return null;
+		}
+
+		Group group = GroupLocalServiceUtil.fetchGroup(groupId);
+
+		if (group == null) {
+			return null;
+		}
+
+		if (group.isLayout()) {
+			return group.getParentGroup();
+		}
+
+		return group;
 	}
 
 	private static final Log _logWebServerServlet = LogFactoryUtil.getLog(
