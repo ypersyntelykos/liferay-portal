@@ -7452,19 +7452,23 @@ public class PortalImpl implements Portal {
 	protected Set<Group> doGetAncestorSiteGroups(
 		long groupId, boolean checkContentSharingWithChildrenEnabled) {
 
-		Set<Group> groups = new LinkedHashSet<>();
-
 		Group siteGroup = _getSiteGroup(groupId);
 
 		if (siteGroup == null) {
-			return groups;
+			return Collections.emptySet();
 		}
+
+		Set<Group> groups = null;
 
 		for (Group group : siteGroup.getAncestors()) {
 			if (checkContentSharingWithChildrenEnabled &&
 				!SitesUtil.isContentSharingWithChildrenEnabled(group)) {
 
 				continue;
+			}
+
+			if (groups == null) {
+				groups = new LinkedHashSet<>();
 			}
 
 			groups.add(group);
@@ -7475,8 +7479,18 @@ public class PortalImpl implements Portal {
 				siteGroup.getCompanyId());
 
 			if (companyGroup != null) {
+				if (groups == null) {
+					return Collections.singleton(companyGroup);
+				}
+
 				groups.add(companyGroup);
+
+				return groups;
 			}
+		}
+
+		if (groups == null) {
+			return Collections.emptySet();
 		}
 
 		return groups;
