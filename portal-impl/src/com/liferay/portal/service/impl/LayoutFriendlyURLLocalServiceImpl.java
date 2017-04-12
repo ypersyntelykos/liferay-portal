@@ -233,7 +233,7 @@ public class LayoutFriendlyURLLocalServiceImpl
 	public Map<Long, String> getLayoutFriendlyURLs(
 		Group siteGroup, List<Layout> layouts, String languageId) {
 
-		Map<Long, String> layoutFriendlyURLMap = new HashMap<>(layouts.size());
+		Map<Long, String> layoutFriendlyURLMap = new HashMap<>();
 
 		UnicodeProperties typeSettingsProperties =
 			siteGroup.getTypeSettingsProperties();
