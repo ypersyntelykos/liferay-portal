@@ -14,7 +14,6 @@
 
 package com.liferay.portal.dao.orm.common;
 
-import com.liferay.portal.dao.sql.transformer.HQLToJPQLTransformerLogic;
 import com.liferay.portal.dao.sql.transformer.JPQLToHQLTransformerLogic;
 import com.liferay.portal.dao.sql.transformer.SQLTransformerFactory;
 import com.liferay.portal.kernel.dao.db.DB;
@@ -43,16 +42,11 @@ public class SQLTransformer {
 	}
 
 	/**
-	 * @deprecated As of 7.0.0, replaced by {@link #transformFromHQLToJQPL(
-	 *             String)}
+	 * @deprecated As of 7.0.0, replaced by {@link #transform(String)}
 	 */
 	@Deprecated
 	public static String transformFromHqlToJpql(String sql) {
-		return transformFromHQLToJQPL(sql);
-	}
-
-	public static String transformFromHQLToJQPL(String sql) {
-		return _instance._transformFromHQLToJPQL(sql);
+		return transform(sql);
 	}
 
 	/**
@@ -89,30 +83,6 @@ public class SQLTransformer {
 		DB db = DBManagerUtil.getDB();
 
 		_sqlTransformer = SQLTransformerFactory.getSQLTransformer(db);
-	}
-
-	private String _transformFromHQLToJPQL(String sql) {
-		String newSQL = _transformedSqls.get(sql);
-
-		if (newSQL != null) {
-			return newSQL;
-		}
-
-		newSQL = _sqlTransformer.transform(sql);
-
-		Function[] functions = {
-			HQLToJPQLTransformerLogic.getPositionalParameterFunction(),
-			HQLToJPQLTransformerLogic.getNotEqualsFunction(),
-			HQLToJPQLTransformerLogic.getCompositeIdMarkerFunction()
-		};
-
-		for (Function<String, String> function : functions) {
-			newSQL = function.apply(newSQL);
-		}
-
-		_transformedSqls.put(sql, newSQL);
-
-		return newSQL;
 	}
 
 	private String _transformFromJPQLToHQL(String sql) {
