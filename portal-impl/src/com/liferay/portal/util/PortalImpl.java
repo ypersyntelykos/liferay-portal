@@ -8181,8 +8181,6 @@ public class PortalImpl implements Portal {
 
 		String portalDomain = themeDisplay.getPortalDomain();
 
-		Locale siteDefaultLocale = getSiteDefaultLocale(layout.getGroupId());
-
 		if (!Validator.isBlank(portalDomain) &&
 			!StringUtil.equalsIgnoreCase(portalDomain, _LOCALHOST) &&
 			StringUtil.equalsIgnoreCase(virtualHostname, _LOCALHOST)) {
@@ -8244,6 +8242,8 @@ public class PortalImpl implements Portal {
 				replaceFriendlyURL = false;
 			}
 		}
+
+		Locale siteDefaultLocale = getSiteDefaultLocale(layout.getGroupId());
 
 		List<LayoutFriendlyURL> layoutFriendlyURLs = null;
 
