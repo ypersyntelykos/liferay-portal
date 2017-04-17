@@ -21,7 +21,6 @@ import com.liferay.portal.kernel.util.Validator;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.jsp.PageContext;
 
 /**
  * @author Preston Crary
@@ -29,9 +28,7 @@ import javax.servlet.jsp.PageContext;
 public class FriendlyURLUtil {
 
 	public static String getFriendlyURL(
-		HttpServletRequest request, PageContext pageContext) {
-
-		ServletConfig servletConfig = pageContext.getServletConfig();
+		HttpServletRequest request, ServletConfig servletConfig) {
 
 		boolean privateParam = GetterUtil.getBoolean(
 			servletConfig.getInitParameter("private"));
