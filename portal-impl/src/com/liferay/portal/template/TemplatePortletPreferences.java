@@ -134,15 +134,8 @@ public class TemplatePortletPreferences {
 		TemplatePortletPreferences.class);
 
 	private final ThreadLocal<PortletPreferencesImpl>
-		_portletPreferencesImplThreadLocal =
-			new AutoResetThreadLocal<PortletPreferencesImpl>(
-				TemplatePortletPreferences.class.getName()) {
-
-				@Override
-				protected PortletPreferencesImpl initialValue() {
-					return new PortletPreferencesImpl();
-				}
-
-			};
+		_portletPreferencesImplThreadLocal = new AutoResetThreadLocal<>(
+			TemplatePortletPreferences.class.getName(),
+			PortletPreferencesImpl::new);
 
 }
