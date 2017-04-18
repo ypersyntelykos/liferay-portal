@@ -492,6 +492,8 @@ public class LayoutSetLocalServiceImpl extends LayoutSetLocalServiceBaseImpl {
 				virtualHostPersistence.removeByC_L(
 					layoutSet.getCompanyId(), layoutSet.getLayoutSetId());
 
+				layoutSetPersistence.clearCache(layoutSet);
+
 				TransactionCommitCallbackUtil.registerCallback(
 					new Callable<Void>() {
 
