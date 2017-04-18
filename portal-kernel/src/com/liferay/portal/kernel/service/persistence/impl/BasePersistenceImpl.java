@@ -544,13 +544,7 @@ public class BasePersistenceImpl<T extends BaseModel<T>>
 			_dbColumnNames = dbColumnNames;
 		}
 
-		String dbColumnName = _dbColumnNames.getOrDefault(fieldName, fieldName);
-
-		if (dbColumnName == null) {
-			return fieldName;
-		}
-
-		return dbColumnName;
+		return _dbColumnNames.getOrDefault(fieldName, fieldName);
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
