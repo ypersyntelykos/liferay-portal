@@ -17,10 +17,10 @@
 <%@ include file="/html/taglib/aui/form/init.jsp" %>
 
 <%
-String namespacedAndEscapedName = namespace + HtmlUtil.escapeAttribute(name);
+String fullName = namespace.concat(HtmlUtil.escapeAttribute(name));
 %>
 
-<form action="<%= HtmlUtil.escapeAttribute(action) %>" class="form <%= cssClass %> <%= inlineLabels ? "field-labels-inline" : StringPool.BLANK %>" data-fm-namespace="<%= namespace %>" id="<%= namespacedAndEscapedName %>" method="<%= method %>" name="<%= namespacedAndEscapedName %>" <%= InlineUtil.buildDynamicAttributes(dynamicAttributes) %>>
+<form action="<%= HtmlUtil.escapeAttribute(action) %>" class="form <%= cssClass %> <%= inlineLabels ? "field-labels-inline" : StringPool.BLANK %>" data-fm-namespace="<%= namespace %>" id="<%= fullName %>" method="<%= method %>" name="<%= fullName %>" <%= InlineUtil.buildDynamicAttributes(dynamicAttributes) %>>
 	<c:if test="<%= Validator.isNotNull(onSubmit) %>">
 		<fieldset class="input-container" disabled="disabled">
 	</c:if>
