@@ -14,7 +14,6 @@
 
 package com.liferay.portlet;
 
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Company;
@@ -219,7 +218,8 @@ public class PortletURLImpl
 
 	public String getNamespace() {
 		if (_namespace == null) {
-			_namespace = PortalUtil.getPortletNamespace(_portletId);
+			_namespace = PortalUtil.getPortletNamespace(
+				_portlet.getPortletId());
 		}
 
 		return _namespace;
@@ -253,39 +253,25 @@ public class PortletURLImpl
 	}
 
 	public Portlet getPortlet() {
-		if (_portlet == null) {
-			try {
-				_portlet = PortletLocalServiceUtil.getPortletById(
-					PortalUtil.getCompanyId(_request), _portletId);
-			}
-			catch (SystemException se) {
-				_log.error(se.getMessage());
-			}
-		}
-
 		return _portlet;
 	}
 
 	public String getPortletFriendlyURLPath() {
 		String portletFriendlyURLPath = null;
 
-		Portlet portlet = getPortlet();
+		if (_portlet.isUndeployedPortlet()) {
+			return portletFriendlyURLPath;
+		}
 
-		if (portlet != null) {
-			if (portlet.isUndeployedPortlet()) {
-				return portletFriendlyURLPath;
-			}
+		FriendlyURLMapper friendlyURLMapper =
+			_portlet.getFriendlyURLMapperInstance();
 
-			FriendlyURLMapper friendlyURLMapper =
-				portlet.getFriendlyURLMapperInstance();
+		if (friendlyURLMapper != null) {
+			portletFriendlyURLPath = friendlyURLMapper.buildPath(this);
 
-			if (friendlyURLMapper != null) {
-				portletFriendlyURLPath = friendlyURLMapper.buildPath(this);
-
-				if (_log.isDebugEnabled()) {
-					_log.debug(
-						"Portlet friendly URL path " + portletFriendlyURLPath);
-				}
+			if (_log.isDebugEnabled()) {
+				_log.debug(
+					"Portlet friendly URL path " + portletFriendlyURLPath);
 			}
 		}
 
@@ -294,7 +280,7 @@ public class PortletURLImpl
 
 	@Override
 	public String getPortletId() {
-		return _portletId;
+		return _portlet.getPortletId();
 	}
 
 	@Override
@@ -384,14 +370,12 @@ public class PortletURLImpl
 			throw new IllegalArgumentException();
 		}
 
-		Portlet portlet = getPortlet();
-
-		if (portlet == null) {
+		if (_portlet.isUndeployedPortlet()) {
 			return;
 		}
 
 		PublicRenderParameter publicRenderParameter =
-			portlet.getPublicRenderParameter(name);
+			_portlet.getPublicRenderParameter(name);
 
 		if (publicRenderParameter == null) {
 			if (_log.isWarnEnabled()) {
@@ -601,7 +585,8 @@ public class PortletURLImpl
 
 	@Override
 	public void setPortletId(String portletId) {
-		_portletId = portletId;
+		_portlet = PortletLocalServiceUtil.getPortletById(
+			PortalUtil.getCompanyId(_request), portletId);
 
 		clearCache();
 	}
@@ -611,10 +596,8 @@ public class PortletURLImpl
 		throws PortletModeException {
 
 		if (_portletRequest != null) {
-			Portlet portlet = getPortlet();
-
-			if ((portlet != null) &&
-				!portlet.hasPortletMode(
+			if (!_portlet.isUndeployedPortlet() &&
+				!_portlet.hasPortletMode(
 					_portletRequest.getResponseContentType(), portletMode)) {
 
 				throw new PortletModeException(
@@ -714,7 +697,7 @@ public class PortletURLImpl
 
 	@Override
 	public void visitReservedParameters(BiConsumer<String, String> biConsumer) {
-		biConsumer.accept("p_p_id", _portletId);
+		biConsumer.accept("p_p_id", _portlet.getPortletId());
 
 		if (_lifecycle.equals(PortletRequest.ACTION_PHASE)) {
 			biConsumer.accept("p_p_lifecycle", "1");
@@ -1021,7 +1004,7 @@ public class PortletURLImpl
 				}
 
 				sb.append("#p_");
-				sb.append(URLCodec.encodeURL(_portletId));
+				sb.append(URLCodec.encodeURL(_portlet.getPortletId()));
 			}
 		}
 
@@ -1106,7 +1089,7 @@ public class PortletURLImpl
 					LiferayWindowState.POP_UP.toString())) {
 
 				sb.append("wsrp-fragmentID=#p_");
-				sb.append(URLCodec.encodeURL(_portletId));
+				sb.append(URLCodec.encodeURL(_portlet.getPortletId()));
 				sb.append(StringPool.AMPERSAND);
 			}
 		}
@@ -1176,13 +1159,11 @@ public class PortletURLImpl
 	}
 
 	protected String getPublicRenderParameterName(String name) {
-		Portlet portlet = getPortlet();
-
 		String publicRenderParameterName = null;
 
-		if (portlet != null) {
+		if (!_portlet.isUndeployedPortlet()) {
 			PublicRenderParameter publicRenderParameter =
-				portlet.getPublicRenderParameter(name);
+				_portlet.getPublicRenderParameter(name);
 
 			if (publicRenderParameter != null) {
 				QName qName = publicRenderParameter.getQName();
@@ -1262,6 +1243,10 @@ public class PortletURLImpl
 		HttpServletRequest request, Portlet portlet,
 		PortletRequest portletRequest, Layout layout, String lifecycle) {
 
+		if (portlet == null) {
+			throw new NullPointerException("Portlet is null");
+		}
+
 		_request = request;
 		_portlet = portlet;
 		_portletRequest = portletRequest;
@@ -1273,9 +1258,7 @@ public class PortletURLImpl
 		_secure = PortalUtil.isSecure(request);
 		_wsrp = ParamUtil.getBoolean(request, "wsrp");
 
-		if (portlet != null) {
-			_portletId = portlet.getPortletId();
-
+		if (!portlet.isUndeployedPortlet()) {
 			Set<String> autopropagatedParameters =
 				portlet.getAutopropagatedParameters();
 
@@ -1310,13 +1293,9 @@ public class PortletURLImpl
 
 		this(
 			request,
-			PortletLocalServiceUtil.fetchPortletById(
+			PortletLocalServiceUtil.getPortletById(
 				PortalUtil.getCompanyId(request), portletId),
 			portletRequest, layout, lifecycle);
-
-		if (_portlet == null) {
-			_portletId = portletId;
-		}
 	}
 
 	private void _appendNamespaceAndEncode(StringBundler sb, String name) {
@@ -1357,7 +1336,7 @@ public class PortletURLImpl
 		String namespace = getNamespace();
 
 		Map<String, String[]> renderParameters = RenderParametersPool.get(
-			_request, _plid, _portletId);
+			_request, _plid, _portlet.getPortletId());
 
 		if (renderParameters == null) {
 			return portletURLParams;
@@ -1418,7 +1397,6 @@ public class PortletURLImpl
 	private Map<String, String[]> _params;
 	private long _plid;
 	private Portlet _portlet;
-	private String _portletId;
 	private String _portletModeString;
 	private final PortletRequest _portletRequest;
 	private long _refererGroupId;
