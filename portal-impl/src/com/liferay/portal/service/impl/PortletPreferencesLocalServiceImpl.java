@@ -394,7 +394,7 @@ public class PortletPreferencesLocalServiceImpl
 		Map<String, javax.portlet.PortletPreferences> portletPreferencesMap =
 			new HashMap<>();
 
-		List<PortletPreferences> portletsPreferencesList =
+		List<PortletPreferences> portletPreferencesList =
 			portletPreferencesPersistence.findByO_O_P(
 				PortletKeys.PREFS_OWNER_ID_DEFAULT,
 				PortletKeys.PREFS_OWNER_TYPE_LAYOUT, plid);
@@ -423,7 +423,7 @@ public class PortletPreferencesLocalServiceImpl
 			}
 			else {
 				for (PortletPreferences portletPreferences :
-						portletsPreferencesList) {
+						portletPreferencesList) {
 
 					if (portletId.equals(portletPreferences.getPortletId())) {
 						preferences = portletPreferences.getPreferences();
