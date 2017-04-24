@@ -404,7 +404,7 @@ public class PortletPreferencesLocalServiceImpl
 			int ownerType = PortletKeys.PREFS_OWNER_TYPE_LAYOUT;
 			String portletId = portlet.getPortletId();
 
-			PortletPreferences portletsPreferences = null;
+			String preferences = portlet.getDefaultPreferences();
 
 			PortletInstance portletInstance =
 				PortletInstance.fromPortletInstanceKey(portletId);
@@ -413,37 +413,31 @@ public class PortletPreferencesLocalServiceImpl
 				ownerId = portletInstance.getUserId();
 				ownerType = PortletKeys.PREFS_OWNER_TYPE_USER;
 
-				portletsPreferences =
+				PortletPreferences portletsPreferences =
 					portletPreferencesPersistence.fetchByO_O_P_P(
 						ownerId, ownerType, plid, portletId);
+
+				if (portletsPreferences != null) {
+					preferences = portletsPreferences.getPreferences();
+				}
 			}
 			else {
 				for (PortletPreferences portletPreferences :
 						portletsPreferencesList) {
 
 					if (portletId.equals(portletPreferences.getPortletId())) {
-						portletsPreferences = portletPreferences;
+						preferences = portletPreferences.getPreferences();
 
 						break;
 					}
 				}
 			}
 
-			javax.portlet.PortletPreferences portletPreferences = null;
-
-			if (portletsPreferences == null) {
-				portletPreferences =
-					PortletPreferencesFactoryUtil.strictFromXML(
-						companyId, ownerId, ownerType, plid, portletId,
-						portlet.getDefaultPreferences());
-			}
-			else {
-				portletPreferences = PortletPreferencesFactoryUtil.fromXML(
+			portletPreferencesMap.put(
+				portletId,
+				PortletPreferencesFactoryUtil.strictFromXML(
 					companyId, ownerId, ownerType, plid, portletId,
-					portletsPreferences.getPreferences());
-			}
-
-			portletPreferencesMap.put(portletId, portletPreferences);
+					preferences));
 		}
 
 		return portletPreferencesMap;
