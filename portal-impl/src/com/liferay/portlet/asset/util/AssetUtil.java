@@ -963,13 +963,13 @@ public class AssetUtil {
 	private static Map<String, PortletURL> _getSortedMapByModelResource(
 		Map<String, PortletURL> addPortletURLs, Locale locale) {
 
-		Map<String, Map.Entry<String, PortletURL>> treeMap = new TreeMap<>(
-			Collator.getInstance(locale));
+		Map<String, Map.Entry<String, PortletURL>> tempSortedMap =
+			new TreeMap<>(Collator.getInstance(locale));
 
 		for (Map.Entry<String, PortletURL> addPortletURL :
 				addPortletURLs.entrySet()) {
 
-			treeMap.put(
+			tempSortedMap.put(
 				ResourceActionsUtil.getModelResource(
 					locale, addPortletURL.getKey()),
 				addPortletURL);
@@ -977,7 +977,7 @@ public class AssetUtil {
 
 		Map<String, PortletURL> sortedAddPortletURLs = new LinkedHashMap<>();
 
-		for (Map.Entry<String, PortletURL> entry : treeMap.values()) {
+		for (Map.Entry<String, PortletURL> entry : tempSortedMap.values()) {
 			sortedAddPortletURLs.put(entry.getKey(), entry.getValue());
 		}
 
