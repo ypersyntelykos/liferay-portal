@@ -76,6 +76,8 @@ import com.liferay.portlet.asset.service.permission.AssetVocabularyPermission;
 
 import java.io.Serializable;
 
+import java.text.Collator;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -961,7 +963,8 @@ public class AssetUtil {
 	private static Map<String, PortletURL> _getSortedMapByModelResource(
 		Map<String, PortletURL> addPortletURLs, Locale locale) {
 
-		Map<String, Map.Entry<String, PortletURL>> treeMap = new TreeMap<>();
+		Map<String, Map.Entry<String, PortletURL>> treeMap = new TreeMap<>(
+			Collator.getInstance(locale));
 
 		for (Map.Entry<String, PortletURL> addPortletURL :
 				addPortletURLs.entrySet()) {
