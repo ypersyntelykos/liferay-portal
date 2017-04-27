@@ -88,7 +88,8 @@ public class DefineObjectsTag extends TagSupport {
 				ProxyUtil.newProxyInstance(
 					ClassLoader.getSystemClassLoader(),
 					new Class<?>[] {Map.class},
-					new LazyDataInvocationHandler(portletPreferences)));
+					new PortletPreferencesValuesInvocationHandler(
+						portletPreferences)));
 
 			PortletSession portletSession = portletRequest.getPortletSession();
 
@@ -133,7 +134,8 @@ public class DefineObjectsTag extends TagSupport {
 		return SKIP_BODY;
 	}
 
-	private class LazyDataInvocationHandler implements InvocationHandler {
+	private static class PortletPreferencesValuesInvocationHandler
+		implements InvocationHandler {
 
 		@Override
 		public Object invoke(Object proxy, Method method, Object[] args)
@@ -146,7 +148,7 @@ public class DefineObjectsTag extends TagSupport {
 			return method.invoke(_map, args);
 		}
 
-		private LazyDataInvocationHandler(
+		private PortletPreferencesValuesInvocationHandler(
 			PortletPreferences portletPreferences) {
 
 			_portletPreferences = portletPreferences;
