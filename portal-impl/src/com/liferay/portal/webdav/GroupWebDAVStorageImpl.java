@@ -65,20 +65,19 @@ public class GroupWebDAVStorageImpl extends BaseWebDAVStorageImpl {
 	protected void verifyGroup(WebDAVRequest webDAVRequest)
 		throws WebDAVException {
 
+		Locale locale = PortalUtil.getLocale(
+			webDAVRequest.getHttpServletRequest());
+		String path = webDAVRequest.getPath();
+
 		try {
 			long userId = webDAVRequest.getUserId();
 
 			List<Group> groups = WebDAVUtil.getGroups(userId);
 
 			for (Group group : groups) {
-				Locale locale = PortalUtil.getLocale(
-					webDAVRequest.getHttpServletRequest());
-
 				String siteFriendlyURL =
 					SitesFriendlyURLAdapterUtil.getSiteFriendlyURL(
 						group.getGroupId(), locale);
-
-				String path = webDAVRequest.getPath();
 
 				if (path.equals(siteFriendlyURL)) {
 					return;

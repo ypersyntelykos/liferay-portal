@@ -3543,8 +3543,6 @@ public class PortalImpl implements Portal {
 
 		String portalURL = getPortalURL(request);
 
-		long companyId = getCompanyId(request);
-
 		int pos = path.indexOf(CharPool.SLASH, 1);
 
 		if (pos == -1) {
@@ -3554,6 +3552,8 @@ public class PortalImpl implements Portal {
 		String siteFriendlyURL =
 			FriendlyURLNormalizerUtil.normalizeWithEncoding(
 				HttpUtil.decodeURL(path.substring(0, pos)));
+
+		long companyId = getCompanyId(request);
 
 		Group group = GroupLocalServiceUtil.fetchFriendlyURLGroup(
 			companyId, siteFriendlyURL);

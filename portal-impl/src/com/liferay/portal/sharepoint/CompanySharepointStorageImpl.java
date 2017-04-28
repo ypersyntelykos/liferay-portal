@@ -36,10 +36,10 @@ public class CompanySharepointStorageImpl extends BaseSharepointStorageImpl {
 
 		List<Group> groups = WebDAVUtil.getGroups(sharepointRequest.getUser());
 
-		for (Group group : groups) {
-			Locale locale = PortalUtil.getLocale(
-				sharepointRequest.getHttpServletRequest());
+		Locale locale = PortalUtil.getLocale(
+			sharepointRequest.getHttpServletRequest());
 
+		for (Group group : groups) {
 			String name = SitesFriendlyURLAdapterUtil.getSiteFriendlyURL(
 				group.getGroupId(), locale);
 
