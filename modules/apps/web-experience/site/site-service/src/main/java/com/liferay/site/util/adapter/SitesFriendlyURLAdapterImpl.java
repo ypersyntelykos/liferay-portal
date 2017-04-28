@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.site.internal.util;
+package com.liferay.site.util.adapter;
 
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.service.GroupLocalService;
