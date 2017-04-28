@@ -35,7 +35,7 @@ import org.osgi.service.component.annotations.Reference;
 public class SitesFriendlyURLAdapterImpl implements SitesFriendlyURLAdapter {
 
 	@Override
-	public Group getGroup(long companyId, String friendlyURL) {
+	public Group getGroupBySiteFriendlyURL(long companyId, String friendlyURL) {
 		SiteFriendlyURL siteFriendlyURL =
 			_siteFriendlyURLLocalService.fetchSiteFriendlyURLByFriendlyURL(
 				companyId, friendlyURL);
