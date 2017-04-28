@@ -24,11 +24,9 @@ import com.liferay.portal.kernel.webdav.Resource;
 import com.liferay.portal.kernel.webdav.WebDAVException;
 import com.liferay.portal.kernel.webdav.WebDAVRequest;
 import com.liferay.portal.kernel.webdav.WebDAVUtil;
-import com.liferay.sites.kernel.util.SitesFriendlyURLAdapterUtil;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 /**
  * @author Alexander Chow
@@ -63,13 +61,10 @@ public class CompanyWebDAVStorageImpl extends BaseWebDAVStorageImpl {
 
 		List<Resource> resources = new ArrayList<>(groups.size());
 
-		Locale locale = user.getLocale();
-
 		for (Group group : groups) {
 			String parentPath = getRootPath();
 
-			String name = SitesFriendlyURLAdapterUtil.getSiteFriendlyURL(
-				group.getGroupId(), locale);
+			String name = group.getFriendlyURL();
 
 			name = name.substring(1);
 
