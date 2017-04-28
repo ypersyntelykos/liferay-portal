@@ -28,7 +28,7 @@ public class SitesFriendlyURLAdapterUtil {
 
 	public static Group getGroup(long companyId, String friendlyURL) {
 		SitesFriendlyURLAdapter sitesFriendlyURLAdapter =
-			_sitesFriendlyURLAdapter;
+			getSiteFriendlyURLAdapter();
 
 		if (sitesFriendlyURLAdapter != null) {
 			return sitesFriendlyURLAdapter.getGroup(companyId, friendlyURL);
@@ -39,7 +39,7 @@ public class SitesFriendlyURLAdapterUtil {
 
 	public static String getSiteFriendlyURL(long groupId, Locale locale) {
 		SitesFriendlyURLAdapter sitesFriendlyURLAdapter =
-			_sitesFriendlyURLAdapter;
+			getSiteFriendlyURLAdapter();
 
 		if (sitesFriendlyURLAdapter != null) {
 			return sitesFriendlyURLAdapter.getSiteFriendlyURL(groupId, locale);
@@ -52,6 +52,10 @@ public class SitesFriendlyURLAdapterUtil {
 		}
 
 		return StringPool.BLANK;
+	}
+
+	public static SitesFriendlyURLAdapter getSiteFriendlyURLAdapter() {
+		return _sitesFriendlyURLAdapter;
 	}
 
 	private static volatile SitesFriendlyURLAdapter _sitesFriendlyURLAdapter =
