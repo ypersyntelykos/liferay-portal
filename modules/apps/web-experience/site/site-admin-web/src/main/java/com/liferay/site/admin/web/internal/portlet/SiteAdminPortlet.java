@@ -390,7 +390,7 @@ public class SiteAdminPortlet extends MVCPortlet {
 		}
 
 		if (Validator.isNull(getFriendlyURL(friendlyName))) {
-			return StringPool.BLANK;
+			return "";
 		}
 
 		friendlyURL = StringPool.SLASH + getFriendlyURL(friendlyName);
