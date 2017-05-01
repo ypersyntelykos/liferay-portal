@@ -219,7 +219,7 @@ public class AssetUtil {
 
 			if ((category != null) &&
 				AssetCategoryPermission.contains(
-					permissionChecker, categoryId, ActionKeys.VIEW)) {
+					permissionChecker, category, ActionKeys.VIEW)) {
 
 				viewableCategoryIds.add(categoryId);
 			}
