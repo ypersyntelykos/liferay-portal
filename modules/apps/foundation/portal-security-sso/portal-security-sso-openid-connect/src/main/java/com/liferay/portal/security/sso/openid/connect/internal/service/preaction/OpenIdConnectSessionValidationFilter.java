@@ -55,7 +55,11 @@ public class OpenIdConnectSessionValidationFilter
 
 		boolean endSession = false;
 
-		HttpSession httpSession = request.getSession();
+		HttpSession httpSession = request.getSession(false);
+
+		if (httpSession == null) {
+			return;
+		}
 
 		OpenIdConnectSession openIdConnectSession =
 			(OpenIdConnectSession)httpSession.getAttribute(
