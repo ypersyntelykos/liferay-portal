@@ -113,6 +113,7 @@ public class UserModelListener extends BaseModelListener<User> {
 
 		Callable<Void> callable = new Callable<Void>() {
 
+			@Override
 			public Void call() throws Exception {
 				ServiceContext serviceContext =
 					ServiceContextThreadLocal.getServiceContext();
