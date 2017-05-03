@@ -36,7 +36,16 @@ public class ServiceXMLTest {
 	public void testTXRequired() throws Exception {
 		Stream<Path> stream = Files.find(
 			Paths.get(System.getProperty("user.dir")), Integer.MAX_VALUE,
-			ServiceXMLTest::_isServiceXml, FileVisitOption.FOLLOW_LINKS);
+			(Path path, BasicFileAttributes basicFileAttributes) -> {
+				Path fileNamePath = path.getFileName();
+
+				if ("service.xml".equals(fileNamePath.toString())) {
+					return true;
+				}
+
+				return false;
+			},
+			FileVisitOption.FOLLOW_LINKS);
 
 		stream.forEach(ServiceXMLTest::_assertNoTXRequiredElement);
 	}
@@ -52,18 +61,6 @@ public class ServiceXMLTest {
 		catch (IOException ioe) {
 			throw new RuntimeException(ioe);
 		}
-	}
-
-	private static boolean _isServiceXml(
-		Path path, BasicFileAttributes basicFileAttributes) {
-
-		Path fileNamePath = path.getFileName();
-
-		if ("service.xml".equals(fileNamePath.toString())) {
-			return true;
-		}
-
-		return false;
 	}
 
 }
