@@ -114,7 +114,7 @@ public class FacetDiscounterTest {
 		return map;
 	}
 
-	private static Map _toMap(String key, int value) {
+	private static Map<String, Integer> _toMap(String key, int value) {
 		return Collections.singletonMap(key, value);
 	}
 
