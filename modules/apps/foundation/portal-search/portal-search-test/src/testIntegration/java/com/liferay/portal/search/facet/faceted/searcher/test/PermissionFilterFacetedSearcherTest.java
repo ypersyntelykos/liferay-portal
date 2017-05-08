@@ -40,6 +40,7 @@ import com.liferay.portal.kernel.test.rule.SynchronousDestinationTestRule;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.SearchContextTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
+import com.liferay.portal.kernel.util.HashMapDictionary;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
@@ -49,7 +50,6 @@ import com.liferay.registry.RegistryUtil;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Dictionary;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
@@ -212,7 +212,7 @@ public class PermissionFilterFacetedSearcherTest
 		_configuration = configurationAdmin.getConfiguration(
 			JournalServiceConfiguration.class.getName(), StringPool.QUESTION);
 
-		Dictionary<String, Object> properties = new Hashtable<>();
+		Dictionary<String, Object> properties = new HashMapDictionary<>();
 
 		properties.put("articleViewPermissionsCheckEnabled", true);
 
