@@ -8323,13 +8323,12 @@ public class PortalImpl implements Portal {
 				virtualHostname = getCanonicalDomain(
 					virtualHostname, portalDomain);
 
-				if ((canonicalURL ||
-					 virtualHostname.startsWith(portalDomain)) &&
-					!controlPanel) {
+				virtualHostname = getPortalURL(
+					virtualHostname, themeDisplay.getServerPort(),
+					themeDisplay.isSecure());
 
-					virtualHostname = getPortalURL(
-						virtualHostname, themeDisplay.getServerPort(),
-						themeDisplay.isSecure());
+				if ((canonicalURL || virtualHostname.contains(portalDomain)) &&
+					!controlPanel) {
 
 					String path = StringPool.BLANK;
 
