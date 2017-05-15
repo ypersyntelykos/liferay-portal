@@ -41,8 +41,8 @@ import com.liferay.registry.ServiceReference;
 import com.liferay.registry.ServiceTracker;
 import com.liferay.registry.ServiceTrackerCustomizer;
 
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 import javax.servlet.FilterChain;
 import javax.servlet.http.HttpServletRequest;
@@ -267,8 +267,8 @@ public class AutoLoginFilter extends BasePortalFilter {
 	private static final Log _log = LogFactoryUtil.getLog(
 		AutoLoginFilter.class);
 
-	private static final List<AutoLogin> _autoLogins =
-		new CopyOnWriteArrayList<>();
+	private static final Set<AutoLogin> _autoLogins =
+		new CopyOnWriteArraySet<>();
 	private static final ServiceTracker<?, AutoLogin> _serviceTracker;
 
 	private static class AutoLoginServiceTrackerCustomizer
