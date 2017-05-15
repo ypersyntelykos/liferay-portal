@@ -56,15 +56,6 @@ import javax.servlet.http.HttpSession;
  */
 public class AutoLoginFilter extends BasePortalFilter {
 
-	public AutoLoginFilter() {
-		Registry registry = RegistryUtil.getRegistry();
-
-		_serviceTracker = registry.trackServices(
-			AutoLogin.class, new AutoLoginServiceTrackerCustomizer());
-
-		_serviceTracker.open();
-	}
-
 	protected String getLoginRemoteUser(
 			HttpServletRequest request, HttpServletResponse response,
 			HttpSession session, String[] credentials)
@@ -278,8 +269,7 @@ public class AutoLoginFilter extends BasePortalFilter {
 
 	private static final List<AutoLogin> _autoLogins =
 		new CopyOnWriteArrayList<>();
-
-	private final ServiceTracker<?, AutoLogin> _serviceTracker;
+	private static final ServiceTracker<?, AutoLogin> _serviceTracker;
 
 	private static class AutoLoginServiceTrackerCustomizer
 		implements ServiceTrackerCustomizer<AutoLogin, AutoLogin> {
@@ -317,6 +307,15 @@ public class AutoLoginFilter extends BasePortalFilter {
 			_autoLogins.remove(autoLogin);
 		}
 
+	}
+
+	static {
+		Registry registry = RegistryUtil.getRegistry();
+
+		_serviceTracker = registry.trackServices(
+			AutoLogin.class, new AutoLoginServiceTrackerCustomizer());
+
+		_serviceTracker.open();
 	}
 
 }
