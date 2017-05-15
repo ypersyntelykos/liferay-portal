@@ -276,10 +276,12 @@ public class AutoLoginFilter extends BasePortalFilter {
 	private static final Log _log = LogFactoryUtil.getLog(
 		AutoLoginFilter.class);
 
-	private final List<AutoLogin> _autoLogins = new CopyOnWriteArrayList<>();
+	private static final List<AutoLogin> _autoLogins =
+		new CopyOnWriteArrayList<>();
+
 	private final ServiceTracker<?, AutoLogin> _serviceTracker;
 
-	private class AutoLoginServiceTrackerCustomizer
+	private static class AutoLoginServiceTrackerCustomizer
 		implements ServiceTrackerCustomizer<AutoLogin, AutoLogin> {
 
 		@Override
