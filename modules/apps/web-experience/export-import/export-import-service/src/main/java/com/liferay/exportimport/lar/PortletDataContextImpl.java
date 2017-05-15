@@ -150,7 +150,9 @@ public class PortletDataContextImpl implements PortletDataContext {
 		LockManager lockManager, boolean createXstream) {
 
 		if (createXstream) {
-			initXStream();
+			synchronized (PortletDataContextImpl.class) {
+				initXStream();
+			}
 		}
 
 		_lockManager = lockManager;
