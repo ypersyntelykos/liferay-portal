@@ -1911,13 +1911,12 @@ public class ThemeDisplay
 			}
 		}
 
-		String actualFriendlyURL = layout.getFriendlyURL(_locale);
 		String layoutFriendlyURL = _layoutFriendlyURLs.get(layout.getPlid());
 
-		if (!actualFriendlyURL.equals(layoutFriendlyURL)) {
-			_layoutFriendlyURLs.put(layout.getPlid(), actualFriendlyURL);
+		if (layoutFriendlyURL == null) {
+			layoutFriendlyURL = layout.getFriendlyURL(_locale);
 
-			layoutFriendlyURL = actualFriendlyURL;
+			_layoutFriendlyURLs.put(layout.getPlid(), layoutFriendlyURL);
 		}
 
 		return layoutFriendlyURL;
