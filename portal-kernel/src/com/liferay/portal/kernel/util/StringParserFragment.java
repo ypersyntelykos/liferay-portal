@@ -120,7 +120,7 @@ public class StringParserFragment {
 			return new NotSlashMatcher();
 		}
 
-		if (pattern.equals("(?!id$)[^/]+") || pattern.equals("(?!id\\)[^/]+")) {
+		if (pattern.equals("(?!id$)[^/]+") || pattern.equals("(?!id/)[^/]+")) {
 			return new NotIdMatcher(pattern);
 		}
 
