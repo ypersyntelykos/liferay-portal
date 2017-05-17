@@ -18,16 +18,13 @@ import com.liferay.portal.kernel.module.framework.ModuleServiceLifecycle;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.ThreadUtil;
 
-import java.util.concurrent.Callable;
-import java.util.concurrent.FutureTask;
-
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceReference;
+import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
-import org.osgi.util.tracker.ServiceTracker;
-import org.osgi.util.tracker.ServiceTrackerCustomizer;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 
 /**
  * @author Matthew Tambara
@@ -35,95 +32,66 @@ import org.osgi.util.tracker.ServiceTrackerCustomizer;
 @Component(immediate = true)
 public class PortalStartupMonitor {
 
+	@Reference(
+		cardinality = ReferenceCardinality.OPTIONAL,
+		policy = ReferencePolicy.DYNAMIC,
+		target = ModuleServiceLifecycle.PORTAL_INITIALIZED
+	)
+	public void setModuleServiceLifecycle(
+		ModuleServiceLifecycle moduleServiceLifecycle) {
+
+		_componentContext.disableComponent(
+			PortalStartupMonitor.class.getName());
+	}
+
+	public void unsetModuleServiceLifecycle(
+		ModuleServiceLifecycle moduleServiceLifecycle) {
+	}
+
 	@Activate
-	protected void activate(BundleContext bundleContext) {
-		_futureTask = new FutureTask<>(
+	protected void activate(ComponentContext componentContext) {
+		_componentContext = componentContext;
 
-			new Callable<Void>() {
+		_thread = new Thread("Portal Startup Monitoring Thread") {
 
-				@Override
-				public Void call() throws InterruptedException {
-					StringBundler sb = new StringBundler(5);
+			@Override
+			public void run() {
+				StringBundler sb = new StringBundler(4);
 
-					while (true) {
+				while (true) {
+					try {
 						Thread.sleep(_SLEEP);
-
-						sb.append("Thread dump for portal startup  ");
-						sb.append("after waiting ");
-						sb.append(_SLEEP);
-						sb.append("ms:");
-						sb.append(ThreadUtil.threadDump());
-
-						System.out.println(sb.toString());
-
-						sb.setIndex(0);
 					}
-				}
-
-			});
-
-		_serviceTracker = new ServiceTracker<>(
-			bundleContext, ModuleServiceLifecycle.class,
-			new ServiceTrackerCustomizer<ModuleServiceLifecycle,
-				ModuleServiceLifecycle>() {
-
-				@Override
-				public ModuleServiceLifecycle addingService(
-					ServiceReference<ModuleServiceLifecycle> serviceReference) {
-
-					String property = String.valueOf(
-						serviceReference.getProperty(
-							"module.service.lifecycle"));
-
-					if (property.equals("portal.initialized")) {
-						deactivate();
+					catch (InterruptedException ie) {
+						break;
 					}
 
-					return bundleContext.getService(serviceReference);
+					sb.append("Thread dump for portal startup after waited ");
+					sb.append(_SLEEP);
+					sb.append("ms:\n");
+					sb.append(ThreadUtil.threadDump());
+
+					System.out.println(sb.toString());
+
+					sb.setIndex(0);
 				}
+			}
 
-				@Override
-				public void modifiedService(
-					ServiceReference<ModuleServiceLifecycle> serviceReference,
-					ModuleServiceLifecycle service) {
-				}
+		};
 
-				@Override
-				public void removedService(
-					ServiceReference<ModuleServiceLifecycle> serviceReference,
-					ModuleServiceLifecycle service) {
-				}
-
-			});
-
-		_serviceTracker.open();
-
-		_thread = new Thread(_futureTask, "Portal Startup Monitoring Thread");
+		_thread.setDaemon(true);
 
 		_thread.start();
 	}
 
 	@Deactivate
 	protected void deactivate() {
-		_serviceTracker.close();
-
-		if (!_futureTask.isDone()) {
-			try {
-				_futureTask.cancel(true);
-
-				_thread.join();
-			}
-			catch (InterruptedException ie) {
-				throw new RuntimeException(ie);
-			}
-		}
+		_thread.interrupt();
 	}
 
 	private static final long _SLEEP = 600000;
 
-	private FutureTask<Void> _futureTask;
-	private ServiceTracker<ModuleServiceLifecycle, ModuleServiceLifecycle>
-		_serviceTracker;
+	private ComponentContext _componentContext;
 	private Thread _thread;
 
 }
