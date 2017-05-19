@@ -23,10 +23,10 @@ PortletURL configurationRenderURL = (PortletURL)request.getAttribute("configurat
 <div class="display-template">
 	<liferay-ddm:template-selector
 		className="<%= AssetEntry.class.getName() %>"
-		defaultDisplayStyle="<%= assetPublisherPortletInstanceConfiguration.defaultDisplayStyle() %>"
+		defaultDisplayStyle="<%= assetPublisherWebConfiguration.defaultDisplayStyle() %>"
 		displayStyle="<%= assetPublisherDisplayContext.getDisplayStyle() %>"
 		displayStyleGroupId="<%= assetPublisherDisplayContext.getDisplayStyleGroupId() %>"
-		displayStyles="<%= Arrays.asList(assetPublisherPortletInstanceConfiguration.displayStyles()) %>"
+		displayStyles="<%= Arrays.asList(assetPublisherWebConfiguration.displayStyles()) %>"
 		label="display-template"
 		refreshURL="<%= configurationRenderURL.toString() %>"
 	/>
