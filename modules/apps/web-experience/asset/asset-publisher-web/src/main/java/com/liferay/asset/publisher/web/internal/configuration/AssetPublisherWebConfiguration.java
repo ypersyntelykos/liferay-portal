@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.asset.publisher.web.configuration;
+package com.liferay.asset.publisher.web.internal.configuration;
 
 import aQute.bnd.annotation.metatype.Meta;
 
