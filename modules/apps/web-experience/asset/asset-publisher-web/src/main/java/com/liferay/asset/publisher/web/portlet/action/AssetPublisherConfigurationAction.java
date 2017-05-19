@@ -20,7 +20,6 @@ import com.liferay.asset.kernel.exception.DuplicateQueryRuleException;
 import com.liferay.asset.kernel.model.AssetQueryRule;
 import com.liferay.asset.kernel.model.AssetRendererFactory;
 import com.liferay.asset.kernel.service.AssetTagLocalService;
-import com.liferay.asset.publisher.web.configuration.AssetPublisherPortletInstanceConfiguration;
 import com.liferay.asset.publisher.web.configuration.AssetPublisherWebConfiguration;
 import com.liferay.asset.publisher.web.constants.AssetPublisherPortletKeys;
 import com.liferay.asset.publisher.web.constants.AssetPublisherWebKeys;
@@ -38,8 +37,6 @@ import com.liferay.portal.kernel.model.LayoutRevision;
 import com.liferay.portal.kernel.model.LayoutSetBranch;
 import com.liferay.portal.kernel.model.LayoutTypePortletConstants;
 import com.liferay.portal.kernel.model.PortletConstants;
-import com.liferay.portal.kernel.module.configuration.ConfigurationException;
-import com.liferay.portal.kernel.module.configuration.ConfigurationProviderUtil;
 import com.liferay.portal.kernel.portlet.ConfigurationAction;
 import com.liferay.portal.kernel.portlet.DefaultConfigurationAction;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
@@ -139,20 +136,13 @@ public class AssetPublisherConfigurationAction
 
 	@Override
 	public void postProcess(
-			long companyId, PortletRequest portletRequest,
-			PortletPreferences portletPreferences)
-		throws ConfigurationException {
-
-		AssetPublisherPortletInstanceConfiguration
-			assetPublisherPortletInstanceConfiguration =
-				ConfigurationProviderUtil.getSystemConfiguration(
-					AssetPublisherPortletInstanceConfiguration.class);
+		long companyId, PortletRequest portletRequest,
+		PortletPreferences portletPreferences) {
 
 		String languageId = LocaleUtil.toLanguageId(
 			LocaleUtil.getSiteDefault());
 		LocalizedValuesMap emailAssetEntryAddedBodyMap =
-			assetPublisherPortletInstanceConfiguration.
-				emailAssetEntryAddedBody();
+			assetPublisherWebConfiguration.emailAssetEntryAddedBody();
 
 		removeDefaultValue(
 			portletRequest, portletPreferences,
@@ -160,8 +150,7 @@ public class AssetPublisherConfigurationAction
 			emailAssetEntryAddedBodyMap.get(LocaleUtil.getSiteDefault()));
 
 		LocalizedValuesMap emailAssetEntryAddedSubjectMap =
-			assetPublisherPortletInstanceConfiguration.
-				emailAssetEntryAddedSubject();
+			assetPublisherWebConfiguration.emailAssetEntryAddedSubject();
 
 		removeDefaultValue(
 			portletRequest, portletPreferences,
