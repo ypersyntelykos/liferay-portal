@@ -242,7 +242,9 @@ public class MainServlet extends ActionServlet {
 				_log.warn(sb.toString());
 			}
 
-			String jvmTimeZone = TimeZone.getDefault().getID();
+			TimeZone timeZone = TimeZone.getDefault();
+
+			String jvmTimeZone = timeZone.getID();
 
 			if (!Objects.equals("UTC", jvmTimeZone) &&
 				!Objects.equals("GMT", jvmTimeZone)) {
