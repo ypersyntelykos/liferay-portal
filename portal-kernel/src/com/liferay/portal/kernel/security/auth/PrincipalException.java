@@ -45,7 +45,7 @@ public class PrincipalException extends PortalException {
 	public static class MustBeAuthenticated extends PrincipalException {
 
 		public MustBeAuthenticated(long userId) {
-			this(String.valueOf(userId));
+			this(String.valueOf(userId), null);
 		}
 
 		public MustBeAuthenticated(long userId, Throwable cause) {
@@ -53,9 +53,7 @@ public class PrincipalException extends PortalException {
 		}
 
 		public MustBeAuthenticated(String login) {
-			super(String.format("User %s must be authenticated", login));
-
-			this.login = login;
+			this(login, null);
 		}
 
 		public MustBeAuthenticated(String login, Throwable cause) {
@@ -157,33 +155,14 @@ public class PrincipalException extends PortalException {
 	public static class MustHavePermission extends PrincipalException {
 
 		public MustHavePermission(long userId, String... actionIds) {
-			super(
-				String.format(
-					"User %s must have permission to perform action %s", userId,
-					StringUtil.merge(actionIds, ",")));
-
-			this.userId = userId;
-
-			actionId = actionIds;
-			resourceId = 0;
-			resourceName = null;
+			this(userId, null, 0, null, actionIds);
 		}
 
 		public MustHavePermission(
 			long userId, String resourceName, long resourceId,
 			String... actionIds) {
 
-			super(
-				String.format(
-					"User %s must have %s permission for %s %s", userId,
-					StringUtil.merge(actionIds, ","), resourceName,
-					resourceId));
-
-			this.userId = userId;
-			this.resourceName = resourceName;
-			this.resourceId = resourceId;
-
-			actionId = actionIds;
+			this (userId, resourceName, resourceId, null, actionIds);
 		}
 
 		public MustHavePermission(
@@ -206,23 +185,13 @@ public class PrincipalException extends PortalException {
 		public MustHavePermission(
 			long userId, Throwable cause, String... actionIds) {
 
-			super(
-				String.format(
-					"User %s must have permission to perform action %s", userId,
-					StringUtil.merge(actionIds, ",")),
-				cause);
-
-			this.userId = userId;
-
-			actionId = actionIds;
-			resourceId = 0;
-			resourceName = null;
+			this(userId, null, 0, cause, actionIds);
 		}
 
 		public MustHavePermission(
 			PermissionChecker permissionChecker, String... actionIds) {
 
-			this(permissionChecker.getUserId(), actionIds);
+			this(permissionChecker.getUserId(), null, 0, null, actionIds);
 		}
 
 		public MustHavePermission(
@@ -230,7 +199,7 @@ public class PrincipalException extends PortalException {
 			long resourceId, String... actionIds) {
 
 			this(
-				permissionChecker.getUserId(), resourceName, resourceId,
+				permissionChecker.getUserId(), resourceName, resourceId, null,
 				actionIds);
 		}
 
@@ -247,7 +216,7 @@ public class PrincipalException extends PortalException {
 			PermissionChecker permissionChecker, Throwable cause,
 			String... actionIds) {
 
-			this(permissionChecker.getUserId(), cause, actionIds);
+			this(permissionChecker.getUserId(), null, 0, cause, actionIds);
 		}
 
 		public final String[] actionId;
