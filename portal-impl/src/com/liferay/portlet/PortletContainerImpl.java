@@ -19,6 +19,7 @@ import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Layout;
+import com.liferay.portal.kernel.model.LayoutType;
 import com.liferay.portal.kernel.model.LayoutTypePortlet;
 import com.liferay.portal.kernel.model.Portlet;
 import com.liferay.portal.kernel.model.PortletPreferencesIds;
@@ -132,6 +133,21 @@ public class PortletContainerImpl implements PortletContainer {
 		}
 		catch (Exception e) {
 			throw new PortletContainerException(e);
+		}
+	}
+
+	@Override
+	public void processPublicRenderParameters(
+		HttpServletRequest request, Layout layout) {
+
+		LayoutType layoutType = layout.getLayoutType();
+		LayoutTypePortlet layoutTypePortlet = null;
+
+		if (layoutType instanceof LayoutTypePortlet) {
+			layoutTypePortlet = (LayoutTypePortlet)layoutType;
+
+			_processPublicRenderParameters(
+				request, layout, layoutTypePortlet.getPortlets());
 		}
 	}
 
