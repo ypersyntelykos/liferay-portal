@@ -123,7 +123,7 @@ public class GZipResponse extends HttpServletResponseWrapper {
 			return;
 		}
 
-		super.setHeader(name, value);
+		_response.setHeader(name, value);
 	}
 
 	private ServletOutputStream _createGZipServletOutputStream(
