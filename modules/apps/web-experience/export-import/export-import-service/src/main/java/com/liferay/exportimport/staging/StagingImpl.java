@@ -1220,7 +1220,7 @@ public class StagingImpl implements Staging {
 			stagingGroup.getTypeSettingsProperties();
 
 		HttpPrincipal httpPrincipal = new HttpPrincipal(
-			StagingUtil.buildRemoteURL(typeSettingsProperties), user.getLogin(),
+			buildRemoteURL(typeSettingsProperties), user.getLogin(),
 			user.getPassword(), user.getPasswordEncrypted());
 
 		long remoteGroupId = GetterUtil.getLong(
