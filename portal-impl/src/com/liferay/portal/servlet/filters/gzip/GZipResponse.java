@@ -14,8 +14,6 @@
 
 package com.liferay.portal.servlet.filters.gzip;
 
-import com.google.common.base.Objects;
-
 import com.liferay.portal.kernel.io.unsync.UnsyncBufferedOutputStream;
 import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayOutputStream;
 import com.liferay.portal.kernel.log.Log;
@@ -30,6 +28,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 
+import java.util.Objects;
 import java.util.zip.GZIPOutputStream;
 
 import javax.servlet.ServletOutputStream;
@@ -119,7 +118,7 @@ public class GZipResponse extends HttpServletResponseWrapper {
 	@Override
 	public void setHeader(String name, String value) {
 		if (HttpHeaders.CONTENT_LENGTH.equals(name)) {
-			if (Objects.equal("0", value)) {
+			if (Objects.equals("0", value)) {
 				super.setContentLength(0);
 			}
 
