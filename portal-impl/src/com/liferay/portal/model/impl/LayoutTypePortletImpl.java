@@ -70,6 +70,7 @@ import java.text.DateFormat;
 import java.text.Format;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -461,8 +462,7 @@ public class LayoutTypePortletImpl
 
 			String columnValue = getColumnValue(columnId);
 
-			portletIds.addAll(
-				ListUtil.fromArray(StringUtil.split(columnValue)));
+			Collections.addAll(portletIds, StringUtil.split(columnValue));
 		}
 
 		return portletIds;
@@ -1508,7 +1508,7 @@ public class LayoutTypePortletImpl
 
 			columns.addAll(layoutTemplate.getColumns());
 
-			columns.addAll(getNestedColumns());
+			Collections.addAll(columns, getNestedColumns());
 		}
 		else if (layout.isTypePanel()) {
 			columns.add("panelSelectedPortlets");
@@ -1549,11 +1549,11 @@ public class LayoutTypePortletImpl
 		return defaultLayoutTypePortletImpl;
 	}
 
-	protected List<String> getNestedColumns() {
+	protected String[] getNestedColumns() {
 		String nestedColumnIds = getTypeSettingsProperty(
 			LayoutTypePortletConstants.NESTED_COLUMN_IDS);
 
-		return ListUtil.fromArray(StringUtil.split(nestedColumnIds));
+		return StringUtil.split(nestedColumnIds);
 	}
 
 	protected long getPlid() {
