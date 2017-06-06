@@ -101,23 +101,18 @@ public class LayoutTypeControllerImpl implements LayoutTypeController {
 	}
 
 	public String getViewPath(String portletId) {
-		String path = StrutsUtil.TEXT_HTML_DIR;
 
 		// Manually check the p_p_id. See LEP-1724.
 
-		if (Validator.isNotNull(portletId)) {
-			if (_type.equals(LayoutConstants.TYPE_PANEL)) {
-				path += "/portal/layout/view/panel.jsp";
-			}
-			else {
-				path += "/portal/layout/view/portlet.jsp";
-			}
-		}
-		else {
+		if (Validator.isNull(portletId)) {
 			return _viewPage;
 		}
 
-		return path;
+		if (_type.equals(LayoutConstants.TYPE_PANEL)) {
+			return StrutsUtil.TEXT_HTML_DIR + "/portal/layout/view/panel.jsp";
+		}
+
+		return StrutsUtil.TEXT_HTML_DIR + "/portal/layout/view/portlet.jsp";
 	}
 
 	@Override
