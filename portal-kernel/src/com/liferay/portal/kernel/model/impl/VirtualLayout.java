@@ -181,6 +181,13 @@ public class VirtualLayout extends LayoutWrapper {
 		_layoutSet = null;
 	}
 
+	@Override
+	public void setPrivateLayout(boolean privateLayout) {
+		super.setPrivateLayout(privateLayout);
+
+		_layoutSet = null;
+	}
+
 	protected String injectVirtualGroupURL(String layoutURL, Locale locale) {
 		if (_sourceLayout.isTypeURL()) {
 			return layoutURL;
