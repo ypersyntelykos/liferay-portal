@@ -46,6 +46,7 @@ import com.liferay.ratings.kernel.service.RatingsEntryLocalService;
 import com.liferay.ratings.kernel.service.RatingsStatsLocalService;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -347,25 +348,30 @@ public class MBCommentManagerImpl implements CommentManager {
 
 		List<Long> classPKs = new ArrayList<>();
 
-		Map<Long, RatingsEntry> ratingsEntries = null;
-
-		Map<Long, RatingsStats> ratingsStats = null;
-
 		if (messages.size() > 1) {
 			for (MBMessage curMessage : messages) {
 				if (!curMessage.isRoot()) {
 					classPKs.add(curMessage.getMessageId());
 				}
 			}
+		}
 
-			long[] classPKsArray = ArrayUtil.toLongArray(classPKs);
+		if (classPKs.isEmpty()) {
+			return new MBDiscussionCommentImpl(
+				treeWalker.getRoot(), treeWalker,
+				Collections.<Long, RatingsEntry>emptyMap(),
+				Collections.<Long, RatingsStats>emptyMap());
+		}
 
-			ratingsEntries = _ratingsEntryLocalService.getEntries(
+		long[] classPKsArray = ArrayUtil.toLongArray(classPKs);
+
+		Map<Long, RatingsEntry> ratingsEntries =
+			_ratingsEntryLocalService.getEntries(
 				userId, CommentConstants.getDiscussionClassName(),
 				classPKsArray);
-			ratingsStats = _ratingsStatsLocalService.getStats(
+		Map<Long, RatingsStats> ratingsStats =
+			_ratingsStatsLocalService.getStats(
 				CommentConstants.getDiscussionClassName(), classPKsArray);
-		}
 
 		return new MBDiscussionCommentImpl(
 			treeWalker.getRoot(), treeWalker, ratingsEntries, ratingsStats);
