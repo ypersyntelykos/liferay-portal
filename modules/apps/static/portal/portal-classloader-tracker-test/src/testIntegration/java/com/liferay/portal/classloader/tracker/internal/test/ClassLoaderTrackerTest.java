@@ -18,6 +18,7 @@ import aQute.bnd.osgi.Builder;
 import aQute.bnd.osgi.Jar;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
+import com.liferay.portal.kernel.concurrent.DefaultNoticeableFuture;
 import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayInputStream;
 import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayOutputStream;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
@@ -38,6 +39,7 @@ import org.junit.runner.RunWith;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.FrameworkEvent;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.wiring.BundleWiring;
 import org.osgi.framework.wiring.FrameworkWiring;
@@ -54,7 +56,7 @@ public class ClassLoaderTrackerTest {
 		new LiferayIntegrationTestRule();
 
 	@Test
-	public void testClassLoaderTracker() throws Exception {
+	public void testClassLoaderTracker() throws Throwable {
 		Bundle bundle = FrameworkUtil.getBundle(ClassLoaderTrackerTest.class);
 
 		BundleContext bundleContext = bundle.getBundleContext();
@@ -109,7 +111,38 @@ public class ClassLoaderTrackerTest {
 			Assert.assertSame(
 				bundleWiring.getClassLoader(), classLoaders.get(contextName));
 
-			// Test 4, stop bundle
+			// Test 4, refresh bundle
+
+			DefaultNoticeableFuture<FrameworkEvent> defaultNoticeableFuture =
+				new DefaultNoticeableFuture<>();
+
+			frameworkWiring.refreshBundles(
+				Arrays.asList(bundle),
+				event -> defaultNoticeableFuture.set(event));
+
+			try {
+				FrameworkEvent frameworkEvent = defaultNoticeableFuture.get();
+
+				if (frameworkEvent.getType() !=
+						FrameworkEvent.PACKAGES_REFRESHED) {
+
+					throw frameworkEvent.getThrowable();
+				}
+			}
+			catch (Throwable t) {
+				throw t;
+			}
+
+			BundleWiring newBundleWiring = bundle.adapt(BundleWiring.class);
+
+			Assert.assertSame(
+				newBundleWiring.getClassLoader(),
+				classLoaders.get(contextName));
+			Assert.assertNotSame(
+				bundleWiring.getClassLoader(),
+				newBundleWiring.getClassLoader());
+
+			// Test 5, stop bundle
 
 			bundle.stop();
 
@@ -117,7 +150,7 @@ public class ClassLoaderTrackerTest {
 
 			Assert.assertNull(classLoaders.get(contextName));
 
-			// Test 5, uninstall bundle
+			// Test 6, uninstall bundle
 
 			bundle.uninstall();
 
