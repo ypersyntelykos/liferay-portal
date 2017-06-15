@@ -303,18 +303,13 @@ public class PACLAggregateTest extends AutoBalanceTestCase {
 
 			List<CaptureAppender> captureAppenders = null;
 
-			String originalTempDir = null;
+			String originalTempDir = System.getProperty(
+				SystemProperties.TMP_DIR);
 
-			Path newTempDir = null;
+			Path newTempDir = Paths.get(originalTempDir, "PACL");
 
 			try {
-				originalTempDir = System.getProperty(SystemProperties.TMP_DIR);
-
-				newTempDir = Paths.get(originalTempDir, "PACL");
-
-				if (!Files.exists(newTempDir)) {
-					Files.createDirectory(newTempDir);
-				}
+				Files.createDirectories(newTempDir);
 
 				System.setProperty(
 					SystemProperties.TMP_DIR, newTempDir.toString());
