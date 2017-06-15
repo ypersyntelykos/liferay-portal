@@ -26,10 +26,10 @@ String randomNamespace = PortalUtil.generateRandomKey(request, "taglib_ui_social
 			<liferay-ui:icon-menu direction="right" icon="share-alt" markupView="lexicon" message="share" showWhenSingleIcon="<%= true %>">
 
 				<%
-				for (int i = 0; i < typesArray.length; i++) {
+				for (int i = 0; i < types.length; i++) {
 				%>
 
-					<liferay-ui:social-bookmark contentId="<%= contentId %>" displayStyle="<%= displayStyle %>" target="<%= target %>" title="<%= title %>" type="<%= typesArray[i] %>" url="<%= url %>" />
+					<liferay-ui:social-bookmark contentId="<%= contentId %>" displayStyle="<%= displayStyle %>" target="<%= target %>" title="<%= title %>" type="<%= types[i] %>" url="<%= url %>" />
 
 				<%
 				}
@@ -49,12 +49,12 @@ String randomNamespace = PortalUtil.generateRandomKey(request, "taglib_ui_social
 			<ul class="list-unstyled <%= displayStyle %>">
 
 				<%
-				for (int i = 0; i < typesArray.length; i++) {
-					String styleClass = "taglib-social-bookmark-" + typesArray[i];
+				for (int i = 0; i < types.length; i++) {
+					String styleClass = "taglib-social-bookmark-" + types[i];
 				%>
 
 					<li class="taglib-social-bookmark <%= styleClass %>">
-						<liferay-ui:social-bookmark contentId="<%= contentId %>" displayStyle="<%= displayStyle %>" target="<%= target %>" title="<%= title %>" type="<%= typesArray[i] %>" url="<%= url %>" />
+						<liferay-ui:social-bookmark contentId="<%= contentId %>" displayStyle="<%= displayStyle %>" target="<%= target %>" title="<%= title %>" type="<%= types[i] %>" url="<%= url %>" />
 					</li>
 
 				<%
