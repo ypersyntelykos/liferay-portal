@@ -23,7 +23,6 @@ import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayOutputStream;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.util.ClassLoaderPool;
 import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.module.framework.ModuleFrameworkUtilAdapter;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 
 import java.io.InputStream;
@@ -38,7 +37,7 @@ import org.junit.runner.RunWith;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.launch.Framework;
+import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.wiring.BundleWiring;
 
 /**
@@ -54,10 +53,9 @@ public class ClassLoaderTrackerTest {
 
 	@Test
 	public void testClassLoaderTracker() throws Exception {
-		Framework framework =
-			(Framework)ModuleFrameworkUtilAdapter.getFramework();
+		Bundle bundle = FrameworkUtil.getBundle(ClassLoaderTrackerTest.class);
 
-		BundleContext bundleContext = framework.getBundleContext();
+		BundleContext bundleContext = bundle.getBundleContext();
 
 		Map<String, ClassLoader> classLoaders =
 			(Map<String, ClassLoader>)ReflectionTestUtil.getFieldValue(
@@ -76,7 +74,7 @@ public class ClassLoaderTrackerTest {
 
 			Assert.assertNull(classLoaders.get(contextName));
 
-			Bundle bundle = bundleContext.installBundle(
+			bundle = bundleContext.installBundle(
 				bundleSymbolicName,
 				_createBundle(bundleSymbolicName, bundleVersion));
 
@@ -112,7 +110,7 @@ public class ClassLoaderTrackerTest {
 			Assert.assertNull(classLoaders.get(contextName));
 		}
 		finally {
-			Bundle bundle = bundleContext.getBundle(bundleSymbolicName);
+			bundle = bundleContext.getBundle(bundleSymbolicName);
 
 			if (bundle != null) {
 				bundle.uninstall();
