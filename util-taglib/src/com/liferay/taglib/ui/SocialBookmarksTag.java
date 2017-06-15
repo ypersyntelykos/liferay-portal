@@ -30,9 +30,7 @@ public class SocialBookmarksTag extends IncludeTag {
 
 	@Override
 	public int doEndTag() throws JspException {
-		if (Validator.isNull(_SOCIAL_BOOKMARK_TYPES) &&
-			Validator.isNull(_types)) {
-
+		if (Validator.isNull(_types)) {
 			return EVAL_PAGE;
 		}
 
@@ -41,9 +39,7 @@ public class SocialBookmarksTag extends IncludeTag {
 
 	@Override
 	public int doStartTag() throws JspException {
-		if (Validator.isNull(_SOCIAL_BOOKMARK_TYPES) &&
-			Validator.isNull(_types)) {
-
+		if (Validator.isNull(_types)) {
 			return SKIP_BODY;
 		}
 
@@ -80,7 +76,7 @@ public class SocialBookmarksTag extends IncludeTag {
 		_displayStyle = null;
 		_target = null;
 		_title = null;
-		_types = null;
+		_types = _SOCIAL_BOOKMARK_TYPES;
 		_url = null;
 	}
 
@@ -95,15 +91,7 @@ public class SocialBookmarksTag extends IncludeTag {
 			"liferay-ui:social-bookmark:contentId", _contentId);
 		request.setAttribute("liferay-ui:social-bookmark:target", _target);
 		request.setAttribute("liferay-ui:social-bookmark:title", _title);
-
-		if (Validator.isNull(_types)) {
-			request.setAttribute(
-				"liferay-ui:social-bookmark:types", _SOCIAL_BOOKMARK_TYPES);
-		}
-		else {
-			request.setAttribute("liferay-ui:social-bookmark:types", _types);
-		}
-
+		request.setAttribute("liferay-ui:social-bookmark:types", _types);
 		request.setAttribute("liferay-ui:social-bookmark:url", _url);
 
 		request.setAttribute(
@@ -120,7 +108,7 @@ public class SocialBookmarksTag extends IncludeTag {
 	private String _displayStyle;
 	private String _target;
 	private String _title;
-	private String _types;
+	private String _types = _SOCIAL_BOOKMARK_TYPES;
 	private String _url;
 
 }
