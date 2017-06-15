@@ -27,6 +27,7 @@ import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 
 import java.io.InputStream;
 
+import java.util.Arrays;
 import java.util.Map;
 
 import org.junit.Assert;
@@ -39,6 +40,7 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.wiring.BundleWiring;
+import org.osgi.framework.wiring.FrameworkWiring;
 
 /**
  * @author Tina Tian
@@ -82,7 +84,21 @@ public class ClassLoaderTrackerTest {
 
 			Assert.assertNull(classLoaders.get(contextName));
 
-			// Test 2, start bundle
+			// Test 2, resolve bundle
+
+			Bundle systemBundle = bundleContext.getBundle(0);
+
+			FrameworkWiring frameworkWiring = systemBundle.adapt(
+				FrameworkWiring.class);
+
+			Assert.assertTrue(
+				frameworkWiring.resolveBundles(Arrays.asList(bundle)));
+
+			Assert.assertEquals(Bundle.RESOLVED, bundle.getState());
+
+			Assert.assertNull(classLoaders.get(contextName));
+
+			// Test 3, start bundle
 
 			bundle.start();
 
@@ -93,7 +109,7 @@ public class ClassLoaderTrackerTest {
 			Assert.assertEquals(
 				bundleWiring.getClassLoader(), classLoaders.get(contextName));
 
-			// Test 3, stop bundle
+			// Test 4, stop bundle
 
 			bundle.stop();
 
@@ -101,7 +117,7 @@ public class ClassLoaderTrackerTest {
 
 			Assert.assertNull(classLoaders.get(contextName));
 
-			// Test 4, uninstall bundle
+			// Test 5, uninstall bundle
 
 			bundle.uninstall();
 
