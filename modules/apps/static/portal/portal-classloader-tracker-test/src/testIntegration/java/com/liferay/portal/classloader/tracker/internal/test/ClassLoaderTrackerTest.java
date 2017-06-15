@@ -106,7 +106,7 @@ public class ClassLoaderTrackerTest {
 
 			BundleWiring bundleWiring = bundle.adapt(BundleWiring.class);
 
-			Assert.assertEquals(
+			Assert.assertSame(
 				bundleWiring.getClassLoader(), classLoaders.get(contextName));
 
 			// Test 4, stop bundle
