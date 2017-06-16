@@ -351,6 +351,18 @@ public class PortletSessionImplTest {
 			_mockHttpSession.getAttribute(scopePrefix.concat(key)) instanceof
 				SerializableObjectWrapper);
 
+		// Set/get non-serializable attribute when value class is not loaded by
+		// PortalClassLoader
+
+		Object objectValue = new Object();
+
+		portletSessionImpl.setAttribute(key, objectValue);
+
+		Assert.assertSame(objectValue, portletSessionImpl.getAttribute(key));
+		Assert.assertSame(
+			objectValue,
+			_mockHttpSession.getAttribute(scopePrefix.concat(key)));
+
 		// Set/get attribute when value class is loaded by PortalClassLoader
 
 		PortalClassLoaderUtilAdvice.setPortalClassLoader(true);
