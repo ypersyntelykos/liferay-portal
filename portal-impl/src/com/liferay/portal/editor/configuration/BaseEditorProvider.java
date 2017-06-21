@@ -209,40 +209,31 @@ public abstract class BaseEditorProvider<T> {
 					editorOptionsContributor, portletNames, editorConfigKeys,
 					editorNames, serviceRanking);
 
-			while (true) {
-				List<EditorContributorProvider<T>> editorContributorProviders =
-					null;
+			_editorContributorsProviders.updateAndGet(
+				editorContributorProviders -> {
+					if (editorContributorProviders == null) {
+						editorContributorProviders = new ArrayList<>();
+					}
+					else {
+						editorContributorProviders = new ArrayList<>(
+							editorContributorProviders);
+					}
 
-				List<EditorContributorProvider<T>>
-					oldEditorContributorProviders =
-						_editorContributorsProviders.get();
+					int index = Collections.binarySearch(
+						editorContributorProviders, editorContributorProvider,
+						Comparator.reverseOrder());
 
-				if (oldEditorContributorProviders == null) {
-					editorContributorProviders = new ArrayList<>();
-				}
-				else {
-					editorContributorProviders = new ArrayList<>(
-						oldEditorContributorProviders);
-				}
+					if (index < 0) {
+						index = -index - 1;
+					}
 
-				int index = Collections.binarySearch(
-					editorContributorProviders, editorContributorProvider,
-					Comparator.reverseOrder());
+					editorContributorProviders.add(
+						index, editorContributorProvider);
 
-				if (index < 0) {
-					index = -index - 1;
-				}
+					return editorContributorProviders;
+				});
 
-				editorContributorProviders.add(
-					index, editorContributorProvider);
-
-				if (_editorContributorsProviders.compareAndSet(
-						oldEditorContributorProviders,
-						editorContributorProviders)) {
-
-					return editorOptionsContributor;
-				}
-			}
+			return editorOptionsContributor;
 		}
 
 		@Override
@@ -262,26 +253,22 @@ public abstract class BaseEditorProvider<T> {
 
 			registry.ungetService(serviceReference);
 
-			while (true) {
-				List<EditorContributorProvider<T>>
-					oldEditorContributorProviders =
-						_editorContributorsProviders.get();
+			_editorContributorsProviders.updateAndGet(
+				editorContributorProviders -> {
+					editorContributorProviders = new ArrayList<>(
+						editorContributorProviders);
 
-				List<EditorContributorProvider<T>> editorContributorProviders =
-					new ArrayList<>(oldEditorContributorProviders);
+					editorContributorProviders.removeIf(
+						editorContributorProvider ->
+							editorContributorProvider._editorContributor ==
+								editorContributor);
 
-				editorContributorProviders.removeIf(
-					editorContributorProvider ->
-						editorContributorProvider._editorContributor ==
-							editorContributor);
+					if (editorContributorProviders.isEmpty()) {
+						return null;
+					}
 
-				if (_editorContributorsProviders.compareAndSet(
-						oldEditorContributorProviders,
-						editorContributorProviders)) {
-
-					return;
-				}
-			}
+					return editorContributorProviders;
+				});
 		}
 
 	}
