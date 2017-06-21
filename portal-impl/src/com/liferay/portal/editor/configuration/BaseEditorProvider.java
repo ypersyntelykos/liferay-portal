@@ -26,7 +26,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
@@ -271,21 +270,10 @@ public abstract class BaseEditorProvider<T> {
 				List<EditorContributorProvider<T>> editorContributorProviders =
 					new ArrayList<>(oldEditorContributorProviders);
 
-				Iterator<EditorContributorProvider<T>> iterator =
-					editorContributorProviders.iterator();
-
-				while (iterator.hasNext()) {
-					EditorContributorProvider<T> editorContributorProvider =
-						iterator.next();
-
-					if (editorContributorProvider._editorContributor ==
-							editorContributor) {
-
-						iterator.remove();
-
-						break;
-					}
-				}
+				editorContributorProviders.removeIf(
+					editorContributorProvider ->
+						editorContributorProvider._editorContributor ==
+							editorContributor);
 
 				if (_editorContributorsProviders.compareAndSet(
 						oldEditorContributorProviders,
