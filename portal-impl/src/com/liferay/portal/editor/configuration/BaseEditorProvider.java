@@ -24,6 +24,7 @@ import com.liferay.registry.util.StringPlus;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -225,19 +226,12 @@ public abstract class BaseEditorProvider<T> {
 						oldEditorContributorProviders);
 				}
 
-				int index = 0;
+				int index = Collections.binarySearch(
+					editorContributorProviders, editorContributorProvider,
+					Comparator.reverseOrder());
 
-				while (index < editorContributorProviders.size()) {
-					EditorContributorProvider<T> curEditorContributorProvider =
-						editorContributorProviders.get(index);
-
-					if (curEditorContributorProvider.compareTo(
-							editorContributorProvider) <= 0) {
-
-						break;
-					}
-
-					index++;
+				if (index < 0) {
+					index = -index - 1;
 				}
 
 				editorContributorProviders.add(
