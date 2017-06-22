@@ -80,15 +80,15 @@ public abstract class BaseEditorProvider<T> {
 		public int compareTo(
 			EditorContributorProvider<T> editorContributorProvider) {
 
-			if (_priority < editorContributorProvider._priority) {
-				return -1;
+			int result = Integer.compare(
+				_priority, editorContributorProvider._priority);
+
+			if (result == 0) {
+				return Integer.compare(
+					editorContributorProvider._serviceRanking, _serviceRanking);
 			}
 
-			if (_priority > editorContributorProvider._priority) {
-				return 1;
-			}
-
-			return editorContributorProvider._serviceRanking - _serviceRanking;
+			return result;
 		}
 
 		public T get() {
