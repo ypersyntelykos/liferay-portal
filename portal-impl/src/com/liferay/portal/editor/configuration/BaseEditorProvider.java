@@ -125,39 +125,21 @@ public abstract class BaseEditorProvider<T> {
 		}
 
 		private int _getPriority() {
-			if (_portletNames.isEmpty() && _editorConfigKeys.isEmpty() &&
-				_editorNames.isEmpty()) {
+			int index = 0;
 
-				return 7;
+			if (!_portletNames.isEmpty()) {
+				index |= 0b100;
 			}
 
-			if (_portletNames.isEmpty() && _editorConfigKeys.isEmpty()) {
-				return 6;
+			if (!_editorConfigKeys.isEmpty()) {
+				index |= 0b010;
 			}
 
-			if (!_portletNames.isEmpty() && _editorConfigKeys.isEmpty() &&
-				_editorNames.isEmpty()) {
-
-				return 5;
+			if (!_editorNames.isEmpty()) {
+				index |= 0b001;
 			}
 
-			if (_portletNames.isEmpty() && _editorNames.isEmpty()) {
-				return 4;
-			}
-
-			if (!_portletNames.isEmpty() && _editorConfigKeys.isEmpty()) {
-				return 3;
-			}
-
-			if (_portletNames.isEmpty()) {
-				return 2;
-			}
-
-			if (_editorNames.isEmpty()) {
-				return 1;
-			}
-
-			return 0;
+			return _priorities[index];
 		}
 
 		private boolean _matches(String name, Set<String> names) {
@@ -175,6 +157,14 @@ public abstract class BaseEditorProvider<T> {
 
 			return new HashSet<>(names);
 		}
+
+		/**
+		 * Use 3 bits to represent the appearance of portletName (highest bit),
+		 * editorConfig (middle bit) and editorName (lowest bit). 1 means have
+		 * it, 0 means don't have it.
+		 */
+		private static final int[] _priorities =
+			new int[] {0b111, 0b110, 0b100, 0b010, 0b101, 0b011, 0b001, 0b000};
 
 		private final Set<String> _editorConfigKeys;
 		private final T _editorContributor;
