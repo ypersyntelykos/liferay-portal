@@ -69,7 +69,7 @@ public abstract class BaseEditorProvider<T> {
 		}
 	}
 
-	private volatile AtomicReference<List<EditorContributorProvider<T>>>
+	private final AtomicReference<List<EditorContributorProvider<T>>>
 		_editorContributorsProviders = new AtomicReference<>();
 	private final ServiceTracker<T, ?> _serviceTracker;
 
