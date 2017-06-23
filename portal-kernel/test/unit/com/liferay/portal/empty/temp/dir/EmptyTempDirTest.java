@@ -50,33 +50,35 @@ public class EmptyTempDirTest {
 				fileNames.isEmpty());
 		}
 		catch (AssertionError ae) {
-			if (!OSDetector.isWindows()) {
-				throw ae;
-			}
+			if (OSDetector.isWindows()) {
+				DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
-			DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+				Calendar calendar = Calendar.getInstance();
 
-			Calendar calendar = Calendar.getInstance();
+				Date today = calendar.getTime();
 
-			Date today = calendar.getTime();
+				File logFile = new File(
+					System.getProperty("liferay.log.dir"),
+					"liferay." + dateFormat.format(today) + ".xml");
 
-			File logFile = new File(
-				System.getProperty("liferay.log.dir"),
-				"liferay." + dateFormat.format(today) + ".xml");
+				if (logFile.exists()) {
+					StringBundler sb = new StringBundler();
 
-			if (logFile.exists()) {
-				StringBundler sb = new StringBundler();
+					sb.append("<log4j:event level=\"ERROR\">\n");
+					sb.append("<log4j:message>");
+					sb.append(ae.getMessage());
+					sb.append("</log4j:message>\n");
+					sb.append("</log4j:event>\n\n");
 
-				sb.append("<log4j:event level=\"ERROR\">\n");
-				sb.append("<log4j:message>");
-				sb.append(ae.getMessage());
-				sb.append("</log4j:message>\n");
-				sb.append("</log4j:event>\n\n");
+					try (FileWriter fileWriter = new FileWriter(
+							logFile, true)) {
 
-				try (FileWriter fileWriter = new FileWriter(logFile, true)) {
-					fileWriter.write(sb.toString());
+						fileWriter.write(sb.toString());
+					}
 				}
 			}
+
+			throw ae;
 		}
 	}
 
