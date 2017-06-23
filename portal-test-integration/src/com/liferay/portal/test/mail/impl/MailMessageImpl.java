@@ -47,6 +47,10 @@ public class MailMessageImpl implements MailMessage {
 		return _mailMessage.getHeaderValues(headerName);
 	}
 
+	public com.dumbster.smtp.MailMessage getMailMessage() {
+		return _mailMessage;
+	}
+
 	private final com.dumbster.smtp.MailMessage _mailMessage;
 
 }
