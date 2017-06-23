@@ -16,8 +16,7 @@ package com.liferay.portal.test.mail;
 
 import aQute.bnd.annotation.ProviderType;
 
-import java.util.List;
-import java.util.Set;
+import java.util.Iterator;
 
 /**
  * @author Adam Brandizzi
@@ -29,8 +28,8 @@ public interface MailMessage {
 
 	public String getFirstHeaderValue(String headerName);
 
-	public Set<String> getHeaderNames();
+	public Iterator<String> getHeaderNames();
 
-	public List<String> getHeaderValues(String headerName);
+	public String[] getHeaderValues(String headerName);
 
 }

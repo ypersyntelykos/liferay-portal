@@ -16,44 +16,37 @@ package com.liferay.portal.test.mail.impl;
 
 import com.liferay.portal.test.mail.MailMessage;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.Iterator;
 
 /**
  * @author Adam Brandizzi
  */
 public class MailMessageImpl implements MailMessage {
 
-	public MailMessageImpl(String body, Map<String, List<String>> headers) {
-		_body = body;
-		_headers = Collections.unmodifiableMap(headers);
+	public MailMessageImpl(com.dumbster.smtp.MailMessage mailMessage) {
+		_mailMessage = mailMessage;
 	}
 
 	@Override
 	public String getBody() {
-		return _body;
+		return _mailMessage.getBody();
 	}
 
 	@Override
 	public String getFirstHeaderValue(String headerName) {
-		List<String> headerValues = getHeaderValues(headerName);
-
-		return headerValues.get(0);
+		return _mailMessage.getFirstHeaderValue(headerName);
 	}
 
 	@Override
-	public Set<String> getHeaderNames() {
-		return _headers.keySet();
+	public Iterator<String> getHeaderNames() {
+		return _mailMessage.getHeaderNames();
 	}
 
 	@Override
-	public List<String> getHeaderValues(String headerName) {
-		return _headers.get(headerName);
+	public String[] getHeaderValues(String headerName) {
+		return _mailMessage.getHeaderValues(headerName);
 	}
 
-	private final String _body;
-	private final Map<String, List<String>> _headers;
+	private final com.dumbster.smtp.MailMessage _mailMessage;
 
 }

@@ -60,7 +60,7 @@ public class MailServiceTestUtil {
 			_smtpServer.getMessages();
 
 		if (mailMessages.length > 0) {
-			return _wrapMailMessage(mailMessages[mailMessages.length - 1]);
+			return new MailMessageImpl(mailMessages[mailMessages.length - 1]);
 		}
 
 		throw new IndexOutOfBoundsException(
@@ -203,21 +203,13 @@ public class MailServiceTestUtil {
 		return headers;
 	}
 
-	private static MailMessage _wrapMailMessage(
-		com.dumbster.smtp.MailMessage mailMessage) {
-
-		Map<String, List<String>> headers = _getHeadersMap(mailMessage);
-
-		return new MailMessageImpl(mailMessage.getBody(), headers);
-	}
-
 	private static List<MailMessage> _wrapMailMessages(
 		List<com.dumbster.smtp.MailMessage> mailMessages) {
 
 		List<MailMessage> wrappedMailMessages = new ArrayList<>();
 
 		for (com.dumbster.smtp.MailMessage mailMessage : mailMessages) {
-			wrappedMailMessages.add(_wrapMailMessage(mailMessage));
+			wrappedMailMessages.add(new MailMessageImpl(mailMessage));
 		}
 
 		return wrappedMailMessages;
