@@ -15,11 +15,14 @@
 package com.liferay.portal.empty.temp.dir;
 
 import com.liferay.portal.kernel.util.OSDetector;
-import com.liferay.portal.kernel.util.StringBundler;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
+
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -57,24 +60,18 @@ public class EmptyTempDirTest {
 
 				Date today = calendar.getTime();
 
-				File logFile = new File(
+				Path logFilePath = Paths.get(
 					System.getProperty("liferay.log.dir"),
 					"liferay." + dateFormat.format(today) + ".xml");
 
-				if (logFile.exists()) {
-					StringBundler sb = new StringBundler();
-
-					sb.append("<log4j:event level=\"ERROR\">\n");
-					sb.append("<log4j:message>");
-					sb.append(ae.getMessage());
-					sb.append("</log4j:message>\n");
-					sb.append("</log4j:event>\n\n");
-
-					try (FileWriter fileWriter = new FileWriter(
-							logFile, true)) {
-
-						fileWriter.write(sb.toString());
-					}
+				if (Files.exists(logFilePath)) {
+					Files.write(
+						logFilePath,
+						Arrays.asList(
+							"<log4j:event level=\"ERROR\">\n<log4j:message>",
+							ae.getMessage(),
+							"</log4j:message>\n</log4j:event>\n\n"),
+						StandardOpenOption.APPEND);
 				}
 			}
 
