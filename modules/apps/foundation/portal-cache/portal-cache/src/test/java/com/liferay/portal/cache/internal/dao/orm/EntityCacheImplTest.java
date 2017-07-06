@@ -50,9 +50,7 @@ public class EntityCacheImplTest {
 	public void setUp() {
 		RegistryUtil.setRegistry(new BasicRegistryImpl());
 
-		Class<?> clazz = EntityCacheImplTest.class;
-
-		_classLoader = clazz.getClassLoader();
+		_classLoader = EntityCacheImplTest.class.getClassLoader();
 
 		_nullModel = ReflectionTestUtil.getFieldValue(
 			BasePersistenceImpl.class, "nullModel");
@@ -107,7 +105,8 @@ public class EntityCacheImplTest {
 					_classLoader, new Class<?>[] {PortalCache.class},
 					new PortalCacheInvocationHandler(_serialized));
 			}
-			else if (methodName.equals("getPortalCacheManager")) {
+
+			if (methodName.equals("getPortalCacheManager")) {
 				return ProxyUtil.newProxyInstance(
 					_classLoader, new Class<?>[] {PortalCacheManager.class},
 					new InvocationHandler() {
@@ -152,18 +151,18 @@ public class EntityCacheImplTest {
 
 			if (methodName.equals("get")) {
 				if (_serialized) {
-					byte[] data = (byte[])_map.get((Serializable)args[0]);
+					byte[] data = (byte[])_map.get(args[0]);
 
 					Deserializer deserializer = new Deserializer(
 						ByteBuffer.wrap(data));
 
 					return deserializer.readObject();
 				}
-				else {
-					return _map.get((Serializable)args[0]);
-				}
+
+				return _map.get(args[0]);
 			}
-			else if (methodName.equals("put")) {
+
+			if (methodName.equals("put")) {
 				if (_serialized) {
 					Serializer serializer = new Serializer();
 
@@ -174,13 +173,11 @@ public class EntityCacheImplTest {
 					_map.put((Serializable)args[0], byteBuffer.array());
 				}
 				else {
-					_map.put((Serializable)args[0], (Serializable)args[1]);
+					_map.put((Serializable)args[0], args[1]);
 				}
-
-				return null;
 			}
 
-			return method.invoke(proxy, args);
+			return null;
 		}
 
 		private PortalCacheInvocationHandler(boolean serialized) {
@@ -195,9 +192,7 @@ public class EntityCacheImplTest {
 	private class PropsInvocationHandler implements InvocationHandler {
 
 		@Override
-		public Object invoke(Object proxy, Method method, Object[] args)
-			throws Throwable {
-
+		public Object invoke(Object proxy, Method method, Object[] args) {
 			String methodName = method.getName();
 
 			if (methodName.equals("get")) {
