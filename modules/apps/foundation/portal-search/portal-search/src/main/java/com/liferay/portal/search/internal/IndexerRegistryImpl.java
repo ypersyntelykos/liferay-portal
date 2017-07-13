@@ -268,11 +268,10 @@ public class IndexerRegistryImpl implements IndexerRegistry {
 				if (_log.isDebugEnabled()) {
 					_log.debug("No indexer exists for " + indexerClassName);
 				}
-
-				continue;
 			}
-
-			indexer.unregisterIndexerPostProcessor(indexerPostProcessor);
+			else {
+				indexer.unregisterIndexerPostProcessor(indexerPostProcessor);
+			}
 
 			synchronized (_queuedIndexerPostProcessors) {
 				_queuedIndexerPostProcessors.remove(indexerClassName);
