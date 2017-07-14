@@ -100,8 +100,7 @@ public abstract class BaseIndexSearcherTestCase extends BaseIndexingTestCase {
 		catch (SearchException se) {
 			Throwable cause = se.getCause();
 
-			Assert.assertEquals(
-				IllegalArgumentException.class, cause.getClass());
+			Assert.assertSame(IllegalArgumentException.class, cause.getClass());
 			Assert.assertEquals("Invalid end -2", cause.getMessage());
 		}
 	}
@@ -114,8 +113,7 @@ public abstract class BaseIndexSearcherTestCase extends BaseIndexingTestCase {
 		catch (SearchException se) {
 			Throwable cause = se.getCause();
 
-			Assert.assertEquals(
-				IllegalArgumentException.class, cause.getClass());
+			Assert.assertSame(IllegalArgumentException.class, cause.getClass());
 			Assert.assertEquals("Invalid start -2", cause.getMessage());
 		}
 	}
