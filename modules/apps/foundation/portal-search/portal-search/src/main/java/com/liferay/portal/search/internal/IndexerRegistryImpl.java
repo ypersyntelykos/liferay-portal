@@ -268,7 +268,16 @@ public class IndexerRegistryImpl implements IndexerRegistry {
 			}
 
 			synchronized (_queuedIndexerPostProcessors) {
-				_queuedIndexerPostProcessors.remove(indexerClassName);
+				List<IndexerPostProcessor> indexerPostProcessors =
+					_queuedIndexerPostProcessors.get(indexerClassName);
+
+				if (indexerPostProcessors != null) {
+					indexerPostProcessors.remove(indexerPostProcessor);
+
+					if (indexerPostProcessors.isEmpty()) {
+						_queuedIndexerPostProcessors.remove(indexerClassName);
+					}
+				}
 			}
 		}
 	}
