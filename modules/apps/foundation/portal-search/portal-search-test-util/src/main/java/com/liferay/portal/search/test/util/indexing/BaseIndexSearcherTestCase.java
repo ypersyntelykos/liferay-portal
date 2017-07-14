@@ -25,7 +25,6 @@ import com.liferay.portal.kernel.test.util.RandomTestUtil;
 
 import java.util.Arrays;
 
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -48,12 +47,6 @@ public abstract class BaseIndexSearcherTestCase extends BaseIndexingTestCase {
 					RandomTestUtil.randomString(
 						UniqueStringRandomizerBumper.INSTANCE)));
 		}
-	}
-
-	@After
-	@Override
-	public void tearDown() throws Exception {
-		super.tearDown();
 	}
 
 	@Test
