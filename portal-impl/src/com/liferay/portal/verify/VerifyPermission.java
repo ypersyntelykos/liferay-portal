@@ -240,100 +240,82 @@ public class VerifyPermission extends VerifyProcess {
 				ResourcePermissionLocalServiceUtil.getActionableDynamicQuery();
 
 			actionableDynamicQuery.setAddCriteriaMethod(
-				new ActionableDynamicQuery.AddCriteriaMethod() {
-
-					@Override
-					public void addCriteria(DynamicQuery dynamicQuery) {
-						dynamicQuery.add(
-							RestrictionsFactoryUtil.eq(
-								"name", Organization.class.getName()));
-					}
-
+				dynamicQuery -> {
+					dynamicQuery.add(
+						RestrictionsFactoryUtil.eq(
+							"name", Organization.class.getName()));
 				});
 			actionableDynamicQuery.setPerformActionMethod(
-				new ActionableDynamicQuery.
-					PerformActionMethod<ResourcePermission>() {
+				(ResourcePermission resourcePermission) -> {
+					long oldActionIds = resourcePermission.getActionIds();
 
-					@Override
-					public void performAction(
-							ResourcePermission resourcePermission)
-						throws PortalException {
+					long newActionIds =
+						oldActionIds &
+						~_deprecatedOrganizationBitwiseValues;
 
-						long oldActionIds = resourcePermission.getActionIds();
-
-						long newActionIds =
-							oldActionIds &
-							~_deprecatedOrganizationBitwiseValues;
-
-						if (newActionIds == oldActionIds) {
-							return;
-						}
-
-						resourcePermission.setActionIds(newActionIds);
-
-						ResourcePermissionLocalServiceUtil.
-							updateResourcePermission(resourcePermission);
-
-						long newGroupActionIds = 0;
-
-						for (Map.Entry<Long, Long> entry :
-								_organizationToGroupBitwiseValues.entrySet()) {
-
-							long organizationBitwiseValue = entry.getKey();
-							long groupBitwiseValue = entry.getValue();
-
-							if ((oldActionIds & organizationBitwiseValue) !=
-									0) {
-
-								newGroupActionIds |= groupBitwiseValue;
-							}
-						}
-
-						ResourcePermission groupResourcePermission =
-							ResourcePermissionLocalServiceUtil.
-								fetchResourcePermission(
-									resourcePermission.getCompanyId(),
-									Group.class.getName(),
-									resourcePermission.getScope(),
-									resourcePermission.getPrimKey(),
-									resourcePermission.getRoleId());
-
-						if (groupResourcePermission == null) {
-							long resourcePermissionId =
-								CounterLocalServiceUtil.increment(
-									ResourcePermission.class.getName());
-
-							groupResourcePermission =
-								ResourcePermissionLocalServiceUtil.
-									createResourcePermission(
-										resourcePermissionId);
-
-							groupResourcePermission.setCompanyId(
-								resourcePermission.getCompanyId());
-							groupResourcePermission.setName(
-								Group.class.getName());
-							groupResourcePermission.setScope(
-								resourcePermission.getScope());
-							groupResourcePermission.setPrimKey(
-								resourcePermission.getPrimKey());
-							groupResourcePermission.setPrimKeyId(
-								GetterUtil.getLong(
-									resourcePermission.getPrimKey()));
-							groupResourcePermission.setRoleId(
-								resourcePermission.getRoleId());
-							groupResourcePermission.setOwnerId(0);
-							groupResourcePermission.setViewActionId(
-								(newGroupActionIds % 2) == 1);
-						}
-
-						groupResourcePermission.setActionIds(
-							groupResourcePermission.getActionIds() |
-							newGroupActionIds);
-
-						ResourcePermissionLocalServiceUtil.
-							updateResourcePermission(groupResourcePermission);
+					if (newActionIds == oldActionIds) {
+						return;
 					}
 
+					resourcePermission.setActionIds(newActionIds);
+
+					ResourcePermissionLocalServiceUtil.updateResourcePermission(
+						resourcePermission);
+
+					long newGroupActionIds = 0;
+
+					for (Map.Entry<Long, Long> entry :
+							_organizationToGroupBitwiseValues.entrySet()) {
+
+						long organizationBitwiseValue = entry.getKey();
+						long groupBitwiseValue = entry.getValue();
+
+						if ((oldActionIds & organizationBitwiseValue) != 0) {
+							newGroupActionIds |= groupBitwiseValue;
+						}
+					}
+
+					ResourcePermission groupResourcePermission =
+						ResourcePermissionLocalServiceUtil.
+							fetchResourcePermission(
+								resourcePermission.getCompanyId(),
+								Group.class.getName(),
+								resourcePermission.getScope(),
+								resourcePermission.getPrimKey(),
+								resourcePermission.getRoleId());
+
+					if (groupResourcePermission == null) {
+						long resourcePermissionId =
+							CounterLocalServiceUtil.increment(
+								ResourcePermission.class.getName());
+
+						groupResourcePermission =
+							ResourcePermissionLocalServiceUtil.
+								createResourcePermission(resourcePermissionId);
+
+						groupResourcePermission.setCompanyId(
+							resourcePermission.getCompanyId());
+						groupResourcePermission.setName(Group.class.getName());
+						groupResourcePermission.setScope(
+							resourcePermission.getScope());
+						groupResourcePermission.setPrimKey(
+							resourcePermission.getPrimKey());
+						groupResourcePermission.setPrimKeyId(
+							GetterUtil.getLong(
+								resourcePermission.getPrimKey()));
+						groupResourcePermission.setRoleId(
+							resourcePermission.getRoleId());
+						groupResourcePermission.setOwnerId(0);
+						groupResourcePermission.setViewActionId(
+							(newGroupActionIds % 2) == 1);
+					}
+
+					groupResourcePermission.setActionIds(
+						groupResourcePermission.getActionIds() |
+						newGroupActionIds);
+
+					ResourcePermissionLocalServiceUtil.updateResourcePermission(
+						groupResourcePermission);
 				});
 
 			actionableDynamicQuery.performActions();
