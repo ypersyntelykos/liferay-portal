@@ -624,7 +624,7 @@ public class BackgroundTaskLocalServiceImpl
 		BackgroundTask backgroundTask = fetchBackgroundTaskWithoutCaching(
 			backgroundTaskId);
 
-		if ((backgroundTask == null) || !backgroundTask.isInProgress() ||
+		if ((backgroundTask == null) || backgroundTask.isCompleted() ||
 			backgroundTask.isInterrupted()) {
 
 			return;
