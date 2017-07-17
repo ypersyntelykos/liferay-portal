@@ -189,12 +189,12 @@ public interface BackgroundTaskManager {
 
 	public String getBackgroundTaskStatusJSON(long backgroundTaskId);
 
-	public void resumeBackgroundTask(long backgroundTaskId);
-
 	public void interruptBackgroundTask(long backgroundTaskId)
 		throws PortalException;
 
 	public void interruptCurrentBackgroundTask();
+
+	public void resumeBackgroundTask(long backgroundTaskId);
 
 	public void triggerBackgroundTask(long backgroundTaskId);
 
