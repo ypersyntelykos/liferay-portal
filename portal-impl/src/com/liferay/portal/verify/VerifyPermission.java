@@ -62,7 +62,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -549,15 +548,11 @@ public class VerifyPermission extends VerifyProcess {
 		new HashMap<>();
 
 	static {
-		List<String> deprecatedOrganizationActionIds = new ArrayList<>();
-
-		deprecatedOrganizationActionIds.add(ActionKeys.MANAGE_ARCHIVED_SETUPS);
-		deprecatedOrganizationActionIds.add(ActionKeys.MANAGE_LAYOUTS);
-		deprecatedOrganizationActionIds.add(ActionKeys.MANAGE_STAGING);
-		deprecatedOrganizationActionIds.add(ActionKeys.MANAGE_TEAMS);
-		deprecatedOrganizationActionIds.add(ActionKeys.PUBLISH_STAGING);
-		deprecatedOrganizationActionIds.add("APPROVE_PROPOSAL");
-		deprecatedOrganizationActionIds.add("ASSIGN_REVIEWER");
+		String[] deprecatedOrganizationActionIds = new String[] {
+			ActionKeys.MANAGE_ARCHIVED_SETUPS, ActionKeys.MANAGE_LAYOUTS,
+			ActionKeys.MANAGE_STAGING, ActionKeys.MANAGE_TEAMS,
+			ActionKeys.PUBLISH_STAGING, "APPROVE_PROPOSAL", "ASSIGN_REVIEWER"
+		};
 
 		long deprecatedOrganizationBitwiseValues = 0;
 
