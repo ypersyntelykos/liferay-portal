@@ -18,11 +18,8 @@ import com.liferay.portal.kernel.configuration.Filter;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
-
-import java.net.URL;
 
 import java.text.Collator;
 import java.text.ParseException;
@@ -50,11 +47,9 @@ public class CollatorUtil {
 			}
 			else if (rules.startsWith("file:")) {
 				try {
-					URL url = new URL(rules);
+					try (InputStream is = new FileInputStream(
+							rules.substring(5))) {
 
-					File file = new File(url.getFile());
-
-					try (InputStream is = new FileInputStream(file)) {
 						rules = StringUtil.read(is);
 					}
 				}
