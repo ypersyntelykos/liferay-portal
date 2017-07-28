@@ -26,12 +26,12 @@ import com.liferay.portal.osgi.util.test.OSGiServiceUtil;
 import java.io.IOException;
 
 import java.util.Dictionary;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.felix.cm.PersistenceManager;
 
 import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -47,11 +47,6 @@ import org.osgi.service.cm.ConfigurationAdmin;
  */
 @RunWith(Arquillian.class)
 public class ConfigurationModelListenerTest {
-
-	@Before
-	public void setUp() throws Exception {
-		_wasCalled = false;
-	}
 
 	@After
 	public void tearDown() throws Exception {
@@ -78,14 +73,14 @@ public class ConfigurationModelListenerTest {
 	public void testOnAfterDelete() throws Exception {
 		String pid = StringUtil.randomString(20);
 
+		AtomicBoolean called = new AtomicBoolean();
+
 		ConfigurationModelListener configurationModelListener =
 			new ConfigurationModelListener() {
 
 				@Override
-				public void onAfterDelete(String pid)
-					throws ConfigurationModelListenerException {
-
-					_wasCalled = true;
+				public void onAfterDelete(String pid) {
+					called.set(true);
 				}
 
 			};
@@ -97,7 +92,7 @@ public class ConfigurationModelListenerTest {
 
 		_configuration.delete();
 
-		Assert.assertTrue(_wasCalled);
+		Assert.assertTrue(called.get());
 
 		_callPersistenceManager(
 			persistenceManager -> Assert.assertFalse(
@@ -112,17 +107,18 @@ public class ConfigurationModelListenerTest {
 
 		testProperties.put(_TEST_KEY, _TEST_VALUE);
 
+		AtomicBoolean called = new AtomicBoolean();
+
 		ConfigurationModelListener configurationModelListener =
 			new ConfigurationModelListener() {
 
 				@Override
 				public void onAfterSave(
-						String pid, Dictionary<String, Object> properties)
-					throws ConfigurationModelListenerException {
+					String pid, Dictionary<String, Object> properties) {
 
 					Assert.assertEquals(_TEST_VALUE, properties.get(_TEST_KEY));
 
-					_wasCalled = true;
+					called.set(true);
 				}
 
 			};
@@ -134,7 +130,7 @@ public class ConfigurationModelListenerTest {
 
 		_configuration.update(testProperties);
 
-		Assert.assertTrue(_wasCalled);
+		Assert.assertTrue(called.get());
 	}
 
 	@Test
@@ -261,7 +257,6 @@ public class ConfigurationModelListenerTest {
 	private static final String _TEST_VALUE = StringUtil.randomString(20);
 
 	private static final BundleContext _bundleContext;
-	private static Boolean _wasCalled;
 
 	static {
 		Bundle bundle = FrameworkUtil.getBundle(
