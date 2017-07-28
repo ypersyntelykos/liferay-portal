@@ -133,6 +133,11 @@ public class ConfigurationModelListenerTest {
 	public void testOnBeforeDelete() throws Exception {
 		String pid = StringUtil.randomString(20);
 
+		ConfigurationModelListenerException cmle1 =
+			new ConfigurationModelListenerException(
+				"There was an issue", ConfigurationModelListenerTest.class,
+				getClass(), new HashMapDictionary<>());
+
 		ConfigurationModelListener configurationModelListener =
 			new ConfigurationModelListener() {
 
@@ -140,10 +145,7 @@ public class ConfigurationModelListenerTest {
 				public void onBeforeDelete(String pid)
 					throws ConfigurationModelListenerException {
 
-					throw new ConfigurationModelListenerException(
-						"There was an issue",
-						ConfigurationModelListenerTest.class, getClass(),
-						new HashMapDictionary<>());
+					throw cmle1;
 				}
 
 			};
@@ -159,6 +161,7 @@ public class ConfigurationModelListenerTest {
 			Assert.fail();
 		}
 		catch (ConfigurationModelListenerException cmle) {
+			Assert.assertSame(cmle1, cmle);
 			Assert.assertTrue(_hasPid(pid));
 		}
 	}
@@ -177,6 +180,11 @@ public class ConfigurationModelListenerTest {
 
 		String newValue = StringUtil.randomString(20);
 
+		ConfigurationModelListenerException cmle1 =
+			new ConfigurationModelListenerException(
+				"There was an issue", ConfigurationModelListenerTest.class,
+				getClass(), new HashMapDictionary<>());
+
 		ConfigurationModelListener configurationModelListener =
 			new ConfigurationModelListener() {
 
@@ -187,10 +195,7 @@ public class ConfigurationModelListenerTest {
 
 					Assert.assertEquals(newValue, properties.get(_TEST_KEY));
 
-					throw new ConfigurationModelListenerException(
-						"There was an issue",
-						ConfigurationModelListenerTest.class, getClass(),
-						new HashMapDictionary<>());
+					throw cmle1;
 				}
 
 			};
@@ -206,6 +211,8 @@ public class ConfigurationModelListenerTest {
 			Assert.fail();
 		}
 		catch (ConfigurationModelListenerException cmle) {
+			Assert.assertSame(cmle1, cmle);
+
 			_configuration = _getConfiguration(pid, StringPool.QUESTION);
 
 			Dictionary<String, Object> properties =
