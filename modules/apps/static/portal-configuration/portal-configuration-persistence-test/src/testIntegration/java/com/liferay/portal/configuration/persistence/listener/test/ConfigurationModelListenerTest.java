@@ -17,6 +17,7 @@ package com.liferay.portal.configuration.persistence.listener.test;
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.portal.configuration.persistence.listener.ConfigurationModelListener;
 import com.liferay.portal.configuration.persistence.listener.ConfigurationModelListenerException;
+import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.util.HashMapDictionary;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -51,21 +52,10 @@ public class ConfigurationModelListenerTest {
 	public void tearDown() throws Exception {
 		_serviceRegistration.unregister();
 
-		try {
-			_configuration.delete();
-		}
-		catch (IllegalStateException ise) {
+		Object delegatee = ReflectionTestUtil.getFieldValue(
+			_configuration, "delegatee");
 
-			// There is a bug in the ConfigurationImpl class where if the
-			// persistence delete method throws, the configuration will still
-			// contain an internal field called 'deleted' that is set to true.
-			// This causes the configuration to throw an IllegalStateException
-			// if any other persistence methods are called on it afterwards.
-			// If the 'onBeforeDelete' method throws, this state occurs. To
-			// work around it for this test, we are catching the
-			// IllegalStateException during clean up.
-
-		}
+		ReflectionTestUtil.invoke(delegatee, "delete", new Class<?>[0]);
 	}
 
 	@Test
