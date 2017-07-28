@@ -14,6 +14,8 @@
 
 package com.liferay.portal.kernel.util;
 
+import java.util.Objects;
+
 /**
  * @author Shuyang Zhou
  */
@@ -37,7 +39,10 @@ public abstract class OrderByComparatorAdapter<T, V>
 			OrderByComparatorAdapter orderByComparatorAdapter =
 				(OrderByComparatorAdapter)object;
 
-			if (orderByComparatorAdapter == _orderByComparator) {
+			if (Objects.equals(
+					orderByComparatorAdapter._orderByComparator,
+					_orderByComparator)) {
+
 				return true;
 			}
 		}
@@ -71,7 +76,7 @@ public abstract class OrderByComparatorAdapter<T, V>
 
 	@Override
 	public int hashCode() {
-		return System.identityHashCode(_orderByComparator);
+		return _orderByComparator.hashCode();
 	}
 
 	@Override
