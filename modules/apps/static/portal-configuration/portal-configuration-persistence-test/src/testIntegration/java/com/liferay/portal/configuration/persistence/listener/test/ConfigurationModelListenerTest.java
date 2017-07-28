@@ -141,8 +141,8 @@ public class ConfigurationModelListenerTest {
 					throws ConfigurationModelListenerException {
 
 					throw new ConfigurationModelListenerException(
-						"There was an issue", getClass(),
-						DummyConfiguration.class, new HashMapDictionary<>());
+						"There was an issue", DummyConfiguration.class,
+						getClass(), new HashMapDictionary<>());
 				}
 
 			};
@@ -187,8 +187,8 @@ public class ConfigurationModelListenerTest {
 					Assert.assertEquals(newValue, properties.get(_TEST_KEY));
 
 					throw new ConfigurationModelListenerException(
-						"There was an issue", getClass(),
-						DummyConfiguration.class, new HashMapDictionary<>());
+						"There was an issue", DummyConfiguration.class,
+						getClass(), new HashMapDictionary<>());
 				}
 
 			};
