@@ -14,13 +14,13 @@
 
 package com.liferay.portal.kernel.io;
 
+import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayInputStream;
+import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayOutputStream;
 import com.liferay.portal.kernel.test.CaptureHandler;
 import com.liferay.portal.kernel.test.JDKLoggerTestUtil;
 import com.liferay.portal.kernel.test.rule.CodeCoverageAssertor;
 import com.liferay.portal.kernel.util.ClassLoaderPool;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
@@ -44,7 +44,7 @@ public class SerializableObjectWrapperTest {
 		CodeCoverageAssertor.INSTANCE;
 
 	@Test
-	public void testEquals() {
+	public void testEquals() throws Exception {
 		Assert.assertFalse(
 			_testSerializableObjectWrapper.equals(_TEST_SERIALIZABLE));
 
@@ -66,7 +66,7 @@ public class SerializableObjectWrapperTest {
 	}
 
 	@Test
-	public void testHashCode() {
+	public void testHashCode() throws Exception {
 		Assert.assertEquals(
 			_testSerializableObjectWrapper.hashCode(),
 			new SerializableObjectWrapper(_TEST_SERIALIZABLE).hashCode());
@@ -76,7 +76,7 @@ public class SerializableObjectWrapperTest {
 	}
 
 	@Test
-	public void testUnwrap() {
+	public void testUnwrap() throws Exception {
 		Assert.assertEquals(
 			_TEST_SERIALIZABLE,
 			SerializableObjectWrapper.unwrap(_testSerializableObjectWrapper));
@@ -96,6 +96,8 @@ public class SerializableObjectWrapperTest {
 
 		ClassLoader contextClassLoader = currentThread.getContextClassLoader();
 
+		ClassNotFoundException cnfe = new ClassNotFoundException();
+
 		currentThread.setContextClassLoader(
 			new ClassLoader() {
 
@@ -104,7 +106,7 @@ public class SerializableObjectWrapperTest {
 					throws ClassNotFoundException {
 
 					if (name.equals(TestSerializable.class.getName())) {
-						throw new ClassNotFoundException();
+						throw cnfe;
 					}
 
 					return super.loadClass(name);
@@ -128,6 +130,7 @@ public class SerializableObjectWrapperTest {
 
 			Assert.assertEquals(
 				"Unable to deserialize object", logRecord.getMessage());
+			Assert.assertSame(cnfe, logRecord.getThrown());
 		}
 		finally {
 			currentThread.setContextClassLoader(contextClassLoader);
@@ -135,7 +138,7 @@ public class SerializableObjectWrapperTest {
 	}
 
 	@Test
-	public void testWriteExternal() {
+	public void testWriteExternal() throws Exception {
 		SerializableObjectWrapper deserializedObject = _getDeserializedObject(
 			_testSerializableObjectWrapper);
 
@@ -144,35 +147,24 @@ public class SerializableObjectWrapperTest {
 	}
 
 	private SerializableObjectWrapper _getDeserializedObject(
-		SerializableObjectWrapper serializableObjectWrapper) {
+			SerializableObjectWrapper serializableObjectWrapper)
+		throws Exception {
 
-		try {
-			ByteArrayOutputStream byteArrayOutputStream =
-				new ByteArrayOutputStream();
+		try (UnsyncByteArrayOutputStream ubaos =
+				new UnsyncByteArrayOutputStream()) {
 
-			ObjectOutputStream objectOutputStream = new ObjectOutputStream(
-				byteArrayOutputStream);
+			try (ObjectOutputStream oos = new ObjectOutputStream(ubaos)) {
+				oos.writeObject(serializableObjectWrapper);
+			}
 
-			objectOutputStream.writeObject(serializableObjectWrapper);
+			try (UnsyncByteArrayInputStream ubais =
+					new UnsyncByteArrayInputStream(
+						ubaos.unsafeGetByteArray(), 0, ubaos.size());
+				ObjectInputStream ois = new ObjectInputStream(ubais)) {
 
-			objectOutputStream.flush();
-
-			byte[] serializedData = byteArrayOutputStream.toByteArray();
-
-			ByteArrayInputStream byteArrayInputStream =
-				new ByteArrayInputStream(serializedData);
-
-			ObjectInputStream objectInputStream = new ObjectInputStream(
-				byteArrayInputStream);
-
-			return (SerializableObjectWrapper)objectInputStream.readObject();
+				return (SerializableObjectWrapper)ois.readObject();
+			}
 		}
-		catch (Exception e) {
-			Assert.fail(
-				"Unable to deserialize object " + serializableObjectWrapper);
-		}
-
-		return null;
 	}
 
 	private static final TestSerializable _TEST_SERIALIZABLE =
