@@ -41,7 +41,8 @@ public class DynamicResourceIncludeUtil {
 
 				if (pathServletContext == null) {
 					pathServletContext = servletContext;
-				} else {
+				}
+				else {
 					String pathServletContextContextPath =
 						pathServletContext.getContextPath();
 
