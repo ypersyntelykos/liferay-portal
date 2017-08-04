@@ -91,9 +91,9 @@ public class LPKGControllerVerifyTest {
 
 		Assert.assertEquals(Bundle.UNINSTALLED, jarBundle.getState());
 
-		warWrapperBundle.uninstall();
-
 		// WAB should uninstall when wrapper is uninstalled
+
+		warWrapperBundle.uninstall();
 
 		Assert.assertEquals(Bundle.UNINSTALLED, warWrapperBundle.getState());
 		Assert.assertEquals(Bundle.UNINSTALLED, warBundle.getState());
@@ -104,29 +104,27 @@ public class LPKGControllerVerifyTest {
 			String symbolicName = bundle.getSymbolicName();
 
 			if (symbolicName.equals(_SYMBOLIC_NAME)) {
-				Assert.assertEquals(
-					"Jar bundle was not reinstalled", Bundle.ACTIVE,
-					bundle.getState());
-
 				jarBundle = bundle;
 			}
 			else if (symbolicName.equals(_SYMBOLIC_NAME.concat("-war"))) {
-				Assert.assertEquals(
-					"War bundle was not reinstalled", Bundle.ACTIVE,
-					bundle.getState());
-
 				warBundle = bundle;
 			}
 			else if (symbolicName.equals(
 						"Test-" + _SYMBOLIC_NAME + "-war-wrapper")) {
 
-				Assert.assertEquals(
-					"War wrapper bundle was not reinstalled", Bundle.ACTIVE,
-					bundle.getState());
-
 				warWrapperBundle = bundle;
 			}
 		}
+
+		Assert.assertEquals(
+			"Jar bundle was not reinstalled", Bundle.ACTIVE,
+			jarBundle.getState());
+		Assert.assertEquals(
+			"War bundle was not reinstalled", Bundle.ACTIVE,
+			warBundle.getState());
+		Assert.assertEquals(
+			"War wrapper bundle was not reinstalled", Bundle.ACTIVE,
+			warWrapperBundle.getState());
 
 		// Stop wab and restart by refreshing wrapper
 
@@ -150,13 +148,13 @@ public class LPKGControllerVerifyTest {
 			String symbolicName = bundle.getSymbolicName();
 
 			if (symbolicName.equals(_SYMBOLIC_NAME.concat("-war"))) {
-				Assert.assertEquals(
-					"War bundle was not reinstalled", Bundle.ACTIVE,
-					bundle.getState());
-
 				warBundle = bundle;
 			}
 		}
+
+		Assert.assertEquals(
+			"War bundle was not reinstalled", Bundle.ACTIVE,
+			warBundle.getState());
 
 		// Uninstall LPKG and check that contents have been uninstalled
 
