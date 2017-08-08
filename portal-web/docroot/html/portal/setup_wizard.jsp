@@ -175,7 +175,7 @@
 									<aui:select cssClass="database-type" name="databaseType">
 
 										<%
-										for (DBType dbType : DBManagerUtil.getDBFactoryTypes()) {
+										for (DBType dbType : DBManagerUtil.getDBTypes()) {
 											String databaseType = dbType.toString();
 
 											Map<String, Object> data = new HashMap<String, Object>();

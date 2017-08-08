@@ -39,10 +39,6 @@ public class DBManagerUtil {
 		return dbManager.getDB(dbManager.getDBType(dialect), dataSource);
 	}
 
-	public static Set<DBType> getDBFactoryTypes() {
-		return getDBManager().getDBFactoryTypes();
-	}
-
 	public static DBManager getDBManager() {
 		PortalRuntimePermission.checkGetBeanProperty(DBManagerUtil.class);
 
@@ -51,6 +47,10 @@ public class DBManagerUtil {
 
 	public static DBType getDBType(Object dialect) {
 		return getDBManager().getDBType(dialect);
+	}
+
+	public static Set<DBType> getDBTypes() {
+		return getDBManager().getDBTypes();
 	}
 
 	public static void reset() {

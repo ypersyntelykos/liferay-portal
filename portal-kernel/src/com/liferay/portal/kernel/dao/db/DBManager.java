@@ -30,9 +30,9 @@ public interface DBManager {
 
 	public DB getDB(DBType dbType, DataSource dataSource);
 
-	public Set<DBType> getDBFactoryTypes();
-
 	public DBType getDBType(Object dialect);
+
+	public Set<DBType> getDBTypes();
 
 	public void setDB(DB db);
 

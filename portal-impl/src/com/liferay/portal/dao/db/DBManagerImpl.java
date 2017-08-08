@@ -121,11 +121,6 @@ public class DBManagerImpl implements DBManager {
 	}
 
 	@Override
-	public Set<DBType> getDBFactoryTypes() {
-		return new LinkedHashSet<>(_dbFactories.keySet());
-	}
-
-	@Override
 	public DBType getDBType(Object dialect) {
 		if (dialect instanceof DialectImpl) {
 			DialectImpl dialectImpl = (DialectImpl)dialect;
@@ -172,6 +167,11 @@ public class DBManagerImpl implements DBManager {
 		}
 
 		throw new IllegalArgumentException("Unknown dialect type " + dialect);
+	}
+
+	@Override
+	public Set<DBType> getDBTypes() {
+		return new LinkedHashSet<>(_dbFactories.keySet());
 	}
 
 	@Override
