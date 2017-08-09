@@ -27,7 +27,14 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.ObjectOutputStream;
 
+import java.net.URISyntaxException;
+import java.net.URL;
+
 import java.nio.file.Path;
+import java.nio.file.Paths;
+
+import java.security.CodeSource;
+import java.security.ProtectionDomain;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -303,11 +310,28 @@ public class UpgradeClient {
 	}
 
 	private String _getBootstrapClassPath() throws IOException {
-		StringBuilder sb = new StringBuilder();
+		Class<?> clazz = getClass();
 
-		_appendClassPath(sb, new File("."));
+		ProtectionDomain protectionDomain = clazz.getProtectionDomain();
 
-		return sb.toString();
+		CodeSource codeSource = protectionDomain.getCodeSource();
+
+		URL location = codeSource.getLocation();
+
+		try {
+			Path path = Paths.get(location.toURI());
+
+			File jarFile = path.toFile();
+
+			StringBuilder sb = new StringBuilder();
+
+			_appendClassPath(sb, jarFile.getParentFile());
+
+			return sb.toString();
+		}
+		catch (URISyntaxException urise) {
+			throw new ExceptionInInitializerError(urise);
+		}
 	}
 
 	private String _getClassPath() throws IOException {
