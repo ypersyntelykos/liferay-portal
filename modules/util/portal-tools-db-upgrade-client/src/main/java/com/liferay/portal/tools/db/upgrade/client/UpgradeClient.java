@@ -310,9 +310,8 @@ public class UpgradeClient {
 	}
 
 	private String _getBootstrapClassPath() throws IOException {
-		Class<?> clazz = getClass();
-
-		ProtectionDomain protectionDomain = clazz.getProtectionDomain();
+		ProtectionDomain protectionDomain =
+			UpgradeClient.class.getProtectionDomain();
 
 		CodeSource codeSource = protectionDomain.getCodeSource();
 
@@ -330,7 +329,7 @@ public class UpgradeClient {
 			return sb.toString();
 		}
 		catch (URISyntaxException urise) {
-			throw new ExceptionInInitializerError(urise);
+			throw new IOException(urise);
 		}
 	}
 
