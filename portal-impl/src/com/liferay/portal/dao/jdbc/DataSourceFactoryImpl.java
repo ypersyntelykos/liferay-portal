@@ -113,16 +113,18 @@ public class DataSourceFactoryImpl implements DataSourceFactory {
 
 	@Override
 	public DataSource initDataSource(Properties properties) throws Exception {
-		if (PropsValues.RETRY_JDBC_ON_STARTUP_MAX_RETRIES > 0) {
-			_waitForJDBCConnection(properties);
-		}
-
 		Properties defaultProperties = PropsUtil.getProperties(
 			"jdbc.default.", true);
 
 		PropertiesUtil.merge(defaultProperties, properties);
 
 		properties = defaultProperties;
+
+		testDatabaseClass(properties);
+
+		if (PropsValues.RETRY_JDBC_ON_STARTUP_MAX_RETRIES > 0) {
+			_waitForJDBCConnection(properties);
+		}
 
 		String jndiName = properties.getProperty("jndi.name");
 
@@ -148,8 +150,6 @@ public class DataSourceFactoryImpl implements DataSourceFactory {
 
 			_log.debug(PropertiesUtil.toString(sortedProperties));
 		}
-
-		testDatabaseClass(properties);
 
 		DataSource dataSource = null;
 
@@ -662,8 +662,6 @@ public class DataSourceFactoryImpl implements DataSourceFactory {
 	private final Function<Properties, Connection> _getJDBCConnectionFunction =
 		(Properties properties) -> {
 			try {
-				testDatabaseClass(properties);
-
 				String databaseURL = properties.getProperty("url");
 				String user = properties.getProperty("username");
 				String password = properties.getProperty("password");
