@@ -63,7 +63,7 @@ public abstract class BaseUpgradeResourceBlock extends UpgradeProcess {
 			long primKeyId, long roleId, long ownerId, long actionIds)
 		throws SQLException {
 
-		ps.setLong(1, 1L);
+		ps.setLong(1, 0L);
 		ps.setLong(2, increment(ResourcePermission.class.getName()));
 		ps.setLong(3, companyId);
 		ps.setString(4, name);
