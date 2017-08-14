@@ -56,7 +56,8 @@ public class DBAssertionUtil {
 						rs.getString("COLUMN_NAME"));
 
 					Assert.assertTrue(
-						columnName + " should exist", names.remove(columnName));
+						columnName + " should not exist",
+						names.remove(columnName));
 				}
 			}
 		}
