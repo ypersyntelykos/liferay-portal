@@ -18,6 +18,8 @@ import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.db.DBType;
+import com.liferay.portal.kernel.io.unsync.UnsyncPrintWriter;
+import com.liferay.portal.kernel.io.unsync.UnsyncStringWriter;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.AssumeTestRule;
 import com.liferay.portal.kernel.util.FileUtil;
@@ -39,7 +41,6 @@ import java.util.Properties;
 import org.hsqldb.jdbc.JDBCDriver;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -120,7 +121,7 @@ public class ExternalDataSourceControllerTest {
 	}
 
 	@Test
-	public void testExternalDataSourceTests() throws Exception {
+	public void testExternalDataSourceTests() throws Throwable {
 		TestRunListener testRunListener = new TestRunListener();
 
 		ServiceRegistration<RunListener> serviceRegistration =
@@ -133,16 +134,10 @@ public class ExternalDataSourceControllerTest {
 		try {
 			bundle.start();
 
-			Assert.assertTrue(
-				testRunListener._failures.toString(),
-				testRunListener._failures.isEmpty());
+			testRunListener.rethrow(null);
 		}
 		catch (Exception e) {
-			for (Failure failure : testRunListener._failures) {
-				e.addSuppressed(failure.getException());
-			}
-
-			throw e;
+			testRunListener.rethrow(e);
 		}
 		finally {
 			serviceRegistration.unregister();
@@ -173,7 +168,44 @@ public class ExternalDataSourceControllerTest {
 	private BundleContext _bundleContext;
 	private Bundle _serviceBundle;
 
+	/**
+	 * A carrier Throwable to overcome Arquillian Exception serialization
+	 * limitation which can not handle suppressed Throwables.
+	 */
+	private static class ArquillianThrowable extends Throwable {
+
+		private ArquillianThrowable(String message) {
+			super(message, null, false, false);
+		}
+
+	}
+
 	private static class TestRunListener extends RunListener {
+
+		public void rethrow(Throwable t) throws Throwable {
+			if (t == null) {
+				if (_failures.isEmpty()) {
+					return;
+				}
+
+				t = new AssertionError(
+					"Inner test bundle junit execution errors:");
+			}
+
+			for (Failure failure : _failures) {
+				t.addSuppressed(failure.getException());
+			}
+
+			try (UnsyncStringWriter unsyncStringWriter =
+					new UnsyncStringWriter();
+				UnsyncPrintWriter unsycPrintWriter = new UnsyncPrintWriter(
+					unsyncStringWriter)) {
+
+				t.printStackTrace(unsycPrintWriter);
+
+				throw new ArquillianThrowable(unsyncStringWriter.toString());
+			}
+		}
 
 		@Override
 		public void testFailure(Failure failure) throws Exception {
