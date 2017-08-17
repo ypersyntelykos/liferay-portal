@@ -50,6 +50,13 @@ public class DataSourceTest {
 
 	@Test
 	public void testUpdate() throws Exception {
+		try (Connection con = _dataSource.getConnection();
+			PreparedStatement ps = con.prepareStatement(
+				"delete from TestEntity")) {
+
+			ps.executeUpdate();
+		}
+
 		long pk = RandomTestUtil.nextLong();
 
 		TestEntity testEntity = _persistence.create(pk);
