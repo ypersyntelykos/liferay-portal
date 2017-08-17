@@ -15,14 +15,13 @@
 package com.liferay.external.data.source.test.activator;
 
 import com.liferay.external.data.source.test.DataSourceTest;
-import com.liferay.registry.Registry;
-import com.liferay.registry.RegistryUtil;
 
 import org.junit.runner.JUnitCore;
 import org.junit.runner.notification.RunListener;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
 
 /**
  * @author Preston Crary
@@ -31,19 +30,25 @@ public class ExternalDataSourceTestActivator implements BundleActivator {
 
 	@Override
 	public void start(BundleContext bundleContext) {
-		Registry registry = RegistryUtil.getRegistry();
+		ServiceReference<RunListener> serviceReference =
+			bundleContext.getServiceReference(RunListener.class);
 
-		RunListener runListener = registry.getService(RunListener.class);
+		RunListener runListener = bundleContext.getService(serviceReference);
 
-		if (runListener == null) {
-			throw new IllegalStateException();
+		try {
+			if (runListener == null) {
+				throw new IllegalStateException();
+			}
+
+			JUnitCore junitCore = new JUnitCore();
+
+			junitCore.addListener(runListener);
+
+			junitCore.run(DataSourceTest.class);
 		}
-
-		JUnitCore junitCore = new JUnitCore();
-
-		junitCore.addListener(runListener);
-
-		junitCore.run(DataSourceTest.class);
+		finally {
+			bundleContext.ungetService(serviceReference);
+		}
 	}
 
 	@Override

@@ -25,8 +25,6 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.util.PropsUtil;
 import com.liferay.portal.util.PropsValues;
-import com.liferay.registry.Registry;
-import com.liferay.registry.RegistryUtil;
 
 import java.io.InputStream;
 
@@ -54,6 +52,7 @@ import org.junit.runner.notification.RunListener;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
+import org.osgi.framework.ServiceRegistration;
 
 /**
  * @author Preston Crary
@@ -124,9 +123,9 @@ public class ExternalDataSourceControllerTest {
 	public void testExternalDataSourceTests() throws Exception {
 		TestRunListener testRunListener = new TestRunListener();
 
-		Registry registry = RegistryUtil.getRegistry();
-
-		registry.registerService(RunListener.class, testRunListener);
+		ServiceRegistration<RunListener> serviceRegistration =
+			_bundleContext.registerService(
+				RunListener.class, testRunListener, null);
 
 		Bundle bundle = _installBundle(
 			"/com.liferay.external.data.source.test.jar");
@@ -146,6 +145,8 @@ public class ExternalDataSourceControllerTest {
 			throw e;
 		}
 		finally {
+			serviceRegistration.unregister();
+
 			bundle.uninstall();
 		}
 	}
