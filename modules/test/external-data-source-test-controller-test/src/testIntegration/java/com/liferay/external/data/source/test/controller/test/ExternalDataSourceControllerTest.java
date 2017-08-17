@@ -113,11 +113,7 @@ public class ExternalDataSourceControllerTest {
 
 	@After
 	public void tearDown() throws Exception {
-		_serviceBundle.stop();
-
 		_serviceBundle.uninstall();
-
-		_apiBundle.stop();
 
 		_apiBundle.uninstall();
 
@@ -150,8 +146,6 @@ public class ExternalDataSourceControllerTest {
 			throw e;
 		}
 		finally {
-			bundle.stop();
-
 			bundle.uninstall();
 		}
 	}
