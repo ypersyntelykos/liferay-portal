@@ -33,7 +33,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLStreamHandler;
-import java.net.URLStreamHandlerFactory;
 import java.net.UnknownServiceException;
 
 import java.nio.file.Path;
@@ -80,7 +79,21 @@ public class WabURLConnectionTest {
 
 		unsecureSAXReaderUtil.setSAXReader(unsecureSAXReader);
 
-		URL.setURLStreamHandlerFactory(new TestURLStreamHandlerFactory());
+		URL.setURLStreamHandlerFactory(
+			protocol -> new URLStreamHandler() {
+
+				@Override
+				protected URLConnection openConnection(URL url) {
+					return new URLConnection(url) {
+
+						@Override
+						public void connect() {
+						}
+
+					};
+				}
+
+			});
 	}
 
 	@Test(expected = UnknownServiceException.class)
@@ -129,31 +142,6 @@ public class WabURLConnectionTest {
 		Path path = Paths.get(url.toURI());
 
 		return path.toFile();
-	}
-
-	private static class TestURLStreamHandler extends URLStreamHandler {
-
-		@Override
-		protected URLConnection openConnection(URL url) {
-			return new URLConnection(url) {
-
-				@Override
-				public void connect() {
-				}
-
-			};
-		}
-
-	}
-
-	private static class TestURLStreamHandlerFactory
-		implements URLStreamHandlerFactory {
-
-		@Override
-		public URLStreamHandler createURLStreamHandler(String protocol) {
-			return new TestURLStreamHandler();
-		}
-
 	}
 
 }
