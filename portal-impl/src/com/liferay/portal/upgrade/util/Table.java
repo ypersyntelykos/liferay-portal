@@ -39,6 +39,7 @@ import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.Reader;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -399,9 +400,9 @@ public class Table {
 					value = StringPool.BLANK;
 				}
 				else {
-					try (UnsyncBufferedReader unsyncBufferedReader =
-							new UnsyncBufferedReader(
-								clob.getCharacterStream())) {
+					try (Reader reader = clob.getCharacterStream();
+						UnsyncBufferedReader unsyncBufferedReader =
+							new UnsyncBufferedReader(reader)) {
 
 						StringBundler sb = new StringBundler();
 
