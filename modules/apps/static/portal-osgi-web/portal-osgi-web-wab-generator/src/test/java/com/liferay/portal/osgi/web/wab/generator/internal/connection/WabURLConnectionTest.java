@@ -17,6 +17,7 @@ package com.liferay.portal.osgi.web.wab.generator.internal.connection;
 import com.liferay.portal.kernel.security.xml.SecureXMLFactoryProviderUtil;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.HttpUtil;
+import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
 import com.liferay.portal.kernel.xml.UnsecureSAXReaderUtil;
 import com.liferay.portal.security.xml.SecureXMLFactoryProviderImpl;
@@ -47,8 +48,8 @@ import org.junit.Test;
 public class WabURLConnectionTest {
 
 	@BeforeClass
-	public static void setUpClass() throws Exception {
-		com.liferay.portal.kernel.util.PropsUtil.setProps(new PropsImpl());
+	public static void setUpClass() {
+		PropsUtil.setProps(new PropsImpl());
 
 		FileUtil fileUtil = new FileUtil();
 
@@ -83,7 +84,7 @@ public class WabURLConnectionTest {
 	}
 
 	@Test(expected = UnknownServiceException.class)
-	public void testWabURLConnectionRequiredParams() throws Exception {
+	public void testWabURLConnectionRequiredParams() throws IOException {
 		URL url = new URL(
 			"webbundle:/path/to/foo?Web-ContextPath=foo&protocol=file");
 
@@ -133,11 +134,11 @@ public class WabURLConnectionTest {
 	private static class TestURLStreamHandler extends URLStreamHandler {
 
 		@Override
-		protected URLConnection openConnection(URL url) throws IOException {
+		protected URLConnection openConnection(URL url) {
 			return new URLConnection(url) {
 
 				@Override
-				public void connect() throws IOException {
+				public void connect() {
 				}
 
 			};
