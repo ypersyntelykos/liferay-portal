@@ -14,7 +14,6 @@
 
 package com.liferay.portal.tools.deploy;
 
-import com.liferay.portal.kernel.deploy.auto.AutoDeployer;
 import com.liferay.portal.kernel.model.Plugin;
 import com.liferay.portal.kernel.plugin.PluginPackage;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
@@ -65,14 +64,7 @@ public class PortletDeployer extends BaseDeployer {
 			}
 		}
 
-		AutoDeployer autoDeployer = null;
-
-		try {
-			autoDeployer = new PortletDeployer(wars, jars);
-		}
-		finally {
-			StreamUtil.cleanUp(autoDeployer);
-		}
+		StreamUtil.cleanUp(new PortletDeployer(wars, jars));
 	}
 
 	public PortletDeployer() {

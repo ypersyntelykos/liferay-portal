@@ -14,7 +14,6 @@
 
 package com.liferay.portal.tools.deploy;
 
-import com.liferay.portal.kernel.deploy.auto.AutoDeployer;
 import com.liferay.portal.kernel.model.Plugin;
 import com.liferay.portal.kernel.util.StreamUtil;
 import com.liferay.portal.tools.ToolDependencies;
@@ -44,14 +43,7 @@ public class ExtDeployer extends BaseDeployer {
 			}
 		}
 
-		AutoDeployer autoDeployer = null;
-
-		try {
-			autoDeployer = new ExtDeployer(wars, jars);
-		}
-		finally {
-			StreamUtil.cleanUp(autoDeployer);
-		}
+		StreamUtil.cleanUp(new ExtDeployer(wars, jars));
 	}
 
 	public ExtDeployer() {

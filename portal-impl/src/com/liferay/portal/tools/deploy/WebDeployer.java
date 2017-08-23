@@ -14,7 +14,6 @@
 
 package com.liferay.portal.tools.deploy;
 
-import com.liferay.portal.kernel.deploy.auto.AutoDeployer;
 import com.liferay.portal.kernel.model.Plugin;
 import com.liferay.portal.kernel.plugin.PluginPackage;
 import com.liferay.portal.kernel.util.StreamUtil;
@@ -45,14 +44,7 @@ public class WebDeployer extends BaseDeployer {
 			}
 		}
 
-		AutoDeployer autoDeployer = null;
-
-		try {
-			autoDeployer = new WebDeployer(wars, jars);
-		}
-		finally {
-			StreamUtil.cleanUp(autoDeployer);
-		}
+		StreamUtil.cleanUp(new WebDeployer(wars, jars));
 	}
 
 	public WebDeployer() {

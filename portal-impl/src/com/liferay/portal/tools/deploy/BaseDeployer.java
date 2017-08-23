@@ -117,14 +117,7 @@ public class BaseDeployer implements AutoDeployer, Deployer {
 			}
 		}
 
-		AutoDeployer autoDeployer = null;
-
-		try {
-			autoDeployer = new BaseDeployer(wars, jars);
-		}
-		finally {
-			StreamUtil.cleanUp(autoDeployer);
-		}
+		StreamUtil.cleanUp(new BaseDeployer(wars, jars));
 	}
 
 	public BaseDeployer() {
