@@ -26,17 +26,14 @@ import com.liferay.portal.util.HttpImpl;
 import com.liferay.portal.util.PropsImpl;
 import com.liferay.portal.xml.SAXReaderImpl;
 
-import java.io.File;
 import java.io.IOException;
 
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLStreamHandler;
 import java.net.UnknownServiceException;
-
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -108,11 +105,9 @@ public class WabURLConnectionTest {
 	public void testWabURLConnectionRequiredParamsCompatibilityMode()
 		throws Exception {
 
-		File file = _getFile("classic-theme.autodeployed.war");
+		String uriString = _getURIString("classic-theme.autodeployed.war");
 
-		URL url = new URL(
-			"webbundle:" + file.toURI().toASCIIString() +
-				"?Web-ContextPath=foo");
+		URL url = new URL("webbundle:" + uriString + "?Web-ContextPath=foo");
 
 		new WabURLConnection(null, null, url).getInputStream();
 	}
@@ -130,14 +125,14 @@ public class WabURLConnectionTest {
 		return clazz.getClassLoader();
 	}
 
-	private File _getFile(String fileName) throws URISyntaxException {
+	private String _getURIString(String fileName) throws URISyntaxException {
 		ClassLoader classLoader = _getClassLoader();
 
 		URL url = classLoader.getResource(fileName);
 
-		Path path = Paths.get(url.toURI());
+		URI uri = url.toURI();
 
-		return path.toFile();
+		return uri.toASCIIString();
 	}
 
 }
