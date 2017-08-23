@@ -19,7 +19,6 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ReflectionUtil;
-import com.liferay.portal.kernel.util.StreamUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 
@@ -55,29 +54,24 @@ public class JasperVersionDetector {
 	}
 
 	private void _initializeJasperVersion() {
-		JarFile jarFile = null;
+		Class<?> clazz = getClass();
 
-		try {
-			Class<?> clazz = getClass();
+		URL url = clazz.getResource("/org/apache/jasper/JasperException.class");
 
-			URL url = clazz.getResource(
-				"/org/apache/jasper/JasperException.class");
+		if (url == null) {
+			return;
+		}
 
-			if (url == null) {
-				return;
-			}
+		String path = url.getPath();
 
-			String path = url.getPath();
+		int pos = path.indexOf(CharPool.EXCLAMATION);
 
-			int pos = path.indexOf(CharPool.EXCLAMATION);
+		if (pos == -1) {
+			return;
+		}
 
-			if (pos == -1) {
-				return;
-			}
-
-			URI jarFileURI = new URI(path.substring(0, pos));
-
-			jarFile = new JarFile(new File(jarFileURI));
+		try (JarFile jarFile = new JarFile(
+				new File(new URI(path.substring(0, pos))))) {
 
 			Manifest manifest = jarFile.getManifest();
 
@@ -119,9 +113,6 @@ public class JasperVersionDetector {
 		}
 		catch (Exception e) {
 			_log.error(e, e);
-		}
-		finally {
-			StreamUtil.cleanUp(jarFile);
 		}
 	}
 
