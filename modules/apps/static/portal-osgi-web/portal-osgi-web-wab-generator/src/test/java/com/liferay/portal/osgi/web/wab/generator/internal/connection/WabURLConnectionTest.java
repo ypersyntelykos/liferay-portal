@@ -135,10 +135,6 @@ public class WabURLConnectionTest {
 
 		URL url = classLoader.getResource(fileName);
 
-		if (!"file".equals(url.getProtocol())) {
-			return null;
-		}
-
 		Path path = Paths.get(url.toURI());
 
 		return path.toFile();
