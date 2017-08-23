@@ -105,7 +105,7 @@ public class WabURLConnectionTest {
 	public void testWabURLConnectionRequiredParamsCompatibilityMode()
 		throws Exception {
 
-		String uriString = _getURIString("classic-theme.autodeployed.war");
+		String uriString = _getURIString("/classic-theme.autodeployed.war");
 
 		URL url = new URL("webbundle:" + uriString + "?Web-ContextPath=foo");
 
@@ -119,16 +119,8 @@ public class WabURLConnectionTest {
 		new WabURLConnection(null, null, url).getInputStream();
 	}
 
-	private ClassLoader _getClassLoader() {
-		Class<?> clazz = getClass();
-
-		return clazz.getClassLoader();
-	}
-
 	private String _getURIString(String fileName) throws URISyntaxException {
-		ClassLoader classLoader = _getClassLoader();
-
-		URL url = classLoader.getResource(fileName);
+		URL url = WabURLConnectionTest.class.getResource(fileName);
 
 		URI uri = url.toURI();
 
