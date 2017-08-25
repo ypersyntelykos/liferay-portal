@@ -542,6 +542,15 @@ public class ClusterSchedulerEngine
 
 				return;
 			}
+			catch (InterruptedException ie) {
+				if (_log.isWarnEnabled()) {
+					_log.warn(
+						"Give up the master response waiting due to " +
+							"interruption", ie);
+				}
+
+				return;
+			}
 			catch (Exception e) {
 				StringBundler sb = new StringBundler(7);
 
@@ -560,7 +569,14 @@ public class ClusterSchedulerEngine
 			try {
 				Thread.sleep(_callMasterTimeout);
 			}
-			catch (Exception e) {
+			catch (InterruptedException ie) {
+				if (_log.isWarnEnabled()) {
+					_log.warn(
+						"Give up the master call retry waiting due to " +
+							"interruption", ie);
+				}
+
+				return;
 			}
 		}
 	}
