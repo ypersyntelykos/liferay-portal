@@ -15,6 +15,7 @@
 package com.liferay.portal.upgrade.v7_0_0;
 
 import com.liferay.portal.dao.orm.common.SQLTransformer;
+import com.liferay.portal.kernel.model.PortletConstants;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LoggingTimer;
@@ -67,7 +68,9 @@ public class UpgradeResourcePermission extends UpgradeProcess {
 
 					long primKeyId = GetterUtil.getLong(primKey);
 
-					if (primKeyId <= 0) {
+					if ((primKeyId <= 0) &&
+						!primKey.contains(PortletConstants.LAYOUT_SEPARATOR)) {
+
 						stringPrimKeys.add(primKey);
 					}
 				}
@@ -76,7 +79,11 @@ public class UpgradeResourcePermission extends UpgradeProcess {
 			if (stringPrimKeys.isEmpty()) {
 				runSQL(
 					"update ResourcePermission set primKeyId = CAST_LONG(" +
-						"primKey)");
+						"primKey) where primKey not like '%_LAYOUT_%'");
+
+				runSQL(
+					"update ResourcePermission set primKeyId = 0 where " +
+						"primKey like '%_LAYOUT_%'");
 
 				return;
 			}
@@ -95,12 +102,13 @@ public class UpgradeResourcePermission extends UpgradeProcess {
 
 			_updatePrimKeyIds(
 				"update ResourcePermission set primKeyId = 0 where primKey " +
-					inClause,
+					"like '%_LAYOUT_%' or primKey " + inClause,
 				stringPrimKeys);
 
 			_updatePrimKeyIds(
 				"update ResourcePermission set primKeyId = CAST_LONG(primKey" +
-					") where primKey not " + inClause,
+					") where primKey not like '%_LAYOUT_%' and primKey not " +
+						inClause,
 				stringPrimKeys);
 		}
 	}
