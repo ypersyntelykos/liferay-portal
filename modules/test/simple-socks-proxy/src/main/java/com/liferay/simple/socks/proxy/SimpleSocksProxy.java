@@ -14,11 +14,14 @@
 
 package com.liferay.simple.socks.proxy;
 
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.process.local.LocalProcessExecutor;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,9 +54,17 @@ public class SimpleSocksProxy {
 		List<String> allowedIPAddresses = new ArrayList<>();
 
 		for (String allowedHostname : StringUtil.split(allowedHostnames)) {
-			InetAddress inetAddress = InetAddress.getByName(allowedHostname);
+			try {
+				InetAddress inetAddress = InetAddress.getByName(
+					allowedHostname);
 
-			allowedIPAddresses.add(inetAddress.getHostAddress());
+				allowedIPAddresses.add(inetAddress.getHostAddress());
+			}
+			catch (UnknownHostException uhe) {
+				if (_log.isWarnEnabled()) {
+					_log.warn("Unknown hostname", uhe);
+				}
+			}
 		}
 
 		_socksProxyInitializer = new SocksProxyInitializer(
@@ -67,6 +78,9 @@ public class SimpleSocksProxy {
 	protected void deactivate() throws Exception {
 		_socksProxyInitializer.stop();
 	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		SimpleSocksProxy.class);
 
 	@Reference
 	private LocalProcessExecutor _localProcessExecutor;
