@@ -42,7 +42,7 @@ public class SocksProxyServer extends Thread {
 		_shutdownWaitTime = shutdownWaitTime;
 		_serverSocketPort = serverSocketPort;
 
-		setName("com.liferay.simple.socks.proxy.SocksProxyServer");
+		setName(SocksProxyServer.class.getName());
 	}
 
 	public void close() throws Exception {
