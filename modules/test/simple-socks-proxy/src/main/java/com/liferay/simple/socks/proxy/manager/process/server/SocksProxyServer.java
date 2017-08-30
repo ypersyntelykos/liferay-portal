@@ -16,7 +16,6 @@ package com.liferay.simple.socks.proxy.manager.process.server;
 
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.util.StringPool;
 
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -25,9 +24,7 @@ import java.net.SocketException;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author Tom Wang
@@ -54,26 +51,7 @@ public class SocksProxyServer extends Thread {
 	@Override
 	public void run() {
 		ExecutorService executorService = Executors.newCachedThreadPool(
-			new ThreadFactory() {
-
-				@Override
-				public Thread newThread(Runnable r) {
-					Thread thread = new Thread(r);
-
-					thread.setName(
-						"com.liferay.simple.socks.proxy." +
-							"SocksProxyServerThreadPool".concat(
-								StringPool.MINUS).concat(
-									String.valueOf(
-										_counter.incrementAndGet())));
-					thread.setDaemon(true);
-
-					return thread;
-				}
-
-				private final AtomicInteger _counter = new AtomicInteger();
-
-			});
+			new SocksProxyServerThreadFactory());
 
 		try (ServerSocket serverSocket = new ServerSocket(_serverSocketPort)) {
 			_serverSocket = serverSocket;
