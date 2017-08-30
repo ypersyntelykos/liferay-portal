@@ -21,6 +21,7 @@ import com.liferay.portal.kernel.process.local.LocalProcessExecutor;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 
+import com.liferay.portal.kernel.util.Time;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
@@ -52,7 +53,7 @@ public class SimpleSocksProxy {
 			properties.get("allowedHostnames"), "");
 
 		long shutdownWaitTime = GetterUtil.getLong(
-			properties.get("shutdownWaitTime"), 10);
+			properties.get("shutdownWaitTime"), 10 * Time.MINUTE);
 
 		int serverSocketPort = GetterUtil.getInteger(
 			properties.get("serverSocketPort"), 8888);
@@ -81,9 +82,7 @@ public class SimpleSocksProxy {
 	}
 
 	@Deactivate
-	protected void deactivate()
-		throws ExecutionException, InterruptedException {
-
+	protected void deactivate() throws Exception {
 		_socksProxyInitializer.stop();
 	}
 

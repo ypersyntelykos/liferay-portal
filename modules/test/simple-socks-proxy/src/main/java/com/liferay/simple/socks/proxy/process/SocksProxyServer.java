@@ -111,7 +111,7 @@ public class SocksProxyServer extends Thread {
 
 			try {
 				executorService.awaitTermination(
-					_shutdownWaitTime, TimeUnit.MINUTES);
+					_shutdownWaitTime, TimeUnit.MILLISECONDS);
 			}
 			catch (InterruptedException ie) {
 				if (_log.isWarnEnabled()) {
