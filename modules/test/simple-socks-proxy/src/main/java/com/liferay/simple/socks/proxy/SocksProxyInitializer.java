@@ -45,7 +45,7 @@ public class SocksProxyInitializer {
 		throws ProcessException {
 
 		_processChannel = _localProcessExecutor.execute(
-			_createProcessConfig(),
+			_processConfig,
 			new SocksProxyServerCallable(
 				allowedIPAddress, executorServiceAwaitTimeout,
 				serverSocketPort));
@@ -58,14 +58,16 @@ public class SocksProxyInitializer {
 		future.get();
 	}
 
-	private ProcessConfig _createProcessConfig() {
+	private static final ProcessConfig _processConfig;
+
+	static {
 		Builder builder = new Builder();
 
 		builder.setBootstrapClassPath(
 			ClassPathUtil.buildClassPath(
 				SocksProxyInitializer.class, PortalException.class));
 
-		return builder.build();
+		_processConfig = builder.build();
 	}
 
 	private final LocalProcessExecutor _localProcessExecutor;
