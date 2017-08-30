@@ -51,8 +51,8 @@ public class SimpleSocksProxy {
 		String allowedHostnames = GetterUtil.getString(
 			properties.get("allowedHostnames"), "");
 
-		int executorServiceAwaitTimeout = GetterUtil.getInteger(
-			properties.get("executorServiceAwaitTimeout"), 10);
+		long shutdownWaitTime = GetterUtil.getLong(
+			properties.get("shutdownWaitTime"), 10);
 
 		int serverSocketPort = GetterUtil.getInteger(
 			properties.get("serverSocketPort"), 8888);
@@ -77,7 +77,7 @@ public class SimpleSocksProxy {
 			_localProcessExecutor);
 
 		_socksProxyInitializer.start(
-			allowedIPAddresses, executorServiceAwaitTimeout, serverSocketPort);
+			allowedIPAddresses, shutdownWaitTime, serverSocketPort);
 	}
 
 	@Deactivate

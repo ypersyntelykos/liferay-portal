@@ -35,11 +35,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class SocksProxyServer extends Thread {
 
 	public SocksProxyServer(
-		List<String> allowedHosts, int executorServiceAwaitTimeout,
+		List<String> allowedHosts, long shutdownWaitTime,
 		int serverSocketPort) {
 
 		_allowedIPAddresses = allowedHosts;
-		_executorServiceTimeout = executorServiceAwaitTimeout;
+		_shutdownWaitTime = shutdownWaitTime;
 		_serverSocketPort = serverSocketPort;
 	}
 
@@ -111,7 +111,7 @@ public class SocksProxyServer extends Thread {
 
 			try {
 				executorService.awaitTermination(
-					_executorServiceTimeout, TimeUnit.MINUTES);
+					_shutdownWaitTime, TimeUnit.MINUTES);
 			}
 			catch (InterruptedException ie) {
 				if (_log.isWarnEnabled()) {
@@ -125,8 +125,8 @@ public class SocksProxyServer extends Thread {
 		SocksProxyServer.class);
 
 	private final List<String> _allowedIPAddresses;
-	private final int _executorServiceTimeout;
 	private ServerSocket _serverSocket;
 	private final int _serverSocketPort;
+	private final long _shutdownWaitTime;
 
 }

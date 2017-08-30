@@ -30,18 +30,18 @@ public class SocksProxyServerProcessCallable
 	implements ProcessCallable<Serializable> {
 
 	public SocksProxyServerProcessCallable(
-		List<String> allowedIPAddress, int executorServiceAwaitTimeout,
+		List<String> allowedIPAddress, long shutdownWaitTime,
 		int serverSocketPort) {
 
 		_allowedIPAddress = allowedIPAddress;
-		_executorServiceAwaitTimeout = executorServiceAwaitTimeout;
+		_shutdownWaitTime = shutdownWaitTime;
 		_serverSocketPort = serverSocketPort;
 	}
 
 	@Override
 	public Serializable call() {
 		SocksProxyServer socksProxyServer = new SocksProxyServer(
-			_allowedIPAddress, _executorServiceAwaitTimeout, _serverSocketPort);
+			_allowedIPAddress, _shutdownWaitTime, _serverSocketPort);
 
 		socksProxyServer.setName(
 			"com.liferay.simple.socks.proxy.SocksProxyServer");
@@ -59,7 +59,7 @@ public class SocksProxyServerProcessCallable
 	private static final long serialVersionUID = 1L;
 
 	private final List<String> _allowedIPAddress;
-	private final int _executorServiceAwaitTimeout;
 	private final int _serverSocketPort;
+	private final long _shutdownWaitTime;
 
 }

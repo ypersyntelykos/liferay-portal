@@ -40,15 +40,14 @@ public class SocksProxyInitializer {
 	}
 
 	public void start(
-			List<String> allowedIPAddress, int executorServiceAwaitTimeout,
+			List<String> allowedIPAddress, long shutdownWaitTime,
 			int serverSocketPort)
 		throws ProcessException {
 
 		_processChannel = _localProcessExecutor.execute(
 			_processConfig,
 			new SocksProxyServerProcessCallable(
-				allowedIPAddress, executorServiceAwaitTimeout,
-				serverSocketPort));
+				allowedIPAddress, shutdownWaitTime, serverSocketPort));
 	}
 
 	public void stop() throws ExecutionException, InterruptedException {
