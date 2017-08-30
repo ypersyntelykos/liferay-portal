@@ -16,8 +16,8 @@ package com.liferay.simple.socks.proxy.manager.process.server;
 
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.simple.socks.proxy.manager.process.util.Constants;
 
+import com.liferay.simple.socks.proxy.manager.process.util.Constants;
 import java.io.IOException;
 
 import java.net.InetAddress;
@@ -25,9 +25,9 @@ import java.net.InetAddress;
 /**
  * @author Tom Wang
  */
-public class Request {
+public class SocksProxyRequest {
 
-	public Request(
+	public SocksProxyRequest(
 		byte ver, byte cmd, byte rsv, byte atyp, byte[] dstAddr,
 		byte[] dstPort) {
 

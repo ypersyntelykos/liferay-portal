@@ -36,9 +36,9 @@ import java.util.concurrent.Future;
 /**
  * @author Tom Wang
  */
-public class SocksConnectionHandler implements Runnable {
+public class SocksProxyConnection implements Runnable {
 
-	public SocksConnectionHandler(
+	public SocksProxyConnection(
 		List<String> allowedIPAddresses, Socket internalSocket,
 		ExecutorService executorService) {
 
@@ -143,7 +143,7 @@ public class SocksConnectionHandler implements Runnable {
 		}
 	}
 
-	private Socket _createExternalSocket(Request request) throws IOException {
+	private Socket _createExternalSocket(SocksProxyRequest request) throws IOException {
 		String remoteAddress = request.getHostAddress();
 
 		if (!_allowedIPAddresses.contains(remoteAddress)) {
@@ -183,7 +183,7 @@ public class SocksConnectionHandler implements Runnable {
 		return reply;
 	}
 
-	private Request _readRequest(InputStream internalInputStream)
+	private SocksProxyRequest _readRequest(InputStream internalInputStream)
 		throws IOException {
 
 		byte verByte = SocksProxyUtil.read(internalInputStream);
@@ -218,7 +218,7 @@ public class SocksConnectionHandler implements Runnable {
 
 		SocksProxyUtil.readFully(internalInputStream, dstPortBytes);
 
-		return new Request(
+		return new SocksProxyRequest(
 			verByte, cmdByte, rsvByte, atypByte, dstAddrBytes, dstPortBytes);
 	}
 
@@ -299,7 +299,7 @@ public class SocksConnectionHandler implements Runnable {
 
 		_authenticate(internalInputStream, internalOutputStream);
 
-		Request request = _readRequest(internalInputStream);
+		SocksProxyRequest request = _readRequest(internalInputStream);
 
 		Socket externalSocket = _createExternalSocket(request);
 
@@ -309,7 +309,7 @@ public class SocksConnectionHandler implements Runnable {
 	}
 
 	private void _validateRequest(
-			Request request, Socket externalSocket,
+			SocksProxyRequest request, Socket externalSocket,
 			OutputStream internalOutputStream)
 		throws IOException {
 
@@ -345,8 +345,7 @@ public class SocksConnectionHandler implements Runnable {
 		outputStream.flush();
 	}
 
-	private static final Log _log = LogFactoryUtil.getLog(
-		SocksConnectionHandler.class);
+	private static final Log _log = LogFactoryUtil.getLog(SocksProxyConnection.class);
 
 	private final List<String> _allowedIPAddresses;
 	private final ExecutorService _executorService;

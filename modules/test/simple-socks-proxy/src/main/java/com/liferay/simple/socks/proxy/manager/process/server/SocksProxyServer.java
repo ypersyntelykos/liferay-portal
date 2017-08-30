@@ -98,7 +98,7 @@ public class SocksProxyServer extends Thread {
 				}
 
 				executorService.execute(
-					new SocksConnectionHandler(
+					new SocksProxyConnection(
 						_allowedIPAddresses, socket, executorService));
 			}
 		}
