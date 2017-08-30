@@ -39,7 +39,7 @@ public class SocksProxyServerProcessCallable
 	}
 
 	@Override
-	public String call() {
+	public Serializable call() {
 		SocksProxyServer socksProxyServer = new SocksProxyServer(
 			_allowedIPAddress, _executorServiceAwaitTimeout, _serverSocketPort);
 
