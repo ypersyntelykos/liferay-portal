@@ -35,19 +35,22 @@ import java.util.concurrent.Future;
  */
 public class SocksProxyInitializer {
 
-	public SocksProxyInitializer(LocalProcessExecutor localProcessExecutor) {
+	public SocksProxyInitializer(
+		LocalProcessExecutor localProcessExecutor,
+		List<String> allowedIPAddress, long shutdownWaitTime,
+		int serverSocketPort) {
+
 		_localProcessExecutor = localProcessExecutor;
+		_allowedIPAddress = allowedIPAddress;
+		_shutdownWaitTime = shutdownWaitTime;
+		_serverSocketPort = serverSocketPort;
 	}
 
-	public void start(
-			List<String> allowedIPAddress, long shutdownWaitTime,
-			int serverSocketPort)
-		throws ProcessException {
-
+	public void start() throws ProcessException {
 		_processChannel = _localProcessExecutor.execute(
 			_processConfig,
 			new SocksProxyServerProcessCallable(
-				allowedIPAddress, shutdownWaitTime, serverSocketPort));
+				_allowedIPAddress, _shutdownWaitTime, _serverSocketPort));
 	}
 
 	public void stop() throws ExecutionException, InterruptedException {
@@ -69,7 +72,10 @@ public class SocksProxyInitializer {
 		_processConfig = builder.build();
 	}
 
+	private final List<String> _allowedIPAddress;
 	private final LocalProcessExecutor _localProcessExecutor;
 	private ProcessChannel<Serializable> _processChannel;
+	private final int _serverSocketPort;
+	private final long _shutdownWaitTime;
 
 }

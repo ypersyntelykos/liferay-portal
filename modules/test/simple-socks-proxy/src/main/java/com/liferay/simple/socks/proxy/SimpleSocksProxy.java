@@ -74,10 +74,10 @@ public class SimpleSocksProxy {
 		}
 
 		_socksProxyInitializer = new SocksProxyInitializer(
-			_localProcessExecutor);
+			_localProcessExecutor, allowedIPAddresses, shutdownWaitTime,
+			serverSocketPort);
 
-		_socksProxyInitializer.start(
-			allowedIPAddresses, shutdownWaitTime, serverSocketPort);
+		_socksProxyInitializer.start();
 	}
 
 	@Deactivate
