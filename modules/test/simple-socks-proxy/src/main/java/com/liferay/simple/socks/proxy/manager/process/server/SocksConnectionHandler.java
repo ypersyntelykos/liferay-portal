@@ -227,7 +227,7 @@ public class SocksConnectionHandler implements Runnable {
 
 		UnsyncByteArrayOutputStream ubaos = new UnsyncByteArrayOutputStream();
 
-		int length;
+		int length = 0;
 
 		byte[] buffer = new byte[4096];
 
