@@ -19,6 +19,7 @@ import com.liferay.portal.kernel.process.ClassPathUtil;
 import com.liferay.portal.kernel.process.ProcessChannel;
 import com.liferay.portal.kernel.process.ProcessConfig;
 import com.liferay.portal.kernel.process.ProcessConfig.Builder;
+import com.liferay.portal.kernel.process.ProcessException;
 import com.liferay.portal.kernel.process.local.LocalProcessExecutor;
 import com.liferay.simple.socks.proxy.callables.SocksProxyServerCallable;
 import com.liferay.simple.socks.proxy.callables.SocksProxyServerCloseCallable;
@@ -26,6 +27,7 @@ import com.liferay.simple.socks.proxy.callables.SocksProxyServerCloseCallable;
 import java.io.Serializable;
 
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 /**
@@ -37,10 +39,10 @@ public class SocksProxyInitializer {
 		_localProcessExecutor = localProcessExecutor;
 	}
 
-	protected void start(
+	public void start(
 			List<String> allowedIPAddress, int executorServiceAwaitTimeout,
 			int serverSocketPort)
-		throws Exception {
+		throws ProcessException {
 
 		_processChannel = _localProcessExecutor.execute(
 			_createProcessConfig(),
@@ -49,7 +51,7 @@ public class SocksProxyInitializer {
 				serverSocketPort));
 	}
 
-	protected void stop() throws Exception {
+	public void stop() throws ExecutionException, InterruptedException {
 		Future<Serializable> future = _processChannel.write(
 			new SocksProxyServerCloseCallable());
 

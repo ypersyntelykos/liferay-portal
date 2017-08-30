@@ -16,6 +16,7 @@ package com.liferay.simple.socks.proxy;
 
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.process.ProcessException;
 import com.liferay.portal.kernel.process.local.LocalProcessExecutor;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -26,6 +27,7 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -43,7 +45,9 @@ import org.osgi.service.component.annotations.Reference;
 public class SimpleSocksProxy {
 
 	@Activate
-	protected void activate(Map<String, Object> properties) throws Exception {
+	protected void activate(Map<String, Object> properties)
+		throws ProcessException {
+
 		String allowedHostnames = GetterUtil.getString(
 			properties.get("allowedHostnames"), "");
 
@@ -77,7 +81,9 @@ public class SimpleSocksProxy {
 	}
 
 	@Deactivate
-	protected void deactivate() throws Exception {
+	protected void deactivate()
+		throws ExecutionException, InterruptedException {
+
 		_socksProxyInitializer.stop();
 	}
 
