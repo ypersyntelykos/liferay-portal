@@ -79,7 +79,7 @@ public class UpgradeResourcePermission extends UpgradeProcess {
 								!primKey.contains(
 									PortletConstants.LAYOUT_SEPARATOR)) {
 
-								stringPrimKeys.add(rs2.getString("primKey"));
+								stringPrimKeys.add(primKey);
 							}
 						}
 					}
