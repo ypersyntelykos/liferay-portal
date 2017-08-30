@@ -59,10 +59,10 @@ public class SocksProxyServer extends Thread {
 			_serverSocket.setSoTimeout(0);
 
 			while (true) {
-				Socket internalSocket = null;
+				Socket socket = null;
 
 				try {
-					internalSocket = _serverSocket.accept();
+					socket = _serverSocket.accept();
 				}
 				catch (SocketException se) {
 					if (_log.isInfoEnabled()) {
@@ -74,11 +74,11 @@ public class SocksProxyServer extends Thread {
 					break;
 				}
 
-				internalSocket.setSoTimeout(0);
+				socket.setSoTimeout(0);
 
 				executorService.execute(
 					new SocksConnectionHandler(
-						_allowedIPAddresses, internalSocket, executorService));
+						_allowedIPAddresses, socket, executorService));
 			}
 		}
 		catch (Exception e) {
