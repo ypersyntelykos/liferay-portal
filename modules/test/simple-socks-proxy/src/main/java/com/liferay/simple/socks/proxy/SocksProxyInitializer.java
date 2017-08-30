@@ -56,8 +56,6 @@ public class SocksProxyInitializer {
 			new SocksProxyServerCloseCallable());
 
 		future.get();
-
-		_localProcessExecutor.destroy();
 	}
 
 	private ProcessConfig _createProcessConfig() {
