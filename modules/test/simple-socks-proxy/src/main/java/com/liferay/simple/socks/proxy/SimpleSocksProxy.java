@@ -29,6 +29,7 @@ import java.util.Map;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 
@@ -36,7 +37,8 @@ import org.osgi.service.component.annotations.Reference;
  * @author Tom Wang
  */
 @Component(
-	configurationPid = "com.liferay.simple.socks.proxy.SocksProxyConfiguration"
+	configurationPid = "com.liferay.simple.socks.proxy.SocksProxyConfiguration",
+	configurationPolicy = ConfigurationPolicy.REQUIRE
 )
 public class SimpleSocksProxy {
 
