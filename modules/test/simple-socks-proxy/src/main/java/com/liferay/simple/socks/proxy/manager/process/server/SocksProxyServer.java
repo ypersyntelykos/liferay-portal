@@ -17,6 +17,8 @@ package com.liferay.simple.socks.proxy.manager.process.server;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 
+import java.io.IOException;
+
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
@@ -56,7 +58,14 @@ public class SocksProxyServer extends Thread {
 		try (ServerSocket serverSocket = new ServerSocket(_serverSocketPort)) {
 			_serverSocket = serverSocket;
 
-			_serverSocket.setSoTimeout(0);
+			try {
+				_serverSocket.setSoTimeout(0);
+			}
+			catch (SocketException se) {
+				if (_log.isWarnEnabled()) {
+					_log.warn("Unable to set server socket sotimeout", se);
+				}
+			}
 
 			while (true) {
 				Socket socket = null;
@@ -73,18 +82,28 @@ public class SocksProxyServer extends Thread {
 
 					break;
 				}
+				catch (IOException ioe) {
+					_log.error("Unable to accept client socket", ioe);
 
-				socket.setSoTimeout(0);
+					continue;
+				}
+
+				try {
+					socket.setSoTimeout(0);
+				}
+				catch (SocketException se) {
+					if (_log.isWarnEnabled()) {
+						_log.warn("Unable to set client socket sotimeout", se);
+					}
+				}
 
 				executorService.execute(
 					new SocksConnectionHandler(
 						_allowedIPAddresses, socket, executorService));
 			}
 		}
-		catch (Exception e) {
-			if (_log.isWarnEnabled()) {
-				_log.warn(e, e);
-			}
+		catch (IOException ioe) {
+			_log.error("Unable to create server socket", ioe);
 		}
 		finally {
 			executorService.shutdown();
