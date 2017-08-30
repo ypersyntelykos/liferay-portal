@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.simple.socks.proxy.process;
+package com.liferay.simple.socks.proxy.manager.process.server;
 
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;

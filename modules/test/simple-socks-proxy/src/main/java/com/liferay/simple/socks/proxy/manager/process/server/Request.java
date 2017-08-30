@@ -12,11 +12,11 @@
  * details.
  */
 
-package com.liferay.simple.socks.proxy.process;
+package com.liferay.simple.socks.proxy.manager.process.server;
 
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.simple.socks.proxy.constants.Constants;
+import com.liferay.simple.socks.proxy.manager.process.util.Constants;
 
 import java.io.IOException;
 

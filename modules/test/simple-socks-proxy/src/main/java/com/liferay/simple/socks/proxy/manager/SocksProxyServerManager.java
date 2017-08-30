@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.simple.socks.proxy;
+package com.liferay.simple.socks.proxy.manager;
 
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.process.ClassPathUtil;
@@ -21,8 +21,8 @@ import com.liferay.portal.kernel.process.ProcessConfig;
 import com.liferay.portal.kernel.process.ProcessConfig.Builder;
 import com.liferay.portal.kernel.process.ProcessException;
 import com.liferay.portal.kernel.process.local.LocalProcessExecutor;
-import com.liferay.simple.socks.proxy.callables.SocksProxyServerCloseProcessCallable;
-import com.liferay.simple.socks.proxy.callables.SocksProxyServerProcessCallable;
+import com.liferay.simple.socks.proxy.manager.process.SocksProxyServerCloseProcessCallable;
+import com.liferay.simple.socks.proxy.manager.process.SocksProxyServerProcessCallable;
 
 import java.io.Serializable;
 
@@ -33,9 +33,9 @@ import java.util.concurrent.TimeUnit;
 /**
  * @author Tom Wang
  */
-public class SocksProxyInitializer {
+public class SocksProxyServerManager {
 
-	public SocksProxyInitializer(
+	public SocksProxyServerManager(
 		LocalProcessExecutor localProcessExecutor,
 		List<String> allowedIPAddress, long shutdownWaitTime,
 		int serverSocketPort) {
@@ -80,7 +80,7 @@ public class SocksProxyInitializer {
 
 		builder.setBootstrapClassPath(
 			ClassPathUtil.buildClassPath(
-				SocksProxyInitializer.class, PortalException.class));
+				SocksProxyServerManager.class, PortalException.class));
 
 		_processConfig = builder.build();
 	}

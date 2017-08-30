@@ -12,11 +12,11 @@
  * details.
  */
 
-package com.liferay.simple.socks.proxy.callables;
+package com.liferay.simple.socks.proxy.manager.process;
 
 import com.liferay.portal.kernel.process.ProcessCallable;
 import com.liferay.portal.kernel.process.local.LocalProcessLauncher.ProcessContext;
-import com.liferay.simple.socks.proxy.process.SocksProxyServer;
+import com.liferay.simple.socks.proxy.manager.process.server.SocksProxyServer;
 
 import java.io.Serializable;
 

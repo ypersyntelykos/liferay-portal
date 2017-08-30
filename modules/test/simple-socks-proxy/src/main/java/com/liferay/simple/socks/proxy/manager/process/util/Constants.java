@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.simple.socks.proxy.constants;
+package com.liferay.simple.socks.proxy.manager.process.util;
 
 import com.liferay.portal.kernel.util.KMPSearch;
 

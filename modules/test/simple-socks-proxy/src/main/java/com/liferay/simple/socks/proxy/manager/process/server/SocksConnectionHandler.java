@@ -12,14 +12,14 @@
  * details.
  */
 
-package com.liferay.simple.socks.proxy.process;
+package com.liferay.simple.socks.proxy.manager.process.server;
 
 import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayOutputStream;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.KMPSearch;
-import com.liferay.simple.socks.proxy.constants.Constants;
-import com.liferay.simple.socks.proxy.utils.SocksProxyUtil;
+import com.liferay.simple.socks.proxy.manager.process.util.Constants;
+import com.liferay.simple.socks.proxy.manager.process.util.SocksProxyUtil;
 
 import java.io.IOException;
 import java.io.InputStream;

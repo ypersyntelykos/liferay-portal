@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.simple.socks.proxy.utils;
+package com.liferay.simple.socks.proxy.manager.process.util;
 
 import java.io.EOFException;
 import java.io.IOException;

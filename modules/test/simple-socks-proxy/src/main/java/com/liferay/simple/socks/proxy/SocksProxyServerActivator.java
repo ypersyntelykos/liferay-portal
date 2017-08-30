@@ -20,15 +20,15 @@ import com.liferay.portal.kernel.process.ProcessException;
 import com.liferay.portal.kernel.process.local.LocalProcessExecutor;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.StringUtil;
-
 import com.liferay.portal.kernel.util.Time;
+import com.liferay.simple.socks.proxy.manager.SocksProxyServerManager;
+
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -43,7 +43,7 @@ import org.osgi.service.component.annotations.Reference;
 	configurationPid = "com.liferay.simple.socks.proxy.SocksProxyConfiguration",
 	configurationPolicy = ConfigurationPolicy.REQUIRE
 )
-public class SimpleSocksProxy {
+public class SocksProxyServerActivator {
 
 	@Activate
 	protected void activate(Map<String, Object> properties)
@@ -74,7 +74,7 @@ public class SimpleSocksProxy {
 			}
 		}
 
-		_socksProxyInitializer = new SocksProxyInitializer(
+		_socksProxyInitializer = new SocksProxyServerManager(
 			_localProcessExecutor, allowedIPAddresses, shutdownWaitTime,
 			serverSocketPort);
 
@@ -87,11 +87,11 @@ public class SimpleSocksProxy {
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
-		SimpleSocksProxy.class);
+		SocksProxyServerActivator.class);
 
 	@Reference
 	private LocalProcessExecutor _localProcessExecutor;
 
-	private SocksProxyInitializer _socksProxyInitializer;
+	private SocksProxyServerManager _socksProxyInitializer;
 
 }
