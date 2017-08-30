@@ -43,9 +43,6 @@ public class SocksProxyServerProcessCallable
 		SocksProxyServer socksProxyServer = new SocksProxyServer(
 			_allowedIPAddress, _shutdownWaitTime, _serverSocketPort);
 
-		socksProxyServer.setName(
-			"com.liferay.simple.socks.proxy.SocksProxyServer");
-
 		ConcurrentMap<String, Object> attributes =
 			ProcessContext.getAttributes();
 

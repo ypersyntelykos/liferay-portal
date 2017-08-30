@@ -41,6 +41,8 @@ public class SocksProxyServer extends Thread {
 		_allowedIPAddresses = allowedHosts;
 		_shutdownWaitTime = shutdownWaitTime;
 		_serverSocketPort = serverSocketPort;
+
+		setName("com.liferay.simple.socks.proxy.SocksProxyServer");
 	}
 
 	public void close() throws Exception {
