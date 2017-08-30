@@ -21,7 +21,6 @@ import com.liferay.portal.kernel.util.StringUtil;
 import java.net.InetAddress;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -40,11 +39,8 @@ public class SimpleSocksProxy {
 
 	@Activate
 	protected void activate(Map<String, Object> properties) throws Exception {
-		String allowedIPAddressString = GetterUtil.getString(
-			properties.get("allowedIPAddresses"), "127.0.0.1");
-
-		String allowedHostnamesString = GetterUtil.getString(
-			properties.get("allowedHostaddresses"), "");
+		String allowedHostnames = GetterUtil.getString(
+			properties.get("allowedHostnames"), "");
 
 		final int executorServiceAwaitTimeout = GetterUtil.getInteger(
 			properties.get("executorServiceAwaitTimeout"), 10);
@@ -52,22 +48,19 @@ public class SimpleSocksProxy {
 		final int serverSocketPort = GetterUtil.getInteger(
 			properties.get("serverSocketPort"), 8888);
 
-		final List<String> allowedIPAddress = new ArrayList<>();
+		final List<String> allowedIPAddresses = new ArrayList<>();
 
-		Collections.addAll(
-			allowedIPAddress, StringUtil.split(allowedIPAddressString));
-
-		for (String hostname : StringUtil.split(allowedHostnamesString)) {
+		for (String hostname : StringUtil.split(allowedHostnames)) {
 			InetAddress inetAddress = InetAddress.getByName(hostname);
 
-			allowedIPAddress.add(inetAddress.getHostAddress());
+			allowedIPAddresses.add(inetAddress.getHostAddress());
 		}
 
 		_socksProxyInitializer = new SocksProxyInitializer(
 			_localProcessExecutor);
 
 		_socksProxyInitializer.start(
-			allowedIPAddress, executorServiceAwaitTimeout, serverSocketPort);
+			allowedIPAddresses, executorServiceAwaitTimeout, serverSocketPort);
 	}
 
 	@Deactivate
