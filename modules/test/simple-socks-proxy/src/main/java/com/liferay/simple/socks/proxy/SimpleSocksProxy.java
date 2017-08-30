@@ -42,16 +42,16 @@ public class SimpleSocksProxy {
 		String allowedHostnames = GetterUtil.getString(
 			properties.get("allowedHostnames"), "");
 
-		final int executorServiceAwaitTimeout = GetterUtil.getInteger(
+		int executorServiceAwaitTimeout = GetterUtil.getInteger(
 			properties.get("executorServiceAwaitTimeout"), 10);
 
-		final int serverSocketPort = GetterUtil.getInteger(
+		int serverSocketPort = GetterUtil.getInteger(
 			properties.get("serverSocketPort"), 8888);
 
-		final List<String> allowedIPAddresses = new ArrayList<>();
+		List<String> allowedIPAddresses = new ArrayList<>();
 
-		for (String hostname : StringUtil.split(allowedHostnames)) {
-			InetAddress inetAddress = InetAddress.getByName(hostname);
+		for (String allowedHostname : StringUtil.split(allowedHostnames)) {
+			InetAddress inetAddress = InetAddress.getByName(allowedHostname);
 
 			allowedIPAddresses.add(inetAddress.getHostAddress());
 		}
