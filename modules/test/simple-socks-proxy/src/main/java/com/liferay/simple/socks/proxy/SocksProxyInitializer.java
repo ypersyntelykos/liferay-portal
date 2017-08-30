@@ -27,8 +27,8 @@ import com.liferay.simple.socks.proxy.callables.SocksProxyServerProcessCallable;
 import java.io.Serializable;
 
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Tom Wang
@@ -53,11 +53,24 @@ public class SocksProxyInitializer {
 				_allowedIPAddress, _shutdownWaitTime, _serverSocketPort));
 	}
 
-	public void stop() throws ExecutionException, InterruptedException {
-		Future<Serializable> future = _processChannel.write(
-			new SocksProxyServerCloseProcessCallable());
+	public void stop() throws Exception {
+		try {
+			Future<Serializable> future = _processChannel.write(
+				new SocksProxyServerCloseProcessCallable());
 
-		future.get();
+			future.get(_shutdownWaitTime, TimeUnit.MILLISECONDS);
+		}
+		finally {
+			Future<Serializable> future =
+				_processChannel.getProcessNoticeableFuture();
+
+			try {
+				future.get(_shutdownWaitTime, TimeUnit.MILLISECONDS);
+			}
+			finally {
+				future.cancel(true);
+			}
+		}
 	}
 
 	private static final ProcessConfig _processConfig;
