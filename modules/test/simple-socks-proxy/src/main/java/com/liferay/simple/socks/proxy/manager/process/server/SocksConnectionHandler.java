@@ -233,7 +233,10 @@ public class SocksConnectionHandler implements Runnable {
 
 		try {
 			while ((length = inputStream.read(buffer)) != -1) {
-				if (ubaos != null) {
+				if (ubaos == null) {
+					outputStream.write(buffer, 0, length);
+				}
+				else {
 					ubaos.write(buffer, 0, length);
 
 					int index = KMPSearch.search(
@@ -266,9 +269,6 @@ public class SocksConnectionHandler implements Runnable {
 					}
 
 					ubaos = null;
-				}
-				else {
-					outputStream.write(buffer, 0, length);
 				}
 			}
 
@@ -313,10 +313,8 @@ public class SocksConnectionHandler implements Runnable {
 			OutputStream internalOutputStream)
 		throws IOException {
 
-		byte[] reply;
-
 		if (request.getCmd() != Constants.CMD_CONNECT) {
-			reply = _createReply(
+			byte[] reply = _createReply(
 				Constants.REP_UNSUPPORTED_COMMAND, externalSocket);
 
 			_write(internalOutputStream, reply);
@@ -326,7 +324,7 @@ public class SocksConnectionHandler implements Runnable {
 		}
 
 		if (request.getAtyp() >= Constants.ATYP_IPV6) {
-			reply = _createReply(
+			byte[] reply = _createReply(
 				Constants.REP_UNSUPPORTED_ADDRESS_TYPE, externalSocket);
 
 			_write(internalOutputStream, reply);
@@ -335,7 +333,7 @@ public class SocksConnectionHandler implements Runnable {
 				"Received unsupported address type in the request");
 		}
 
-		reply = _createReply(Constants.REP_SUCCEEDED, externalSocket);
+		byte[] reply = _createReply(Constants.REP_SUCCEEDED, externalSocket);
 
 		_write(internalOutputStream, reply);
 	}
