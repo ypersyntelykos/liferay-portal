@@ -26,7 +26,7 @@ import java.util.concurrent.ConcurrentMap;
 /**
  * @author Tom Wang
  */
-public class SocksProxyServerCloseCallable
+public class SocksProxyServerCloseProcessCallable
 	implements ProcessCallable<Serializable> {
 
 	@Override

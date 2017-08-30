@@ -26,9 +26,10 @@ import java.util.concurrent.ConcurrentMap;
 /**
  * @author Tom Wang
  */
-public class SocksProxyServerCallable implements ProcessCallable<Serializable> {
+public class SocksProxyServerProcessCallable
+	implements ProcessCallable<Serializable> {
 
-	public SocksProxyServerCallable(
+	public SocksProxyServerProcessCallable(
 		List<String> allowedIPAddress, int executorServiceAwaitTimeout,
 		int serverSocketPort) {
 

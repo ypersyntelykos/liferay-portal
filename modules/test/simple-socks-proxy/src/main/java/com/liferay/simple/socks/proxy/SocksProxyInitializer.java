@@ -21,8 +21,8 @@ import com.liferay.portal.kernel.process.ProcessConfig;
 import com.liferay.portal.kernel.process.ProcessConfig.Builder;
 import com.liferay.portal.kernel.process.ProcessException;
 import com.liferay.portal.kernel.process.local.LocalProcessExecutor;
-import com.liferay.simple.socks.proxy.callables.SocksProxyServerCallable;
-import com.liferay.simple.socks.proxy.callables.SocksProxyServerCloseCallable;
+import com.liferay.simple.socks.proxy.callables.SocksProxyServerCloseProcessCallable;
+import com.liferay.simple.socks.proxy.callables.SocksProxyServerProcessCallable;
 
 import java.io.Serializable;
 
@@ -46,14 +46,14 @@ public class SocksProxyInitializer {
 
 		_processChannel = _localProcessExecutor.execute(
 			_processConfig,
-			new SocksProxyServerCallable(
+			new SocksProxyServerProcessCallable(
 				allowedIPAddress, executorServiceAwaitTimeout,
 				serverSocketPort));
 	}
 
 	public void stop() throws ExecutionException, InterruptedException {
 		Future<Serializable> future = _processChannel.write(
-			new SocksProxyServerCloseCallable());
+			new SocksProxyServerCloseProcessCallable());
 
 		future.get();
 	}
