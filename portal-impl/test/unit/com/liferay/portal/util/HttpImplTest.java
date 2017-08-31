@@ -366,6 +366,10 @@ public class HttpImplTest extends PowerMockito {
 
 		Assert.assertSame(paramValue, _httpImpl.shortenURL(paramValue));
 
+		String url = "www.liferay.com?key=" + paramValue;
+
+		Assert.assertEquals(url, _httpImpl.shortenURL(url));
+
 		// Remove redirect one deep
 
 		Assert.assertEquals(
