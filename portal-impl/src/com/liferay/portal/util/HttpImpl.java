@@ -2044,7 +2044,8 @@ public class HttpImpl implements Http {
 		for (String param : params) {
 			if (param.contains("_backURL=") || param.contains("_redirect=") ||
 				param.contains("_returnToFullPageURL=") ||
-				param.startsWith("redirect")) {
+				(param.startsWith("redirect") &&
+				 (param.indexOf(CharPool.EQUAL) != -1))) {
 
 				redirectParams.add(param);
 			}
