@@ -2024,16 +2024,18 @@ public class HttpImpl implements Http {
 	}
 
 	private String _shortenURL(String url, int currentLength) {
-		StringBundler sb = new StringBundler();
-
 		int index = url.indexOf(CharPool.QUESTION);
 
-		if (index != -1) {
-			sb.append(url.substring(0, index));
-			sb.append(StringPool.QUESTION);
-
-			url = url.substring(index + 1);
+		if (index == -1) {
+			return url;
 		}
+
+		StringBundler sb = new StringBundler();
+
+		sb.append(url.substring(0, index));
+		sb.append(StringPool.QUESTION);
+
+		url = url.substring(index + 1);
 
 		String[] params = StringUtil.split(url, CharPool.AMPERSAND);
 
