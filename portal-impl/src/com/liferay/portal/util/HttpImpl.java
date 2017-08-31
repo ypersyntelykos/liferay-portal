@@ -2035,9 +2035,9 @@ public class HttpImpl implements Http {
 		sb.append(url.substring(0, index));
 		sb.append(StringPool.QUESTION);
 
-		url = url.substring(index + 1);
+		String queryString = url.substring(index + 1);
 
-		String[] params = StringUtil.split(url, CharPool.AMPERSAND);
+		String[] params = StringUtil.split(queryString, CharPool.AMPERSAND);
 
 		List<String> redirectParams = new ArrayList<>();
 
