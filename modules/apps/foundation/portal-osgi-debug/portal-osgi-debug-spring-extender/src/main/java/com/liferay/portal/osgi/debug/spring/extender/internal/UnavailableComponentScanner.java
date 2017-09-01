@@ -49,8 +49,7 @@ public class UnavailableComponentScanner {
 
 	@Activate
 	protected void activate(
-			BundleContext bundleContext, Map<String, Object> properties)
-		throws Exception {
+		BundleContext bundleContext, Map<String, Object> properties) {
 
 		UnavailableComponentScannerConfiguration springExtenderConfiguration =
 			ConfigurableUtil.createConfigurable(
@@ -69,7 +68,9 @@ public class UnavailableComponentScanner {
 	}
 
 	@Deactivate
-	protected void deactivate(BundleContext bundleContext) throws Exception {
+	protected void deactivate(BundleContext bundleContext)
+		throws InterruptedException {
+
 		if (_unavailableComponentScanningThread != null) {
 			_unavailableComponentScanningThread.interrupt();
 
