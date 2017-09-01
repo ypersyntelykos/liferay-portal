@@ -380,11 +380,11 @@ public class HttpImplTest extends PowerMockito {
 
 		Assert.assertEquals(
 			"www.liferay.com",
-			_httpImpl.shortenURL("www.liferay.com?redirect=" + paramValue));
+			_httpImpl.shortenURL("www.liferay.com?_backURL=" + paramValue));
 		Assert.assertEquals(
 			"www.liferay.com?key1=value1",
 			_httpImpl.shortenURL(
-				"www.liferay.com?key1=value1&redirect=" + paramValue));
+				"www.liferay.com?key1=value1&_redirect=" + paramValue));
 		Assert.assertEquals(
 			"www.liferay.com?key1=value1",
 			_httpImpl.shortenURL(
