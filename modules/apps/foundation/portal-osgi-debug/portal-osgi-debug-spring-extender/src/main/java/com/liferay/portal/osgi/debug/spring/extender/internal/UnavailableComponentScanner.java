@@ -51,12 +51,14 @@ public class UnavailableComponentScanner {
 	protected void activate(
 		BundleContext bundleContext, Map<String, Object> properties) {
 
-		UnavailableComponentScannerConfiguration springExtenderConfiguration =
-			ConfigurableUtil.createConfigurable(
-				UnavailableComponentScannerConfiguration.class, properties);
+		UnavailableComponentScannerConfiguration
+			unavailableComponentScannerConfiguration =
+				ConfigurableUtil.createConfigurable(
+					UnavailableComponentScannerConfiguration.class, properties);
 
 		long scanningInterval =
-			springExtenderConfiguration.unavailableComponentScanningInterval();
+			unavailableComponentScannerConfiguration.
+				unavailableComponentScanningInterval();
 
 		if (scanningInterval > 0) {
 			_unavailableComponentScanningThread =
