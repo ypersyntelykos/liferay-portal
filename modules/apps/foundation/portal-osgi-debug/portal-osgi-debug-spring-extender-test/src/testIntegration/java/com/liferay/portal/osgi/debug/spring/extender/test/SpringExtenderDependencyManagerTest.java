@@ -18,6 +18,7 @@ import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayInputStream;
 import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayOutputStream;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.HashMapDictionary;
 import com.liferay.portal.kernel.util.StreamUtil;
@@ -25,9 +26,10 @@ import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.osgi.debug.spring.extender.test.reference.SpringExtenderTestComponentReference;
 import com.liferay.portal.osgi.debug.spring.extender.test.service.impl.SpringExtenderTestComponentLocalServiceImpl;
-import com.liferay.portal.osgi.util.test.OSGiServiceUtil;
 import com.liferay.portal.test.log.CaptureAppender;
 import com.liferay.portal.test.log.Log4JLoggerTestUtil;
+import com.liferay.portal.test.rule.Inject;
+import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -48,6 +50,8 @@ import org.apache.log4j.spi.LoggingEvent;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -67,6 +71,11 @@ import org.osgi.service.cm.ConfigurationListener;
 @RunWith(Arquillian.class)
 public class SpringExtenderDependencyManagerTest {
 
+	@ClassRule
+	@Rule
+	public static final AggregateTestRule aggregateTestRule =
+		new LiferayIntegrationTestRule();
+
 	@BeforeClass
 	public static void setUpClass() throws IOException {
 		Bundle bundle = FrameworkUtil.getBundle(
@@ -74,10 +83,8 @@ public class SpringExtenderDependencyManagerTest {
 
 		_bundleContext = bundle.getBundleContext();
 
-		_unavailableComponentScannerConfiguration = OSGiServiceUtil.callService(
-			_bundleContext, ConfigurationAdmin.class,
-			configurationAdmin -> configurationAdmin.getConfiguration(
-				_CONFIG_NAME, null));
+		_unavailableComponentScannerConfiguration =
+			_configurationAdmin.getConfiguration(_CONFIG_NAME, null);
 
 		_properties = _unavailableComponentScannerConfiguration.getProperties();
 	}
@@ -296,6 +303,10 @@ public class SpringExtenderDependencyManagerTest {
 		SpringExtenderTestComponentReference.class.getName();
 
 	private static BundleContext _bundleContext;
+
+	@Inject
+	private static ConfigurationAdmin _configurationAdmin;
+
 	private static Dictionary<String, Object> _properties;
 	private static Configuration _unavailableComponentScannerConfiguration;
 
