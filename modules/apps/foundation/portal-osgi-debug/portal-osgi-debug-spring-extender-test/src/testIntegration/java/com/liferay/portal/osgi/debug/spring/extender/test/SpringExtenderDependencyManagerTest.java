@@ -108,21 +108,28 @@ public class SpringExtenderDependencyManagerTest {
 				Log4JLoggerTestUtil.configureLog4JLogger(
 					_LOGGER_NAME, Level.INFO)) {
 
-			_testDependencyManager(captureAppender);
+			_captureLog(captureAppender);
 
 			List<LoggingEvent> loggingEvents =
 				captureAppender.getLoggingEvents();
 
-			Assert.assertFalse(loggingEvents.isEmpty());
+			Assert.assertEquals(
+				loggingEvents.toString(), 2, loggingEvents.size());
 
-			for (LoggingEvent loggingEvent : loggingEvents) {
-				String logMessage = (String)loggingEvent.getMessage();
+			LoggingEvent loggingEvent = loggingEvents.get(0);
 
-				Assert.assertEquals(
-					"All Spring extender dependency manager components are " +
-						"registered",
-					logMessage);
-			}
+			Assert.assertEquals(Level.INFO, loggingEvent.getLevel());
+			Assert.assertEquals(
+				"All Spring extender dependency manager components are " +
+					"registered",
+				loggingEvent.getMessage());
+
+			loggingEvent = loggingEvents.get(1);
+
+			Assert.assertEquals(Level.INFO, loggingEvent.getLevel());
+			Assert.assertEquals(
+				"Stopped scanning for unavailable components",
+				loggingEvent.getMessage());
 		}
 	}
 
@@ -137,14 +144,21 @@ public class SpringExtenderDependencyManagerTest {
 
 		try (CaptureAppender captureAppender =
 				Log4JLoggerTestUtil.configureLog4JLogger(
-					_LOGGER_NAME, Level.WARN)) {
+					_LOGGER_NAME, Level.INFO)) {
 
-			_testDependencyManager(captureAppender);
+			_captureLog(captureAppender);
 
 			List<LoggingEvent> loggingEvents =
 				captureAppender.getLoggingEvents();
 
-			Assert.assertFalse(loggingEvents.isEmpty());
+			Assert.assertEquals(
+				loggingEvents.toString(), 2, loggingEvents.size());
+
+			LoggingEvent loggingEvent = loggingEvents.get(0);
+
+			Assert.assertEquals(Level.WARN, loggingEvent.getLevel());
+
+			String message = (String)loggingEvent.getMessage();
 
 			StringBundler sb = new StringBundler(4);
 
@@ -153,17 +167,75 @@ public class SpringExtenderDependencyManagerTest {
 			sb.append(_SPRING_EXTENDER_TEST_COMPONENT_REFERENCE_NAME);
 			sb.append(" null]");
 
-			String warningMessage = sb.toString();
+			Assert.assertTrue(message.contains(sb.toString()));
 
-			for (LoggingEvent loggingEvent : loggingEvents) {
-				String logMessage = (String)loggingEvent.getMessage();
+			loggingEvent = loggingEvents.get(1);
 
-				Assert.assertTrue(
-					logMessage, logMessage.contains(warningMessage));
-			}
-
+			Assert.assertEquals(Level.INFO, loggingEvent.getLevel());
+			Assert.assertEquals(
+				"Stopped scanning for unavailable components",
+				loggingEvent.getMessage());
+		}
+		finally {
 			bundle.uninstall();
 		}
+	}
+
+	private static void _captureLog(CaptureAppender captureAppender)
+		throws Exception {
+
+		AtomicReference<Thread> scanningThreadReference =
+			new AtomicReference<>();
+
+		CountDownLatch countDownLatch = new CountDownLatch(1);
+
+		ReflectionTestUtil.setFieldValue(
+			captureAppender, "_loggingEvents",
+			new CopyOnWriteArrayList<LoggingEvent>() {
+
+				@Override
+				public boolean add(LoggingEvent loggingEvent) {
+					boolean added = super.add(loggingEvent);
+
+					if ("Stopped scanning for unavailable components".equals(
+							loggingEvent.getMessage())) {
+
+						return added;
+					}
+
+					try {
+						_unavailableComponentScannerConfiguration.update(
+							new HashMapDictionary<String, Object>());
+					}
+					catch (IOException ioe) {
+						ReflectionUtil.throwException(ioe);
+					}
+
+					Thread thread = Thread.currentThread();
+
+					while (!thread.isInterrupted()) {
+					}
+
+					scanningThreadReference.set(Thread.currentThread());
+
+					countDownLatch.countDown();
+
+					return added;
+				}
+
+			});
+
+		Dictionary<String, Object> properties = new HashMapDictionary<>();
+
+		properties.put("unavailableComponentScanningInterval", "1");
+
+		_unavailableComponentScannerConfiguration.update(properties);
+
+		countDownLatch.await();
+
+		Thread scanningThread = scanningThreadReference.get();
+
+		scanningThread.join();
 	}
 
 	private static void _ensureStopScanning() throws Exception {
@@ -171,47 +243,7 @@ public class SpringExtenderDependencyManagerTest {
 				Log4JLoggerTestUtil.configureLog4JLogger(
 					_LOGGER_NAME, Level.INFO)) {
 
-			AtomicReference<Thread> scanningThreadReference =
-				new AtomicReference<>();
-
-			CountDownLatch countDownLatch = new CountDownLatch(1);
-
-			ReflectionTestUtil.setFieldValue(
-				captureAppender, "_loggingEvents",
-				new CopyOnWriteArrayList<LoggingEvent>() {
-
-					@Override
-					public boolean add(LoggingEvent loggingEvent) {
-						boolean ret = super.add(loggingEvent);
-
-						try {
-							_unavailableComponentScannerConfiguration.update(
-								new HashMapDictionary<String, Object>());
-						}
-						catch (IOException ioe) {
-							ReflectionUtil.throwException(ioe);
-						}
-
-						scanningThreadReference.set(Thread.currentThread());
-
-						countDownLatch.countDown();
-
-						return ret;
-					}
-
-				});
-
-			Dictionary<String, Object> properties = new HashMapDictionary<>();
-
-			properties.put("unavailableComponentScanningInterval", "1");
-
-			_unavailableComponentScannerConfiguration.update(properties);
-
-			countDownLatch.await();
-
-			Thread scanningThread = scanningThreadReference.get();
-
-			scanningThread.join();
+			_captureLog(captureAppender);
 		}
 	}
 
@@ -261,35 +293,6 @@ public class SpringExtenderDependencyManagerTest {
 				unsyncByteArrayOutputStream.unsafeGetByteArray(), 0,
 				unsyncByteArrayOutputStream.size());
 		}
-	}
-
-	private void _testDependencyManager(CaptureAppender captureAppender)
-		throws Exception {
-
-		final CountDownLatch countDownLatch = new CountDownLatch(1);
-
-		ReflectionTestUtil.setFieldValue(
-			captureAppender, "_loggingEvents",
-			new CopyOnWriteArrayList<LoggingEvent>() {
-
-				@Override
-				public boolean add(LoggingEvent loggingEvent) {
-					boolean ret = super.add(loggingEvent);
-
-					countDownLatch.countDown();
-
-					return ret;
-				}
-
-			});
-
-		Dictionary<String, Object> properties = new HashMapDictionary<>();
-
-		properties.put("unavailableComponentScanningInterval", "1");
-
-		_unavailableComponentScannerConfiguration.update(properties);
-
-		countDownLatch.await();
 	}
 
 	private void _writeClasses(
