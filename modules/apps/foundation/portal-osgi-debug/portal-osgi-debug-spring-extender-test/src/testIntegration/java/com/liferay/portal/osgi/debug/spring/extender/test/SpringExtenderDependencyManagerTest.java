@@ -47,7 +47,7 @@ import java.util.zip.ZipEntry;
 import org.apache.log4j.Level;
 import org.apache.log4j.spi.LoggingEvent;
 
-import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
@@ -59,11 +59,8 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.FrameworkUtil;
-import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
-import org.osgi.service.cm.ConfigurationEvent;
-import org.osgi.service.cm.ConfigurationListener;
 
 /**
  * @author Matthew Tambara
@@ -89,38 +86,13 @@ public class SpringExtenderDependencyManagerTest {
 		_properties = _unavailableComponentScannerConfiguration.getProperties();
 	}
 
-	@After
-	public void tearDown() throws Exception {
-		final CountDownLatch countDownLatch = new CountDownLatch(1);
-
-		ConfigurationListener configurationListener =
-			new ConfigurationListener() {
-
-				@Override
-				public void configurationEvent(
-					ConfigurationEvent configurationEvent) {
-
-					if ((configurationEvent.getType() ==
-							ConfigurationEvent.CM_UPDATED) &&
-						_CONFIG_NAME.equals(configurationEvent.getPid())) {
-
-						countDownLatch.countDown();
-					}
-				}
-
-			};
-
-		ServiceRegistration<ConfigurationListener> serviceRegistration =
-			_bundleContext.registerService(
-				ConfigurationListener.class, configurationListener, null);
-
-		try {
-			_unavailableComponentScannerConfiguration.update(_properties);
-
-			countDownLatch.await();
+	@AfterClass
+	public static void tearDownClass() throws Exception {
+		if (_properties == null) {
+			_unavailableComponentScannerConfiguration.delete();
 		}
-		finally {
-			serviceRegistration.unregister();
+		else {
+			_unavailableComponentScannerConfiguration.update(_properties);
 		}
 	}
 
