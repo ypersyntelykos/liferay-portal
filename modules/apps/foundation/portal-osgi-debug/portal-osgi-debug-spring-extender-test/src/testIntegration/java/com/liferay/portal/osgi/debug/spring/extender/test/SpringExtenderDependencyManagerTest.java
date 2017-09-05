@@ -21,6 +21,7 @@ import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.HashMapDictionary;
+import com.liferay.portal.kernel.util.ReflectionUtil;
 import com.liferay.portal.kernel.util.StreamUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -38,6 +39,7 @@ import java.util.Dictionary;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 import java.util.jar.JarOutputStream;
@@ -74,7 +76,7 @@ public class SpringExtenderDependencyManagerTest {
 		new LiferayIntegrationTestRule();
 
 	@BeforeClass
-	public static void setUpClass() throws IOException {
+	public static void setUpClass() throws Exception {
 		Bundle bundle = FrameworkUtil.getBundle(
 			SpringExtenderDependencyManagerTest.class);
 
@@ -84,6 +86,8 @@ public class SpringExtenderDependencyManagerTest {
 			_configurationAdmin.getConfiguration(_CONFIG_NAME, null);
 
 		_properties = _unavailableComponentScannerConfiguration.getProperties();
+
+		_ensureStopScanning();
 	}
 
 	@AfterClass
@@ -159,6 +163,55 @@ public class SpringExtenderDependencyManagerTest {
 			}
 
 			bundle.uninstall();
+		}
+	}
+
+	private static void _ensureStopScanning() throws Exception {
+		try (CaptureAppender captureAppender =
+				Log4JLoggerTestUtil.configureLog4JLogger(
+					_LOGGER_NAME, Level.INFO)) {
+
+			AtomicReference<Thread> scanningThreadReference =
+				new AtomicReference<>();
+
+			CountDownLatch countDownLatch = new CountDownLatch(1);
+
+			ReflectionTestUtil.setFieldValue(
+				captureAppender, "_loggingEvents",
+				new CopyOnWriteArrayList<LoggingEvent>() {
+
+					@Override
+					public boolean add(LoggingEvent loggingEvent) {
+						boolean ret = super.add(loggingEvent);
+
+						try {
+							_unavailableComponentScannerConfiguration.update(
+								new HashMapDictionary<String, Object>());
+						}
+						catch (IOException ioe) {
+							ReflectionUtil.throwException(ioe);
+						}
+
+						scanningThreadReference.set(Thread.currentThread());
+
+						countDownLatch.countDown();
+
+						return ret;
+					}
+
+				});
+
+			Dictionary<String, Object> properties = new HashMapDictionary<>();
+
+			properties.put("unavailableComponentScanningInterval", "1");
+
+			_unavailableComponentScannerConfiguration.update(properties);
+
+			countDownLatch.await();
+
+			Thread scanningThread = scanningThreadReference.get();
+
+			scanningThread.join();
 		}
 	}
 
