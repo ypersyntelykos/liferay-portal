@@ -624,6 +624,8 @@ public class UpgradeClient {
 	private void _verifyPortalUpgradeExtProperties() throws IOException {
 		String value = _portalUpgradeExtProperties.getProperty("liferay.home");
 
+		File baseDir = new File(".");
+
 		if ((value == null) || value.isEmpty()) {
 			File defaultLiferayHomeDir = new File(_jarDir, "../../");
 
@@ -637,11 +639,14 @@ public class UpgradeClient {
 				value = defaultLiferayHomeDir.getCanonicalPath();
 			}
 		}
+		else {
+			baseDir = _jarDir;
+		}
 
 		File liferayHome = new File(value);
 
 		if (!liferayHome.isAbsolute()) {
-			liferayHome = new File(_jarDir, value);
+			liferayHome = new File(baseDir, value);
 		}
 
 		_portalUpgradeExtProperties.setProperty(
