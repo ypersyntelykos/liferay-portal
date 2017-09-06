@@ -62,7 +62,15 @@ public class ServiceLoader {
 			ServiceLoaderCondition serviceLoaderCondition)
 		throws Exception {
 
-		Enumeration<URL> enu = classLoader.getResources(
+		return load(classLoader, classLoader, clazz, serviceLoaderCondition);
+	}
+
+	public static <S> List<S> load(
+			ClassLoader lookupClassLoader, ClassLoader defineClassLoader,
+			Class<S> clazz, ServiceLoaderCondition serviceLoaderCondition)
+		throws Exception {
+
+		Enumeration<URL> enu = lookupClassLoader.getResources(
 			"META-INF/services/" + clazz.getName());
 
 		List<S> services = new ArrayList<>();
@@ -77,11 +85,12 @@ public class ServiceLoader {
 			}
 
 			try {
-				_load(services, classLoader, clazz, url);
+				_load(services, defineClassLoader, clazz, url);
 			}
 			catch (Exception e) {
 				_log.error(
-					"Unable to load " + clazz + " with " + classLoader, e);
+					"Unable to load " + clazz + " with " + defineClassLoader,
+					e);
 			}
 		}
 
