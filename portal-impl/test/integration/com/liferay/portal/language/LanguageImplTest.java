@@ -79,7 +79,7 @@ public class LanguageImplTest {
 			long originalCompanyId = CompanyThreadLocal.getCompanyId();
 
 			try {
-				setCompanyThreadLocalWithLocales(_company, _locales);
+				_setCompanyThreadLocalWithLocales(_company, _locales);
 
 				Assert.assertEquals(_locales, _language.getAvailableLocales());
 			}
@@ -95,19 +95,19 @@ public class LanguageImplTest {
 			long originalCompanyId = CompanyThreadLocal.getCompanyId();
 
 			try {
-				setCompanyThreadLocalWithLocales(_company, _locales);
+				_setCompanyThreadLocalWithLocales(_company, _locales);
 			}
 			finally {
 				CompanyThreadLocal.setCompanyId(originalCompanyId);
 			}
 
 			Assert.assertEquals(
-				_locales, _language.getAvailableLocales(getGuestGroupId()));
+				_locales, _language.getAvailableLocales(_getGuestGroupId()));
 		}
 
 		@Test
 		public void testGroupWithSpecificLocales() throws Exception {
-			long groupId = getGuestGroupId();
+			long groupId = _getGuestGroupId();
 
 			GroupTestUtil.updateDisplaySettings(
 				groupId, _locales, LocaleUtil.US);
@@ -116,14 +116,14 @@ public class LanguageImplTest {
 				_locales, _language.getAvailableLocales(groupId));
 		}
 
-		protected long getGuestGroupId() throws PortalException {
+		private long _getGuestGroupId() throws PortalException {
 			Group group = _groupLocalService.getGroup(
 				_company.getCompanyId(), GroupConstants.GUEST);
 
 			return group.getGroupId();
 		}
 
-		protected void setCompanyThreadLocalWithLocales(
+		private void _setCompanyThreadLocalWithLocales(
 				Company company, Set<Locale> locales)
 			throws Exception {
 
