@@ -43,7 +43,6 @@ import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.SystemProperties;
 import com.liferay.portal.module.framework.ModuleFramework;
-import com.liferay.portal.module.framework.RuntimeServiceLoaderCondition;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.registry.Registry;
 import com.liferay.registry.RegistryUtil;
@@ -56,8 +55,10 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLClassLoader;
 
 import java.nio.file.DirectoryStream;
 import java.nio.file.FileVisitResult;
@@ -254,8 +255,12 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 
 		_initRequiredStartupDirs();
 
+		Thread currentThread = Thread.currentThread();
+
 		List<FrameworkFactory> frameworkFactories = ServiceLoader.load(
-			FrameworkFactory.class, new RuntimeServiceLoaderCondition());
+			new URLClassLoader(_getClassPathURLs(), null),
+			currentThread.getContextClassLoader(), FrameworkFactory.class,
+			null);
 
 		FrameworkFactory frameworkFactory = frameworkFactories.get(0);
 
@@ -573,6 +578,27 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 
 			throw new PortalException(be);
 		}
+	}
+
+	private static URL[] _getClassPathURLs() throws IOException {
+		File coreDir = new File(PropsValues.MODULE_FRAMEWORK_BASE_DIR, "core");
+
+		File[] files = coreDir.listFiles();
+
+		if (files == null) {
+			throw new IllegalStateException(
+				"Missing " + coreDir.getCanonicalPath());
+		}
+
+		URL[] urls = new URL[files.length];
+
+		for (int i = 0; i < urls.length; i++) {
+			URI uri = files[i].toURI();
+
+			urls[i] = uri.toURL();
+		}
+
+		return urls;
 	}
 
 	private Bundle _addBundle(
