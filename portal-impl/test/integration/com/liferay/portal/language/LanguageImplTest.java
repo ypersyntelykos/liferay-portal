@@ -32,17 +32,14 @@ import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.LocaleThreadLocal;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Locale;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.Set;
 
 import org.apache.struts.mock.MockHttpServletRequest;
 
@@ -84,7 +81,7 @@ public class LanguageImplTest {
 			try {
 				setCompanyThreadLocalWithLocales(_company, _locales);
 
-				assertEquals(_locales, _language.getAvailableLocales());
+				Assert.assertEquals(_locales, _language.getAvailableLocales());
 			}
 			finally {
 				CompanyThreadLocal.setCompanyId(originalCompanyId);
@@ -104,7 +101,7 @@ public class LanguageImplTest {
 				CompanyThreadLocal.setCompanyId(originalCompanyId);
 			}
 
-			assertEquals(
+			Assert.assertEquals(
 				_locales, _language.getAvailableLocales(getGuestGroupId()));
 		}
 
@@ -115,14 +112,8 @@ public class LanguageImplTest {
 			GroupTestUtil.updateDisplaySettings(
 				groupId, _locales, LocaleUtil.US);
 
-			assertEquals(_locales, _language.getAvailableLocales(groupId));
-		}
-
-		protected void assertEquals(
-			Collection<?> expected, Collection<?> actual) {
-
 			Assert.assertEquals(
-				toStringSorted(expected), toStringSorted(actual));
+				_locales, _language.getAvailableLocales(groupId));
 		}
 
 		protected long getGuestGroupId() throws PortalException {
@@ -133,22 +124,11 @@ public class LanguageImplTest {
 		}
 
 		protected void setCompanyThreadLocalWithLocales(
-				Company company, List<Locale> locales)
+				Company company, Set<Locale> locales)
 			throws Exception {
 
 			CompanyTestUtil.resetCompanyLocales(
 				company.getCompanyId(), locales, LocaleUtil.US);
-		}
-
-		protected String toStringSorted(Collection<?> collection) {
-			Stream<?> stream = collection.stream();
-
-			return stream.map(
-				Object::toString
-			).sorted(
-			).collect(
-				Collectors.joining(StringPool.PIPE)
-			);
 		}
 
 		@Inject
@@ -157,9 +137,10 @@ public class LanguageImplTest {
 		@Inject
 		private static Language _language;
 
-		private static final List<Locale> _locales = Arrays.asList(
-			LocaleUtil.BRAZIL, LocaleUtil.HUNGARY, LocaleUtil.JAPAN,
-			LocaleUtil.US);
+		private static final Set<Locale> _locales = new HashSet<>(
+			Arrays.asList(
+				LocaleUtil.BRAZIL, LocaleUtil.HUNGARY, LocaleUtil.JAPAN,
+				LocaleUtil.US));
 
 		@DeleteAfterTestRun
 		private Company _company;
