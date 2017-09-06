@@ -49,7 +49,6 @@ import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.runners.Enclosed;
-import org.junit.rules.TestRule;
 import org.junit.runner.RunWith;
 
 /**
@@ -63,9 +62,10 @@ public class LanguageImplTest {
 
 		@ClassRule
 		@Rule
-		public static final TestRule testRule = new AggregateTestRule(
-			new LiferayIntegrationTestRule(),
-			SynchronousDestinationTestRule.INSTANCE);
+		public static final AggregateTestRule aggregateTestRule =
+			new AggregateTestRule(
+				new LiferayIntegrationTestRule(),
+				SynchronousDestinationTestRule.INSTANCE);
 
 		@Before
 		public void setUp() throws Exception {
