@@ -486,18 +486,20 @@ public class UpgradeClient {
 				_appServer.getServerDetectorServerId());
 		}
 		else {
-			File dir = new File(_appServerProperties.getProperty("dir"));
+			String dirString = _appServerProperties.getProperty("dir");
 
-			if (!dir.isAbsolute()) {
-				dir = new File(
-					_jarDir, _appServerProperties.getProperty("dir"));
+			File dirFile = new File(dirString);
+
+			if (!dirFile.isAbsolute()) {
+				dirFile = new File(_jarDir, dirString);
 			}
 
-			_appServerProperties.setProperty("dir", dir.getCanonicalPath());
+			dirString = dirFile.getCanonicalPath();
+
+			_appServerProperties.setProperty("dir", dirString);
 
 			_appServer = new AppServer(
-				_appServerProperties.getProperty("dir"),
-				_appServerProperties.getProperty("extra.lib.dirs"),
+				dirString, _appServerProperties.getProperty("extra.lib.dirs"),
 				_appServerProperties.getProperty("global.lib.dir"),
 				_appServerProperties.getProperty("portal.dir"), value);
 		}
