@@ -41,9 +41,8 @@ public class SocksProxyUtilTest {
 
 	@Test
 	public void testRead() throws IOException {
-		byte[] bytes = {Constants.SOCKS5_VERSION};
-
-		InputStream inputStream = new UnsyncByteArrayInputStream(bytes);
+		InputStream inputStream = new UnsyncByteArrayInputStream(
+			new byte[] {Constants.SOCKS5_VERSION});
 
 		byte value = SocksProxyUtil.read(inputStream);
 
@@ -60,28 +59,27 @@ public class SocksProxyUtilTest {
 
 	@Test
 	public void testReadFully() throws IOException {
-		byte[] bytes =
+		byte[] expectedBytes =
 			{Constants.SOCKS5_VERSION, Constants.CMD_CONNECT, Constants.RSV};
 
-		InputStream inputStream = new UnsyncByteArrayInputStream(bytes) {
+		InputStream inputStream =
+			new UnsyncByteArrayInputStream(expectedBytes) {
 
-			@Override
-			public int read(byte[] bytes, int offset, int length) {
-				return super.read(bytes, offset, 1);
-			}
+				@Override
+				public int read(byte[] bytes, int offset, int length) {
+					return super.read(bytes, offset, 1);
+				}
 
-		};
+			};
 
-		byte[] values = new byte[3];
+		byte[] actualBytes = new byte[3];
 
-		SocksProxyUtil.readFully(inputStream, values);
+		SocksProxyUtil.readFully(inputStream, actualBytes);
 
-		Assert.assertEquals(Constants.SOCKS5_VERSION, values[0]);
-		Assert.assertEquals(Constants.CMD_CONNECT, values[1]);
-		Assert.assertEquals(Constants.RSV, values[2]);
+		Assert.assertArrayEquals(expectedBytes, actualBytes);
 
 		try {
-			SocksProxyUtil.readFully(inputStream, values);
+			SocksProxyUtil.readFully(inputStream, actualBytes);
 
 			Assert.fail();
 		}
