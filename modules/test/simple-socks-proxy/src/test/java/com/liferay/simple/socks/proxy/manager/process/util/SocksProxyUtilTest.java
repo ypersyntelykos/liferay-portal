@@ -35,10 +35,8 @@ public class SocksProxyUtilTest {
 		CodeCoverageAssertor.INSTANCE;
 
 	@Test
-	public void testInstance() {
-		SocksProxyUtil socksProxyUtil = new SocksProxyUtil();
-
-		Assert.assertEquals(SocksProxyUtil.class, socksProxyUtil.getClass());
+	public void testContructor() {
+		new SocksProxyUtil();
 	}
 
 	@Test
