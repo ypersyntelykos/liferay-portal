@@ -14,9 +14,9 @@
 
 package com.liferay.simple.socks.proxy.manager.process.util;
 
+import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayInputStream;
 import com.liferay.portal.kernel.test.rule.CodeCoverageAssertor;
 
-import java.io.ByteArrayInputStream;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -43,7 +43,7 @@ public class SocksProxyUtilTest {
 	public void testRead() throws IOException {
 		byte[] bytes = {Constants.SOCKS5_VERSION};
 
-		InputStream inputStream = new ByteArrayInputStream(bytes);
+		InputStream inputStream = new UnsyncByteArrayInputStream(bytes);
 
 		byte value = SocksProxyUtil.read(inputStream);
 
@@ -63,7 +63,7 @@ public class SocksProxyUtilTest {
 		byte[] bytes =
 			{Constants.SOCKS5_VERSION, Constants.CMD_CONNECT, Constants.RSV};
 
-		InputStream inputStream = new ByteArrayInputStream(bytes);
+		InputStream inputStream = new UnsyncByteArrayInputStream(bytes);
 
 		byte[] values = new byte[3];
 
