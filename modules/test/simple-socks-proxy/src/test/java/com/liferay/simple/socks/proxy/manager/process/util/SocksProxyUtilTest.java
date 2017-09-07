@@ -63,7 +63,14 @@ public class SocksProxyUtilTest {
 		byte[] bytes =
 			{Constants.SOCKS5_VERSION, Constants.CMD_CONNECT, Constants.RSV};
 
-		InputStream inputStream = new UnsyncByteArrayInputStream(bytes);
+		InputStream inputStream = new UnsyncByteArrayInputStream(bytes) {
+
+			@Override
+			public int read(byte[] bytes, int offset, int length) {
+				return super.read(bytes, offset, 1);
+			}
+
+		};
 
 		byte[] values = new byte[3];
 
