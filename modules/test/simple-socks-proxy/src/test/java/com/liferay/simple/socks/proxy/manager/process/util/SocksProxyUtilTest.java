@@ -51,9 +51,10 @@ public class SocksProxyUtilTest {
 
 		try {
 			SocksProxyUtil.read(inputStream);
+
+			Assert.fail();
 		}
-		catch (Exception e) {
-			Assert.assertEquals(EOFException.class, e.getClass());
+		catch (EOFException eofe) {
 		}
 	}
 
@@ -74,9 +75,10 @@ public class SocksProxyUtilTest {
 
 		try {
 			SocksProxyUtil.readFully(inputStream, values);
+
+			Assert.fail();
 		}
-		catch (Exception e) {
-			Assert.assertEquals(EOFException.class, e.getClass());
+		catch (EOFException eofe) {
 		}
 	}
 
