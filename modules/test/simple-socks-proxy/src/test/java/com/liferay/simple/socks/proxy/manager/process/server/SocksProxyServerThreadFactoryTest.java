@@ -17,8 +17,6 @@ package com.liferay.simple.socks.proxy.manager.process.server;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.test.rule.CodeCoverageAssertor;
 
-import java.lang.reflect.Field;
-
 import org.junit.Assert;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -50,12 +48,10 @@ public class SocksProxyServerThreadFactoryTest {
 
 		Assert.assertTrue(thread.isDaemon());
 
-		Field prefix = ReflectionTestUtil.getField(
+		String prefix = ReflectionTestUtil.getFieldValue(
 			SocksProxyServerThreadFactory.class, "_prefix");
 
-		String prefixString = (String)prefix.get(new String());
-
-		Assert.assertEquals(prefixString.concat("1"), thread.getName());
+		Assert.assertEquals(prefix.concat("1"), thread.getName());
 
 		Thread thread2 = socksProxyServerThreadFactory.newThread(
 			new Runnable() {
@@ -66,7 +62,7 @@ public class SocksProxyServerThreadFactoryTest {
 
 			});
 
-		Assert.assertEquals(prefixString.concat("2"), thread2.getName());
+		Assert.assertEquals(prefix.concat("2"), thread2.getName());
 	}
 
 }
