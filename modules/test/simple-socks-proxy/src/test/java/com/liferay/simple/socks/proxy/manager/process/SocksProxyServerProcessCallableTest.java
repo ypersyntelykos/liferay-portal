@@ -36,12 +36,19 @@ public class SocksProxyServerProcessCallableTest {
 
 	@Test
 	public void testSocksProxyServerProcessCallable() throws Exception {
+		ConcurrentMap<String, Object> attributes =
+			ProcessContext.getAttributes();
+
 		try {
 			SocksProxyServerProcessCallable socksProxyServerProcessCallable =
 				new SocksProxyServerProcessCallable(
 					Collections.emptyList(), 100000, 8888);
 
 			socksProxyServerProcessCallable.call();
+
+			Object object = attributes.get(SocksProxyServer.class.getName());
+
+			Assert.assertSame(SocksProxyServer.class, object.getClass());
 
 			Thread.sleep(5000);
 		}
@@ -53,12 +60,7 @@ public class SocksProxyServerProcessCallableTest {
 			socksProxyServerCloseProcessCallable.call();
 		}
 
-		ConcurrentMap<String, Object> attributes =
-			ProcessContext.getAttributes();
-
-		Object object = attributes.get(SocksProxyServer.class.getName());
-
-		Assert.assertSame(SocksProxyServer.class, object.getClass());
+		Assert.assertNull(attributes.get(SocksProxyServer.class.getName()));
 	}
 
 }
