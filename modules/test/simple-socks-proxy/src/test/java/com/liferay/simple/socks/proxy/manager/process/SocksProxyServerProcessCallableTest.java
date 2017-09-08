@@ -39,7 +39,7 @@ public class SocksProxyServerProcessCallableTest {
 		try {
 			SocksProxyServerProcessCallable socksProxyServerProcessCallable =
 				new SocksProxyServerProcessCallable(
-					Collections.EMPTY_LIST, 100000, 8888);
+					Collections.emptyList(), 100000, 8888);
 
 			socksProxyServerProcessCallable.call();
 
