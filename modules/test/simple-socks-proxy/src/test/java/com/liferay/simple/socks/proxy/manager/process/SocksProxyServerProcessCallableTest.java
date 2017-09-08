@@ -58,7 +58,7 @@ public class SocksProxyServerProcessCallableTest {
 
 		Object object = attributes.get(SocksProxyServer.class.getName());
 
-		Assert.assertEquals(SocksProxyServer.class, object.getClass());
+		Assert.assertSame(SocksProxyServer.class, object.getClass());
 	}
 
 }
