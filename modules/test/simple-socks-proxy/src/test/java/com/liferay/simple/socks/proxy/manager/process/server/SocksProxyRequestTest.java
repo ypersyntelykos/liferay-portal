@@ -38,7 +38,7 @@ public class SocksProxyRequestTest {
 
 	@Test
 	public void testDomainNameATYPE() throws IOException {
-		InetAddress inetAddress = InetAddress.getByName("www.liferay.com");
+		InetAddress inetAddress = InetAddress.getByName("www.zzzz.com");
 
 		int port = 8080;
 
