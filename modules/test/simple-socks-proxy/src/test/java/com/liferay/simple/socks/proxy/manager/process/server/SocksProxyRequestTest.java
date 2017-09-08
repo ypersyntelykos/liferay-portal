@@ -37,7 +37,7 @@ public class SocksProxyRequestTest {
 		CodeCoverageAssertor.INSTANCE;
 
 	@Test
-	public void testDomainNameATYPE() throws Exception {
+	public void testDomainNameATYPE() throws IOException {
 		InetAddress inetAddress = InetAddress.getByName("www.liferay.com");
 
 		int port = 8080;
@@ -54,7 +54,7 @@ public class SocksProxyRequestTest {
 	}
 
 	@Test
-	public void testSocksProxyRequest() throws Exception {
+	public void testSocksProxyRequest() throws IOException {
 		InetAddress inetAddress = InetAddress.getByName("www.liferay.com");
 
 		int port = 8080;
@@ -93,7 +93,7 @@ public class SocksProxyRequestTest {
 	}
 
 	@Test
-	public void testUnsupportedATYPE() throws Exception {
+	public void testUnsupportedATYPE() throws IOException {
 		InetAddress inetAddress = InetAddress.getByName("www.liferay.com");
 
 		int port = 8080;
