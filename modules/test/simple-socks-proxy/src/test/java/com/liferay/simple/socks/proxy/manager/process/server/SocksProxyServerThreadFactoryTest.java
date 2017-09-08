@@ -53,7 +53,7 @@ public class SocksProxyServerThreadFactoryTest {
 
 		Assert.assertEquals(prefix.concat("1"), thread.getName());
 
-		Thread thread2 = socksProxyServerThreadFactory.newThread(
+		thread = socksProxyServerThreadFactory.newThread(
 			new Runnable() {
 
 				@Override
@@ -62,7 +62,7 @@ public class SocksProxyServerThreadFactoryTest {
 
 			});
 
-		Assert.assertEquals(prefix.concat("2"), thread2.getName());
+		Assert.assertEquals(prefix.concat("2"), thread.getName());
 	}
 
 }
