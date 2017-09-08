@@ -31,37 +31,24 @@ public class SocksProxyServerThreadFactoryTest {
 		CodeCoverageAssertor.INSTANCE;
 
 	@Test
-	public void testSocksProxyServerThreadFactory()
-		throws IllegalAccessException, IllegalArgumentException {
+	public void testSocksProxyServerThreadFactory() {
+		String prefix = ReflectionTestUtil.getFieldValue(
+			SocksProxyServerThreadFactory.class, "_prefix");
 
 		SocksProxyServerThreadFactory socksProxyServerThreadFactory =
 			new SocksProxyServerThreadFactory();
 
-		Thread thread = socksProxyServerThreadFactory.newThread(
-			new Runnable() {
+		Runnable runnable = () -> {
+		};
 
-				@Override
-				public void run() {
-				}
-
-			});
+		Thread thread = socksProxyServerThreadFactory.newThread(runnable);
 
 		Assert.assertTrue(thread.isDaemon());
-
-		String prefix = ReflectionTestUtil.getFieldValue(
-			SocksProxyServerThreadFactory.class, "_prefix");
-
 		Assert.assertEquals(prefix.concat("1"), thread.getName());
 
-		thread = socksProxyServerThreadFactory.newThread(
-			new Runnable() {
+		thread = socksProxyServerThreadFactory.newThread(runnable);
 
-				@Override
-				public void run() {
-				}
-
-			});
-
+		Assert.assertTrue(thread.isDaemon());
 		Assert.assertEquals(prefix.concat("2"), thread.getName());
 	}
 
