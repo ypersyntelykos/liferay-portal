@@ -306,63 +306,57 @@ public class ToolsUtil {
 			break;
 		}
 
-		try (UnsyncBufferedReader unsyncBufferedReader =
-				new UnsyncBufferedReader(new UnsyncStringReader(imports))) {
+		for (String line : StringUtil.splitLines(imports)) {
+			int x = line.indexOf("import ");
 
-			String line = null;
-
-			while ((line = unsyncBufferedReader.readLine()) != null) {
-				int x = line.indexOf("import ");
-
-				if (x == -1) {
-					continue;
-				}
-
-				String importPackageAndClassName = line.substring(
-					x + 7, line.lastIndexOf(StringPool.SEMICOLON));
-
-				if (importPackageAndClassName.contains(StringPool.STAR)) {
-					continue;
-				}
-
-				String s = StringUtil.replace(
-					importPackageAndClassName, ".", "\\.");
-
-				Pattern pattern3 = Pattern.compile("\n(.*)(" + s + ")\\W");
-
-				outerLoop:
-				while (true) {
-					Matcher matcher3 = pattern3.matcher(content);
-
-					while (matcher3.find()) {
-						String lineStart = StringUtil.trimLeading(
-							matcher3.group(1));
-
-						if (lineStart.startsWith("import ") ||
-							lineStart.contains("//") ||
-							isInsideQuotes(content, matcher3.start(2))) {
-
-							continue;
-						}
-
-						String importClassName =
-							importPackageAndClassName.substring(
-								importPackageAndClassName.lastIndexOf(
-									StringPool.PERIOD) + 1);
-
-						content = StringUtil.replaceFirst(
-							content, importPackageAndClassName, importClassName,
-							matcher3.start());
-
-						continue outerLoop;
-					}
-
-					break;
-				}
+			if (x == -1) {
+				continue;
 			}
 
-			return content;
+			String importPackageAndClassName = line.substring(
+				x + 7, line.lastIndexOf(CharPool.SEMICOLON));
+
+			if (importPackageAndClassName.indexOf(CharPool.STAR) != -1) {
+				continue;
+			}
+
+			int index = content.indexOf(imports) + imports.length();
+
+			while (true) {
+				index = content.indexOf(importPackageAndClassName, index);
+
+				if (index == -1) {
+					break;
+				}
+
+				int lineStart = content.lastIndexOf(CharPool.NEW_LINE, index);
+
+				// TODO make this better
+
+				String tempString = content.substring(lineStart, index);
+
+				if (tempString.contains("//") ||
+						isInsideQuotes(content, index)) {
+
+					index += importPackageAndClassName.length();
+
+					continue;
+				}
+
+				String importClassName =
+					importPackageAndClassName.substring(
+						importPackageAndClassName.lastIndexOf(
+							CharPool.PERIOD) + 1);
+
+				content = content.substring(0, index) + importClassName +
+					content.substring(
+						index + importPackageAndClassName.length());
+
+				index += importClassName.length();
+			}
 		}
+
+		return content;
 	}
 
 	public static void writeFile(
