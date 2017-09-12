@@ -21,6 +21,7 @@ import com.liferay.portal.kernel.util.KMPSearch;
 import com.liferay.simple.socks.proxy.manager.process.util.Constants;
 import com.liferay.simple.socks.proxy.manager.process.util.SocksProxyUtil;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -49,32 +50,41 @@ public class SocksProxyConnection implements Runnable {
 
 	@Override
 	public void run() {
-		try (InputStream internalInputStream = _internalSocket.getInputStream();
+		try {
+			InputStream internalInputStream = _internalSocket.getInputStream();
 			OutputStream internalOutputStream =
 				_internalSocket.getOutputStream();
+
 			Socket externalSocket = _setUpExternalConnection(
 				internalInputStream, internalOutputStream);
-			InputStream externalInputStream = externalSocket.getInputStream();
-			OutputStream externalOutputStream =
-				externalSocket.getOutputStream()) {
 
-			Future<?> future = _executorService.submit(
-				new Runnable() {
+			try {
+				InputStream externalInputStream =
+					externalSocket.getInputStream();
+				OutputStream externalOutputStream =
+					externalSocket.getOutputStream();
 
-					@Override
-					public void run() {
-						_relayData(
-							internalInputStream, externalOutputStream,
-							externalSocket, Constants.DEFAULT_BUFFER_SIZE);
-					}
+				Future<?> future = _executorService.submit(
+					new Runnable() {
 
-				});
+						@Override
+						public void run() {
+							_relayData(
+								internalInputStream, externalOutputStream,
+								externalSocket, Constants.DEFAULT_BUFFER_SIZE);
+						}
 
-			_relayData(
-				externalInputStream, internalOutputStream, _internalSocket,
-				Constants.DEFAULT_BUFFER_SIZE);
+					});
 
-			future.get();
+				_relayData(
+					externalInputStream, internalOutputStream, _internalSocket,
+					Constants.DEFAULT_BUFFER_SIZE);
+
+				future.get();
+			}
+			finally {
+				externalSocket.close();
+			}
 		}
 		catch (Exception e) {
 			if (_log.isWarnEnabled()) {
@@ -82,17 +92,23 @@ public class SocksProxyConnection implements Runnable {
 			}
 		}
 		finally {
-			try {
-				_internalSocket.close();
-			}
-			catch (IOException ioe) {
-				if (_log.isWarnEnabled()) {
-					_log.warn(
-						"Failed to close socket between proxy and remote", ioe);
-				}
+			_closeWithLog(
+				_internalSocket,
+				"Failed to close socket between proxy and remote");
+		}
+	}
+
+	private void _closeWithLog(Closeable closeable, String message) {
+		try {
+			closeable.close();
+		}
+		catch (IOException ioe) {
+			if (_log.isWarnEnabled()) {
+				_log.warn(message, ioe);
 			}
 		}
 	}
+
 
 	private void _authenticate(
 			InputStream internalInputStream, OutputStream internalOutputStream)
@@ -281,14 +297,10 @@ public class SocksProxyConnection implements Runnable {
 			}
 		}
 		finally {
-			try {
-				socket.shutdownOutput();
-			}
-			catch (IOException ioe) {
-				if (_log.isWarnEnabled()) {
-					_log.warn("Error during socket.shutdownOutput", ioe);
-				}
-			}
+			_closeWithLog(
+				() -> {socket.shutdownOutput();},
+				"Error during socket.shutdownOutput");
+			
 		}
 	}
 

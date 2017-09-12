@@ -44,7 +44,7 @@ public class SocksProxyServerManagerTest {
 		CodeCoverageAssertor.INSTANCE;
 
 	@Test
-	public void testNormalStartStop() throws IOException {
+	public void testNormalStartStop() throws Exception {
 		int port = SocksProxyTestUtil.findOpenPort(8888);
 
 		SocksProxyServerManager socksProxyServerManager =
@@ -52,7 +52,6 @@ public class SocksProxyServerManagerTest {
 				new LocalProcessExecutor(), Collections.emptyList(), 10000,
 				port);
 
-		try {
 			socksProxyServerManager.start();
 
 			ProcessChannel<Serializable> processChannel =
@@ -78,12 +77,6 @@ public class SocksProxyServerManagerTest {
 
 			Assert.assertFalse(
 				stdOutString.contains(String.valueOf(processID)));
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-
-			Assert.fail();
-		}
 	}
 
 	private static class ReturnProcessIDCallable
