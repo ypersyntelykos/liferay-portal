@@ -12,20 +12,20 @@
  * details.
  */
 
-package com.liferay.portal.upgrade.v7_0_4;
+package com.liferay.portal.upgrade.v7_0_3;
 
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
-import com.liferay.portal.upgrade.v7_0_4.util.ContactTable;
+import com.liferay.portal.upgrade.v7_0_3.util.UserTable;
 
 /**
  * @author Ugurcan Cetin
  */
-public class UpgradeContact extends UpgradeProcess {
+public class UpgradeUser extends UpgradeProcess {
 
 	@Override
 	protected void doUpgrade() throws Exception {
 		alter(
-			ContactTable.class,
+			UserTable.class,
 			new AlterColumnType("emailAddress", "VARCHAR(254) null"));
 	}
 
