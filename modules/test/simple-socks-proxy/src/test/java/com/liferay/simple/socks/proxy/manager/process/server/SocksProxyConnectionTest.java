@@ -493,6 +493,45 @@ public class SocksProxyConnectionTest {
 	}
 
 	@Test
+	public void testRelayDataWithBadOutputStream2() throws IOException {
+		Socket socket = SocksProxyTestUtil.createTestSocket(
+			SocksProxyTestUtil.content.getBytes(), new IOException(), null);
+
+		OutputStream outputStream = new OutputStream() {
+
+			@Override
+			public void write(byte[] b, int off, int len) throws IOException {
+				throw new RuntimeException("Error in OutputStream");
+			}
+
+			@Override
+			public void write(int b) throws IOException {
+				throw new RuntimeException("Error in OutputStream");
+			}
+
+		};
+
+		SocksProxyConnection socksProxyConnection = new SocksProxyConnection(
+			Collections.singletonList(_inetAddress.getHostAddress()), socket,
+			Executors.newCachedThreadPool(new SocksProxyServerThreadFactory()));
+
+		try {
+			ReflectionTestUtil.invoke(
+				socksProxyConnection, "_relayData",
+				new Class<?>[] {
+					InputStream.class, OutputStream.class, Socket.class,
+					int.class
+				},
+				socket.getInputStream(), outputStream, socket, 4096);
+
+			Assert.fail();
+		}
+		catch (RuntimeException re) {
+			Assert.assertEquals("Error in OutputStream", re.getMessage());
+		}
+	}
+
+	@Test
 	public void testRelayDataWithBadOutputStreamWithoutLogging()
 		throws IOException {
 

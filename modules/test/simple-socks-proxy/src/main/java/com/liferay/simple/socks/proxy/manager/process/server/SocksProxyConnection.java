@@ -297,10 +297,14 @@ public class SocksProxyConnection implements Runnable {
 			}
 		}
 		finally {
-			_closeWithLog(
-				() -> {socket.shutdownOutput();},
-				"Error during socket.shutdownOutput");
-			
+			try {
+				socket.shutdownOutput();
+			}
+			catch (IOException ioe) {
+				if (_log.isWarnEnabled()) {
+					_log.warn("Error during socket.shutdownOutput", ioe);
+				}
+			}
 		}
 	}
 
